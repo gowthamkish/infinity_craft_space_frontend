@@ -1,9 +1,22 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
-import { useNavigate } from "react-router-dom";
-import { fetchProducts } from "../../features/productsSlice";
-import { useParams } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { Form, Button, Container, Row, Col, Card } from "react-bootstrap";
+
+const CATEGORY_OPTIONS = [
+  "Embroidery hoop",
+  "Emboidery with hoop",
+  "Bangles",
+  "Necklace",
+];
+
+// Map category to subcategories
+const SUBCATEGORY_MAP = {
+  "Embroidery hoop": ["Round", "Square", "Oval", "Custom"],
+  "Emboidery with hoop": ["Round", "Square"],
+  "Bangles": ["Gold", "Silver", "Custom"],
+  "Necklace": ["Choker", "Pendant", "Custom"],
+};
 
 const AddProduct = () => {
   const params = useParams();
@@ -18,24 +31,22 @@ const AddProduct = () => {
     subCategory: "",
   });
 
-  console.log(params);
+  const [editingId, setEditingId] = useState(params?.id ?? null);
 
-  const [editingId, setEditingId] = useState(params?.id ?? null); // for tracking update mode
+  // Get subcategories for selected category
+  const subCategoryOptions = form.category ? SUBCATEGORY_MAP[form.category] || [] : [];
 
   const handleSubmit = async (e) => {
     const token = localStorage.getItem("token");
 
     e.preventDefault();
-    debugger;
     try {
       if (editingId) {
-        // Update product
         await api.put(`/api/products/${editingId}`, form, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setEditingId(null); // Exit edit mode
+        setEditingId(null);
       } else {
-        // Add new product
         await api.post("/api/products", form, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -57,8 +68,7 @@ const AddProduct = () => {
 
   useEffect(() => {
     const product = location.state?.product;
-    console.log(product)
-    if (editingId) {
+    if (editingId && product) {
       setForm({
         name: product.name,
         price: product.price,
@@ -67,44 +77,95 @@ const AddProduct = () => {
         subCategory: product.subCategory,
       });
     }
-  }, [editingId]);
+  }, [editingId, location.state]);
+
+  // Reset subCategory if category changes
+  const handleCategoryChange = (e) => {
+    setForm({
+      ...form,
+      category: e.target.value,
+      subCategory: "", // reset subCategory when category changes
+    });
+  };
 
   return (
-    <div>
-      <h1>{editingId ? "Update" : "Add"} Product</h1>
-
-      <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
-        <input
-          placeholder="Name"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          required
-        />
-        <input
-          placeholder="Price"
-          type="number"
-          value={form.price}
-          onChange={(e) => setForm({ ...form, price: e.target.value })}
-          required
-        />
-        <input
-          placeholder="Description"
-          value={form.description}
-          onChange={(e) => setForm({ ...form, description: e.target.value })}
-        />
-        <input
-          placeholder="Category"
-          value={form.category}
-          onChange={(e) => setForm({ ...form, category: e.target.value })}
-        />
-        <input
-          placeholder="Subcategory"
-          value={form.subCategory}
-          onChange={(e) => setForm({ ...form, subCategory: e.target.value })}
-        />
-        <button type="submit">{editingId ? "Update" : "Add"} Product</button>
-      </form>
-    </div>
+    <Container className="mt-4">
+      <Row className="justify-content-center">
+        <Col xs={12} md={8} lg={6}>
+          <Card>
+            <Card.Body>
+              <Card.Title className="mb-4">
+                {editingId ? "Update" : "Add"} Product
+              </Card.Title>
+              <Form onSubmit={handleSubmit}>
+                <Form.Group className="mb-3" controlId="formName">
+                  <Form.Label style={{ textAlign: "left", display: "block" }}>Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Name"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="formPrice">
+                  <Form.Label style={{ textAlign: "left", display: "block" }}>Price</Form.Label>
+                  <Form.Control
+                    type="number"
+                    placeholder="Price"
+                    value={form.price}
+                    onChange={(e) =>
+                      setForm({ ...form, price: e.target.value })
+                    }
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="formDescription">
+                  <Form.Label style={{ textAlign: "left", display: "block" }}>Description</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Description"
+                    value={form.description}
+                    onChange={(e) =>
+                      setForm({ ...form, description: e.target.value })
+                    }
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="formCategory">
+                  <Form.Label style={{ textAlign: "left", display: "block" }}>Category</Form.Label>
+                  <Form.Select
+                    value={form.category}
+                    onChange={handleCategoryChange}
+                    required
+                  >
+                    <option value="">Select Category</option>
+                    {CATEGORY_OPTIONS.map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="formSubCategory">
+                  <Form.Label style={{ textAlign: "left", display: "block" }}>Subcategory</Form.Label>
+                  <Form.Select
+                    value={form.subCategory}
+                    onChange={(e) => setForm({ ...form, subCategory: e.target.value })}
+                    disabled={!form.category}
+                  >
+                    <option value="">Select Subcategory</option>
+                    {subCategoryOptions.map((sub) => (
+                      <option key={sub} value={sub}>{sub}</option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+                <Button variant="primary" type="submit" className="w-100">
+                  {editingId ? "Update" : "Add"} Product
+                </Button>
+              </Form>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 

@@ -20,7 +20,7 @@ function Header() {
   return (
     <Navbar bg="dark" variant="dark" expand="lg">
       <Container>
-        <Navbar.Brand style={{ cursor: "pointer" }} onClick={() => navigate("/home")}>
+        <Navbar.Brand style={{ cursor: "pointer" }} onClick={() => navigate(user?.isAdmin ? "/admin/dashboard" : "/home")}>
           Infinity Craft Space
         </Navbar.Brand>
         <Nav className="ms-auto">

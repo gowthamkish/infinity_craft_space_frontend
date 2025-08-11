@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { addToCart, removeFromCart } from "../features/cartSlice";
 import Header from "../components/header";
 import api from "../api/axios";
@@ -14,7 +14,6 @@ export default function Home() {
   const dispatch = useDispatch();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const cart = useSelector((state) => state.cart.items);
 
   useEffect(() => {
     const fetchProducts = async () => {

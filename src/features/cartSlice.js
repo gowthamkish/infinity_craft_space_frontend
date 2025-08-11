@@ -20,7 +20,6 @@ const cartSlice = createSlice({
     },
 
     removeFromCart: (state, action) => {
-      debugger;
       console.log("Removing from cart:", action.payload, state);
       const productId = action.payload.product._id;
       const existing = state.items.find(
