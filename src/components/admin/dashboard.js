@@ -320,9 +320,9 @@ export default function Dashboard() {
         </Container>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .hover-card:hover {
-          transform: translateY(-4px);
+          transform: translateY(-4px) !important;
           box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04) !important;
         }
       `}</style>

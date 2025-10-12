@@ -11,7 +11,7 @@ import { deleteProduct } from "../../features/productsSlice";
 const ProductList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { data: products, loading, error } = useProducts();
+  const { data: products = [], loading = false, error = null } = useProducts() || {};
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -43,14 +43,14 @@ const ProductList = () => {
     }
   };
 
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
+  const filteredProducts = (products && Array.isArray(products)) ? products.filter(product => {
+    const matchesSearch = product?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         product?.category?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === "all" || product?.category === selectedCategory;
     return matchesSearch && matchesCategory;
-  });
+  }) : [];
 
-  const categories = [...new Set(products.map(p => p.category))];
+  const categories = (products && Array.isArray(products)) ? [...new Set(products.map(p => p?.category).filter(Boolean))] : [];
 
   const getStatusBadge = (product) => {
     // You can customize this based on your product status logic

@@ -36,7 +36,7 @@ export const fetchDashboardCounts = createAsyncThunk(
         const orderRes = await api.get("/api/orders", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        orderCount = orderRes.data.length;
+        orderCount = orderRes.data.count;
       } catch (error) {
         console.log("Orders API not available:", error.message);
       }
@@ -68,6 +68,38 @@ export const fetchUsers = createAsyncThunk(
   }
 );
 
+// Fetch orders list
+export const fetchOrders = createAsyncThunk(
+  'admin/fetchOrders',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.get("/api/orders", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch orders');
+    }
+  }
+);
+
+// Update order status
+export const updateOrderStatus = createAsyncThunk(
+  'admin/updateOrderStatus',
+  async ({ orderId, status }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.put(`/api/orders/${orderId}/status`, { status }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to update order status');
+    }
+  }
+);
+
 const adminSlice = createSlice({
   name: 'admin',
   initialState: {
@@ -87,7 +119,14 @@ const adminSlice = createSlice({
     usersLoading: false,
     usersError: null,
     usersLastFetched: null,
-    usersIsStale: true
+    usersIsStale: true,
+    
+    // Orders data
+    orders: { orders: [] },
+    ordersLoading: false,
+    ordersError: null,
+    ordersLastFetched: null,
+    ordersIsStale: true
   },
   reducers: {
     clearDashboardError: (state) => {
@@ -96,19 +135,28 @@ const adminSlice = createSlice({
     clearUsersError: (state) => {
       state.usersError = null;
     },
+    clearOrdersError: (state) => {
+      state.ordersError = null;
+    },
     markDashboardAsStale: (state) => {
       state.dashboardIsStale = true;
     },
     markUsersAsStale: (state) => {
       state.usersIsStale = true;
     },
+    markOrdersAsStale: (state) => {
+      state.ordersIsStale = true;
+    },
     clearAdminData: (state) => {
       state.dashboardCounts = { userCount: 0, productCount: 0, orderCount: 0 };
       state.users = [];
+      state.orders = { orders: [] };
       state.dashboardLastFetched = null;
       state.usersLastFetched = null;
+      state.ordersLastFetched = null;
       state.dashboardIsStale = true;
       state.usersIsStale = true;
+      state.ordersIsStale = true;
     }
   },
   extraReducers: (builder) => {
@@ -146,6 +194,51 @@ const adminSlice = createSlice({
       .addCase(fetchUsers.rejected, (state, action) => {
         state.usersLoading = false;
         state.usersError = action.payload;
+      })
+      // Orders
+      .addCase(fetchOrders.pending, (state) => {
+        state.ordersLoading = true;
+        state.ordersError = null;
+      })
+      .addCase(fetchOrders.fulfilled, (state, action) => {
+        // Handle both array and object responses
+        const ordersData = Array.isArray(action.payload) ? action.payload : action.payload.orders || [];
+        state.orders = { orders: ordersData };
+        state.ordersLoading = false;
+        state.ordersError = null;
+        state.ordersLastFetched = Date.now();
+        state.ordersIsStale = false;
+        // Update order count in dashboard
+        state.dashboardCounts.orderCount = ordersData.length;
+      })
+      .addCase(fetchOrders.rejected, (state, action) => {
+        state.ordersLoading = false;
+        state.ordersError = action.payload;
+      })
+      // Update order status
+      .addCase(updateOrderStatus.pending, (state) => {
+        state.ordersLoading = true;
+        state.ordersError = null;
+      })
+      .addCase(updateOrderStatus.fulfilled, (state, action) => {
+        const updatedOrder = action.payload;
+        // Ensure orders is properly structured
+        if (!state.orders.orders) {
+          state.orders = { orders: [] };
+        }
+        
+        // Find and update the order
+        const orderToUpdate = updatedOrder.order || updatedOrder;
+        const index = state.orders.orders.findIndex(order => order._id === orderToUpdate._id);
+        if (index !== -1) {
+          state.orders.orders[index] = orderToUpdate;
+        }
+        state.ordersLoading = false;
+        state.ordersError = null;
+      })
+      .addCase(updateOrderStatus.rejected, (state, action) => {
+        state.ordersLoading = false;
+        state.ordersError = action.payload;
       });
   },
 });
@@ -153,8 +246,10 @@ const adminSlice = createSlice({
 export const { 
   clearDashboardError, 
   clearUsersError, 
+  clearOrdersError,
   markDashboardAsStale, 
   markUsersAsStale, 
+  markOrdersAsStale,
   clearAdminData 
 } = adminSlice.actions;
 

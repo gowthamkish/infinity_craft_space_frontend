@@ -15,6 +15,7 @@ import AdminDashboard from "./components/admin/dashboard";
 import UsersList from "./components/users/users";
 import ProductList from "./components/products/products";
 import AddProduct from "./components/products/addProduct";
+import AdminOrders from "./components/orders/Orders";
 
 function App() {
   const dispatch = useDispatch();
@@ -86,6 +87,11 @@ function App() {
           <Route path="/admin/addProduct/:id" element={
             <AdminRoute>
               <AddProduct />
+            </AdminRoute>
+          } />
+          <Route path="/admin/orders" element={
+            <AdminRoute>
+              <AdminOrders />
             </AdminRoute>
           } />
         </Routes>

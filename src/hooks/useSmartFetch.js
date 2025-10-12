@@ -1,5 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { createSelector } from '@reduxjs/toolkit';
+import { fetchProducts } from '../features/productsSlice';
+import { fetchDashboardCounts, fetchUsers, fetchOrders } from '../features/adminSlice';
 
 // Custom hook for smart data fetching with caching
 export const useSmartFetch = (
@@ -27,50 +30,89 @@ export const useSmartFetch = (
 };
 
 // Hook specifically for products
-export const useProducts = (forceRefresh = false) => {
-  const { fetchProducts } = require('../features/productsSlice');
+// Memoized selector for products
+const selectProductsData = createSelector(
+  [(state) => state.products],
+  (products) => ({
+    data: products.items || [],
+    loading: products.loading,
+    error: products.error,
+    lastFetched: products.lastFetched,
+    isStale: products.isStale
+  })
+);
+
+// Hook for products data
+export const useProducts = (dependencies = []) => {
   return useSmartFetch(
     fetchProducts,
-    (state) => ({
-      data: state.products.items,
-      loading: state.products.loading,
-      error: state.products.error,
-      lastFetched: state.products.lastFetched,
-      isStale: state.products.isStale
-    }),
-    [forceRefresh]
+    selectProductsData,
+    dependencies
   );
 };
 
 // Hook specifically for dashboard counts
-export const useDashboardCounts = (forceRefresh = false) => {
-  const { fetchDashboardCounts } = require('../features/adminSlice');
+// Memoized selector for dashboard counts
+const selectDashboardCounts = createSelector(
+  [(state) => state.admin],
+  (admin) => ({
+    data: admin.dashboardCounts,
+    loading: admin.dashboardCountsLoading,
+    error: admin.error,
+    lastFetched: admin.dashboardCountsLastFetched,
+    isStale: admin.dashboardCountsIsStale
+  })
+);
+
+// Hook for dashboard counts
+export const useDashboardCounts = (dependencies = []) => {
   return useSmartFetch(
     fetchDashboardCounts,
-    (state) => ({
-      data: state.admin.dashboardCounts,
-      loading: state.admin.dashboardLoading,
-      error: state.admin.dashboardError,
-      lastFetched: state.admin.dashboardLastFetched,
-      isStale: state.admin.dashboardIsStale
-    }),
-    [forceRefresh],
-    2 * 60 * 1000 // 2 minutes cache for dashboard
+    selectDashboardCounts,
+    dependencies
   );
 };
 
 // Hook specifically for users
-export const useUsers = (forceRefresh = false) => {
-  const { fetchUsers } = require('../features/adminSlice');
+// Memoized selector for users
+const selectUsersData = createSelector(
+  [(state) => state.admin],
+  (admin) => ({
+    data: admin.users,
+    loading: admin.usersLoading,
+    error: admin.error,
+    lastFetched: admin.usersLastFetched,
+    isStale: admin.usersIsStale
+  })
+);
+
+// Hook for users data
+export const useUsers = (dependencies = []) => {
   return useSmartFetch(
     fetchUsers,
-    (state) => ({
-      data: state.admin.users,
-      loading: state.admin.usersLoading,
-      error: state.admin.usersError,
-      lastFetched: state.admin.usersLastFetched,
-      isStale: state.admin.usersIsStale
-    }),
-    [forceRefresh]
+    selectUsersData,
+    dependencies
+  );
+};
+
+// Hook specifically for orders
+// Memoized selector for orders
+const selectOrdersData = createSelector(
+  [(state) => state.admin],
+  (admin) => ({
+    data: admin.orders,
+    loading: admin.ordersLoading,
+    error: admin.error,
+    lastFetched: admin.ordersLastFetched,
+    isStale: admin.ordersIsStale
+  })
+);
+
+// Hook for orders data
+export const useOrders = (dependencies = []) => {
+  return useSmartFetch(
+    fetchOrders,
+    selectOrdersData,
+    dependencies
   );
 };
