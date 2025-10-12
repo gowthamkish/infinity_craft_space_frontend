@@ -1,10 +1,10 @@
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { addToCart, removeFromCart } from "../features/cartSlice";
 import Header from "../components/header";
 import ProductFilters from "../components/ProductFilters";
-import api from "../api/axios";
+import { useProducts } from "../hooks/useSmartFetch";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
@@ -67,9 +67,7 @@ if (typeof document !== 'undefined') {
 export default function ProductListing() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { data: products, loading, error } = useProducts();
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [filters, setFilters] = useState({
     categories: [],
@@ -83,38 +81,6 @@ export default function ProductListing() {
 
   // Calculate total items in cart
   const totalCartItems = cartItems.reduce((total, item) => total + item.quantity, 0);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        // Fetch products without authentication for public access
-        const res = await api.get("/api/products");
-        setProducts(res.data);
-      } catch (err) {
-        // Fallback: try with authentication if public endpoint doesn't exist
-        try {
-          const token = localStorage.getItem("token");
-          if (token) {
-            const res = await api.get("/api/products", {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            setProducts(res.data);
-          } else {
-            // If no token, try without authorization
-            const res = await api.get("/api/products");
-            setProducts(res.data);
-          }
-        } catch (fallbackErr) {
-          console.error("Error fetching products:", fallbackErr);
-          setError("Failed to load products. Please try again later.");
-        }
-      }
-      setLoading(false);
-    };
-    fetchProducts();
-  }, []);
 
   // Filter and sort products based on active filters
   const filteredAndSortedProducts = useMemo(() => {
@@ -407,7 +373,7 @@ export default function ProductListing() {
               )}
 
               {error && (
-                <Alert variant="danger" dismissible onClose={() => setError(null)}>
+                <Alert variant="danger" dismissible>
                   {error}
                 </Alert>
               )}

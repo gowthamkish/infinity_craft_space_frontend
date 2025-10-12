@@ -1,6 +1,8 @@
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../features/authSlice";
 import { clearCart } from "../features/cartSlice";
+import { clearProducts } from "../features/productsSlice";
+import { clearAdminData } from "../features/adminSlice";
 import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
@@ -26,6 +28,8 @@ function Header() {
   const handleLogout = () => {
     dispatch(logout());
     dispatch(clearCart()); // Clear cart items on logout
+    dispatch(clearProducts()); // Clear cached products
+    dispatch(clearAdminData()); // Clear cached admin data
     localStorage.removeItem("token");
     localStorage.removeItem("redirectAfterLogin");
     navigate("/");

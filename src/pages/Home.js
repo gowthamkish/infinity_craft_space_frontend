@@ -1,32 +1,17 @@
-import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { addToCart, removeFromCart } from "../features/cartSlice";
 import Header from "../components/header";
-import api from "../api/axios";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Spinner from "react-bootstrap/Spinner";
+import { useProducts } from "../hooks/useSmartFetch";
 
 export default function Home() {
   const dispatch = useDispatch();
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      const token = localStorage.getItem("token");
-      const res = await api.get("/api/products", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setProducts(res.data);
-      setLoading(false);
-    };
-    fetchProducts();
-  }, []);
+  const { data: products, loading, error } = useProducts();
 
   return (
     <div>
