@@ -217,21 +217,22 @@ export default function Checkout() {
         setLoading(false);
         return;
       }
-
       // Create order on backend
       const token = localStorage.getItem("token");
-      const orderResponse = await api.post("/api/orders/create-razorpay-order", {
+      const orderResponse = await api.post("/api/payment", {
         amount: Math.round(total * 100), // Razorpay expects amount in paise
-        currency: "INR"
+        currency: "INR",
+        shippingAddress: shippingAddress,
+        items: cartItems
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      const { razorpayOrderId, amount, currency } = orderResponse.data;
+      const { razorpayOrderId, amount, currency } = orderResponse.data.order;
 
       // Razorpay options
       const options = {
-        key: process.env.REACT_APP_RAZORPAY_KEY_ID || "rzp_test_9S6p2krWFRzZ1T", // Replace with your Razorpay key
+        key: orderResponse.razorpayKeyId, // Replace with your Razorpay key
         amount: amount,
         currency: currency,
         name: "Infinity Craft Space",
@@ -240,7 +241,7 @@ export default function Checkout() {
         handler: async function (response) {
           try {
             // Verify payment on backend
-            const verifyResponse = await api.post("/api/orders/verify-payment", {
+            const verifyResponse = await api.post("/api/payment/verify-payment", {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
