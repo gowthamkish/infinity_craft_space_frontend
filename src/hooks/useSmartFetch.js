@@ -57,10 +57,10 @@ const selectDashboardCounts = createSelector(
   [(state) => state.admin],
   (admin) => ({
     data: admin.dashboardCounts,
-    loading: admin.dashboardCountsLoading,
-    error: admin.error,
-    lastFetched: admin.dashboardCountsLastFetched,
-    isStale: admin.dashboardCountsIsStale
+    loading: admin.dashboardLoading,
+    error: admin.dashboardError,
+    lastFetched: admin.dashboardLastFetched,
+    isStale: admin.dashboardIsStale
   })
 );
 

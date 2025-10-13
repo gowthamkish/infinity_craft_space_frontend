@@ -3,7 +3,6 @@ import api from "../api/axios";
 
 export const loginUser = createAsyncThunk("auth/login", async (creds) => {
   const res = await api.post("/api/auth/login", creds);
-  console.log(res.data);
   return res.data;
 });
 

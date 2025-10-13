@@ -187,6 +187,7 @@ const ProductList = () => {
                     <Table responsive className="mb-0">
                       <thead style={{ background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)' }}>
                         <tr>
+                          <th style={{ border: 'none', padding: '1rem', fontWeight: '600', color: '#495057' }}>Image</th>
                           <th style={{ border: 'none', padding: '1rem', fontWeight: '600', color: '#495057' }}>Product</th>
                           <th style={{ border: 'none', padding: '1rem', fontWeight: '600', color: '#495057' }}>Price</th>
                           <th style={{ border: 'none', padding: '1rem', fontWeight: '600', color: '#495057' }}>Category</th>
@@ -197,6 +198,39 @@ const ProductList = () => {
                       <tbody>
                         {filteredProducts.map((product, index) => (
                           <tr key={product._id || product.id} style={{ borderBottom: '1px solid #f1f3f4' }}>
+                            <td style={{ border: 'none', padding: '1rem' }}>
+                              {product?.image?.url ? (
+                                <img 
+                                  src={product.image.url} 
+                                  alt={product.name}
+                                  style={{
+                                    width: '60px',
+                                    height: '60px',
+                                    objectFit: 'cover',
+                                    borderRadius: '8px',
+                                    border: '2px solid #e9ecef'
+                                  }}
+                                  onError={(e) => {
+                                    e.target.style.display = 'none';
+                                  }}
+                                />
+                              ) : (
+                                <div 
+                                  style={{
+                                    width: '60px',
+                                    height: '60px',
+                                    backgroundColor: '#f8f9fa',
+                                    borderRadius: '8px',
+                                    border: '2px solid #e9ecef',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                  }}
+                                >
+                                  <FiPackage size={24} color="#6c757d" />
+                                </div>
+                              )}
+                            </td>
                             <td style={{ border: 'none', padding: '1rem' }}>
                               <div>
                                 <h6 className="mb-1" style={{ fontWeight: '600', color: '#212529' }}>{product?.name}</h6>
@@ -261,9 +295,49 @@ const ProductList = () => {
                       {filteredProducts.map((product, index) => (
                         <Card key={product._id || product.id} className="mb-3 border-0 shadow-sm" style={{ borderRadius: '12px' }}>
                           <Card.Body>
-                            <div className="d-flex justify-content-between align-items-start mb-2">
-                              <h6 className="mb-0" style={{ fontWeight: '600', color: '#212529' }}>{product?.name}</h6>
-                              {getStatusBadge(product)}
+                            <div className="d-flex align-items-start mb-3">
+                              {/* Product Image */}
+                              <div className="me-3">
+                                {product?.image?.url ? (
+                                  <img 
+                                    src={product.image.url} 
+                                    alt={product.name}
+                                    style={{
+                                      width: '80px',
+                                      height: '80px',
+                                      objectFit: 'cover',
+                                      borderRadius: '12px',
+                                      border: '2px solid #e9ecef'
+                                    }}
+                                    onError={(e) => {
+                                      e.target.style.display = 'none';
+                                    }}
+                                  />
+                                ) : (
+                                  <div 
+                                    style={{
+                                      width: '80px',
+                                      height: '80px',
+                                      backgroundColor: '#f8f9fa',
+                                      borderRadius: '12px',
+                                      border: '2px solid #e9ecef',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center'
+                                    }}
+                                  >
+                                    <FiPackage size={32} color="#6c757d" />
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {/* Product Info */}
+                              <div className="flex-grow-1">
+                                <div className="d-flex justify-content-between align-items-start mb-2">
+                                  <h6 className="mb-0" style={{ fontWeight: '600', color: '#212529' }}>{product?.name}</h6>
+                                  {getStatusBadge(product)}
+                                </div>
+                              </div>
                             </div>
                             
                             <p className="text-muted small mb-2" style={{ 

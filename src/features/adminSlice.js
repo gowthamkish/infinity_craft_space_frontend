@@ -8,45 +8,17 @@ export const fetchDashboardCounts = createAsyncThunk(
     try {
       const token = localStorage.getItem("token");
       
-      // Fetch users count
-      let userCount = 0;
-      try {
-        const userRes = await api.get("/api/admin/users", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        userCount = userRes.data.length;
-      } catch (error) {
-        console.log("Users API not available:", error.message);
-      }
-
-      // Fetch products count
-      let productCount = 0;
-      try {
-        const productRes = await api.get("/api/products", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        productCount = productRes.data.length;
-      } catch (error) {
-        console.log("Products API error:", error.message);
-      }
-
-      // Fetch orders count (with fallback)
-      let orderCount = 0;
-      try {
-        const orderRes = await api.get("/api/orders", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        orderCount = orderRes.data.count;
-      } catch (error) {
-        console.log("Orders API not available:", error.message);
-      }
-
+      // Use the dedicated dashboard endpoint
+      const res = await api.get("/api/admin/dashboard", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       return {
-        userCount,
-        productCount,
-        orderCount
+        userCount: res.data.userCount || 0,
+        productCount: res.data.productCount || 0,
+        orderCount: res.data.orderCount || 0
       };
     } catch (error) {
+      console.error("Dashboard counts error:", error);
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch dashboard data');
     }
   }

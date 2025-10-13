@@ -417,7 +417,7 @@ export default function ProductListing() {
                                 <Card.Img
                                   variant="top"
                                   src={
-                                    product.image ||
+                                    product?.image?.url ||
                                     "https://via.placeholder.com/200x200?text=No+Image"
                                   }
                                   style={{

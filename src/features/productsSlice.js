@@ -10,7 +10,8 @@ export const fetchProducts = createAsyncThunk(
       const res = await api.get('/api/products', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return res.data;
+      // Handle both old format (array) and new format (object with products array)
+      return res.data.products || res.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch products');
     }
@@ -24,11 +25,14 @@ export const addProduct = createAsyncThunk(
     try {
       const token = localStorage.getItem("token");
       const res = await api.post('/api/products', productData, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
       });
-      return res.data;
+      return res.data.product || res.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to add product');
+      return rejectWithValue(error.response?.data?.error || error.response?.data?.message || 'Failed to add product');
     }
   }
 );
@@ -40,11 +44,14 @@ export const updateProduct = createAsyncThunk(
     try {
       const token = localStorage.getItem("token");
       const res = await api.put(`/api/products/${id}`, productData, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
       });
-      return res.data;
+      return res.data.product || res.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to update product');
+      return rejectWithValue(error.response?.data?.error || error.response?.data?.message || 'Failed to update product');
     }
   }
 );

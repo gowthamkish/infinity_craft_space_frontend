@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { Form, Button, Container, Row, Col, Card, Breadcrumb, Alert, Spinner } from "react-bootstrap";
-import { FiArrowLeft, FiPackage, FiSave, FiDollarSign, FiFileText, FiTag, FiLayers } from "react-icons/fi";
+import { Form, Button, Container, Row, Col, Card, Breadcrumb, Alert, Spinner, Image } from "react-bootstrap";
+import { FiArrowLeft, FiPackage, FiSave, FiDollarSign, FiFileText, FiTag, FiLayers, FiCamera, FiX } from "react-icons/fi";
 import Header from "../header";
 import { addProduct, updateProduct } from "../../features/productsSlice";
 
@@ -26,6 +26,7 @@ const AddProduct = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  const fileInputRef = useRef(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -39,9 +40,70 @@ const AddProduct = () => {
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ show: false, message: "", variant: "" });
   const [validated, setValidated] = useState(false);
+  
+  // Image upload states
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [existingImageUrl, setExistingImageUrl] = useState(null);
 
   // Get subcategories for selected category
   const subCategoryOptions = form.category ? SUBCATEGORY_MAP[form.category] || [] : [];
+
+  // Handle image file selection
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setAlert({ 
+          show: true, 
+          message: "Please select a valid image file", 
+          variant: "danger" 
+        });
+        return;
+      }
+      
+      // Validate file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        setAlert({ 
+          show: true, 
+          message: "Image size should be less than 5MB", 
+          variant: "danger" 
+        });
+        return;
+      }
+
+      setImageFile(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Remove selected image
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    // Clear the file input using ref
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // Convert file to base64
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,15 +119,31 @@ const AddProduct = () => {
     setAlert({ show: false, message: "", variant: "" });
 
     try {
+      let productData = { ...form };
+
+      // Handle image upload if file is selected
+      if (imageFile) {
+        setImageUploading(true);
+        const base64Image = await fileToBase64(imageFile);
+        
+        productData.image = {
+          base64: base64Image,
+          filename: imageFile.name,
+          mimetype: imageFile.type,
+          size: imageFile.size,
+          originalName: imageFile.name
+        };
+      }
+
       if (editingId) {
-        await dispatch(updateProduct({ id: editingId, productData: form })).unwrap();
+        await dispatch(updateProduct({ id: editingId, productData })).unwrap();
         setAlert({ 
           show: true, 
           message: "Product updated successfully!", 
           variant: "success" 
         });
       } else {
-        await dispatch(addProduct(form)).unwrap();
+        await dispatch(addProduct(productData)).unwrap();
         setAlert({ 
           show: true, 
           message: "Product added successfully!", 
@@ -82,6 +160,7 @@ const AddProduct = () => {
           category: "",
           subCategory: "",
         });
+        handleRemoveImage();
         setValidated(false);
       }
 
@@ -99,6 +178,7 @@ const AddProduct = () => {
       });
     } finally {
       setLoading(false);
+      setImageUploading(false);
     }
   };
 
@@ -112,6 +192,11 @@ const AddProduct = () => {
         category: product.category,
         subCategory: product.subCategory,
       });
+      
+      // Set existing image if available
+      if (product.image && product.image.url) {
+        setExistingImageUrl(product.image.url);
+      }
     }
   }, [editingId, location.state]);
 
@@ -330,11 +415,81 @@ const AddProduct = () => {
                     </Col>
                   </Row>
 
+                  {/* Image Upload Section */}
+                  <Row>
+                    <Col md={12}>
+                      <Form.Group className="mb-4" controlId="formImage">
+                        <Form.Label className="fw-semibold text-dark mb-2" style={{ fontSize: '1rem' }}>
+                          <FiCamera className="me-2" />
+                          Product Image
+                        </Form.Label>
+                        
+                        {/* File Input */}
+                        <Form.Control
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          style={{ 
+                            borderRadius: '12px', 
+                            border: '2px solid #e9ecef',
+                            fontSize: '1rem',
+                            padding: '12px 16px',
+                            transition: 'all 0.3s ease'
+                          }}
+                          className="form-control-lg mb-3"
+                        />
+                        
+                        {/* Image Preview */}
+                        {(imagePreview || existingImageUrl) && (
+                          <div className="position-relative d-inline-block">
+                            <Image
+                              src={imagePreview || existingImageUrl}
+                              alt="Product preview"
+                              thumbnail
+                              style={{
+                                width: '200px',
+                                height: '200px',
+                                objectFit: 'cover',
+                                borderRadius: '12px'
+                              }}
+                            />
+                            {imagePreview && (
+                              <Button
+                                variant="danger"
+                                size="sm"
+                                className="position-absolute"
+                                style={{
+                                  top: '10px',
+                                  right: '10px',
+                                  borderRadius: '50%',
+                                  width: '30px',
+                                  height: '30px',
+                                  padding: '0',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center'
+                                }}
+                                onClick={handleRemoveImage}
+                              >
+                                <FiX size={14} />
+                              </Button>
+                            )}
+                          </div>
+                        )}
+                        
+                        <Form.Text className="text-muted">
+                          Upload a product image (JPEG, PNG, GIF, WebP). Max size: 5MB
+                        </Form.Text>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
                   <div className="d-grid gap-2 mt-4">
                     <Button 
                       variant="primary" 
                       type="submit" 
-                      disabled={loading}
+                      disabled={loading || imageUploading}
                       size="lg"
                       style={{
                         borderRadius: '12px',
@@ -346,7 +501,7 @@ const AddProduct = () => {
                         transition: 'all 0.3s ease'
                       }}
                     >
-                      {loading ? (
+                      {loading || imageUploading ? (
                         <>
                           <Spinner
                             as="span"
@@ -356,7 +511,8 @@ const AddProduct = () => {
                             aria-hidden="true"
                             className="me-2"
                           />
-                          {editingId ? "Updating..." : "Adding..."}
+                          {imageUploading ? "Uploading image..." : 
+                           loading ? (editingId ? "Updating..." : "Adding...") : ""}
                         </>
                       ) : (
                         <>
@@ -369,7 +525,7 @@ const AddProduct = () => {
                     <Button
                       variant="outline-secondary"
                       onClick={() => navigate("/admin/products")}
-                      disabled={loading}
+                      disabled={loading || imageUploading}
                       size="lg"
                       style={{
                         borderRadius: '12px',

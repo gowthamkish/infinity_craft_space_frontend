@@ -131,7 +131,7 @@ export default function Dashboard() {
                           lineHeight: "1"
                         }}
                       >
-                        {dashboardCounts.userCount}
+                        {dashboardCounts?.userCount || 0}
                       </h3>
                       <p className="mb-0" style={{ fontSize: "1.1rem", opacity: 0.9 }}>
                         Total Users
@@ -179,7 +179,7 @@ export default function Dashboard() {
                           lineHeight: "1"
                         }}
                       >
-                        {dashboardCounts.productCount}
+                        {dashboardCounts?.productCount || 0}
                       </h3>
                       <p className="mb-0" style={{ fontSize: "1.1rem", opacity: 0.9 }}>
                         Total Products
@@ -227,7 +227,7 @@ export default function Dashboard() {
                           lineHeight: "1"
                         }}
                       >
-                        {dashboardCounts.orderCount}
+                        {dashboardCounts?.orderCount || 0}
                       </h3>
                       <p className="mb-0" style={{ fontSize: "1.1rem", opacity: 0.9 }}>
                         Total Orders
