@@ -16,6 +16,7 @@ import UsersList from "./components/users/users";
 import ProductList from "./components/products/products";
 import AddProduct from "./components/products/addProduct";
 import AdminOrders from "./components/orders/Orders";
+import IdleTimeoutManager from "./components/IdleTimeoutManager";
 
 function App() {
   const dispatch = useDispatch();
@@ -40,6 +41,9 @@ function App() {
   return (
     <div className="App">
       <Router>
+        {/* Idle Timeout Manager - Active globally for all authenticated users */}
+        <IdleTimeoutManager />
+        
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<ProductListing />} />
