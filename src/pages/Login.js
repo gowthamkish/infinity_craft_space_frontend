@@ -1,5 +1,5 @@
-import { useDispatch } from "react-redux";
-import { loginUser } from "../features/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser, clearError } from "../features/authSlice";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Form from "react-bootstrap/Form";
@@ -14,13 +14,14 @@ import Alert from "react-bootstrap/Alert";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [validationErrors, setValidationErrors] = useState({});
   const [validated, setValidated] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  
+  // Get auth state from Redux
+  const { loading, error } = useSelector((state) => state.auth);
 
   useEffect(() => {
     // Check for registration success message
@@ -56,7 +57,8 @@ export default function Login() {
     e.preventDefault();
     e.stopPropagation();
 
-    setError("");
+    // Clear any existing errors
+    dispatch(clearError());
     setValidationErrors({});
     setValidated(true);
 
@@ -66,15 +68,14 @@ export default function Login() {
       return;
     }
 
-    setLoading(true);
     try {
       const response = await dispatch(loginUser({ email, password }));
-      setLoading(false);
 
-      if (response?.payload?.token) {
+      // Check if login was successful
+      if (loginUser.fulfilled.match(response)) {
         const redirectPath = localStorage.getItem("redirectAfterLogin");
 
-        if (response?.payload?.user?.isAdmin) {
+        if (response.payload?.user?.isAdmin) {
           navigate("/admin/dashboard");
         } else if (redirectPath) {
           localStorage.removeItem("redirectAfterLogin");
@@ -82,15 +83,10 @@ export default function Login() {
         } else {
           navigate("/");
         }
-      } else {
-        setError(
-          response?.error?.message ||
-            "Invalid email or password. Please try again."
-        );
       }
+      // If rejected, error will be handled by Redux state
     } catch (err) {
-      setLoading(false);
-      setError("Login failed. Please check your credentials and try again.");
+      console.error("Unexpected error:", err);
     }
   };
 
@@ -107,19 +103,6 @@ export default function Login() {
           "linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%)",
       }}
     >
-      {error && (
-        <Alert
-          variant="danger"
-          className="mb-4"
-          style={{
-            borderRadius: "12px",
-            border: "none",
-            fontSize: "0.9rem",
-          }}
-        >
-          {error}
-        </Alert>
-      )}
 
       {loading ? (
         <div
@@ -236,6 +219,10 @@ export default function Login() {
                               email: "",
                             });
                           }
+                          // Clear auth error when user starts typing
+                          if (error) {
+                            dispatch(clearError());
+                          }
                         }}
                         placeholder="Enter your email"
                         required
@@ -253,19 +240,7 @@ export default function Login() {
                           transition: "all 0.3s ease",
                         }}
                       />
-                      <Form.Control.Feedback
-                        type="invalid"
-                        style={{ fontSize: "0.875rem" }}
-                      >
-                        {validationErrors.email ||
-                          "Please provide a valid email address."}
-                      </Form.Control.Feedback>
-                      <Form.Control.Feedback
-                        type="valid"
-                        style={{ fontSize: "0.875rem" }}
-                      >
-                        Email looks good!
-                      </Form.Control.Feedback>
+                      
                     </Form.Group>
 
                     <Form.Group className="mb-4" controlId="loginPassword">
@@ -289,6 +264,10 @@ export default function Login() {
                               password: "",
                             });
                           }
+                          // Clear auth error when user starts typing
+                          if (error) {
+                            dispatch(clearError());
+                          }
                         }}
                         placeholder="Enter your password"
                         required
@@ -307,16 +286,8 @@ export default function Login() {
                           transition: "all 0.3s ease",
                         }}
                       />
-                      <Form.Control.Feedback
-                        type="invalid"
-                        style={{ fontSize: "0.875rem" }}
-                      ></Form.Control.Feedback>
-                      <Form.Control.Feedback
-                        type="valid"
-                        style={{ fontSize: "0.875rem" }}
-                      >
-                        Password strength looks good!
-                      </Form.Control.Feedback>
+                      
+                      
                     </Form.Group>
 
                     <div className="d-grid gap-3 mb-4">

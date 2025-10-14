@@ -1,14 +1,32 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../api/axios";
 
-export const loginUser = createAsyncThunk("auth/login", async (creds) => {
-  const res = await api.post("/api/auth/login", creds);
-  return res.data;
+export const loginUser = createAsyncThunk("auth/login", async (creds, { rejectWithValue }) => {
+  try {
+    const res = await api.post("/api/auth/login", creds);
+    return res.data;
+  } catch (error) {
+    console.error("Login error details:", error.response?.data || error.message);
+    // Return the actual error message from backend
+    if (error.response?.data?.error) {
+      return rejectWithValue(error.response.data.error);
+    }
+    return rejectWithValue(error.message || "Login failed");
+  }
 });
 
-export const register = createAsyncThunk("auth/register", async (details) => {
-  const res = await api.post("/api/auth/register", details);
-  return res.data;
+export const register = createAsyncThunk("auth/register", async (details, { rejectWithValue }) => {
+  try {
+    const res = await api.post("/api/auth/register", details);
+    return res.data;
+  } catch (error) {
+    console.error("Registration error details:", error.response?.data || error.message);
+    // Return the actual error message from backend
+    if (error.response?.data?.error) {
+      return rejectWithValue(error.response.data.error);
+    }
+    return rejectWithValue(error.message || "Registration failed");
+  }
 });
 
 const authSlice = createSlice({
@@ -18,10 +36,14 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.token = null;
+      state.error = null;
     },
     setAuthFromStorage: (state, action) => {
       state.user = action.payload.user;
       state.token = action.payload.token;
+    },
+    clearError: (state) => {
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -39,7 +61,8 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        // Use the payload from rejectWithValue, fallback to error.message
+        state.error = action.payload || action.error?.message || "Login failed";
       })
       .addCase(register.pending, (state) => {
         state.loading = true;
@@ -54,10 +77,11 @@ const authSlice = createSlice({
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        // Use the payload from rejectWithValue, fallback to error.message
+        state.error = action.payload || action.error?.message || "Registration failed";
       });
   },
 });
 
-export const { logout, setAuthFromStorage } = authSlice.actions;
+export const { logout, setAuthFromStorage, clearError } = authSlice.actions;
 export default authSlice.reducer;

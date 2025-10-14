@@ -25,7 +25,6 @@ export default function Orders() {
           headers: { Authorization: `Bearer ${token}` }
         });
         // Handle the response structure: { success, count, orders }
-        console.log('Orders API Response:', res.data);
         if (res.data.success && Array.isArray(res.data.orders)) {
           setOrders(res.data.orders);
         } else {
