@@ -1,9 +1,7 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback, lazy, Suspense } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { addToCart, removeFromCart } from "../features/cartSlice";
-import Header from "../components/header";
-import ProductFilters from "../components/ProductFilters";
 import { useProducts } from "../hooks/useSmartFetch";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
@@ -15,6 +13,128 @@ import Badge from "react-bootstrap/Badge";
 import Alert from "react-bootstrap/Alert";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import { FiGrid, FiFilter, FiShoppingCart, FiX } from "react-icons/fi";
+
+// Lazy load components
+const Header = lazy(() => import("../components/header"));
+const ProductFilters = lazy(() => import("../components/ProductFilters"));
+
+// Optimized ProductCard component with React.memo
+const ProductCard = React.memo(({ 
+  product, 
+  quantityInCart, 
+  onAddToCart, 
+  onRemoveFromCart 
+}) => (
+  <Card className="h-100 product-card hover-shadow">
+    <div style={{ overflow: "hidden", borderRadius: "12px 12px 0 0" }}>
+      <Card.Img
+        variant="top"
+        src={product?.image?.url || "https://via.placeholder.com/200x200?text=No+Image"}
+        loading="lazy" // Native lazy loading
+        style={{
+          objectFit: "contain",
+          height: "220px",
+          background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+          padding: "1rem",
+          transition: "transform 0.3s ease"
+        }}
+        onError={(e) => {
+          e.target.src = "https://via.placeholder.com/200x200?text=No+Image";
+        }}
+      />
+    </div>
+    <Card.Body className="d-flex flex-column p-4">
+      <div className="d-flex justify-content-between align-items-start mb-2">
+        <Card.Title className="mb-0" style={{ 
+          fontSize: "1.1rem", 
+          fontWeight: "600",
+          color: "var(--text-primary)",
+          lineHeight: "1.4"
+        }}>
+          {product.name}
+        </Card.Title>
+        {product.category && (
+          <Badge 
+            bg="light" 
+            text="dark" 
+            style={{
+              fontSize: "0.75rem",
+              padding: "4px 8px",
+              borderRadius: "12px",
+              backgroundColor: "var(--bg-tertiary)",
+              color: "var(--text-secondary)"
+            }}
+          >
+            {product.category}
+          </Badge>
+        )}
+      </div>
+      
+      <div className="price-tag mb-2">
+        ₹{product.price}
+      </div>
+      
+      <Card.Text className="text-muted-custom" style={{ 
+        fontSize: "0.9rem",
+        lineHeight: "1.5",
+        flex: "1"
+      }}>
+        {product.description}
+      </Card.Text>
+      
+      <div className="mt-auto">
+        {quantityInCart > 0 && (
+          <div className="text-center mb-3">
+            <Badge 
+              style={{
+                background: "var(--primary-color)",
+                fontSize: "0.8rem",
+                padding: "6px 12px",
+                borderRadius: "20px"
+              }}
+            >
+              {quantityInCart} in cart
+            </Badge>
+          </div>
+        )}
+        <div className="d-flex gap-2 justify-content-center">
+          <Button
+            variant="success"
+            size="sm"
+            onClick={() => onAddToCart(product)}
+            className="hover-scale flex-fill"
+            style={{
+              borderRadius: "8px",
+              fontWeight: "500",
+              padding: "8px 16px",
+              background: "var(--secondary-color)",
+              border: "none"
+            }}
+          >
+            + Add to Cart
+          </Button>
+          {quantityInCart > 0 && (
+            <Button
+              variant="outline-danger"
+              size="sm"
+              onClick={() => onRemoveFromCart(product)}
+              className="hover-scale"
+              style={{
+                borderRadius: "8px",
+                fontWeight: "500",
+                padding: "8px 16px",
+                borderColor: "var(--error-color)",
+                color: "var(--error-color)"
+              }}
+            >
+              Remove
+            </Button>
+          )}
+        </div>
+      </div>
+    </Card.Body>
+  </Card>
+));
 
 // Add custom styles for better mobile experience
 const mobileStyles = `
@@ -64,7 +184,7 @@ if (typeof document !== 'undefined') {
   document.head.appendChild(styleElement);
 }
 
-export default function ProductListing() {
+const ProductListing = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { data: products, loading, error } = useProducts();
@@ -79,107 +199,130 @@ export default function ProductListing() {
   const cartItems = useSelector((state) => state.cart.items);
   const isAuthenticated = useSelector((state) => state.auth.token);
 
-  // Calculate total items in cart
-  const totalCartItems = cartItems.reduce((total, item) => total + item.quantity, 0);
+  // Memoized calculations for better performance
+  const totalCartItems = useMemo(() => 
+    cartItems.reduce((total, item) => total + item.quantity, 0), 
+    [cartItems]
+  );
 
-  // Filter and sort products based on active filters
+  // Memoized cart item lookup
+  const cartItemsMap = useMemo(() => {
+    const map = new Map();
+    cartItems.forEach(item => {
+      map.set(item.product._id, item.quantity);
+    });
+    return map;
+  }, [cartItems]);
+
+  const getItemQuantityInCart = useCallback((productId) => {
+    return cartItemsMap.get(productId) || 0;
+  }, [cartItemsMap]);
+
+  // Optimized filter and sort products with better performance
   const filteredAndSortedProducts = useMemo(() => {
-    let filtered = [...products];
+    if (!Array.isArray(products) || products.length === 0) return [];
 
-    // Search filter
+    let filtered = products;
+
+    // Search filter with optimized regex
     if (filters.searchTerm) {
-      const searchLower = filters.searchTerm.toLowerCase();
+      const searchRegex = new RegExp(filters.searchTerm, 'i');
       filtered = filtered.filter(product => 
-        product.name.toLowerCase().includes(searchLower) ||
-        product.description?.toLowerCase().includes(searchLower)
+        searchRegex.test(product.name) ||
+        (product.description && searchRegex.test(product.description))
       );
     }
 
-    // Category filter
+    // Category filter with Set for better performance
     if (filters.categories && filters.categories.length > 0) {
-      filtered = filtered.filter(product => 
-        filters.categories.includes(product.category)
-      );
+      const filterCategoriesSet = new Set(filters.categories.map(cat => cat.toLowerCase()));
+      filtered = filtered.filter(product => {
+        const productCategoryLower = product.category?.toLowerCase();
+        const productSubCategoryLower = product.subCategory?.toLowerCase();
+        
+        return filterCategoriesSet.has(productCategoryLower) ||
+               filterCategoriesSet.has(productSubCategoryLower);
+      });
     }
 
     // Price range filter
     if (filters.priceRange) {
+      const { min, max } = filters.priceRange;
       filtered = filtered.filter(product => 
-        product.price >= filters.priceRange.min && 
-        product.price <= filters.priceRange.max
+        product.price >= min && product.price <= max
       );
     }
 
-    // Sort products
+    // Sort products with optimized sorting
     if (filters.sortBy) {
+      const sortedFiltered = [...filtered]; // Create new array for immutability
       switch (filters.sortBy) {
         case "price-low-high":
-          filtered.sort((a, b) => a.price - b.price);
+          sortedFiltered.sort((a, b) => a.price - b.price);
           break;
         case "price-high-low":
-          filtered.sort((a, b) => b.price - a.price);
+          sortedFiltered.sort((a, b) => b.price - a.price);
           break;
         case "name-asc":
-          filtered.sort((a, b) => a.name.localeCompare(b.name));
+          sortedFiltered.sort((a, b) => a.name.localeCompare(b.name));
           break;
         case "name-desc":
-          filtered.sort((a, b) => b.name.localeCompare(a.name));
+          sortedFiltered.sort((a, b) => b.name.localeCompare(a.name));
           break;
         default:
-          break;
+          return filtered;
       }
+      return sortedFiltered;
     }
 
     return filtered;
   }, [products, filters]);
 
-  const getItemQuantityInCart = (productId) => {
-    const item = cartItems.find(item => item.product._id === productId);
-    return item ? item.quantity : 0;
-  };
-
-  const handleFiltersChange = (newFilters) => {
+  // Optimized event handlers with useCallback
+  const handleFiltersChange = useCallback((newFilters) => {
     setFilters(newFilters);
-  };
+  }, []);
 
-  const handleClearFilters = () => {
+  const handleClearFilters = useCallback(() => {
     setFilters({
       categories: [],
       priceRange: null,
       searchTerm: "",
       sortBy: ""
     });
-  };
+  }, []);
 
-  const handleCloseMobileFilters = () => {
+  const handleCloseMobileFilters = useCallback(() => {
     setShowMobileFilters(false);
-  };
+  }, []);
 
-  const handleShowMobileFilters = () => {
+  const handleShowMobileFilters = useCallback(() => {
     setShowMobileFilters(true);
-  };
+  }, []);
 
-  const handleAddToCart = (product) => {
+  const handleAddToCart = useCallback((product) => {
     dispatch(addToCart({ product, quantity: 1 }));
-  };
+  }, [dispatch]);
 
-  const handleRemoveFromCart = (product) => {
+  const handleRemoveFromCart = useCallback((product) => {
     dispatch(removeFromCart({ product }));
-  };
+  }, [dispatch]);
 
-  const handleCheckout = () => {
+  const handleCheckout = useCallback(() => {
     if (!isAuthenticated) {
-      // Store current path to redirect back after login
       localStorage.setItem('redirectAfterLogin', '/checkout');
       navigate('/login');
     } else {
       navigate('/checkout');
     }
-  };
+  }, [isAuthenticated, navigate]);
 
   return (
     <div className="App">
-      <Header />
+      <Suspense fallback={<div className="d-flex justify-content-center p-3"><Spinner animation="border" /></div>}>
+        <Header />
+      </Suspense>
+      
       <div className="main-container" style={{ backgroundColor: "#f8fafc", minHeight: "100vh", padding: "1rem" }}>
         <Container fluid style={{ padding: "0" }}>
           <Row>
@@ -194,12 +337,14 @@ export default function ProductListing() {
                   overflowY: "auto"
                 }}
               >
-                <ProductFilters
-                  products={products}
-                  onFiltersChange={handleFiltersChange}
-                  activeFilters={filters}
-                  onClearFilters={handleClearFilters}
-                />
+                <Suspense fallback={<div className="p-3"><Spinner size="sm" animation="border" /></div>}>
+                  <ProductFilters
+                    products={products}
+                    onFiltersChange={handleFiltersChange}
+                    activeFilters={filters}
+                    onClearFilters={handleClearFilters}
+                  />
+                </Suspense>
               </div>
             </Col>
 
@@ -239,12 +384,14 @@ export default function ProductListing() {
                 </Button>
               </Offcanvas.Header>
               <Offcanvas.Body style={{ padding: "1.5rem" }}>
-                <ProductFilters
-                  products={products}
-                  onFiltersChange={handleFiltersChange}
-                  activeFilters={filters}
-                  onClearFilters={handleClearFilters}
-                />
+                <Suspense fallback={<div className="p-3"><Spinner size="sm" animation="border" /></div>}>
+                  <ProductFilters
+                    products={products}
+                    onFiltersChange={handleFiltersChange}
+                    activeFilters={filters}
+                    onClearFilters={handleClearFilters}
+                  />
+                </Suspense>
                 <div className="mt-4 d-grid">
                   <Button
                     variant="primary"
@@ -412,114 +559,12 @@ export default function ProductListing() {
                         const quantityInCart = getItemQuantityInCart(product._id);
                         return (
                           <Col key={product._id}>
-                            <Card className="h-100 product-card hover-shadow">
-                              <div style={{ overflow: "hidden", borderRadius: "12px 12px 0 0" }}>
-                                <Card.Img
-                                  variant="top"
-                                  src={
-                                    product?.image?.url ||
-                                    "https://via.placeholder.com/200x200?text=No+Image"
-                                  }
-                                  style={{
-                                    objectFit: "contain",
-                                    height: "220px",
-                                    background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
-                                    padding: "1rem",
-                                    transition: "transform 0.3s ease"
-                                  }}
-                                />
-                              </div>
-                              <Card.Body className="d-flex flex-column p-4">
-                                <div className="d-flex justify-content-between align-items-start mb-2">
-                                  <Card.Title className="mb-0" style={{ 
-                                    fontSize: "1.1rem", 
-                                    fontWeight: "600",
-                                    color: "var(--text-primary)",
-                                    lineHeight: "1.4"
-                                  }}>
-                                    {product.name}
-                                  </Card.Title>
-                                  {product.category && (
-                                    <Badge 
-                                      bg="light" 
-                                      text="dark" 
-                                      style={{
-                                        fontSize: "0.75rem",
-                                        padding: "4px 8px",
-                                        borderRadius: "12px",
-                                        backgroundColor: "var(--bg-tertiary)",
-                                        color: "var(--text-secondary)"
-                                      }}
-                                    >
-                                      {product.category}
-                                    </Badge>
-                                  )}
-                                </div>
-                                
-                                <div className="price-tag mb-2">
-                                  ₹{product.price}
-                                </div>
-                                
-                                <Card.Text className="text-muted-custom" style={{ 
-                                  fontSize: "0.9rem",
-                                  lineHeight: "1.5",
-                                  flex: "1"
-                                }}>
-                                  {product.description}
-                                </Card.Text>
-                                
-                                <div className="mt-auto">
-                                  {quantityInCart > 0 && (
-                                    <div className="text-center mb-3">
-                                      <Badge 
-                                        style={{
-                                          background: "var(--primary-color)",
-                                          fontSize: "0.8rem",
-                                          padding: "6px 12px",
-                                          borderRadius: "20px"
-                                        }}
-                                      >
-                                        {quantityInCart} in cart
-                                      </Badge>
-                                    </div>
-                                  )}
-                                  <div className="d-flex gap-2 justify-content-center">
-                                    <Button
-                                      variant="success"
-                                      size="sm"
-                                      onClick={() => handleAddToCart(product)}
-                                      className="hover-scale flex-fill"
-                                      style={{
-                                        borderRadius: "8px",
-                                        fontWeight: "500",
-                                        padding: "8px 16px",
-                                        background: "var(--secondary-color)",
-                                        border: "none"
-                                      }}
-                                    >
-                                      + Add to Cart
-                                    </Button>
-                                    {quantityInCart > 0 && (
-                                      <Button
-                                        variant="outline-danger"
-                                        size="sm"
-                                        onClick={() => handleRemoveFromCart(product)}
-                                        className="hover-scale"
-                                        style={{
-                                          borderRadius: "8px",
-                                          fontWeight: "500",
-                                          padding: "8px 16px",
-                                          borderColor: "var(--error-color)",
-                                          color: "var(--error-color)"
-                                        }}
-                                      >
-                                        Remove
-                                      </Button>
-                                    )}
-                                  </div>
-                                </div>
-                              </Card.Body>
-                            </Card>
+                            <ProductCard
+                              product={product}
+                              quantityInCart={quantityInCart}
+                              onAddToCart={handleAddToCart}
+                              onRemoveFromCart={handleRemoveFromCart}
+                            />
                           </Col>
                         );
                       })}
@@ -533,4 +578,7 @@ export default function ProductListing() {
       </div>
     </div>
   );
-}
+};
+
+// Export with React.memo for performance optimization
+export default React.memo(ProductListing);

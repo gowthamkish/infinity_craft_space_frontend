@@ -1,18 +1,53 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { createSelector } from '@reduxjs/toolkit';
 import { fetchProducts } from '../features/productsSlice';
 import { fetchDashboardCounts, fetchUsers, fetchOrders } from '../features/adminSlice';
 
-// Custom hook for smart data fetching with caching
+// Request deduplication cache
+const requestCache = new Map();
+
+// Custom hook for smart data fetching with enhanced caching and request deduplication
 export const useSmartFetch = (
   asyncThunk,
   selector,
   dependencies = [],
-  cacheTimeout = 5 * 60 * 1000 // 5 minutes default
+  cacheTimeout = 5 * 60 * 1000, // 5 minutes default
+  requestDeduplication = true
 ) => {
   const dispatch = useDispatch();
   const { data, loading, error, lastFetched, isStale } = useSelector(selector);
+  const fetchTimeoutRef = useRef(null);
+  const thunkKey = asyncThunk.typePrefix;
+
+  // Debounced fetch function to prevent rapid successive calls
+  const debouncedFetch = useCallback((delay = 100) => {
+    if (fetchTimeoutRef.current) {
+      clearTimeout(fetchTimeoutRef.current);
+    }
+    
+    fetchTimeoutRef.current = setTimeout(() => {
+      // Check if request is already in progress (deduplication)
+      if (requestDeduplication && requestCache.has(thunkKey)) {
+        return;
+      }
+
+      if (requestDeduplication) {
+        requestCache.set(thunkKey, true);
+      }
+
+      const promise = dispatch(asyncThunk());
+      
+      // Clear cache after request completes
+      if (requestDeduplication && promise && typeof promise.finally === 'function') {
+        promise.finally(() => {
+          requestCache.delete(thunkKey);
+        });
+      }
+      
+      return promise;
+    }, delay);
+  }, [dispatch, asyncThunk, thunkKey, requestDeduplication]);
 
   useEffect(() => {
     const shouldFetch = 
@@ -22,11 +57,31 @@ export const useSmartFetch = (
       dependencies.some(dep => dep);
 
     if (shouldFetch && !loading) {
-      dispatch(asyncThunk());
+      debouncedFetch();
     }
-  }, [dispatch, asyncThunk, isStale, lastFetched, loading, cacheTimeout, ...dependencies]);
 
-  return { data, loading, error };
+    // Cleanup timeout on unmount
+    return () => {
+      if (fetchTimeoutRef.current) {
+        clearTimeout(fetchTimeoutRef.current);
+      }
+    };
+  }, [debouncedFetch, isStale, lastFetched, loading, cacheTimeout, ...dependencies]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (requestDeduplication) {
+        requestCache.delete(thunkKey);
+      }
+    };
+  }, [thunkKey, requestDeduplication]);
+
+  return useMemo(() => ({ 
+    data: data || [], 
+    loading: Boolean(loading), 
+    error 
+  }), [data, loading, error]);
 };
 
 // Hook specifically for products

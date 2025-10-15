@@ -24,3 +24,5 @@ yarn-error.log*
 
 # Documentation files
 API_OPTIMIZATION.md
+PERFORMANCE_OPTIMIZATIONS.md
+PERFORMANCE_SUMMARY.md

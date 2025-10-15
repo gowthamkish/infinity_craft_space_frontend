@@ -1,23 +1,45 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, Suspense, lazy } from "react";
 import { useDispatch } from "react-redux";
 import { setAuthFromStorage } from "./features/authSlice";
-import ProductListing from "./pages/ProductListing";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Checkout from "./pages/Checkout";
-import Orders from "./pages/Orders";
-import ProtectedRoute from "./components/ProtectedRoute";
-import AdminRoute from "./components/AdminRoute";
-import AdminDashboard from "./components/admin/dashboard";
-import UsersList from "./components/users/users";
-import ProductList from "./components/products/products";
-import AddProduct from "./components/products/addProduct";
-import AdminOrders from "./components/orders/Orders";
-import CategoryManagement from "./components/categories/CategoryManagement";
-import IdleTimeoutManager from "./components/IdleTimeoutManager";
+import { Spinner, Container } from "react-bootstrap";
+
+// Lazy load components for better performance
+const ProductListing = lazy(() => import("./pages/ProductListing"));
+const Home = lazy(() => import("./pages/Home"));
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const Orders = lazy(() => import("./pages/Orders"));
+const ProtectedRoute = lazy(() => import("./components/ProtectedRoute"));
+const AdminRoute = lazy(() => import("./components/AdminRoute"));
+const AdminDashboard = lazy(() => import("./components/admin/dashboard"));
+const UsersList = lazy(() => import("./components/users/users"));
+const ProductList = lazy(() => import("./components/products/products"));
+const AddProduct = lazy(() => import("./components/products/addProduct"));
+const AdminOrders = lazy(() => import("./components/orders/Orders"));
+const CategoryManagement = lazy(() => import("./components/categories/CategoryManagement"));
+const IdleTimeoutManager = lazy(() => import("./components/IdleTimeoutManager"));
+
+// Loading fallback component
+const LoadingFallback = ({ message = "Loading..." }) => (
+  <Container 
+    className="d-flex flex-column justify-content-center align-items-center" 
+    style={{ minHeight: "50vh" }}
+  >
+    <Spinner 
+      animation="border" 
+      role="status" 
+      style={{
+        width: "3rem",
+        height: "3rem",
+        color: "#3b82f6"
+      }}
+    />
+    <p className="mt-3 text-muted">{message}</p>
+  </Container>
+);
 
 function App() {
   const dispatch = useDispatch();
@@ -42,69 +64,142 @@ function App() {
   return (
     <div className="App">
       <Router>
-        {/* Idle Timeout Manager - Active globally for all authenticated users */}
-        <IdleTimeoutManager />
-        
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<ProductListing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+        <Suspense fallback={<LoadingFallback message="Loading application..." />}>
+          {/* Idle Timeout Manager - Active globally for all authenticated users */}
+          <IdleTimeoutManager />
           
-          {/* Protected Routes */}
-          <Route path="/home" element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          } />
-          <Route path="/checkout" element={
-            <ProtectedRoute>
-              <Checkout />
-            </ProtectedRoute>
-          } />
-          <Route path="/orders" element={
-            <ProtectedRoute>
-              <Orders />
-            </ProtectedRoute>
-          } />
-          
-          {/* Admin Routes */}
-          <Route path="/admin/dashboard" element={
-            <AdminRoute>
-              <AdminDashboard />
-            </AdminRoute>
-          } />
-          <Route path="/admin/users" element={
-            <AdminRoute>
-              <UsersList />
-            </AdminRoute>
-          } />
-          <Route path="/admin/products" element={
-            <AdminRoute>
-              <ProductList />
-            </AdminRoute>
-          } />
-          <Route path="/admin/addProduct" element={
-            <AdminRoute>
-              <AddProduct />
-            </AdminRoute>
-          } />
-          <Route path="/admin/addProduct/:id" element={
-            <AdminRoute>
-              <AddProduct />
-            </AdminRoute>
-          } />
-          <Route path="/admin/orders" element={
-            <AdminRoute>
-              <AdminOrders />
-            </AdminRoute>
-          } />
-          <Route path="/admin/categories" element={
-            <AdminRoute>
-              <CategoryManagement />
-            </AdminRoute>
-          } />
-        </Routes>
+          <Routes>
+            {/* Public Routes */}
+            <Route 
+              path="/" 
+              element={
+                <Suspense fallback={<LoadingFallback message="Loading products..." />}>
+                  <ProductListing />
+                </Suspense>
+              } 
+            />
+            <Route 
+              path="/login" 
+              element={
+                <Suspense fallback={<LoadingFallback message="Loading login..." />}>
+                  <Login />
+                </Suspense>
+              } 
+            />
+            <Route 
+              path="/register" 
+              element={
+                <Suspense fallback={<LoadingFallback message="Loading registration..." />}>
+                  <Register />
+                </Suspense>
+              } 
+            />
+            
+            {/* Protected Routes */}
+            <Route 
+              path="/home" 
+              element={
+                <Suspense fallback={<LoadingFallback message="Loading home..." />}>
+                  <ProtectedRoute>
+                    <Home />
+                  </ProtectedRoute>
+                </Suspense>
+              } 
+            />
+            <Route 
+              path="/checkout" 
+              element={
+                <Suspense fallback={<LoadingFallback message="Loading checkout..." />}>
+                  <ProtectedRoute>
+                    <Checkout />
+                  </ProtectedRoute>
+                </Suspense>
+              } 
+            />
+            <Route 
+              path="/orders" 
+              element={
+                <Suspense fallback={<LoadingFallback message="Loading orders..." />}>
+                  <ProtectedRoute>
+                    <Orders />
+                  </ProtectedRoute>
+                </Suspense>
+              } 
+            />
+            
+            {/* Admin Routes */}
+            <Route 
+              path="/admin/dashboard" 
+              element={
+                <Suspense fallback={<LoadingFallback message="Loading admin dashboard..." />}>
+                  <AdminRoute>
+                    <AdminDashboard />
+                  </AdminRoute>
+                </Suspense>
+              } 
+            />
+            <Route 
+              path="/admin/users" 
+              element={
+                <Suspense fallback={<LoadingFallback message="Loading users..." />}>
+                  <AdminRoute>
+                    <UsersList />
+                  </AdminRoute>
+                </Suspense>
+              } 
+            />
+            <Route 
+              path="/admin/products" 
+              element={
+                <Suspense fallback={<LoadingFallback message="Loading products..." />}>
+                  <AdminRoute>
+                    <ProductList />
+                  </AdminRoute>
+                </Suspense>
+              } 
+            />
+            <Route 
+              path="/admin/addProduct" 
+              element={
+                <Suspense fallback={<LoadingFallback message="Loading product form..." />}>
+                  <AdminRoute>
+                    <AddProduct />
+                  </AdminRoute>
+                </Suspense>
+              } 
+            />
+            <Route 
+              path="/admin/addProduct/:id" 
+              element={
+                <Suspense fallback={<LoadingFallback message="Loading product form..." />}>
+                  <AdminRoute>
+                    <AddProduct />
+                  </AdminRoute>
+                </Suspense>
+              } 
+            />
+            <Route 
+              path="/admin/orders" 
+              element={
+                <Suspense fallback={<LoadingFallback message="Loading admin orders..." />}>
+                  <AdminRoute>
+                    <AdminOrders />
+                  </AdminRoute>
+                </Suspense>
+              } 
+            />
+            <Route 
+              path="/admin/categories" 
+              element={
+                <Suspense fallback={<LoadingFallback message="Loading categories..." />}>
+                  <AdminRoute>
+                    <CategoryManagement />
+                  </AdminRoute>
+                </Suspense>
+              } 
+            />
+          </Routes>
+        </Suspense>
       </Router>
     </div>
   );
