@@ -21,6 +21,8 @@ const AddProduct = lazy(() => import("./components/products/addProduct"));
 const AdminOrders = lazy(() => import("./components/orders/Orders"));
 const CategoryManagement = lazy(() => import("./components/categories/CategoryManagement"));
 const IdleTimeoutManager = lazy(() => import("./components/IdleTimeoutManager"));
+const PWAInstallPrompt = lazy(() => import("./components/PWAInstallPrompt"));
+const OfflineIndicator = lazy(() => import("./components/OfflineIndicator"));
 
 // Loading fallback component
 const LoadingFallback = ({ message = "Loading..." }) => (
@@ -65,6 +67,12 @@ function App() {
     <div className="App">
       <Router>
         <Suspense fallback={<LoadingFallback message="Loading application..." />}>
+          {/* Offline Indicator - Shows connection status */}
+          <OfflineIndicator />
+          
+          {/* PWA Install Prompt - Shows on mobile devices */}
+          <PWAInstallPrompt />
+          
           {/* Idle Timeout Manager - Active globally for all authenticated users */}
           <IdleTimeoutManager />
           

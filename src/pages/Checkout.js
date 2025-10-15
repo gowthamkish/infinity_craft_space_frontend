@@ -336,7 +336,6 @@ export default function Checkout() {
     setError(null);
 
     try {
-      const token = localStorage.getItem("token");
       const newOrderData = {
         items: cartItems.map(item => ({
           product: item.product._id,
