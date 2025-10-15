@@ -1,25 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Form, Button, Container, Row, Col, Card, Breadcrumb, Alert, Spinner, Image } from "react-bootstrap";
 import { FiArrowLeft, FiPackage, FiSave, FiDollarSign, FiFileText, FiTag, FiLayers, FiCamera, FiX } from "react-icons/fi";
 import Header from "../header";
 import { addProduct, updateProduct } from "../../features/productsSlice";
-
-const CATEGORY_OPTIONS = [
-  "Embroidery hoop",
-  "Emboidery with hoop",
-  "Bangles",
-  "Necklace",
-];
-
-// Map category to subcategories
-const SUBCATEGORY_MAP = {
-  "Embroidery hoop": ["Round", "Square", "Oval", "Custom"],
-  "Emboidery with hoop": ["Round", "Square"],
-  "Bangles": ["Gold", "Silver", "Custom"],
-  "Necklace": ["Choker", "Pendant", "Custom"],
-};
+import { fetchPublicCategories } from "../../features/categoriesSlice";
 
 const AddProduct = () => {
   const params = useParams();
@@ -27,6 +13,12 @@ const AddProduct = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const fileInputRef = useRef(null);
+
+  // Get categories from Redux state
+  const { 
+    publicCategories: categories = [], 
+    publicCategoriesLoading: categoriesLoading 
+  } = useSelector(state => state.categories);
 
   const [form, setForm] = useState({
     name: "",
@@ -47,8 +39,10 @@ const AddProduct = () => {
   const [imageUploading, setImageUploading] = useState(false);
   const [existingImageUrl, setExistingImageUrl] = useState(null);
 
-  // Get subcategories for selected category
-  const subCategoryOptions = form.category ? SUBCATEGORY_MAP[form.category] || [] : [];
+  // Get subcategories for selected category from dynamic categories
+  const subCategoryOptions = form.category 
+    ? categories.find(cat => cat.name === form.category)?.subcategories?.filter(sub => sub.isActive) || []
+    : [];
 
   // Handle image file selection
   const handleImageChange = (e) => {
@@ -181,6 +175,11 @@ const AddProduct = () => {
       setImageUploading(false);
     }
   };
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    dispatch(fetchPublicCategories());
+  }, [dispatch]);
 
   useEffect(() => {
     const product = location.state?.product;
@@ -345,9 +344,13 @@ const AddProduct = () => {
                           className="form-control-lg"
                         >
                           <option value="">Select Category</option>
-                          {CATEGORY_OPTIONS.map((cat) => (
-                            <option key={cat} value={cat}>{cat}</option>
-                          ))}
+                          {categoriesLoading ? (
+                            <option disabled>Loading categories...</option>
+                          ) : (
+                            categories.map((cat) => (
+                              <option key={cat._id} value={cat.name}>{cat.name}</option>
+                            ))
+                          )}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
                           Please select a category.
@@ -379,7 +382,7 @@ const AddProduct = () => {
                         >
                           <option value="">Select Subcategory</option>
                           {subCategoryOptions.map((sub) => (
-                            <option key={sub} value={sub}>{sub}</option>
+                            <option key={sub._id} value={sub.name}>{sub.name}</option>
                           ))}
                         </Form.Select>
                         <Form.Text className="text-muted">

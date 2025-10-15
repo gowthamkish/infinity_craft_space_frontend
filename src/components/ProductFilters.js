@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Badge from "react-bootstrap/Badge";
-import { FiFilter, FiX } from "react-icons/fi";
+import Spinner from "react-bootstrap/Spinner";
+import { FiFilter, FiX, FiChevronDown, FiChevronRight } from "react-icons/fi";
+import { fetchPublicCategories } from "../features/categoriesSlice";
 
 export default function ProductFilters({ 
   products, 
@@ -11,23 +14,56 @@ export default function ProductFilters({
   activeFilters,
   onClearFilters 
 }) {
+  const dispatch = useDispatch();
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
+  const [expandedCategories, setExpandedCategories] = useState(new Set());
 
-  // Extract unique categories from products
-  const categories = [...new Set(products.map(product => product.category).filter(Boolean))];
+  // Get categories from Redux state
+  const { 
+    publicCategories: categories, 
+    publicCategoriesLoading: categoriesLoading,
+    publicCategoriesError: categoriesError
+  } = useSelector(state => state.categories);
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    dispatch(fetchPublicCategories());
+  }, [dispatch]);
   
   // Calculate price range from products
   const prices = products.map(p => p.price);
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);
 
-  const handleCategoryChange = (category, checked) => {
+  const toggleCategoryExpansion = (categoryId) => {
+    const newExpanded = new Set(expandedCategories);
+    if (newExpanded.has(categoryId)) {
+      newExpanded.delete(categoryId);
+    } else {
+      newExpanded.add(categoryId);
+    }
+    setExpandedCategories(newExpanded);
+  };
+
+  const handleCategoryChange = (categoryName, checked) => {
     const currentCategories = activeFilters.categories || [];
     const updatedCategories = checked 
-      ? [...currentCategories, category]
-      : currentCategories.filter(c => c !== category);
+      ? [...currentCategories, categoryName]
+      : currentCategories.filter(c => c !== categoryName);
+    
+    onFiltersChange({
+      ...activeFilters,
+      categories: updatedCategories
+    });
+  };
+
+  const handleSubcategoryChange = (subcategoryName, checked) => {
+    const currentCategories = activeFilters.categories || [];
+    const updatedCategories = checked 
+      ? [...currentCategories, subcategoryName]
+      : currentCategories.filter(c => c !== subcategoryName);
     
     onFiltersChange({
       ...activeFilters,
@@ -160,30 +196,95 @@ export default function ProductFilters({
         </div>
 
         {/* Categories */}
-        {categories.length > 0 && (
-          <div className="mb-4">
-            <Form.Label className="fw-bold text-start d-block" style={{ color: "var(--text-primary)", marginBottom: "0.75rem" }}>
-              Categories
-            </Form.Label>
-            <div style={{ maxHeight: "200px", overflowY: "auto" }}>
+        <div className="mb-4">
+          <Form.Label className="fw-bold text-start d-block" style={{ color: "var(--text-primary)", marginBottom: "0.75rem" }}>
+            Categories
+          </Form.Label>
+          
+          {categoriesLoading ? (
+            <div className="text-center py-3">
+              <Spinner animation="border" size="sm" />
+              <div className="small text-muted mt-2">Loading categories...</div>
+            </div>
+          ) : categoriesError ? (
+            <div className="text-center py-3 text-danger small">
+              Failed to load categories
+            </div>
+          ) : categories && categories.length > 0 ? (
+            <div style={{ maxHeight: "300px", overflowY: "auto" }}>
               {categories.map((category) => (
-                <Form.Check
-                  key={category}
-                  type="checkbox"
-                  id={`category-${category}`}
-                  label={category}
-                  checked={activeFilters.categories?.includes(category) || false}
-                  onChange={(e) => handleCategoryChange(category, e.target.checked)}
-                  className="text-start mb-2"
-                  style={{
-                    fontSize: "0.9rem",
-                    color: "var(--text-secondary)"
-                  }}
-                />
+                <div key={category._id} className="mb-3">
+                  {/* Main Category */}
+                  <div className="d-flex align-items-center">
+                    {category.subcategories && category.subcategories.length > 0 && (
+                      <Button
+                        variant="link"
+                        size="sm"
+                        onClick={() => toggleCategoryExpansion(category._id)}
+                        className="p-0 me-2"
+                        style={{ 
+                          color: "#6b7280",
+                          textDecoration: "none",
+                          minWidth: "20px",
+                          height: "20px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center"
+                        }}
+                      >
+                        {expandedCategories.has(category._id) ? 
+                          <FiChevronDown size={14} /> : 
+                          <FiChevronRight size={14} />
+                        }
+                      </Button>
+                    )}
+                    <Form.Check
+                      type="checkbox"
+                      id={`category-${category._id}`}
+                      label={category.name}
+                      checked={activeFilters.categories?.includes(category.name) || false}
+                      onChange={(e) => handleCategoryChange(category.name, e.target.checked)}
+                      className="text-start mb-0 flex-grow-1"
+                      style={{
+                        fontSize: "0.9rem",
+                        color: "var(--text-secondary)",
+                        fontWeight: category.subcategories?.length > 0 ? "600" : "normal"
+                      }}
+                    />
+                  </div>
+
+                  {/* Subcategories */}
+                  {expandedCategories.has(category._id) && category.subcategories && category.subcategories.length > 0 && (
+                    <div className="ms-4 mt-2">
+                      {category.subcategories
+                        .filter(sub => sub.isActive)
+                        .map((subcategory) => (
+                          <Form.Check
+                            key={subcategory._id}
+                            type="checkbox"
+                            id={`subcategory-${subcategory._id}`}
+                            label={subcategory.name}
+                            checked={activeFilters.categories?.includes(subcategory.name) || false}
+                            onChange={(e) => handleSubcategoryChange(subcategory.name, e.target.checked)}
+                            className="text-start mb-2"
+                            style={{
+                              fontSize: "0.85rem",
+                              color: "#6b7280",
+                              paddingLeft: "0.25rem"
+                            }}
+                          />
+                        ))}
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="text-center py-3 text-muted small">
+              No categories available
+            </div>
+          )}
+        </div>
 
         {/* Price Range */}
         <div className="mb-4">
@@ -247,26 +348,65 @@ export default function ProductFilters({
 
         {/* Active Filters Summary */}
         {getActiveFiltersCount() > 0 && (
-          <div className="mt-4 pt-3 border-top">
-            <div className="fw-bold mb-2">Active Filters:</div>
+          <div className="mt-4 pt-3 border-top" style={{ borderTop: "1px solid #e2e8f0" }}>
+            <div className="fw-bold mb-2" style={{ color: "var(--text-primary)", fontSize: "0.9rem" }}>
+              Active Filters:
+            </div>
             <div className="d-flex flex-wrap gap-1">
               {activeFilters.categories?.map(category => (
-                <Badge key={category} bg="secondary" className="me-1">
+                <Badge 
+                  key={category} 
+                  style={{
+                    backgroundColor: "#3b82f6",
+                    color: "white",
+                    fontSize: "0.75rem",
+                    padding: "4px 8px",
+                    borderRadius: "12px"
+                  }}
+                  className="me-1 mb-1"
+                >
                   {category}
                 </Badge>
               ))}
               {activeFilters.priceRange && (
-                <Badge bg="secondary">
+                <Badge 
+                  style={{
+                    backgroundColor: "#10b981",
+                    color: "white",
+                    fontSize: "0.75rem",
+                    padding: "4px 8px",
+                    borderRadius: "12px"
+                  }}
+                  className="mb-1"
+                >
                   ₹{activeFilters.priceRange.min} - ₹{activeFilters.priceRange.max === Infinity ? 'Max' : activeFilters.priceRange.max}
                 </Badge>
               )}
               {activeFilters.searchTerm && (
-                <Badge bg="secondary">
+                <Badge 
+                  style={{
+                    backgroundColor: "#f59e0b",
+                    color: "white",
+                    fontSize: "0.75rem",
+                    padding: "4px 8px",
+                    borderRadius: "12px"
+                  }}
+                  className="mb-1"
+                >
                   Search: "{activeFilters.searchTerm}"
                 </Badge>
               )}
               {activeFilters.sortBy && (
-                <Badge bg="secondary">
+                <Badge 
+                  style={{
+                    backgroundColor: "#8b5cf6",
+                    color: "white",
+                    fontSize: "0.75rem",
+                    padding: "4px 8px",
+                    borderRadius: "12px"
+                  }}
+                  className="mb-1"
+                >
                   {activeFilters.sortBy.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                 </Badge>
               )}

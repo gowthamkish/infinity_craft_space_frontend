@@ -310,6 +310,23 @@ export default function Dashboard() {
                             View Orders
                           </Button>
                         </Col>
+                        <Col xs={12} sm={6} md={4}>
+                          <Button
+                            variant="outline-info"
+                            className="w-100 d-flex align-items-center justify-content-center"
+                            style={{
+                              borderRadius: "12px",
+                              padding: "1rem",
+                              border: "2px solid #0dcaf0",
+                              fontWeight: "500",
+                              color: "#0dcaf0"
+                            }}
+                            onClick={() => navigate("/admin/categories")}
+                          >
+                            <FiPackage size={20} className="me-2" />
+                            Manage Categories
+                          </Button>
+                        </Col>
                       </Row>
                     </Card.Body>
                   </Card>

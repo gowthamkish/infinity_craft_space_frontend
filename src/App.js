@@ -16,6 +16,7 @@ import UsersList from "./components/users/users";
 import ProductList from "./components/products/products";
 import AddProduct from "./components/products/addProduct";
 import AdminOrders from "./components/orders/Orders";
+import CategoryManagement from "./components/categories/CategoryManagement";
 import IdleTimeoutManager from "./components/IdleTimeoutManager";
 
 function App() {
@@ -96,6 +97,11 @@ function App() {
           <Route path="/admin/orders" element={
             <AdminRoute>
               <AdminOrders />
+            </AdminRoute>
+          } />
+          <Route path="/admin/categories" element={
+            <AdminRoute>
+              <CategoryManagement />
             </AdminRoute>
           } />
         </Routes>
