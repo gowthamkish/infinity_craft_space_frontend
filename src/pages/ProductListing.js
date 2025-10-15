@@ -136,11 +136,12 @@ const ProductCard = React.memo(({
   </Card>
 ));
 
-// Add custom styles for better mobile experience
+// Add custom styles for better mobile experience with fixed header
 const mobileStyles = `
   @media (max-width: 767.98px) {
     .main-container {
-      padding: 1rem !important;
+      padding: 90px 1rem 1rem 1rem !important;
+      padding-top: 90px !important;
     }
     .filter-offcanvas .offcanvas-header {
       padding: 1.5rem;
@@ -154,6 +155,12 @@ const mobileStyles = `
     .product-card .card-img-top {
       height: 180px !important;
     }
+  }
+  
+  /* Ensure content scrolls properly with fixed header */
+  .main-container {
+    height: 100vh;
+    overflow-y: auto;
   }
   
   .filter-offcanvas {
@@ -323,7 +330,18 @@ const ProductListing = () => {
         <Header />
       </Suspense>
       
-      <div className="main-container" style={{ backgroundColor: "#f8fafc", minHeight: "100vh", padding: "1rem" }}>
+      {/* Main Content with top margin to account for fixed header */}
+      <div 
+        className="main-container" 
+        style={{ 
+          backgroundColor: "#f8fafc", 
+          minHeight: "100vh", 
+          paddingTop: "90px", // Account for fixed header height
+          padding: "90px 1rem 1rem 1rem",
+          overflowY: "auto",
+          maxHeight: "100vh"
+        }}
+      >
         <Container fluid style={{ padding: "0" }}>
           <Row>
             {/* Desktop Filter Panel - Hidden on mobile */}
@@ -332,8 +350,8 @@ const ProductListing = () => {
                 className="filter-panel"
                 style={{
                   position: "sticky",
-                  top: "2rem",
-                  maxHeight: "calc(100vh - 4rem)",
+                  top: "0", // Account for fixed header (70px + 20px margin + 20px buffer)
+                  maxHeight: "calc(100vh - 130px)", // Adjust for header and margins
                   overflowY: "auto"
                 }}
               >

@@ -137,7 +137,7 @@ const Orders = () => {
     <>
       <Header />
       
-      <Container fluid className="py-4" style={{ background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)', minHeight: '100vh' }}>
+      <Container fluid className="" style={{ background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)', minHeight: '100vh', paddingTop: '110px' }}>
         {/* Header Section */}
         <div className="mb-4">
           <Breadcrumb className="mb-3">
@@ -311,7 +311,7 @@ const Orders = () => {
                             <td style={{ border: 'none', padding: '1rem' }}>
                               <div>
                                 <h6 className="mb-0" style={{ fontWeight: '500', color: '#374151' }}>
-                                  {order.user?.name || order.customerName || 'Unknown'}
+                                  {order.userId.username || order.customerName || 'Unknown'}
                                 </h6>
                                 <small className="text-muted">{order.user?.email || order.customerEmail}</small>
                               </div>
@@ -952,7 +952,7 @@ const Orders = () => {
                           ))}
                         </div>
                       ) : (
-                        <div className="text-center py-4">
+                        <div className="text-center">
                           <FiPackage size={48} style={{ color: '#cbd5e1', margin: '0 0 0.75rem 0' }} />
                           <p style={{ color: '#64748b', margin: 0, fontSize: '0.9rem' }}>No items found in this order</p>
                         </div>

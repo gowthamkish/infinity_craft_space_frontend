@@ -15,6 +15,9 @@ body {
   line-height: 1.6;
   color: var(--text-primary);
   background-color: var(--bg-secondary);
+  /* Ensure proper scrolling with fixed header */
+  padding-top: 0;
+  overflow-x: hidden;
 }
 
 code {

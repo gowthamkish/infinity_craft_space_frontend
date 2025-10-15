@@ -233,9 +233,10 @@ const CategoryManagement = () => {
     <>
       <Header />
       
-      <Container fluid className="py-4" style={{ 
+      <Container fluid className="" style={{ 
         background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)', 
-        minHeight: '100vh' 
+        minHeight: '100vh',
+        paddingTop: '110px'
       }}>
         {/* Header Section */}
         <div className="mb-4">

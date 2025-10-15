@@ -246,3 +246,56 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+/* Fixed header scrolling optimizations */
+.main-container {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom scrollbar for main container */
+.main-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.main-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.main-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.main-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Ensure fixed header doesn't interfere with content */
+.navbar-fixed {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Smooth transitions for mobile menu */
+.offcanvas {
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Optimize for touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .hover-scale:hover {
+    transform: none;
+  }
+  
+  .hover-shadow:hover {
+    box-shadow: var(--shadow-md);
+  }
+}

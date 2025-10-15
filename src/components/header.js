@@ -58,11 +58,15 @@ function Header() {
     <>
       {/* Main Navbar */}
       <Navbar 
+        fixed="top"
         style={{
           background: "linear-gradient(135deg, #1e293b 0%, #334155 100%)",
           minHeight: "70px",
           padding: "0.75rem 0",
-          boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)"
+          boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+          zIndex: 1030,
+          backdropFilter: "blur(10px)",
+          WebkitBackdropFilter: "blur(10px)"
         }}
         variant="dark"
       >

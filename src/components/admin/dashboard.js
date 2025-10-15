@@ -23,7 +23,7 @@ export default function Dashboard() {
         style={{ 
           backgroundColor: "#f8fafc", 
           minHeight: "100vh",
-          paddingTop: "2rem"
+          paddingTop: "110px"
         }}
       >
         <Container fluid className="px-3 px-md-4">
@@ -341,6 +341,25 @@ export default function Dashboard() {
         .hover-card:hover {
           transform: translateY(-4px) !important;
           box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04) !important;
+        }
+        
+        /* Quick Action Button Hover Styles */
+        .btn-outline-warning:hover {
+          background-color: #f59e0b !important;
+          border-color: #f59e0b !important;
+          color: white !important;
+        }
+        
+        .btn-outline-info:hover {
+          background-color: #0dcaf0 !important;
+          border-color: #0dcaf0 !important;
+          color: white !important;
+        }
+        
+        /* Ensure icons also change to white on hover */
+        .btn-outline-warning:hover svg,
+        .btn-outline-info:hover svg {
+          color: white !important;
         }
       `}</style>
     </div>

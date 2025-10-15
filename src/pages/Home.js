@@ -16,7 +16,7 @@ export default function Home() {
   return (
     <div>
       <Header />
-      <Container className="mt-4">
+      <Container style={{ marginTop: "90px", paddingTop: "1rem" }}>
         <h1 className="mb-4 text-center">Product Listings</h1>
         {loading ? (
           <div

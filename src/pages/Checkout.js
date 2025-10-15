@@ -1712,7 +1712,7 @@ export default function Checkout() {
     return (
       <div className="App">
         <Header />
-        <div className="main-container" style={{ paddingTop: "2rem" }}>
+        <div className="main-container" style={{ paddingTop: "110px" }}>
           <Container>
             <Row className="justify-content-center">
               <Col md={8} lg={6}>
@@ -1775,7 +1775,7 @@ export default function Checkout() {
   return (
     <div className="App">
       <Header />
-      <div className="main-container checkout-container" style={{ paddingTop: "clamp(1rem, 3vw, 2rem)" }}>
+      <div className="main-container checkout-container" style={{ paddingTop: "110px" }}>
         <Container className="px-3 px-md-4">
           <CheckoutProgressBar />
           

@@ -81,7 +81,7 @@ export default function Orders() {
     return (
       <>
         <Header />
-        <Container fluid className="py-4" style={{ background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)', minHeight: '100vh' }}>
+        <Container fluid className="" style={{ background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)', minHeight: '100vh', paddingTop: '110px' }}>
           <div className="d-flex flex-column justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
             <div className="text-center">
               <Spinner 
@@ -108,7 +108,7 @@ export default function Orders() {
   return (
     <>
       <Header />
-      <Container fluid className="py-4" style={{ background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)', minHeight: '100vh' }}>
+      <Container fluid className="" style={{ background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)', minHeight: '100vh', paddingTop: '110px' }}>
         {/* Header Section */}
         <div className="text-center mb-5">
           <h1 className="text-dark mb-2" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: '700' }}>
