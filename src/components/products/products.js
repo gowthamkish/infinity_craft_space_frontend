@@ -199,37 +199,74 @@ const ProductList = () => {
                         {filteredProducts.map((product, index) => (
                           <tr key={product._id || product.id} style={{ borderBottom: '1px solid #f1f3f4' }}>
                             <td style={{ border: 'none', padding: '1rem' }}>
-                              {product?.image?.url ? (
-                                <img 
-                                  src={product.image.url} 
-                                  alt={product.name}
-                                  style={{
-                                    width: '60px',
-                                    height: '60px',
-                                    objectFit: 'cover',
-                                    borderRadius: '8px',
-                                    border: '2px solid #e9ecef'
-                                  }}
-                                  onError={(e) => {
-                                    e.target.style.display = 'none';
-                                  }}
-                                />
-                              ) : (
-                                <div 
-                                  style={{
-                                    width: '60px',
-                                    height: '60px',
-                                    backgroundColor: '#f8f9fa',
-                                    borderRadius: '8px',
-                                    border: '2px solid #e9ecef',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                  }}
-                                >
-                                  <FiPackage size={24} color="#6c757d" />
-                                </div>
-                              )}
+                              {/* Multiple Images Display */}
+                              <div className="d-flex align-items-center">
+                                {product?.images?.length > 0 ? (
+                                  <div className="d-flex">
+                                    {/* Primary Image */}
+                                    <img 
+                                      src={product.images[0].url} 
+                                      alt={product.name}
+                                      style={{
+                                        width: '50px',
+                                        height: '50px',
+                                        objectFit: 'cover',
+                                        borderRadius: '6px',
+                                        border: '2px solid #e9ecef'
+                                      }}
+                                      onError={(e) => {
+                                        e.target.style.display = 'none';
+                                      }}
+                                    />
+                                    {/* Additional Images Count */}
+                                    {product.images.length > 1 && (
+                                      <div 
+                                        className="ms-1 d-flex align-items-center justify-content-center bg-primary text-white"
+                                        style={{
+                                          width: '20px',
+                                          height: '20px',
+                                          borderRadius: '50%',
+                                          fontSize: '10px',
+                                          fontWeight: 'bold'
+                                        }}
+                                      >
+                                        +{product.images.length - 1}
+                                      </div>
+                                    )}
+                                  </div>
+                                ) : product?.image?.url ? (
+                                  // Backward compatibility for single image
+                                  <img 
+                                    src={product.image.url} 
+                                    alt={product.name}
+                                    style={{
+                                      width: '50px',
+                                      height: '50px',
+                                      objectFit: 'cover',
+                                      borderRadius: '6px',
+                                      border: '2px solid #e9ecef'
+                                    }}
+                                    onError={(e) => {
+                                      e.target.style.display = 'none';
+                                    }}
+                                  />
+                                ) : (
+                                  <div 
+                                    style={{
+                                      width: '50px',
+                                      height: '50px',
+                                      backgroundColor: '#f8f9fa',
+                                      borderRadius: '6px',
+                                      border: '2px solid #e9ecef',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center'
+                                    }}
+                                  >
+                                    <FiPackage size={20} color="#6c757d" />
+                                  </div>
+                                )}
+                              </div>
                             </td>
                             <td style={{ border: 'none', padding: '1rem' }}>
                               <div>
@@ -296,9 +333,43 @@ const ProductList = () => {
                         <Card key={product._id || product.id} className="mb-3 border-0 shadow-sm" style={{ borderRadius: '12px' }}>
                           <Card.Body>
                             <div className="d-flex align-items-start mb-3">
-                              {/* Product Image */}
+                              {/* Multiple Product Images */}
                               <div className="me-3">
-                                {product?.image?.url ? (
+                                {product?.images?.length > 0 ? (
+                                  <div className="position-relative">
+                                    {/* Primary Image */}
+                                    <img 
+                                      src={product.images[0].url} 
+                                      alt={product.name}
+                                      style={{
+                                        width: '80px',
+                                        height: '80px',
+                                        objectFit: 'cover',
+                                        borderRadius: '12px',
+                                        border: '2px solid #e9ecef'
+                                      }}
+                                      onError={(e) => {
+                                        e.target.style.display = 'none';
+                                      }}
+                                    />
+                                    {/* Images Count Badge */}
+                                    {product.images.length > 1 && (
+                                      <div 
+                                        className="position-absolute top-0 end-0 bg-primary text-white"
+                                        style={{
+                                          fontSize: '10px',
+                                          padding: '2px 6px',
+                                          borderRadius: '8px',
+                                          fontWeight: 'bold',
+                                          transform: 'translate(25%, -25%)'
+                                        }}
+                                      >
+                                        {product.images.length}
+                                      </div>
+                                    )}
+                                  </div>
+                                ) : product?.image?.url ? (
+                                  // Backward compatibility for single image
                                   <img 
                                     src={product.image.url} 
                                     alt={product.name}

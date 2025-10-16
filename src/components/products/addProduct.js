@@ -33,69 +33,139 @@ const AddProduct = () => {
   const [alert, setAlert] = useState({ show: false, message: "", variant: "" });
   const [validated, setValidated] = useState(false);
   
-  // Image upload states
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  // Multiple image upload states
+  const [imageFiles, setImageFiles] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
   const [imageUploading, setImageUploading] = useState(false);
-  const [existingImageUrl, setExistingImageUrl] = useState(null);
+  const [existingImages, setExistingImages] = useState([]);
+  const [dragOver, setDragOver] = useState(false);
 
   // Get subcategories for selected category from dynamic categories
   const subCategoryOptions = form.category 
     ? categories.find(cat => cat.name === form.category)?.subcategories?.filter(sub => sub.isActive) || []
     : [];
 
-  // Handle image file selection
+  // Handle multiple image files selection
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+    const files = Array.from(e.target.files);
+    handleFiles(files);
+  };
+
+  // Handle files from input or drag & drop
+  const handleFiles = (files) => {
+    const maxFiles = 10;
+    const maxSize = 10 * 1024 * 1024; // 10MB per file
+
+    if (imageFiles.length + files.length > maxFiles) {
+      setAlert({ 
+        show: true, 
+        message: `You can only upload a maximum of ${maxFiles} images`, 
+        variant: "danger" 
+      });
+      return;
+    }
+
+    const validFiles = [];
+    const newPreviews = [];
+
+    files.forEach((file) => {
       // Validate file type
       if (!file.type.startsWith('image/')) {
         setAlert({ 
           show: true, 
-          message: "Please select a valid image file", 
-          variant: "danger" 
+          message: `${file.name} is not a valid image file`, 
+          variant: "warning" 
         });
         return;
       }
       
-      // Validate file size (5MB limit)
-      if (file.size > 5 * 1024 * 1024) {
+      // Validate file size
+      if (file.size > maxSize) {
         setAlert({ 
           show: true, 
-          message: "Image size should be less than 5MB", 
-          variant: "danger" 
+          message: `${file.name} is too large. Maximum size is 10MB`, 
+          variant: "warning" 
         });
         return;
       }
 
-      setImageFile(file);
+      validFiles.push(file);
       
       // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result);
+        newPreviews.push({
+          id: Date.now() + Math.random(),
+          file: file,
+          preview: reader.result,
+          name: file.name
+        });
+        
+        if (newPreviews.length === validFiles.length) {
+          setImageFiles(prev => [...prev, ...validFiles]);
+          setImagePreviews(prev => [...prev, ...newPreviews]);
+        }
       };
       reader.readAsDataURL(file);
-    }
+    });
   };
 
-  // Remove selected image
-  const handleRemoveImage = () => {
-    setImageFile(null);
-    setImagePreview(null);
-    // Clear the file input using ref
+  // Remove specific image
+  const handleRemoveImage = (index) => {
+    const newFiles = imageFiles.filter((_, i) => i !== index);
+    const newPreviews = imagePreviews.filter((_, i) => i !== index);
+    
+    setImageFiles(newFiles);
+    setImagePreviews(newPreviews);
+  };
+
+  // Remove all images
+  const handleRemoveAllImages = () => {
+    setImageFiles([]);
+    setImagePreviews([]);
+    setExistingImages([]);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
-  // Convert file to base64
-  const fileToBase64 = (file) => {
+  // Handle drag and drop
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setDragOver(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    
+    const files = Array.from(e.dataTransfer.files);
+    handleFiles(files);
+  };
+
+  // Optimized image compression function
+  // Simplified image processing - just convert to base64 without compression
+  const processImageFile = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
       reader.readAsDataURL(file);
+    });
+  };
+
+  // Convert file to base64
+  const fileToBase64 = async (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
       reader.onload = () => resolve(reader.result);
       reader.onerror = error => reject(error);
+      reader.readAsDataURL(file);
     });
   };
 
@@ -115,18 +185,41 @@ const AddProduct = () => {
     try {
       let productData = { ...form };
 
-      // Handle image upload if file is selected
-      if (imageFile) {
+      // Handle multiple images upload if files are selected
+      if (imageFiles.length > 0) {
         setImageUploading(true);
-        const base64Image = await fileToBase64(imageFile);
         
-        productData.image = {
-          base64: base64Image,
-          filename: imageFile.name,
-          mimetype: imageFile.type,
-          size: imageFile.size,
-          originalName: imageFile.name
-        };
+        try {
+          const imagesData = [];
+          
+          // Process images in batches to prevent memory issues
+          for (let i = 0; i < imageFiles.length; i++) {
+            const file = imageFiles[i];
+            console.log(`Processing image ${i + 1}/${imageFiles.length}: ${file.name}`);
+            
+            const base64Image = await fileToBase64(file);
+            imagesData.push({
+              base64: base64Image,
+              filename: file.name,
+              mimetype: file.type,
+              size: file.size,
+              originalName: file.name
+            });
+          }
+          
+          productData.images = imagesData;
+          console.log(`Total payload size: ~${JSON.stringify(productData).length / 1024 / 1024} MB`);
+        } catch (imageError) {
+          console.error('Image processing error:', imageError);
+          setAlert({ 
+            show: true, 
+            message: "Failed to process images. Please try with fewer images or smaller file sizes.", 
+            variant: "danger" 
+          });
+          setImageUploading(false);
+          setLoading(false);
+          return;
+        }
       }
 
       if (editingId) {
@@ -154,7 +247,7 @@ const AddProduct = () => {
           category: "",
           subCategory: "",
         });
-        handleRemoveImage();
+        handleRemoveAllImages();
         setValidated(false);
       }
 
@@ -165,9 +258,21 @@ const AddProduct = () => {
 
     } catch (err) {
       console.error("Error submitting form:", err);
+      
+      let errorMessage = err?.message || err || "An error occurred while saving the product";
+      
+      // Handle specific error types
+      if (err?.message?.includes('413') || err?.message?.includes('Payload too large')) {
+        errorMessage = "The images are too large. Please try with fewer images or compress them further.";
+      } else if (err?.message?.includes('timeout') || err?.message?.includes('TIMEOUT')) {
+        errorMessage = "Request timed out. Please try with fewer images.";
+      } else if (err?.message?.includes('network') || err?.message?.includes('NETWORK')) {
+        errorMessage = "Network error. Please check your connection and try again.";
+      }
+      
       setAlert({ 
         show: true, 
-        message: err || "An error occurred while saving the product", 
+        message: errorMessage, 
         variant: "danger" 
       });
     } finally {
@@ -192,9 +297,16 @@ const AddProduct = () => {
         subCategory: product.subCategory,
       });
       
-      // Set existing image if available
-      if (product.image && product.image.url) {
-        setExistingImageUrl(product.image.url);
+      // Set existing images if available
+      if (product.images && product.images.length > 0) {
+        setExistingImages(product.images);
+      } else if (product.image && product.image.url) {
+        // Backward compatibility for single image
+        setExistingImages([{
+          url: product.image.url,
+          originalName: product.image.originalName || 'existing-image.jpg',
+          isPrimary: true
+        }]);
       }
     }
   }, [editingId, location.state]);
@@ -418,71 +530,178 @@ const AddProduct = () => {
                     </Col>
                   </Row>
 
-                  {/* Image Upload Section */}
+                  {/* Multiple Images Upload Section */}
                   <Row>
                     <Col md={12}>
-                      <Form.Group className="mb-4" controlId="formImage">
-                        <Form.Label className="fw-semibold text-dark mb-2" style={{ fontSize: '1rem' }}>
+                      <Form.Group className="mb-4" controlId="formImages">
+                        <Form.Label className="fw-semibold text-dark mb-3" style={{ fontSize: '1rem' }}>
                           <FiCamera className="me-2" />
-                          Product Image
+                          Product Images (Maximum 10)
                         </Form.Label>
                         
-                        {/* File Input */}
+                        {/* Drag & Drop Zone */}
+                        <div
+                          className={`border-2 border-dashed rounded-3 p-4 text-center mb-3 ${
+                            dragOver ? 'border-primary bg-light' : 'border-secondary'
+                          }`}
+                          style={{
+                            borderStyle: 'dashed',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease'
+                          }}
+                          onDragOver={handleDragOver}
+                          onDragLeave={handleDragLeave}
+                          onDrop={handleDrop}
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          <FiCamera size={48} className="text-muted mb-2" />
+                          <p className="mb-2 text-muted">
+                            <strong>Click to upload</strong> or drag and drop images here
+                          </p>
+                          <small className="text-muted">
+                            JPEG, PNG, GIF, WebP up to 10MB each
+                          </small>
+                        </div>
+                        
+                        {/* Hidden File Input */}
                         <Form.Control
                           ref={fileInputRef}
                           type="file"
                           accept="image/*"
+                          multiple
                           onChange={handleImageChange}
-                          style={{ 
-                            borderRadius: '12px', 
-                            border: '2px solid #e9ecef',
-                            fontSize: '1rem',
-                            padding: '12px 16px',
-                            transition: 'all 0.3s ease'
-                          }}
-                          className="form-control-lg mb-3"
+                          style={{ display: 'none' }}
                         />
                         
-                        {/* Image Preview */}
-                        {(imagePreview || existingImageUrl) && (
-                          <div className="position-relative d-inline-block">
-                            <Image
-                              src={imagePreview || existingImageUrl}
-                              alt="Product preview"
-                              thumbnail
-                              style={{
-                                width: '200px',
-                                height: '200px',
-                                objectFit: 'cover',
-                                borderRadius: '12px'
-                              }}
-                            />
-                            {imagePreview && (
+                        {/* Image Previews Grid */}
+                        {(imagePreviews.length > 0 || existingImages.length > 0) && (
+                          <div className="mt-4">
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                              <h6 className="mb-0 text-dark">
+                                Selected Images ({imagePreviews.length + existingImages.length}/10)
+                              </h6>
                               <Button
-                                variant="danger"
+                                variant="outline-danger"
                                 size="sm"
-                                className="position-absolute"
-                                style={{
-                                  top: '10px',
-                                  right: '10px',
-                                  borderRadius: '50%',
-                                  width: '30px',
-                                  height: '30px',
-                                  padding: '0',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center'
-                                }}
-                                onClick={handleRemoveImage}
+                                onClick={handleRemoveAllImages}
+                                style={{ borderRadius: '8px' }}
                               >
-                                <FiX size={14} />
+                                <FiX className="me-1" />
+                                Remove All
                               </Button>
-                            )}
+                            </div>
+                            
+                            <Row className="g-3">
+                              {/* Existing Images */}
+                              {existingImages.map((img, index) => (
+                                <Col xs={6} sm={4} md={3} key={`existing-${index}`}>
+                                  <div className="position-relative">
+                                    <Image
+                                      src={img.url}
+                                      alt={img.originalName || `Existing image ${index + 1}`}
+                                      thumbnail
+                                      style={{
+                                        width: '100%',
+                                        height: '120px',
+                                        objectFit: 'cover',
+                                        borderRadius: '8px'
+                                      }}
+                                    />
+                                    {img.isPrimary && (
+                                      <div
+                                        className="position-absolute top-0 start-0 bg-primary text-white px-2 py-1"
+                                        style={{
+                                          fontSize: '0.7rem',
+                                          borderRadius: '8px 0 8px 0'
+                                        }}
+                                      >
+                                        Primary
+                                      </div>
+                                    )}
+                                    <div
+                                      className="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-1"
+                                      style={{
+                                        fontSize: '0.7rem',
+                                        borderRadius: '0 0 8px 8px'
+                                      }}
+                                    >
+                                      <small className="text-truncate d-block">
+                                        {img.originalName || 'Existing'}
+                                      </small>
+                                    </div>
+                                  </div>
+                                </Col>
+                              ))}
+                              
+                              {/* New Image Previews */}
+                              {imagePreviews.map((imgData, index) => (
+                                <Col xs={6} sm={4} md={3} key={`new-${index}`}>
+                                  <div className="position-relative">
+                                    <Image
+                                      src={imgData.preview}
+                                      alt={imgData.name}
+                                      thumbnail
+                                      style={{
+                                        width: '100%',
+                                        height: '120px',
+                                        objectFit: 'cover',
+                                        borderRadius: '8px'
+                                      }}
+                                    />
+                                    <Button
+                                      variant="danger"
+                                      size="sm"
+                                      className="position-absolute"
+                                      style={{
+                                        top: '5px',
+                                        right: '5px',
+                                        borderRadius: '50%',
+                                        width: '25px',
+                                        height: '25px',
+                                        padding: '0',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                      }}
+                                      onClick={() => handleRemoveImage(index)}
+                                    >
+                                      <FiX size={12} />
+                                    </Button>
+                                    {index === 0 && existingImages.length === 0 && (
+                                      <div
+                                        className="position-absolute top-0 start-0 bg-success text-white px-2 py-1"
+                                        style={{
+                                          fontSize: '0.7rem',
+                                          borderRadius: '8px 0 8px 0'
+                                        }}
+                                      >
+                                        Primary
+                                      </div>
+                                    )}
+                                    <div
+                                      className="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-1"
+                                      style={{
+                                        fontSize: '0.7rem',
+                                        borderRadius: '0 0 8px 8px'
+                                      }}
+                                    >
+                                      <small className="text-truncate d-block">{imgData.name}</small>
+                                    </div>
+                                  </div>
+                                </Col>
+                              ))}
+                            </Row>
                           </div>
                         )}
                         
-                        <Form.Text className="text-muted">
-                          Upload a product image (JPEG, PNG, GIF, WebP). Max size: 5MB
+                        <Form.Text className="text-muted mt-2 d-block">
+                          • Upload multiple product images (up to 10 images)
+                          <br />
+                          • Supported formats: JPEG, PNG, GIF, WebP
+                          <br />
+                          • Maximum size per image: 10MB
+                          <br />
+                          • First image will be set as primary
                         </Form.Text>
                       </Form.Group>
                     </Col>
@@ -514,7 +733,7 @@ const AddProduct = () => {
                             aria-hidden="true"
                             className="me-2"
                           />
-                          {imageUploading ? "Uploading image..." : 
+                          {imageUploading ? `Uploading ${imageFiles.length} image${imageFiles.length > 1 ? 's' : ''}...` : 
                            loading ? (editingId ? "Updating..." : "Adding...") : ""}
                         </>
                       ) : (

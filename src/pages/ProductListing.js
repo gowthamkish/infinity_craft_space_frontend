@@ -17,31 +17,132 @@ import { FiGrid, FiFilter, FiShoppingCart, FiX } from "react-icons/fi";
 // Lazy load components
 const Header = lazy(() => import("../components/header"));
 const ProductFilters = lazy(() => import("../components/ProductFilters"));
+const ImageCarouselModal = lazy(() => import("../components/ImageCarouselModal"));
 
 // Optimized ProductCard component with React.memo
 const ProductCard = React.memo(({ 
   product, 
   quantityInCart, 
   onAddToCart, 
-  onRemoveFromCart 
+  onRemoveFromCart,
+  onImageClick
 }) => (
   <Card className="h-100 product-card hover-shadow">
-    <div style={{ overflow: "hidden", borderRadius: "12px 12px 0 0" }}>
-      <Card.Img
-        variant="top"
-        src={product?.image?.url || "https://via.placeholder.com/200x200?text=No+Image"}
-        loading="lazy" // Native lazy loading
-        style={{
-          objectFit: "contain",
-          height: "220px",
-          background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
-          padding: "1rem",
-          transition: "transform 0.3s ease"
-        }}
-        onError={(e) => {
-          e.target.src = "https://via.placeholder.com/200x200?text=No+Image";
-        }}
-      />
+    <div 
+      style={{ 
+        overflow: "hidden", 
+        borderRadius: "12px 12px 0 0", 
+        position: "relative",
+        cursor: "pointer"
+      }}
+      onClick={() => onImageClick && onImageClick(product)}
+    >
+      {/* Multiple Images Display */}
+      {product?.images?.length > 0 ? (
+        <>
+          <Card.Img
+            variant="top"
+            src={product.images[0].url}
+            loading="lazy"
+            style={{
+              objectFit: "contain",
+              height: "220px",
+              background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+              padding: "1rem",
+              transition: "transform 0.3s ease"
+            }}
+            onError={(e) => {
+              e.target.src = "https://via.placeholder.com/200x200?text=No+Image";
+            }}
+          />
+          {/* Images Count Indicator */}
+          {product.images.length > 1 && (
+            <div 
+              style={{
+                position: "absolute",
+                top: "10px",
+                right: "10px",
+                background: "rgba(0,0,0,0.8)",
+                color: "white",
+                padding: "6px 10px",
+                borderRadius: "15px",
+                fontSize: "12px",
+                fontWeight: "bold",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.3)"
+              }}
+            >
+              📸 {product.images.length}
+            </div>
+          )}
+          {/* Click to View Overlay */}
+          <div 
+            className="position-absolute w-100 h-100 d-flex align-items-center justify-content-center"
+            style={{
+              top: 0,
+              left: 0,
+              background: "rgba(0,0,0,0)",
+              color: "white",
+              opacity: 0,
+              transition: "opacity 0.3s ease",
+              fontSize: "14px",
+              fontWeight: "600"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(0,0,0,0.5)";
+              e.currentTarget.style.opacity = "1";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "rgba(0,0,0,0)";
+              e.currentTarget.style.opacity = "0";
+            }}
+          >
+            🔍 Click to view all images
+          </div>
+        </>
+      ) : (
+        // Backward compatibility for single image
+        <>
+          <Card.Img
+            variant="top"
+            src={product?.image?.url || "https://via.placeholder.com/200x200?text=No+Image"}
+            loading="lazy"
+            style={{
+              objectFit: "contain",
+              height: "220px",
+              background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+              padding: "1rem",
+              transition: "transform 0.3s ease"
+            }}
+            onError={(e) => {
+              e.target.src = "https://via.placeholder.com/200x200?text=No+Image";
+            }}
+          />
+          {/* Click to View Overlay for single image */}
+          <div 
+            className="position-absolute w-100 h-100 d-flex align-items-center justify-content-center"
+            style={{
+              top: 0,
+              left: 0,
+              background: "rgba(0,0,0,0)",
+              color: "white",
+              opacity: 0,
+              transition: "opacity 0.3s ease",
+              fontSize: "14px",
+              fontWeight: "600"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(0,0,0,0.5)";
+              e.currentTarget.style.opacity = "1";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "rgba(0,0,0,0)";
+              e.currentTarget.style.opacity = "0";
+            }}
+          >
+            🔍 Click to view image
+          </div>
+        </>
+      )}
     </div>
     <Card.Body className="d-flex flex-column p-4">
       <div className="d-flex justify-content-between align-items-start mb-2">
@@ -203,6 +304,10 @@ const ProductListing = () => {
     sortBy: ""
   });
   
+  // Image carousel modal state
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  
   const cartItems = useSelector((state) => state.cart.items);
   const isAuthenticated = useSelector((state) => state.auth.token);
 
@@ -323,6 +428,17 @@ const ProductListing = () => {
       navigate('/checkout');
     }
   }, [isAuthenticated, navigate]);
+
+  // Image modal handlers
+  const handleImageClick = useCallback((product) => {
+    setSelectedProduct(product);
+    setShowImageModal(true);
+  }, []);
+
+  const handleCloseImageModal = useCallback(() => {
+    setShowImageModal(false);
+    setSelectedProduct(null);
+  }, []);
 
   return (
     <div className="App">
@@ -582,6 +698,7 @@ const ProductListing = () => {
                               quantityInCart={quantityInCart}
                               onAddToCart={handleAddToCart}
                               onRemoveFromCart={handleRemoveFromCart}
+                              onImageClick={handleImageClick}
                             />
                           </Col>
                         );
@@ -594,6 +711,17 @@ const ProductListing = () => {
           </Row>
         </Container>
       </div>
+
+      {/* Image Carousel Modal */}
+      <Suspense fallback={<div>Loading...</div>}>
+        <ImageCarouselModal
+          show={showImageModal}
+          onHide={handleCloseImageModal}
+          images={selectedProduct?.images || (selectedProduct?.image ? [selectedProduct.image] : [])}
+          productName={selectedProduct?.name || "Product Images"}
+          initialIndex={0}
+        />
+      </Suspense>
     </div>
   );
 };

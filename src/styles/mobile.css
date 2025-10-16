@@ -284,6 +284,73 @@
   }
 }
 
+/* Image Modal Styles */
+.image-carousel-modal .modal-dialog {
+  max-width: 90vw;
+}
+
+.image-carousel-modal .modal-content {
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.image-carousel-modal .modal-header {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.image-carousel-modal .modal-body {
+  padding: 0;
+  background: #f8fafc;
+}
+
+/* Product Card Image Hover Effects */
+.product-card .card-img-top:hover {
+  transform: scale(1.02);
+}
+
+.product-card:hover {
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+.hover-shadow {
+  transition: all 0.3s ease;
+}
+
+.hover-shadow:hover {
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+/* Mobile Modal Optimizations */
+@media (max-width: 768px) {
+  .image-carousel-modal .modal-dialog {
+    max-width: 95vw;
+    margin: 1rem;
+  }
+  
+  .image-carousel-modal .modal-title {
+    font-size: 1.1rem;
+  }
+  
+  .image-carousel-modal .btn-close-custom {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+/* Touch device optimizations for image modal */
+@media (hover: none) and (pointer: coarse) {
+  .image-carousel-modal .position-absolute.start-0,
+  .image-carousel-modal .position-absolute.end-0 {
+    display: block;
+    opacity: 1;
+    background: rgba(255,255,255,0.9);
+  }
+}
+
 /* Print styles for mobile */
 @media print {
   .mobile-hide-print {
