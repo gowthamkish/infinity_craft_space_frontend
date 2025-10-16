@@ -4,7 +4,6 @@
   "private": true,
   "proxy": "http://localhost:5000",
   "dependencies": {
-    "@google-cloud/local-auth": "^3.0.1",
     "@reduxjs/toolkit": "^2.8.2",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.6.4",
@@ -12,7 +11,6 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.11.0",
     "bootstrap": "^5.3.7",
-    "google-auth-library": "^10.4.1",
     "razorpay": "^2.9.6",
     "react": "^19.1.1",
     "react-bootstrap": "^2.10.10",

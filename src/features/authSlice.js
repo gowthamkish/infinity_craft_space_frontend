@@ -41,15 +41,6 @@ const authSlice = createSlice({
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     },
-    loginSuccess: (state, action) => {
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-      state.loading = false;
-      state.error = null;
-      // Store in localStorage
-      localStorage.setItem('token', action.payload.token);
-      localStorage.setItem('user', JSON.stringify(action.payload.user));
-    },
     autoLogout: (state, action) => {
       console.log('🚪 Auto-logout triggered:', action.payload?.reason || 'Inactivity');
       state.user = null;
@@ -110,5 +101,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, loginSuccess, autoLogout, setAuthFromStorage, clearError } = authSlice.actions;
+export const { logout, autoLogout, setAuthFromStorage, clearError } = authSlice.actions;
 export default authSlice.reducer;
