@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser, clearError } from "../features/authSlice";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -10,6 +10,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Spinner from "react-bootstrap/Spinner";
 import Alert from "react-bootstrap/Alert";
+import GoogleLoginButton from "../components/GoogleLoginButton";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -19,6 +20,7 @@ export default function Login() {
   const [validated, setValidated] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
   
   // Get auth state from Redux
   const { loading, error } = useSelector((state) => state.auth);
@@ -35,7 +37,17 @@ export default function Login() {
         setSuccessMessage("");
       }, 5000);
     }
-  }, []);
+
+    // Check for OAuth errors
+    const oauthError = searchParams.get('error');
+    if (oauthError) {
+      if (oauthError === 'oauth_failed') {
+        setSuccessMessage('');
+        dispatch(clearError());
+        // You could set a specific error message here
+      }
+    }
+  }, [searchParams, dispatch]);
 
   const validateForm = () => {
     const errors = {};
@@ -338,6 +350,16 @@ export default function Login() {
                       >
                         Create New Account
                       </Button>
+                    </div>
+
+                    {/* Google Login Section */}
+                    <div className="text-center mb-4">
+                      <GoogleLoginButton />
+                      <div className="d-flex align-items-center my-3">
+                        <div className="flex-grow-1" style={{ height: '1px', backgroundColor: '#e9ecef' }}></div>
+                        <span className="mx-3 text-muted" style={{ fontSize: '0.9rem' }}>Or continue with email</span>
+                        <div className="flex-grow-1" style={{ height: '1px', backgroundColor: '#e9ecef' }}></div>
+                      </div>
                     </div>
 
                     <div className="text-center">

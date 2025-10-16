@@ -10,6 +10,7 @@ const ProductListing = lazy(() => import("./pages/ProductListing"));
 const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
+const AuthSuccess = lazy(() => import("./pages/AuthSuccess"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const Orders = lazy(() => import("./pages/Orders"));
 const ProtectedRoute = lazy(() => import("./components/ProtectedRoute"));
@@ -99,6 +100,14 @@ function App() {
               element={
                 <Suspense fallback={<LoadingFallback message="Loading registration..." />}>
                   <Register />
+                </Suspense>
+              } 
+            />
+            <Route 
+              path="/auth/success" 
+              element={
+                <Suspense fallback={<LoadingFallback message="Completing authentication..." />}>
+                  <AuthSuccess />
                 </Suspense>
               } 
             />
