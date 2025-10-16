@@ -72,6 +72,22 @@ export const updateOrderStatus = createAsyncThunk(
   }
 );
 
+// Update user role (make admin/user)
+export const updateUserRole = createAsyncThunk(
+  'admin/updateUserRole',
+  async ({ userId, isAdmin }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.put(`/api/admin/users/${userId}/role`, { isAdmin }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.error || 'Failed to update user role');
+    }
+  }
+);
+
 const adminSlice = createSlice({
   name: 'admin',
   initialState: {
@@ -211,6 +227,25 @@ const adminSlice = createSlice({
       .addCase(updateOrderStatus.rejected, (state, action) => {
         state.ordersLoading = false;
         state.ordersError = action.payload;
+      })
+      // Update user role
+      .addCase(updateUserRole.pending, (state) => {
+        state.usersLoading = true;
+        state.usersError = null;
+      })
+      .addCase(updateUserRole.fulfilled, (state, action) => {
+        const updatedUser = action.payload.user;
+        // Find and update the user in the users array
+        const index = state.users.findIndex(user => user._id === updatedUser._id);
+        if (index !== -1) {
+          state.users[index] = updatedUser;
+        }
+        state.usersLoading = false;
+        state.usersError = null;
+      })
+      .addCase(updateUserRole.rejected, (state, action) => {
+        state.usersLoading = false;
+        state.usersError = action.payload;
       });
   },
 });

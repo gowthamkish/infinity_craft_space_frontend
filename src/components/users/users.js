@@ -1,21 +1,53 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import Header from "../header";
 import Table from "react-bootstrap/Table";
-import { Container, Spinner, Breadcrumb, Card, Row, Col, Badge, InputGroup, Form } from "react-bootstrap";
-import { FiArrowLeft, FiUsers, FiMail, FiShield, FiUser, FiSearch, FiUserCheck, FiUserX, FiCrosshair } from "react-icons/fi";
+import { Container, Spinner, Breadcrumb, Card, Row, Col, Badge, InputGroup, Form, Button, Modal } from "react-bootstrap";
+import { FiArrowLeft, FiUsers, FiMail, FiShield, FiUser, FiSearch, FiUserCheck, FiUserX, FiCrosshair, FiSettings } from "react-icons/fi";
 import { useUsers } from "../../hooks/useSmartFetch";
+import { updateUserRole } from "../../features/adminSlice";
 
 const UsersList = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { data: users, loading, error } = useUsers();
   const [searchTerm, setSearchTerm] = useState("");
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [roleActionLoading, setRoleActionLoading] = useState(false);
 
   // Filter users based on search term
   const filteredUsers = users.filter(user => 
     user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Handle role change
+  const handleRoleChange = (user) => {
+    setSelectedUser(user);
+    setShowConfirmModal(true);
+  };
+
+  // Confirm role change
+  const confirmRoleChange = async () => {
+    if (!selectedUser) return;
+
+    setRoleActionLoading(true);
+    try {
+      await dispatch(updateUserRole({
+        userId: selectedUser._id,
+        isAdmin: !selectedUser.isAdmin
+      })).unwrap();
+      
+      setShowConfirmModal(false);
+      setSelectedUser(null);
+    } catch (error) {
+      console.error('Failed to update user role:', error);
+    } finally {
+      setRoleActionLoading(false);
+    }
+  };
 
   const getUserIcon = (user) => {
     if (user.isAdmin) {
@@ -199,6 +231,10 @@ const UsersList = () => {
                           <th style={{ border: 'none', padding: '1rem', fontWeight: '600', color: '#495057' }}>
                             Status
                           </th>
+                          <th style={{ border: 'none', padding: '1rem', fontWeight: '600', color: '#495057', textAlign: 'center' }}>
+                            <FiSettings className="me-2" style={{ color: '#6366f1' }} />
+                            Actions
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -257,6 +293,34 @@ const UsersList = () => {
                                 Active
                               </Badge>
                             </td>
+                            <td style={{ border: 'none', padding: '1rem', textAlign: 'center' }}>
+                              <Button
+                                size="sm"
+                                variant={user.isAdmin ? "outline-warning" : "outline-success"}
+                                onClick={() => handleRoleChange(user)}
+                                disabled={roleActionLoading}
+                                style={{
+                                  borderRadius: '8px',
+                                  fontWeight: '500',
+                                  padding: '0.4rem 0.8rem',
+                                  border: '2px solid',
+                                  fontSize: '0.75rem'
+                                }}
+                                className="d-flex align-items-center gap-1"
+                              >
+                                {user.isAdmin ? (
+                                  <>
+                                    <FiUser size={12} />
+                                    Make User
+                                  </>
+                                ) : (
+                                  <>
+                                    <FiShield size={12} />
+                                    Make Admin
+                                  </>
+                                )}
+                              </Button>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -292,7 +356,7 @@ const UsersList = () => {
                                   <FiMail className="me-2" style={{ color: '#10b981' }} />
                                   <span className="text-muted small">{user.email}</span>
                                 </div>
-                                <div className="d-flex justify-content-between align-items-center">
+                                <div className="d-flex justify-content-between align-items-center mb-2">
                                   <small className="text-muted">ID: {user._id?.slice(-6) || user.id?.toString().slice(-6)}</small>
                                   <Badge 
                                     bg="success" 
@@ -315,6 +379,34 @@ const UsersList = () => {
                                     Active
                                   </Badge>
                                 </div>
+                                <div className="d-flex justify-content-end">
+                                  <Button
+                                    size="sm"
+                                    variant={user.isAdmin ? "outline-warning" : "outline-success"}
+                                    onClick={() => handleRoleChange(user)}
+                                    disabled={roleActionLoading}
+                                    style={{
+                                      borderRadius: '6px',
+                                      fontWeight: '500',
+                                      padding: '0.3rem 0.6rem',
+                                      border: '2px solid',
+                                      fontSize: '0.7rem'
+                                    }}
+                                    className="d-flex align-items-center gap-1"
+                                  >
+                                    {user.isAdmin ? (
+                                      <>
+                                        <FiUser size={10} />
+                                        Make User
+                                      </>
+                                    ) : (
+                                      <>
+                                        <FiShield size={10} />
+                                        Make Admin
+                                      </>
+                                    )}
+                                  </Button>
+                                </div>
                               </div>
                             </div>
                           </Card.Body>
@@ -328,6 +420,91 @@ const UsersList = () => {
           </Card>
         )}
       </Container>
+
+      {/* Role Change Confirmation Modal */}
+      <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)} centered>
+        <Modal.Header closeButton style={{ border: 'none', paddingBottom: 0 }}>
+          <Modal.Title className="d-flex align-items-center gap-2">
+            <FiShield style={{ color: '#f59e0b' }} />
+            {selectedUser?.isAdmin ? 'Remove Admin Access' : 'Grant Admin Access'}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ paddingTop: '1rem' }}>
+          {selectedUser && (
+            <div>
+              <div className="d-flex align-items-center gap-3 mb-3 p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '12px' }}>
+                <div 
+                  className="d-flex align-items-center justify-content-center"
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    backgroundColor: selectedUser.isAdmin ? '#fef3c7' : '#e0f2fe',
+                    borderRadius: '10px'
+                  }}
+                >
+                  {getUserIcon(selectedUser)}
+                </div>
+                <div>
+                  <h6 className="mb-0" style={{ fontWeight: '600' }}>{selectedUser.username}</h6>
+                  <small className="text-muted">{selectedUser.email}</small>
+                </div>
+              </div>
+              
+              <div className="alert alert-info d-flex align-items-start gap-2" style={{ border: 'none', borderRadius: '12px' }}>
+                <FiShield style={{ color: '#0ea5e9', marginTop: '2px', flexShrink: 0 }} />
+                <div>
+                  <strong className="d-block mb-1">
+                    {selectedUser.isAdmin ? 'Remove Admin Privileges' : 'Grant Admin Privileges'}
+                  </strong>
+                  <small>
+                    {selectedUser.isAdmin 
+                      ? 'This user will lose admin access and become a regular user. They will no longer be able to access the admin dashboard.'
+                      : 'This user will gain admin access and be able to manage products, orders, and other users through the admin dashboard.'
+                    }
+                  </small>
+                </div>
+              </div>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer style={{ border: 'none', paddingTop: 0 }}>
+          <Button 
+            variant="outline-secondary" 
+            onClick={() => setShowConfirmModal(false)}
+            style={{ borderRadius: '8px' }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            variant={selectedUser?.isAdmin ? "warning" : "success"}
+            onClick={confirmRoleChange}
+            disabled={roleActionLoading}
+            style={{ borderRadius: '8px' }}
+            className="d-flex align-items-center gap-2"
+          >
+            {roleActionLoading ? (
+              <>
+                <Spinner size="sm" />
+                Updating...
+              </>
+            ) : (
+              <>
+                {selectedUser?.isAdmin ? (
+                  <>
+                    <FiUser size={14} />
+                    Make User
+                  </>
+                ) : (
+                  <>
+                    <FiShield size={14} />
+                    Make Admin
+                  </>
+                )}
+              </>
+            )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };
