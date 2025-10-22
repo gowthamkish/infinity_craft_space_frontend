@@ -4,6 +4,7 @@ import { useEffect, Suspense, lazy } from "react";
 import { useDispatch } from "react-redux";
 import { setAuthFromStorage } from "./features/authSlice";
 import { Spinner, Container } from "react-bootstrap";
+import { HelmetProvider } from "react-helmet-async";
 
 // Lazy load components for better performance
 const ProductListing = lazy(() => import("./pages/ProductListing"));
@@ -65,18 +66,19 @@ function App() {
 
   return (
     <div className="App">
-      <Router>
-        <Suspense fallback={<LoadingFallback message="Loading application..." />}>
-          {/* Offline Indicator - Shows connection status */}
-          <OfflineIndicator />
-          
-          {/* PWA Install Prompt - Shows on mobile devices */}
-          <PWAInstallPrompt />
-          
-          {/* Idle Timeout Manager - Active globally for all authenticated users */}
-          <IdleTimeoutManager />
-          
-          <Routes>
+      <HelmetProvider>
+        <Router>
+          <Suspense fallback={<LoadingFallback message="Loading application..." />}>
+            {/* Offline Indicator - Shows connection status */}
+            <OfflineIndicator />
+            
+            {/* PWA Install Prompt - Shows on mobile devices */}
+            <PWAInstallPrompt />
+            
+            {/* Idle Timeout Manager - Active globally for all authenticated users */}
+            <IdleTimeoutManager />
+            
+            <Routes>
             {/* Public Routes */}
             <Route 
               path="/" 
@@ -206,9 +208,10 @@ function App() {
                 </Suspense>
               } 
             />
-          </Routes>
-        </Suspense>
-      </Router>
+            </Routes>
+          </Suspense>
+        </Router>
+      </HelmetProvider>
     </div>
   );
 }

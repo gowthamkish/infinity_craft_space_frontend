@@ -10,6 +10,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Spinner from "react-bootstrap/Spinner";
 import Alert from "react-bootstrap/Alert";
+import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 
 export default function Register() {
   const [form, setForm] = useState({ username: "", email: "", password: "" });
@@ -81,12 +82,21 @@ export default function Register() {
   };
 
   return (
-    <div
-      className="d-flex align-items-center justify-content-center"
-      style={{
-        minHeight: "100vh",
-        background:
-          "linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%)",
+    <>
+      <SEOHead
+        title={`Register - ${SEO_CONFIG.SITE_NAME}`}
+        description="Create your Infinity Craft Space account to access premium craft supplies, track orders, write reviews, and enjoy exclusive member benefits."
+        keywords="register, sign up, create account, craft supplies account, join community"
+        url={`${SEO_CONFIG.SITE_URL}/register`}
+        noindex={true}
+        canonical={`${SEO_CONFIG.SITE_URL}/register`}
+      />
+      <div
+        className="d-flex align-items-center justify-content-center"
+        style={{
+          minHeight: "100vh",
+          background:
+            "linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%)",
       }}
     >
       {loading ? (
@@ -407,5 +417,6 @@ export default function Register() {
         </Container>
       )}
     </div>
+    </>
   );
 }

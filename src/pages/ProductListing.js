@@ -13,6 +13,7 @@ import Badge from "react-bootstrap/Badge";
 import Alert from "react-bootstrap/Alert";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import { FiGrid, FiFilter, FiShoppingCart, FiX } from "react-icons/fi";
+import SEOHead, { SEO_CONFIG, generateBreadcrumbStructuredData } from "../components/SEOHead";
 
 // Lazy load components
 const Header = lazy(() => import("../components/header"));
@@ -440,8 +441,92 @@ const ProductListing = () => {
     setSelectedProduct(null);
   }, []);
 
+  // Generate dynamic SEO based on filters and search
+  const generatePageSEO = useMemo(() => {
+    let title = "Premium Craft Supplies & Materials";
+    let description = SEO_CONFIG.DEFAULT_DESCRIPTION;
+    let keywords = SEO_CONFIG.DEFAULT_KEYWORDS;
+    
+    if (filters.searchTerm) {
+      title = `${filters.searchTerm} - Craft Supplies & Materials`;
+      description = `Find ${filters.searchTerm} and related craft supplies at Infinity Craft Space. Browse our collection of premium materials and tools.`;
+      keywords = `${filters.searchTerm}, ${SEO_CONFIG.DEFAULT_KEYWORDS}`;
+    }
+    
+    if (filters.categories && filters.categories.length > 0) {
+      const categoryText = filters.categories.join(", ");
+      title = `${categoryText} - Craft Supplies`;
+      description = `Shop ${categoryText} supplies at Infinity Craft Space. Premium quality materials and tools for your crafting needs.`;
+      keywords = `${categoryText}, ${SEO_CONFIG.DEFAULT_KEYWORDS}`;
+    }
+    
+    if (filters.priceRange) {
+      const priceText = `₹${filters.priceRange.min} - ₹${filters.priceRange.max}`;
+      title = `Craft Supplies ${priceText} - Affordable Materials`;
+      description = `Quality craft supplies in the ${priceText} price range. Find affordable materials and tools at Infinity Craft Space.`;
+    }
+    
+    return {
+      title: `${title} - ${SEO_CONFIG.SITE_NAME}`,
+      description,
+      keywords,
+      url: `${SEO_CONFIG.SITE_URL}${filters.searchTerm ? `/search?q=${encodeURIComponent(filters.searchTerm)}` : '/products'}`,
+      structuredData: {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": title,
+        "description": description,
+        "url": `${SEO_CONFIG.SITE_URL}${filters.searchTerm ? `/search?q=${encodeURIComponent(filters.searchTerm)}` : '/products'}`,
+        "mainEntity": {
+          "@type": "ItemList",
+          "numberOfItems": filteredAndSortedProducts.length,
+          "itemListElement": filteredAndSortedProducts.slice(0, 20).map((product, index) => ({
+            "@type": "ListItem",
+            "position": index + 1,
+            "item": {
+              "@type": "Product",
+              "name": product.name,
+              "description": product.description,
+              "image": product.images?.[0]?.url || product.image?.url,
+              "offers": {
+                "@type": "Offer",
+                "price": product.price,
+                "priceCurrency": "INR",
+                "availability": "https://schema.org/InStock"
+              }
+            }
+          }))
+        }
+      }
+    };
+  }, [filters, filteredAndSortedProducts]);
+
+  const breadcrumbs = [
+    { name: "Home", url: SEO_CONFIG.SITE_URL },
+    { name: "Products", url: `${SEO_CONFIG.SITE_URL}/products` }
+  ];
+
+  if (filters.categories && filters.categories.length > 0) {
+    filters.categories.forEach(category => {
+      breadcrumbs.push({
+        name: category,
+        url: `${SEO_CONFIG.SITE_URL}/products?category=${encodeURIComponent(category)}`
+      });
+    });
+  }
+
   return (
     <div className="App">
+      <SEOHead
+        title={generatePageSEO.title}
+        description={generatePageSEO.description}
+        keywords={generatePageSEO.keywords}
+        url={generatePageSEO.url}
+        type="website"
+        structuredData={generatePageSEO.structuredData}
+        canonical={generatePageSEO.url}
+      />
+      
       <Suspense fallback={<div className="d-flex justify-content-center p-3"><Spinner animation="border" /></div>}>
         <Header />
       </Suspense>
