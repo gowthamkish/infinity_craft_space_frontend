@@ -10,6 +10,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Spinner from "react-bootstrap/Spinner";
 import Alert from "react-bootstrap/Alert";
+import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -95,13 +96,22 @@ export default function Login() {
   };
 
   return (
-    <div
-      className="d-flex align-items-center justify-content-center"
-      style={{
-        minHeight: "100vh",
-        background:
-          "linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%)",
-      }}
+    <>
+      <SEOHead
+        title={`Login - ${SEO_CONFIG.SITE_NAME}`}
+        description="Sign in to your Infinity Craft Space account to access exclusive features, track orders, and manage your craft supplies shopping experience."
+        keywords="login, sign in, account, craft supplies account, user login"
+        url={`${SEO_CONFIG.SITE_URL}/login`}
+        noindex={true}
+        canonical={`${SEO_CONFIG.SITE_URL}/login`}
+      />
+      <div
+        className="d-flex align-items-center justify-content-center"
+        style={{
+          minHeight: "100vh",
+          background:
+            "linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%)",
+        }}
     >
 
       {loading ? (
@@ -361,6 +371,7 @@ export default function Login() {
           </Row>
         </Container>
       )}
-    </div>
+      </div>
+    </>
   );
 }

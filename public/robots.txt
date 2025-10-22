@@ -1,3 +1,78 @@
-# https://www.robotstxt.org/robotstxt.html
+# Robots.txt for Infinity Craft Space
+# https://infinitycraftspace.com/robots.txt
+
 User-agent: *
-Disallow:
+
+# Allow all crawlers to access public pages
+Allow: /
+Allow: /products
+Allow: /categories/
+Allow: /product/
+Allow: /about
+Allow: /contact
+Allow: /craft-guides
+Allow: /tutorials
+Allow: /shipping-info
+Allow: /return-policy
+Allow: /privacy-policy
+Allow: /terms-of-service
+
+# Disallow private/user-specific pages
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /checkout
+Disallow: /orders
+Disallow: /profile
+Disallow: /cart
+Disallow: /my-account
+Disallow: /user/
+
+# Disallow authentication pages (already have noindex)
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+
+# Disallow API endpoints
+Disallow: /api/
+
+# Disallow build and static files that shouldn't be indexed
+Disallow: /build/
+Disallow: /static/js/
+Disallow: /static/css/
+Disallow: *.js$
+Disallow: *.css$
+Disallow: *.map$
+
+# Allow access to important files
+Allow: /favicon.ico
+Allow: /logo*.png
+Allow: /manifest.json
+
+# Sitemap location
+Sitemap: https://infinitycraftspace.com/sitemap.xml
+
+# Crawl delay (be respectful to server resources)
+Crawl-delay: 1
+
+# Special rules for different bots
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Block problematic bots
+User-agent: CCBot
+Disallow: /
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /

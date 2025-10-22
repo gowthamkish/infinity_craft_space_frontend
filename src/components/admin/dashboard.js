@@ -10,22 +10,33 @@ import { useNavigate } from "react-router-dom";
 import Spinner from "react-bootstrap/Spinner";
 import { FiUsers, FiPackage, FiTrendingUp, FiPlus, FiBarChart, FiShoppingCart } from "react-icons/fi";
 import { useDashboardCounts } from "../../hooks/useSmartFetch";
+import SEOHead, { SEO_CONFIG } from "../SEOHead";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { data: dashboardCounts, loading, error } = useDashboardCounts();
 
   return (
-    <div className="App">
-      <Header />
-      <div 
-        className="main-container" 
-        style={{ 
-          backgroundColor: "#f8fafc", 
-          minHeight: "100vh",
-          paddingTop: "110px"
-        }}
-      >
+    <>
+      <SEOHead
+        title={`Admin Dashboard - ${SEO_CONFIG.SITE_NAME}`}
+        description="Administrative dashboard for managing craft supplies store. Access restricted to authorized administrators only."
+        keywords="admin dashboard, administration, management panel, restricted access"
+        url={`${SEO_CONFIG.SITE_URL}/admin/dashboard`}
+        noindex={true}
+        nofollow={true}
+        canonical={`${SEO_CONFIG.SITE_URL}/admin/dashboard`}
+      />
+      <div className="App">
+        <Header />
+        <div 
+          className="main-container" 
+          style={{ 
+            backgroundColor: "#f8fafc", 
+            minHeight: "100vh",
+            paddingTop: "110px"
+          }}
+        >
         <Container fluid className="px-3 px-md-4">
           {/* Dashboard Header */}
           <Row className="mb-5">
@@ -363,5 +374,6 @@ export default function Dashboard() {
         }
       `}</style>
     </div>
+    </>
   );
 }

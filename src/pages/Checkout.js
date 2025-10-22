@@ -13,6 +13,7 @@ import Alert from "react-bootstrap/Alert";
 import Badge from "react-bootstrap/Badge";
 import { Trash2, Plus, Minus, Check, Package, CreditCard, Lock, CheckCircle } from "react-feather";
 import api from "../api/axios";
+import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 
 // Add CSS for payment method hover effects and mobile responsiveness
 const paymentMethodStyles = `
@@ -1772,9 +1773,18 @@ export default function Checkout() {
   }
 
   return (
-    <div className="App">
-      <Header />
-      <div className="main-container checkout-container" style={{ paddingTop: "110px" }}>
+    <>
+      <SEOHead
+        title={`Checkout - ${currentStep === 1 ? 'Review Cart' : currentStep === 2 ? 'Shipping Details' : currentStep === 3 ? 'Payment' : 'Confirmation'}`}
+        description="Complete your craft supplies purchase with our secure checkout process. Review your order, add shipping details, and complete payment safely."
+        keywords="checkout, secure payment, craft supplies order, shipping details, order completion"
+        url={`${SEO_CONFIG.SITE_URL}/checkout`}
+        noindex={true}
+        canonical={`${SEO_CONFIG.SITE_URL}/checkout`}
+      />
+      <div className="App">
+        <Header />
+        <div className="main-container checkout-container" style={{ paddingTop: "110px" }}>
         <Container className="px-3 px-md-4">
           <CheckoutProgressBar />
           
@@ -1785,5 +1795,6 @@ export default function Checkout() {
         </Container>
       </div>
     </div>
+    </>
   );
 }

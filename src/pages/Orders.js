@@ -10,6 +10,7 @@ import ListGroup from "react-bootstrap/ListGroup";
 import Button from "react-bootstrap/Button";
 import { FiPackage, FiCalendar, FiMapPin, FiCreditCard, FiTruck, FiCheck, FiClock, FiX, FiShoppingBag } from "react-icons/fi";
 import api from "../api/axios";
+import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
@@ -107,6 +108,14 @@ export default function Orders() {
 
   return (
     <>
+      <SEOHead
+        title={`My Orders - ${SEO_CONFIG.SITE_NAME}`}
+        description="View and track all your craft supply orders. Check order status, delivery information, and leave reviews for delivered products."
+        keywords="my orders, order history, track orders, delivery status, order management, purchase history"
+        url={`${SEO_CONFIG.SITE_URL}/orders`}
+        noindex={true}
+        canonical={`${SEO_CONFIG.SITE_URL}/orders`}
+      />
       <Header />
       <Container fluid className="" style={{ background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)', minHeight: '100vh', paddingTop: '110px' }}>
         {/* Header Section */}

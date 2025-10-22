@@ -8,15 +8,64 @@ import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Spinner from "react-bootstrap/Spinner";
 import { useProducts } from "../hooks/useSmartFetch";
+import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 
 export default function Home() {
   const dispatch = useDispatch();
   const { data: products, loading, error } = useProducts();
 
   return (
-    <div>
-      <Header />
-      <Container style={{ marginTop: "90px", paddingTop: "1rem" }}>
+    <>
+      <SEOHead
+        title={SEO_CONFIG.SITE_NAME}
+        description="Discover premium craft supplies at Infinity Craft Space. From painting supplies to sculpting tools, jewelry making materials to pottery wheels - everything you need for your creative journey."
+        keywords="craft supplies, art materials, painting supplies, sculpting tools, jewelry making, pottery, crafting materials, creative supplies, art store"
+        url={SEO_CONFIG.SITE_URL}
+        canonical={SEO_CONFIG.SITE_URL}
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "Store",
+          "name": SEO_CONFIG.SITE_NAME,
+          "description": "Premium craft supplies and art materials for creative enthusiasts",
+          "url": SEO_CONFIG.SITE_URL,
+          "telephone": "+1-555-CRAFT-01",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "123 Creative Lane",
+            "addressLocality": "Art District",
+            "addressRegion": "Creative State",
+            "postalCode": "12345",
+            "addressCountry": "US"
+          },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": `${SEO_CONFIG.SITE_URL}/products?search={search_term_string}`,
+            "query-input": "required name=search_term_string"
+          },
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Craft Supplies Catalog",
+            "itemListElement": products?.slice(0, 5).map(product => ({
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Product",
+                "name": product.name,
+                "description": product.description,
+                "image": product.image,
+                "offers": {
+                  "@type": "Offer",
+                  "price": product.price,
+                  "priceCurrency": "INR",
+                  "availability": "https://schema.org/InStock"
+                }
+              }
+            })) || []
+          }
+        }}
+      />
+      <div>
+        <Header />
+        <Container style={{ marginTop: "90px", paddingTop: "1rem" }}>
         <h1 className="mb-4 text-center">Product Listings</h1>
         {loading ? (
           <div
@@ -85,5 +134,6 @@ export default function Home() {
         )}
       </Container>
     </div>
+    </>
   );
 }
