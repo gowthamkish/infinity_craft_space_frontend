@@ -3,14 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { autoLogout } from '../features/authSlice';
 import IDLE_TIMEOUT_CONFIG from '../config/idleTimeout';
 
-const useIdleTimeout = (timeoutDuration = IDLE_TIMEOUT_CONFIG.TIMEOUT_DURATION, paused = false) => {
+const useIdleTimeout = (timeoutDuration = IDLE_TIMEOUT_CONFIG.TIMEOUT_DURATION, paused = false, isAdminUser = false) => {
   const dispatch = useDispatch();
   const { token } = useSelector(state => state.auth);
   const timeoutRef = useRef(null);
   const lastActivityRef = useRef(Date.now());
   const warningShownRef = useRef(false);
 
-  // Clear all tokens and logout
+  // Clear all tokens and logout - ONLY for admin users
   const performLogout = useCallback(() => {
     console.log('🚪 Auto-logout triggered due to inactivity');
     
@@ -50,8 +50,8 @@ const useIdleTimeout = (timeoutDuration = IDLE_TIMEOUT_CONFIG.TIMEOUT_DURATION, 
   const events = IDLE_TIMEOUT_CONFIG.ACTIVITY_EVENTS;
 
   useEffect(() => {
-    // Only activate idle timeout if user is logged in
-    if (!token) {
+    // Only activate idle timeout if user is logged in AND is an admin
+    if (!token || !isAdminUser) {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
@@ -80,7 +80,7 @@ const useIdleTimeout = (timeoutDuration = IDLE_TIMEOUT_CONFIG.TIMEOUT_DURATION, 
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [token, resetTimeout, handleActivity, paused]);
+  }, [token, resetTimeout, handleActivity, paused, isAdminUser]);
 
   // Handle visibility change (tab switching)
   useEffect(() => {

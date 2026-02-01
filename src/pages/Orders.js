@@ -241,7 +241,7 @@ export default function Orders() {
                                   </small>
                                 </div>
                                 <span className="fw-bold text-primary" style={{ fontSize: '1.1rem' }}>
-                                  ₹{((item.price || 0) * (item.quantity || 1)).toFixed(2)}
+                                  ₹{(item.totalPrice || (item.product?.price * item.quantity) || 0).toFixed(2)}
                                 </span>
                               </ListGroup.Item>
                             ))}
@@ -260,24 +260,15 @@ export default function Orders() {
                                 <FiCreditCard className="me-2 text-success" />
                                 Order Summary
                               </h6>
-                              <div className="d-flex justify-content-between mb-2">
-                                <small className="text-muted">Subtotal:</small>
-                                <small className="fw-semibold">₹{order.subtotal?.toFixed(2) || "0.00"}</small>
-                              </div>
-                              <div className="d-flex justify-content-between mb-2">
-                                <small className="text-muted">Shipping:</small>
-                                <small className="fw-semibold">₹{order.shipping?.toFixed(2) || "0.00"}</small>
-                              </div>
-                              <div className="d-flex justify-content-between mb-2">
-                                <small className="text-muted">Tax:</small>
-                                <small className="fw-semibold">₹{order.tax?.toFixed(2) || "0.00"}</small>
-                              </div>
-                              <hr className="my-2" style={{ borderColor: '#dee2e6' }} />
-                              <div className="d-flex justify-content-between">
-                                <strong className="text-dark">Total:</strong>
+                              <div className="d-flex justify-content-between mb-3">
+                                <strong className="text-dark">Order Total:</strong>
                                 <strong className="text-primary" style={{ fontSize: '1.2rem' }}>
-                                  ₹{order.total?.toFixed(2) || "0.00"}
+                                  ₹{(order.totalAmount || 0).toFixed(2)}
                                 </strong>
+                              </div>
+                              <div className="d-flex justify-content-between text-muted small">
+                                <span>Items: {(order.items || []).length}</span>
+                                <span>Currency: {order.currency || 'INR'}</span>
                               </div>
                             </Card.Body>
                           </Card>

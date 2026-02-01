@@ -311,7 +311,7 @@ const Orders = () => {
                             <td style={{ border: 'none', padding: '1rem' }}>
                               <div>
                                 <h6 className="mb-0" style={{ fontWeight: '500', color: '#374151' }}>
-                                  {order.userId.username || order.customerName || 'Unknown'}
+                                  {order.userId?.username || order.customerName || 'Unknown'}
                                 </h6>
                                 <small className="text-muted">{order.user?.email || order.customerEmail}</small>
                               </div>
@@ -787,7 +787,7 @@ const Orders = () => {
                               Full Name
                             </label>
                             <p style={{ margin: '0.15rem 0 0 0', fontSize: '0.9rem', fontWeight: '600', color: '#1e293b' }}>
-                              {selectedOrder.user?.name || selectedOrder.customerName || 'Unknown Customer'}
+                              {typeof selectedOrder.userId === 'object' ? (selectedOrder.userId?.username || selectedOrder.customerName || 'Unknown Customer') : (selectedOrder.customerName || 'Unknown Customer')}
                             </p>
                           </div>
                           <div className="mb-2">
@@ -795,7 +795,7 @@ const Orders = () => {
                               Email Address
                             </label>
                             <p style={{ margin: '0.15rem 0 0 0', fontSize: '0.85rem', color: '#475569' }}>
-                              {selectedOrder.user?.email || selectedOrder.customerEmail || 'N/A'}
+                              {typeof selectedOrder.userId === 'object' ? (selectedOrder.userId?.email || selectedOrder.customerEmail || 'N/A') : (selectedOrder.customerEmail || 'N/A')}
                             </p>
                           </div>
                           <div>
@@ -803,7 +803,7 @@ const Orders = () => {
                               Phone Number
                             </label>
                             <p style={{ margin: '0.15rem 0 0 0', fontSize: '0.85rem', color: '#475569' }}>
-                              {selectedOrder.shippingAddress?.phone || 'N/A'}
+                              {selectedOrder.shippingAddress?.phone || selectedOrder.phone || 'N/A'}
                             </p>
                           </div>
                         </Card.Body>
@@ -845,9 +845,9 @@ const Orders = () => {
                                 color: '#475569',
                                 fontSize: '0.85rem'
                               }}>
-                                {selectedOrder.shippingAddress.street}<br />
-                                {selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.state}<br />
-                                <strong>{selectedOrder.shippingAddress.zipCode}</strong>
+                                {selectedOrder.shippingAddress?.street}<br />
+                                {selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.state}<br />
+                                <strong>{selectedOrder.shippingAddress?.zipCode}</strong>
                               </p>
                             </div>
                           ) : (
@@ -899,7 +899,7 @@ const Orders = () => {
                                     fontWeight: '600',
                                     fontSize: '0.95rem'
                                   }}>
-                                    {item.productName || item.name || 'Unknown Product'}
+                                    {item.product?.name || item.productName || item.name || 'Unknown Product'}
                                   </h6>
                                   <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                                     <div>
@@ -933,7 +933,7 @@ const Orders = () => {
                                         color: '#475569',
                                         fontWeight: '600'
                                       }}>
-                                        {formatCurrency(item.price)}
+                                        {formatCurrency(item.product?.price || item.price || 0)}
                                       </span>
                                     </div>
                                   </div>
@@ -944,7 +944,7 @@ const Orders = () => {
                                     fontWeight: '700', 
                                     color: '#059669'
                                   }}>
-                                    {formatCurrency(item.price * item.quantity)}
+                                    {formatCurrency((item.product?.price || item.price || 0) * item.quantity)}
                                   </div>
                                 </div>
                               </div>
