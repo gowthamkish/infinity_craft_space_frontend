@@ -66,7 +66,8 @@ export const useSmartFetch = (
         clearTimeout(fetchTimeoutRef.current);
       }
     };
-  }, [debouncedFetch, isStale, lastFetched, loading, cacheTimeout, ...dependencies]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedFetch, isStale, lastFetched, loading, cacheTimeout]);
 
   // Cleanup on unmount
   useEffect(() => {

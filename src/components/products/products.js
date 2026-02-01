@@ -11,7 +11,7 @@ import { deleteProduct } from "../../features/productsSlice";
 const ProductList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { data: products = [], loading = false, error = null } = useProducts() || {};
+  const { data: products = [], loading = false } = useProducts() || {};
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");

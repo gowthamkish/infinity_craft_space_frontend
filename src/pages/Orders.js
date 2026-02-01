@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import Header from "../components/header";
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
@@ -16,7 +15,6 @@ export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     const fetchOrders = async () => {

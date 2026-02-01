@@ -12,7 +12,7 @@ import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 
 export default function Home() {
   const dispatch = useDispatch();
-  const { data: products, loading, error } = useProducts();
+  const { data: products, loading } = useProducts();
 
   return (
     <>

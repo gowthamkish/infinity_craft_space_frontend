@@ -44,24 +44,6 @@ const ImageCarouselModal = ({
     }
   }, [show, initialIndex]);
 
-  // Navigation handlers
-  const handlePrevious = useCallback(() => {
-    const newIndex = activeIndex === 0 ? images.length - 1 : activeIndex - 1;
-    setActiveIndex(newIndex);
-    resetImageTransform();
-  }, [activeIndex, images.length]);
-
-  const handleNext = useCallback(() => {
-    const newIndex = activeIndex === images.length - 1 ? 0 : activeIndex + 1;
-    setActiveIndex(newIndex);
-    resetImageTransform();
-  }, [activeIndex, images.length]);
-
-  const handleThumbnailClick = useCallback((index) => {
-    setActiveIndex(index);
-    resetImageTransform();
-  }, []);
-
   // Reset image transform state
   const resetImageTransform = useCallback(() => {
     setZoomLevel(1);
@@ -69,6 +51,24 @@ const ImageCarouselModal = ({
     setDragOffset({ x: 0, y: 0 });
     setIsZoomed(false);
   }, []);
+
+  // Navigation handlers
+  const handlePrevious = useCallback(() => {
+    const newIndex = activeIndex === 0 ? images.length - 1 : activeIndex - 1;
+    setActiveIndex(newIndex);
+    resetImageTransform();
+  }, [activeIndex, images.length, resetImageTransform]);
+
+  const handleNext = useCallback(() => {
+    const newIndex = activeIndex === images.length - 1 ? 0 : activeIndex + 1;
+    setActiveIndex(newIndex);
+    resetImageTransform();
+  }, [activeIndex, images.length, resetImageTransform]);
+
+  const handleThumbnailClick = useCallback((index) => {
+    setActiveIndex(index);
+    resetImageTransform();
+  }, [resetImageTransform]);
 
   // Zoom functionality
   const handleZoomIn = useCallback(() => {
@@ -510,7 +510,7 @@ const ImageCarouselModal = ({
               <img
                 ref={imageRef}
                 src={currentImage?.url}
-                alt={`${productName} - Image ${activeIndex + 1}`}
+                alt={`Product - ${activeIndex + 1}`}
                 style={{
                   maxWidth: zoomLevel === 1 ? '100%' : 'none',
                   maxHeight: zoomLevel === 1 ? '100%' : 'none',

@@ -28,7 +28,7 @@ const AddProduct = () => {
     subCategory: "",
   });
 
-  const [editingId, setEditingId] = useState(params?.id ?? null);
+  const [editingId] = useState(params?.id ?? null);
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ show: false, message: "", variant: "" });
   const [validated, setValidated] = useState(false);
@@ -147,9 +147,9 @@ const AddProduct = () => {
     const files = Array.from(e.dataTransfer.files);
     handleFiles(files);
   };
-
   // Optimized image compression function
   // Simplified image processing - just convert to base64 without compression
+  // eslint-disable-next-line no-unused-vars
   const processImageFile = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();

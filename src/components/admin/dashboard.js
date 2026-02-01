@@ -14,7 +14,7 @@ import SEOHead, { SEO_CONFIG } from "../SEOHead";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { data: dashboardCounts, loading, error } = useDashboardCounts();
+  const { data: dashboardCounts, loading } = useDashboardCounts();
 
   return (
     <>

@@ -13,7 +13,7 @@ import Badge from "react-bootstrap/Badge";
 import Alert from "react-bootstrap/Alert";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import { FiGrid, FiFilter, FiShoppingCart, FiX } from "react-icons/fi";
-import SEOHead, { SEO_CONFIG, generateBreadcrumbStructuredData } from "../components/SEOHead";
+import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 
 // Lazy load components
 const Header = lazy(() => import("../components/header"));
