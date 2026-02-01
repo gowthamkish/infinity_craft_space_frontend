@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { autoLogout } from '../features/authSlice';
 import IDLE_TIMEOUT_CONFIG from '../config/idleTimeout';
@@ -46,8 +46,8 @@ const useIdleTimeout = (timeoutDuration = IDLE_TIMEOUT_CONFIG.TIMEOUT_DURATION, 
     }
   }, [resetTimeout, paused]);
 
-  // Events to track for user activity
-  const events = IDLE_TIMEOUT_CONFIG.ACTIVITY_EVENTS;
+  // Memoize events to avoid dependency array issues
+  const events = useMemo(() => IDLE_TIMEOUT_CONFIG.ACTIVITY_EVENTS, []);
 
   useEffect(() => {
     // Only activate idle timeout if user is logged in AND is an admin
@@ -80,7 +80,7 @@ const useIdleTimeout = (timeoutDuration = IDLE_TIMEOUT_CONFIG.TIMEOUT_DURATION, 
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [token, resetTimeout, handleActivity, paused, isAdminUser]);
+  }, [token, resetTimeout, handleActivity, paused, isAdminUser, events]);
 
   // Handle visibility change (tab switching)
   useEffect(() => {

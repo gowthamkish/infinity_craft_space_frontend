@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Modal, Button, Alert, ProgressBar } from 'react-bootstrap';
+import { Modal, Button } from 'react-bootstrap';
 import { FiClock, FiLogOut, FiRefreshCw } from 'react-icons/fi';
 import { autoLogout } from '../features/authSlice';
 import useIdleTimeout from '../hooks/useIdleTimeout';
@@ -71,7 +71,7 @@ const IdleTimeoutManager = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [showWarning, isActive, getRemainingTime, isAdminUser, handleAutoLogout, setWarningShown]);
+  }, [showWarning, isActive, getRemainingTime, isAdminUser, handleAutoLogout, setWarningShown, showPreWarning]);
 
   const handleStayLoggedIn = () => {
     resetTimeout();
