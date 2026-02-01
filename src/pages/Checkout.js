@@ -132,7 +132,8 @@ export default function Checkout() {
     city: "",
     state: "",
     zipCode: "",
-    country: "India"
+    country: "India",
+    phone: ""
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -180,7 +181,7 @@ export default function Checkout() {
 
   const proceedToPayment = () => {
     // Validate shipping address
-    const requiredFields = ['street', 'city', 'state', 'zipCode'];
+    const requiredFields = ['street', 'city', 'state', 'zipCode', 'phone'];
     const missingFields = requiredFields.filter(field => !shippingAddress[field].trim());
     
     if (missingFields.length > 0) {
@@ -976,6 +977,27 @@ export default function Checkout() {
                       value={shippingAddress.zipCode}
                       onChange={handleInputChange}
                       placeholder="Enter ZIP/Postal code"
+                      required
+                      style={{
+                        borderRadius: "12px",
+                        border: "2px solid var(--border-color)",
+                        padding: "12px 16px",
+                        fontSize: "1rem"
+                      }}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md={6} className="mb-3">
+                  <Form.Group>
+                    <Form.Label style={{ fontWeight: "600", color: "var(--text-primary)" }}>
+                      Phone Number *
+                    </Form.Label>
+                    <Form.Control
+                      type="tel"
+                      name="phone"
+                      value={shippingAddress.phone}
+                      onChange={handleInputChange}
+                      placeholder="Enter phone number"
                       required
                       style={{
                         borderRadius: "12px",

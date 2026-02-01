@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Modal, Button, Alert, ProgressBar } from 'react-bootstrap';
 import { FiClock, FiLogOut, FiRefreshCw } from 'react-icons/fi';
@@ -10,17 +10,37 @@ import IDLE_TIMEOUT_CONFIG from '../config/idleTimeout';
 const IdleTimeoutManager = () => {
   const dispatch = useDispatch();
   const { token } = useSelector(state => state.auth);
+  const user = useSelector(state => state.auth.user);
   const [showWarning, setShowWarning] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [showPreWarning, setShowPreWarning] = useState(false);
   
+  // Only enable idle timeout for admin users
+  const isAdminUser = user?.isAdmin === true;
+
+  // Define handleAutoLogout first using useCallback
+  const handleAutoLogout = useCallback((reason) => {
+    console.log('🚪 Performing auto-logout:', reason);
+    dispatch(autoLogout({ reason }));
+    setShowWarning(false);
+    
+    // Redirect if configured to do so
+    if (IDLE_TIMEOUT_CONFIG.AUTO_REDIRECT) {
+      window.location.href = IDLE_TIMEOUT_CONFIG.REDIRECT_URL;
+    }
+  }, [dispatch]);
+  
+  // Always call the hook (React Rules of Hooks)
+  // Pass isAdminUser so the hook can disable itself for non-admins
   const { resetTimeout, getRemainingTime, isActive, setWarningShown } = useIdleTimeout(
     IDLE_TIMEOUT_CONFIG.TIMEOUT_DURATION,
-    showWarning  // Pause activity tracking when warning modal is shown
+    showWarning,  // Pause activity tracking when warning modal is shown
+    isAdminUser   // Pass admin status to hook
   );
 
   useEffect(() => {
-    if (!isActive()) return;
+    // Don't track idle time for non-admin users
+    if (!isAdminUser) return;
 
     const interval = setInterval(() => {
       const remaining = getRemainingTime();
@@ -51,18 +71,7 @@ const IdleTimeoutManager = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [showWarning, isActive, getRemainingTime]);
-
-  const handleAutoLogout = (reason) => {
-    console.log('🚪 Performing auto-logout:', reason);
-    dispatch(autoLogout({ reason }));
-    setShowWarning(false);
-    
-    // Redirect if configured to do so
-    if (IDLE_TIMEOUT_CONFIG.AUTO_REDIRECT) {
-      window.location.href = IDLE_TIMEOUT_CONFIG.REDIRECT_URL;
-    }
-  };
+  }, [showWarning, isActive, getRemainingTime, isAdminUser, handleAutoLogout, setWarningShown]);
 
   const handleStayLoggedIn = () => {
     resetTimeout();
@@ -76,8 +85,8 @@ const IdleTimeoutManager = () => {
     handleAutoLogout('User chose to logout');
   };
 
-  // Don't render if user is not logged in
-  if (!token) {
+  // Don't render if user is not logged in or not an admin
+  if (!token || !isAdminUser) {
     return null;
   }
 

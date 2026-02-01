@@ -235,23 +235,24 @@ export default function ProductFilters({
           ) : categories && categories.length > 0 ? (
             <div style={{ maxHeight: "300px", overflowY: "auto" }}>
               {categories.map((category) => (
-                <div key={category._id} className="mb-3">
+                <div key={category._id} style={{ marginBottom: "0.5rem" }}>
                   {/* Main Category */}
-                  <div className="d-flex align-items-center">
+                  <div className="d-flex align-items-center" style={{ paddingLeft: "0.5rem" }}>
                     {category.subcategories && category.subcategories.length > 0 && (
                       <Button
                         variant="link"
                         size="sm"
                         onClick={() => toggleCategoryExpansion(category._id)}
-                        className="p-0 me-2"
+                        className="p-0 me-1"
                         style={{ 
                           color: "#6b7280",
                           textDecoration: "none",
-                          minWidth: "20px",
-                          height: "20px",
+                          minWidth: "18px",
+                          height: "18px",
                           display: "flex",
                           alignItems: "center",
-                          justifyContent: "center"
+                          justifyContent: "center",
+                          flexShrink: 0
                         }}
                       >
                         {expandedCategories.has(category._id) ? 
@@ -260,27 +261,29 @@ export default function ProductFilters({
                         }
                       </Button>
                     )}
+                    {!category.subcategories || category.subcategories.length === 0 ? (
+                      <div style={{ minWidth: "18px", marginRight: "0.5rem" }}></div>
+                    ) : null}
                     <Form.Check
                       type="checkbox"
                       id={`category-${category._id}`}
-                      label={category.name}
+                      label={<span style={{ fontWeight: "500" }}>{category.name}</span>}
                       checked={activeFilters.categories?.includes(category.name) || false}
                       onChange={(e) => handleCategoryChange(category.name, e.target.checked)}
                       className="text-start mb-0 flex-grow-1"
                       style={{
                         fontSize: "0.9rem",
-                        color: "var(--text-secondary)",
-                        fontWeight: category.subcategories?.length > 0 ? "600" : "normal"
+                        color: "var(--text-secondary)"
                       }}
                     />
                   </div>
 
                   {/* Subcategories */}
                   {expandedCategories.has(category._id) && category.subcategories && category.subcategories.length > 0 && (
-                    <div className="ms-4 mt-2">
+                    <div style={{ marginTop: "0.25rem", marginLeft: "2rem", borderLeft: "2px solid #e5e7eb", paddingLeft: "0.75rem" }}>
                       {category.subcategories
                         .filter(sub => sub.isActive)
-                        .map((subcategory) => (
+                        .map((subcategory, index) => (
                           <Form.Check
                             key={subcategory._id}
                             type="checkbox"
@@ -288,11 +291,11 @@ export default function ProductFilters({
                             label={subcategory.name}
                             checked={activeFilters.categories?.includes(subcategory.name) || false}
                             onChange={(e) => handleSubcategoryChange(subcategory.name, e.target.checked)}
-                            className="text-start mb-2"
+                            className="text-start"
                             style={{
                               fontSize: "0.85rem",
                               color: "#6b7280",
-                              paddingLeft: "0.25rem"
+                              marginBottom: index < category.subcategories.filter(sub => sub.isActive).length - 1 ? "0.35rem" : "0rem"
                             }}
                           />
                         ))}
