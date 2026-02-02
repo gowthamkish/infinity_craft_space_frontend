@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import Header from "../header";
 import { Container, Spinner, Breadcrumb, Card, Row, Col, Badge, Button, Modal, Form, Table } from "react-bootstrap";
@@ -26,6 +26,7 @@ import { updateOrderStatus } from "../../features/adminSlice";
 
 const Orders = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const { data: orders, loading, error } = useOrders();
   const [searchTerm, setSearchTerm] = useState("");
@@ -35,6 +36,24 @@ const Orders = () => {
   const [newStatus, setNewStatus] = useState("");
   const [updating, setUpdating] = useState(false);
   const [showOrderDetails, setShowOrderDetails] = useState(false);
+
+  // Auto-open order details when navigation provides an `openOrderId` in location.state
+  useEffect(() => {
+    try {
+      const openOrderId = location?.state?.openOrderId;
+      if (openOrderId && orders?.orders?.length) {
+        const ord = orders.orders.find(o => (o._id && o._id.toString() === openOrderId.toString()) || o.id === openOrderId);
+        if (ord) {
+          setSelectedOrder(ord);
+          setShowOrderDetails(true);
+          // Clear the history state so reloading or back navigation doesn't reopen it
+          try { window.history.replaceState({}, document.title, '/admin/orders'); } catch (e) { /* ignore */ }
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, [location, orders]);
 
   // Filter orders based on search and status
   const filteredOrders = orders.orders;

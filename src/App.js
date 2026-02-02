@@ -21,6 +21,7 @@ const ProductList = lazy(() => import("./components/products/products"));
 const AddProduct = lazy(() => import("./components/products/addProduct"));
 const AdminOrders = lazy(() => import("./components/orders/Orders"));
 const CategoryManagement = lazy(() => import("./components/categories/CategoryManagement"));
+const AdminNotifications = lazy(() => import("./components/admin/Notifications"));
 const IdleTimeoutManager = lazy(() => import("./components/IdleTimeoutManager"));
 const PWAInstallPrompt = lazy(() => import("./components/PWAInstallPrompt"));
 const OfflineIndicator = lazy(() => import("./components/OfflineIndicator"));
@@ -207,6 +208,16 @@ function App() {
                   </AdminRoute>
                 </Suspense>
               } 
+            />
+            <Route 
+              path="/admin/notifications"
+              element={
+                <Suspense fallback={<LoadingFallback message="Loading notifications..." />}>
+                  <AdminRoute>
+                    <AdminNotifications />
+                  </AdminRoute>
+                </Suspense>
+              }
             />
             </Routes>
           </Suspense>

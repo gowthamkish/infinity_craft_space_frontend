@@ -10,7 +10,9 @@ import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Badge from "react-bootstrap/Badge";
 import Offcanvas from "react-bootstrap/Offcanvas";
-import { FiLogOut, FiShoppingCart, FiUser, FiHome, FiPackage, FiMenu, FiX } from "react-icons/fi";
+import { FiLogOut, FiShoppingCart, FiUser, FiHome, FiPackage, FiMenu, FiX, FiBell } from "react-icons/fi";
+import { useEffect } from 'react';
+import api from '../api/axios';
 import { useState } from "react";
 
 function Header() {
@@ -21,6 +23,7 @@ function Header() {
   const isAuthenticated = useSelector((state) => state.auth.token);
   const cartItems = useSelector((state) => state.cart.items);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   // Calculate total items in cart
   const totalCartItems = cartItems.reduce((total, item) => total + item.quantity, 0);
@@ -53,6 +56,24 @@ function Header() {
       navigate("/");
     }
   };
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchUnread = async () => {
+      if (!user?.isAdmin) return;
+      try {
+        const token = localStorage.getItem('token');
+        const res = await api.get('/api/admin/notifications/unread-count', { headers: { Authorization: `Bearer ${token}` } });
+        if (mounted) setUnreadCount(res.data.unreadCount || 0);
+      } catch (err) {
+        // ignore
+      }
+    };
+
+    fetchUnread();
+    const t = setInterval(fetchUnread, 30000); // poll every 30s
+    return () => { mounted = false; clearInterval(t); };
+  }, [user]);
 
   return (
     <>
@@ -156,6 +177,21 @@ function Header() {
                     >
                       {totalCartItems}
                     </Badge>
+                  )}
+                </Button>
+              )}
+
+              {/* Admin Notification Bell */}
+              {user?.isAdmin && (
+                <Button
+                  variant="outline-light"
+                  title="Notifications"
+                  onClick={() => navigate('/admin/notifications')}
+                  style={{ border: "2px solid rgba(255,255,255,0.2)", position: "relative", borderRadius: "10px", padding: "8px 12px", transition: "all 0.3s ease" }}
+                >
+                  <FiBell size={18} />
+                  {unreadCount > 0 && (
+                    <Badge bg="danger" pill className="position-absolute top-0 start-100 translate-middle" style={{ fontSize: '0.65rem', minWidth: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{unreadCount}</Badge>
                   )}
                 </Button>
               )}
