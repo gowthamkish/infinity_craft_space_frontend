@@ -233,7 +233,7 @@ export default function Checkout() {
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });      
-      const { razorpayOrderId, amount, currency } = orderResponse.data.order;
+      const { razorpayOrderId, currency } = orderResponse.data.order;
       const orderId = orderResponse.data.order.id;
 
       // Razorpay options
