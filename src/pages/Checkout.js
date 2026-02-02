@@ -140,8 +140,12 @@ export default function Checkout() {
 
   // Calculate totals
   const subtotal = cartItems.reduce((total, item) => total + item.totalPrice, 0);
-  const shipping = subtotal > 500 ? 0 : 50; // Free shipping over ₹500
-  const tax = subtotal * 0.18; // 18% GST
+  // TODO: Uncomment when ready to enable shipping charges
+  // const shipping = subtotal > 500 ? 0 : 50; // Free shipping over ₹500
+  const shipping = 0; // Temporarily disabled - free shipping for now
+  // TODO: Uncomment when ready to enable GST
+  // const tax = subtotal * 0.18; // 18% GST
+  const tax = 0; // Temporarily disabled - no GST for now
   const total = subtotal + shipping + tax;
 
   // Step configuration
@@ -228,25 +232,26 @@ export default function Checkout() {
         items: cartItems
       }, {
         headers: { Authorization: `Bearer ${token}` }
-      });
-
+      });      
       const { razorpayOrderId, amount, currency } = orderResponse.data.order;
+      const orderId = orderResponse.data.order.id;
 
       // Razorpay options
       const options = {
-        key: orderResponse.razorpayKeyId, // Replace with your Razorpay key
-        amount: amount,
+        key: orderResponse.data.razorpayKeyId, // Replace with your Razorpay key
+        amount: Math.round(total * 100), // Use actual amount in paise
         currency: currency,
         name: "Infinity Craft Space",
         description: "Order Payment",
         order_id: razorpayOrderId,
         handler: async function (response) {
-          try {
+          try {            
             // Verify payment on backend
             const verifyResponse = await api.post("/api/payment/verify-payment", {
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+              orderId: orderId,
             }, {
               headers: { Authorization: `Bearer ${token}` }
             });
@@ -255,11 +260,12 @@ export default function Checkout() {
               // Payment successful, create the actual order
               await completeOrder(response);
             } else {
-              setError("Payment verification failed. Please try again.");
+              console.error("Verification failed:", verifyResponse.data);
+              setError("Payment verification failed. " + (verifyResponse.data.message || "Please try again."));
               setLoading(false);
             }
           } catch (error) {
-            console.error("Payment verification error:", error);
+            console.error("Payment verification error:", error.response?.data || error.message);
             setError("Payment verification failed. Please contact support.");
             setLoading(false);
           }
@@ -285,6 +291,7 @@ export default function Checkout() {
 
     } catch (error) {
       console.error("Payment initialization error:", error);
+      console.error("Error details:", error.response?.data || error.message);
       setError("Failed to initialize payment. Please try again.");
       setLoading(false);
     }
@@ -292,41 +299,51 @@ export default function Checkout() {
 
   const completeOrder = async (paymentResponse) => {
     try {
-      const token = localStorage.getItem("token");
-      const newOrderData = {
-        items: cartItems.map(item => ({
-          product: item.product._id,
-          quantity: item.quantity,
-          price: item.product.price
-        })),
-        shippingAddress,
-        subtotal,
-        tax,
-        shipping,
-        total,
+      setLoading(true);
+
+      // Capture items and totals from current cart before clearing it
+      const items = cartItems.map(item => ({
+        product: item.product._id,
+        productName: item.product.name,
+        quantity: item.quantity,
+        unitPrice: item.product.price,
+        totalPrice: item.totalPrice
+      }));
+
+      const subtotalLocal = subtotal;
+      const shippingLocal = shipping;
+      const taxLocal = tax;
+      const totalLocal = total;
+
+      const finalOrderData = {
+        orderId: paymentResponse?.order_id || paymentResponse?.razorpay_order_id || `ORD-${Date.now()}`,
+        items,
+        subtotal: subtotalLocal,
+        shipping: shippingLocal,
+        tax: taxLocal,
+        total: totalLocal,
         paymentDetails: {
-          razorpay_order_id: paymentResponse.razorpay_order_id,
-          razorpay_payment_id: paymentResponse.razorpay_payment_id,
-          razorpay_signature: paymentResponse.razorpay_signature,
-          payment_status: "completed"
+          razorpay_order_id: paymentResponse?.razorpay_order_id,
+          razorpay_payment_id: paymentResponse?.razorpay_payment_id,
+          razorpay_signature: paymentResponse?.razorpay_signature,
+          payment_status: paymentResponse?.status || "completed",
+          method: paymentResponse?.method || "online"
         },
         orderDate: new Date().toISOString(),
-        orderId: `ORD-${Date.now()}`,
         status: "confirmed"
       };
 
-      const response = await api.post("/api/orders", newOrderData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      // Clear the cart after capturing items
+      dispatch(clearCart());
 
-      setOrderData(response.data || newOrderData);
+      setOrderData(finalOrderData);
       setPaymentData(paymentResponse);
       setCurrentStep(4);
-      dispatch(clearCart());
+      setError(null);
 
     } catch (err) {
       console.error("Order completion error:", err);
-      setError("Payment successful but order creation failed. Please contact support with your payment ID: " + paymentResponse.razorpay_payment_id);
+      setError("Payment successful but there was an error finalizing the order. Please contact support with your payment ID: " + (paymentResponse?.razorpay_payment_id || paymentResponse?.payment_id));
     } finally {
       setLoading(false);
     }
@@ -341,8 +358,10 @@ export default function Checkout() {
       const newOrderData = {
         items: cartItems.map(item => ({
           product: item.product._id,
+          productName: item.product.name,
           quantity: item.quantity,
-          price: item.product.price
+          unitPrice: item.product.price,
+          totalPrice: item.totalPrice
         })),
         shippingAddress,
         subtotal,
@@ -363,7 +382,7 @@ export default function Checkout() {
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       setOrderData(newOrderData);
-      setPaymentData({ payment_id: `demo_pay_${Date.now()}` });
+      setPaymentData({ payment_id: `demo_pay_${Date.now()}`, payment_status: "completed" });
       setCurrentStep(4);
       dispatch(clearCart());
 
@@ -803,7 +822,8 @@ export default function Checkout() {
                 <span style={{ color: "var(--text-secondary)" }}>Subtotal:</span>
                 <span style={{ fontWeight: "600" }}>₹{subtotal.toFixed(2)}</span>
               </div>
-              <div className="d-flex justify-content-between mb-2">
+              {/* TODO: Uncomment when ready to enable shipping charges and GST */}
+              {/* <div className="d-flex justify-content-between mb-2">
                 <span style={{ color: "var(--text-secondary)" }}>
                   Shipping: {shipping === 0 && <Badge bg="success" className="ms-1">FREE</Badge>}
                 </span>
@@ -812,7 +832,7 @@ export default function Checkout() {
               <div className="d-flex justify-content-between mb-3">
                 <span style={{ color: "var(--text-secondary)" }}>Tax (18% GST):</span>
                 <span style={{ fontWeight: "600" }}>₹{tax.toFixed(2)}</span>
-              </div>
+              </div> */}
               <hr style={{ border: "1px solid var(--border-color)" }} />
               <div className="d-flex justify-content-between">
                 <span style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--text-primary)" }}>
@@ -1145,7 +1165,8 @@ export default function Checkout() {
                 <span style={{ color: "var(--text-secondary)" }}>Subtotal:</span>
                 <span style={{ fontWeight: "600" }}>₹{subtotal.toFixed(2)}</span>
               </div>
-              <div className="d-flex justify-content-between mb-2">
+              {/* TODO: Uncomment when ready to enable shipping charges and GST */}
+              {/* <div className="d-flex justify-content-between mb-2">
                 <span style={{ color: "var(--text-secondary)" }}>
                   Shipping: {shipping === 0 && <Badge bg="success" className="ms-1">FREE</Badge>}
                 </span>
@@ -1154,7 +1175,7 @@ export default function Checkout() {
               <div className="d-flex justify-content-between mb-3">
                 <span style={{ color: "var(--text-secondary)" }}>Tax (18% GST):</span>
                 <span style={{ fontWeight: "600" }}>₹{tax.toFixed(2)}</span>
-              </div>
+              </div> */}
               <hr style={{ border: "1px solid var(--border-color)" }} />
               <div className="d-flex justify-content-between">
                 <span style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--text-primary)" }}>
@@ -1655,36 +1676,47 @@ export default function Checkout() {
                     <div className="col-md-4">
                       <h6 style={{ color: "var(--text-primary)", fontWeight: "600" }}>Order Details</h6>
                       <p className="mb-1">
-                        <strong>Order ID:</strong> {orderData.orderId}
+                        <strong>Order ID:</strong> {orderData.orderId || orderData.id || orderData._id}
                       </p>
                       <p className="mb-1">
-                        <strong>Total Amount:</strong> ₹{total.toFixed(2)}
+                        <strong>Total Amount:</strong> ₹{(orderData.total ?? total).toFixed(2)}
                       </p>
                       <p className="mb-0">
                         <strong>Items:</strong> {orderData.items?.length || 0} {orderData.items?.length === 1 ? 'item' : 'items'}
                       </p>
+
+                      {/* Small item list */}
+                      {orderData.items && orderData.items.length > 0 && (
+                        <div style={{ marginTop: '0.75rem' }}>
+                          {orderData.items.map((it, idx) => (
+                            <div key={idx} style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.4rem' }}>
+                              {it.productName || it.name || it.product} × {it.quantity} — ₹{(it.totalPrice ?? (it.unitPrice * it.quantity)).toFixed(2)}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     <div className="col-md-4">
                       <h6 style={{ color: "var(--text-primary)", fontWeight: "600" }}>Payment Details</h6>
                       <p className="mb-1">
-                        <strong>Payment ID:</strong> {paymentData?.razorpay_payment_id || paymentData?.payment_id || 'N/A'}
+                        <strong>Payment ID:</strong> {paymentData?.razorpay_payment_id || paymentData?.payment_id || paymentData?.id || 'N/A'}
                       </p>
                       <p className="mb-1">
                         <strong>Status:</strong> 
                         <Badge bg="success" className="ms-2">
-                          {orderData.paymentDetails?.payment_status || 'Completed'}
+                          {orderData.paymentDetails?.payment_status || paymentData?.payment_status || 'Completed'}
                         </Badge>
                       </p>
                       <p className="mb-0">
-                        <strong>Method:</strong> {orderData.paymentDetails?.payment_method || 'Online Payment'}
+                        <strong>Method:</strong> {orderData.paymentDetails?.method || orderData.paymentDetails?.payment_method || paymentData?.method || 'Online Payment'}
                       </p>
                     </div>
                     <div className="col-md-4">
                       <h6 style={{ color: "var(--text-primary)", fontWeight: "600" }}>Shipping Address</h6>
                       <p className="mb-0" style={{ fontSize: "0.9rem" }}>
-                        {shippingAddress.street}<br />
-                        {shippingAddress.city}, {shippingAddress.state} {shippingAddress.zipCode}<br />
-                        {shippingAddress.country}
+                        {shippingAddress.street || orderData.shippingAddress?.street}<br />
+                        {shippingAddress.city || orderData.shippingAddress?.city}, {shippingAddress.state || orderData.shippingAddress?.state} {shippingAddress.zipCode || orderData.shippingAddress?.zipCode}<br />
+                        {shippingAddress.country || orderData.shippingAddress?.country}
                       </p>
                     </div>
                   </div>
