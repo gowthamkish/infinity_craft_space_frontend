@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { clearCart, updateCartItemQuantity, removeItemCompletely } from "../features/cartSlice";
@@ -137,6 +137,10 @@ export default function Checkout() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [loadingAddresses, setLoadingAddresses] = useState(false);
+  const [saveAddressToBook, setSaveAddressToBook] = useState(false);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
 
   // Calculate totals
   const subtotal = cartItems.reduce((total, item) => total + item.totalPrice, 0);
@@ -163,6 +167,77 @@ export default function Checkout() {
       [name]: value
     }));
   };
+
+  // Fetch saved addresses from backend
+  const fetchSavedAddresses = async () => {
+    setLoadingAddresses(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setSavedAddresses([]);
+        setLoadingAddresses(false);
+        return;
+      }
+      const res = await api.get('/api/auth/addresses', { headers: { Authorization: `Bearer ${token}` } });
+      setSavedAddresses(res.data.addresses || []);
+    } catch (err) {
+      console.error('Failed to load saved addresses', err.response?.data || err.message);
+    } finally {
+      setLoadingAddresses(false);
+    }
+  };
+
+  // Save current shippingAddress to user's address book
+  const handleSaveAddress = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Please login to save addresses');
+        return;
+      }
+      const payload = { ...shippingAddress };
+      const res = await api.post('/api/auth/addresses', payload, { headers: { Authorization: `Bearer ${token}` } });
+      setSavedAddresses(res.data.addresses || []);
+      setSaveAddressToBook(false);
+    } catch (err) {
+      console.error('Failed to save address', err.response?.data || err.message);
+      setError('Failed to save address');
+    }
+  };
+
+  const handleDeleteAddress = async (addressId) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Please login to manage addresses');
+        return;
+      }
+      const res = await api.delete(`/api/auth/addresses/${addressId}`, { headers: { Authorization: `Bearer ${token}` } });
+      setSavedAddresses(res.data.addresses || []);
+    } catch (err) {
+      console.error('Failed to delete address', err.response?.data || err.message);
+      setError('Failed to delete address');
+    }
+  };
+
+  const selectSavedAddress = (addr) => {
+    setShippingAddress({
+      street: addr.street || "",
+      city: addr.city || "",
+      state: addr.state || "",
+      zipCode: addr.zipCode || "",
+      country: addr.country || "India",
+      phone: addr.phone || ""
+    });
+    setSelectedAddressId(addr._id);
+    setError(null);
+  };
+
+  // Load addresses on mount
+  useEffect(() => {
+    fetchSavedAddresses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleQuantityChange = (productId, newQuantity) => {
     if (newQuantity > 0) {
@@ -921,7 +996,113 @@ export default function Checkout() {
             </p>
           </Card.Header>
           <Card.Body style={{ padding: "2rem" }}>
-            <Form onSubmit={(e) => { e.preventDefault(); proceedToPayment(); }}>
+            {/* Saved addresses fetched from user's account (stored in DB) */}
+            {loadingAddresses ? (
+              <div className="mb-4 text-center" style={{ padding: "2rem", color: "var(--text-secondary)" }}>
+                <div className="spinner-border spinner-border-sm me-2" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+                Loading your saved addresses...
+              </div>
+            ) : savedAddresses.length > 0 ? (
+              <div className="mb-4">
+                <h5 style={{ marginBottom: '1.5rem', fontWeight: 600, color: "var(--text-primary)" }}>
+                  📍 Your Saved Addresses
+                </h5>
+                <div style={{ display: 'grid', gap: '1rem', marginBottom: '1.5rem' }}>
+                  {savedAddresses.map((addr) => (
+                    <div 
+                      key={addr._id} 
+                      style={{
+                        border: selectedAddressId === addr._id ? '2px solid var(--secondary-color)' : '2px solid var(--border-color)',
+                        borderRadius: '12px',
+                        padding: '1rem',
+                        background: selectedAddressId === addr._id ? 'rgba(16, 185, 129, 0.05)' : 'var(--bg-tertiary)',
+                        transition: 'all 0.3s ease',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '1rem',
+                        position: 'relative'
+                      }}
+                      onClick={() => selectSavedAddress(addr)}
+                    >
+                      {/* Radio Button */}
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minWidth: '24px',
+                        height: '24px',
+                        borderRadius: '50%',
+                        border: selectedAddressId === addr._id ? '6px solid var(--secondary-color)' : '2px solid var(--border-color)',
+                        background: selectedAddressId === addr._id ? 'var(--secondary-color)' : 'white',
+                        marginTop: '2px'
+                      }} />
+
+                      {/* Address Details */}
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 600, color: "var(--text-primary)", marginBottom: '0.25rem' }}>
+                          {addr.label ? (
+                            <>
+                              {addr.label} <Badge bg="light" text="dark" style={{ fontSize: '0.75rem', marginLeft: '0.5rem' }}>
+                                {addr.city}
+                              </Badge>
+                            </>
+                          ) : (
+                            `${addr.city}, ${addr.state}`
+                          )}
+                        </div>
+                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.5' }}>
+                          {addr.street}<br />
+                          {addr.city}, {addr.state} {addr.zipCode}<br />
+                          {addr.country}
+                        </div>
+                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.5rem' }}>
+                          📞 {addr.phone}
+                        </div>
+                      </div>
+
+                      {/* Delete Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteAddress(addr._id);
+                        }}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: '0.5rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: 'var(--text-secondary)',
+                          transition: 'all 0.2s ease',
+                          minWidth: '32px',
+                          height: '32px',
+                          borderRadius: '6px'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.background = 'rgba(239, 68, 68, 0.1)';
+                          e.target.style.color = '#ef4444';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.background = 'transparent';
+                          e.target.style.color = 'var(--text-secondary)';
+                        }}
+                        title="Delete this address"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <hr style={{ border: '1px solid var(--border-color)', margin: '1.5rem 0' }} />
+              </div>
+            ) : null}
+
+            <Form onSubmit={async (e) => { e.preventDefault(); if (saveAddressToBook) await handleSaveAddress(); proceedToPayment(); }}>
               <Row>
                 <Col md={12} className="mb-3">
                   <Form.Group>
@@ -1070,6 +1251,9 @@ export default function Checkout() {
                 >
                   Back to Cart
                 </Button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <Form.Check type="checkbox" id="saveAddress" label="Save this address to my account" checked={saveAddressToBook} onChange={(e) => setSaveAddressToBook(e.target.checked)} />
+                </div>
                 <Button
                   variant="primary"
                   type="submit"
