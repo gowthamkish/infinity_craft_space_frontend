@@ -129,7 +129,8 @@ const PWAInstallPrompt = () => {
         style={{
           borderRadius: '12px',
           background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-          color: 'white'
+          color: 'white',
+          top: '5rem'
         }}
       >
         <div className="d-flex justify-content-between align-items-center">

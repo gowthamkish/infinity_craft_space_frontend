@@ -133,8 +133,23 @@ export default function Checkout() {
     state: "",
     zipCode: "",
     country: "India",
-    phone: ""
+    phone: "",
+    label: "",
+    isDefault: false
   });
+
+  // Stable input style object to prevent re-renders on mobile
+  const inputStyle = {
+    borderRadius: "12px",
+    border: "2px solid var(--border-color)",
+    padding: "12px 16px",
+    fontSize: "1rem"
+  };
+
+  const labelStyle = {
+    fontWeight: "600",
+    color: "var(--text-primary)"
+  };
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [savedAddresses, setSavedAddresses] = useState([]);
@@ -179,7 +194,15 @@ export default function Checkout() {
         return;
       }
       const res = await api.get('/api/auth/addresses', { headers: { Authorization: `Bearer ${token}` } });
-      setSavedAddresses(res.data.addresses || []);
+      const addrs = res.data.addresses || [];
+      setSavedAddresses(addrs);
+      // Auto-select address marked as default in the address book
+      const defaultAddr = addrs.find(a => a.isDefault || a.isDefault === true);
+      if (defaultAddr) {
+        // populate the form and set selected id
+        selectSavedAddress(defaultAddr);
+        setSelectedAddressId(defaultAddr._id);
+      }
     } catch (err) {
       console.error('Failed to load saved addresses', err.response?.data || err.message);
     } finally {
@@ -227,7 +250,9 @@ export default function Checkout() {
       state: addr.state || "",
       zipCode: addr.zipCode || "",
       country: addr.country || "India",
-      phone: addr.phone || ""
+      phone: addr.phone || "",
+      label: addr.label || "",
+      isDefault: !!addr.isDefault
     });
     setSelectedAddressId(addr._id);
     setError(null);
@@ -1106,7 +1131,22 @@ export default function Checkout() {
               <Row>
                 <Col md={12} className="mb-3">
                   <Form.Group>
-                    <Form.Label style={{ fontWeight: "600", color: "var(--text-primary)" }}>
+                    <Form.Label style={labelStyle}>
+                      Address Label (optional)
+                    </Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="label"
+                      value={shippingAddress.label}
+                      onChange={handleInputChange}
+                      placeholder="Home / Office / Friend"
+                      style={inputStyle}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md={12} className="mb-3">
+                  <Form.Group>
+                    <Form.Label style={labelStyle}>
                       Street Address *
                     </Form.Label>
                     <Form.Control
@@ -1116,18 +1156,13 @@ export default function Checkout() {
                       onChange={handleInputChange}
                       placeholder="Enter your complete street address"
                       required
-                      style={{
-                        borderRadius: "12px",
-                        border: "2px solid var(--border-color)",
-                        padding: "12px 16px",
-                        fontSize: "1rem"
-                      }}
+                      style={inputStyle}
                     />
                   </Form.Group>
                 </Col>
                 <Col md={6} className="mb-3">
                   <Form.Group>
-                    <Form.Label style={{ fontWeight: "600", color: "var(--text-primary)" }}>
+                    <Form.Label style={labelStyle}>
                       City *
                     </Form.Label>
                     <Form.Control
@@ -1137,18 +1172,13 @@ export default function Checkout() {
                       onChange={handleInputChange}
                       placeholder="Enter your city"
                       required
-                      style={{
-                        borderRadius: "12px",
-                        border: "2px solid var(--border-color)",
-                        padding: "12px 16px",
-                        fontSize: "1rem"
-                      }}
+                      style={inputStyle}
                     />
                   </Form.Group>
                 </Col>
                 <Col md={6} className="mb-3">
                   <Form.Group>
-                    <Form.Label style={{ fontWeight: "600", color: "var(--text-primary)" }}>
+                    <Form.Label style={labelStyle}>
                       State *
                     </Form.Label>
                     <Form.Control
@@ -1158,18 +1188,13 @@ export default function Checkout() {
                       onChange={handleInputChange}
                       placeholder="Enter your state"
                       required
-                      style={{
-                        borderRadius: "12px",
-                        border: "2px solid var(--border-color)",
-                        padding: "12px 16px",
-                        fontSize: "1rem"
-                      }}
+                      style={inputStyle}
                     />
                   </Form.Group>
                 </Col>
                 <Col md={6} className="mb-3">
                   <Form.Group>
-                    <Form.Label style={{ fontWeight: "600", color: "var(--text-primary)" }}>
+                    <Form.Label style={labelStyle}>
                       ZIP Code *
                     </Form.Label>
                     <Form.Control
@@ -1179,18 +1204,13 @@ export default function Checkout() {
                       onChange={handleInputChange}
                       placeholder="Enter ZIP/Postal code"
                       required
-                      style={{
-                        borderRadius: "12px",
-                        border: "2px solid var(--border-color)",
-                        padding: "12px 16px",
-                        fontSize: "1rem"
-                      }}
+                      style={inputStyle}
                     />
                   </Form.Group>
                 </Col>
                 <Col md={6} className="mb-3">
                   <Form.Group>
-                    <Form.Label style={{ fontWeight: "600", color: "var(--text-primary)" }}>
+                    <Form.Label style={labelStyle}>
                       Phone Number *
                     </Form.Label>
                     <Form.Control
@@ -1200,18 +1220,13 @@ export default function Checkout() {
                       onChange={handleInputChange}
                       placeholder="Enter phone number"
                       required
-                      style={{
-                        borderRadius: "12px",
-                        border: "2px solid var(--border-color)",
-                        padding: "12px 16px",
-                        fontSize: "1rem"
-                      }}
+                      style={inputStyle}
                     />
                   </Form.Group>
                 </Col>
                 <Col md={6} className="mb-3">
                   <Form.Group>
-                    <Form.Label style={{ fontWeight: "600", color: "var(--text-primary)" }}>
+                    <Form.Label style={labelStyle}>
                       Country
                     </Form.Label>
                     <Form.Control
@@ -1222,10 +1237,7 @@ export default function Checkout() {
                       placeholder="India"
                       disabled
                       style={{
-                        borderRadius: "12px",
-                        border: "2px solid var(--border-color)",
-                        padding: "12px 16px",
-                        fontSize: "1rem",
+                        ...inputStyle,
                         backgroundColor: "var(--bg-tertiary)"
                       }}
                     />
@@ -1253,6 +1265,7 @@ export default function Checkout() {
                 </Button>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <Form.Check type="checkbox" id="saveAddress" label="Save this address to my account" checked={saveAddressToBook} onChange={(e) => setSaveAddressToBook(e.target.checked)} />
+                  <Form.Check type="checkbox" id="defaultAddress" label="Make this my default address" checked={shippingAddress.isDefault} onChange={(e) => setShippingAddress(prev => ({ ...prev, isDefault: e.target.checked }))} />
                 </div>
                 <Button
                   variant="primary"

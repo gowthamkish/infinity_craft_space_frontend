@@ -143,6 +143,22 @@ function Header() {
                   My Orders
                 </Nav.Link>
               )}
+              {isAuthenticated && !user?.isAdmin && (
+                <Nav.Link 
+                  onClick={() => navigate("/account")}
+                  className={`${location.pathname === "/account" ? "active" : ""} d-flex align-items-center`}
+                  style={{ 
+                    fontWeight: "500",
+                    padding: "0.5rem 1rem",
+                    borderRadius: "8px",
+                    margin: "0 0.25rem",
+                    color: location.pathname === "/account" ? "#22d3ee" : "#e2e8f0"
+                  }}
+                >
+                  <FiUser size={16} className="me-2" />
+                  My Account
+                </Nav.Link>
+              )}
             </Nav>
 
             {/* Right Side Actions */}
@@ -386,6 +402,25 @@ function Header() {
               >
                 <FiPackage size={20} className="me-3" />
                 My Orders
+              </Nav.Link>
+            )}
+            {isAuthenticated && !user?.isAdmin && (
+              <Nav.Link 
+                onClick={() => {
+                  navigate("/account");
+                  setShowMobileMenu(false);
+                }}
+                className="d-flex align-items-center mb-3"
+                style={{ 
+                  fontWeight: "500",
+                  padding: "0.75rem",
+                  borderRadius: "8px",
+                  color: location.pathname === "/account" ? "#22d3ee" : "#e2e8f0",
+                  backgroundColor: location.pathname === "/account" ? "rgba(34, 211, 238, 0.1)" : "transparent"
+                }}
+              >
+                <FiUser size={20} className="me-3" />
+                My Account
               </Nav.Link>
             )}
           </Nav>

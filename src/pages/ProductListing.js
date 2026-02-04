@@ -5,14 +5,17 @@ import { addToCart, removeFromCart } from "../features/cartSlice";
 import { useProducts } from "../hooks/useSmartFetch";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
+import api from '../api/axios';
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Spinner from "react-bootstrap/Spinner";
 import Badge from "react-bootstrap/Badge";
 import Alert from "react-bootstrap/Alert";
+import Toast from "react-bootstrap/Toast";
+import ToastContainer from "react-bootstrap/ToastContainer";
 import Offcanvas from "react-bootstrap/Offcanvas";
-import { FiGrid, FiFilter, FiShoppingCart, FiX } from "react-icons/fi";
+import { FiGrid, FiFilter, FiShoppingCart, FiX, FiHeart, FiTrash2 } from "react-icons/fi";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 
 // Lazy load components
@@ -26,8 +29,29 @@ const ProductCard = React.memo(({
   quantityInCart, 
   onAddToCart, 
   onRemoveFromCart,
-  onImageClick
-}) => (
+  onImageClick,
+  onShowToast
+}) => {
+  const navigate = useNavigate();
+  
+  const handleAddToWishlist = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    try {
+      await api.post('/api/auth/wishlist', { productId: product._id }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      onShowToast('✓ Added to wishlist!', 'success');
+    } catch (err) {
+      onShowToast('Failed to add to wishlist', 'error');
+      console.error(err);
+    }
+  };
+  
+  return (
   <Card className="h-100 product-card hover-shadow">
     <div 
       style={{ 
@@ -186,12 +210,12 @@ const ProductCard = React.memo(({
       
       <div className="mt-auto">
         {quantityInCart > 0 && (
-          <div className="text-center mb-3">
+          <div className="text-center mb-2">
             <Badge 
               style={{
                 background: "var(--primary-color)",
-                fontSize: "0.8rem",
-                padding: "6px 12px",
+                fontSize: "0.75rem",
+                padding: "4px 10px",
                 borderRadius: "20px"
               }}
             >
@@ -205,38 +229,68 @@ const ProductCard = React.memo(({
             size="sm"
             onClick={() => onAddToCart(product)}
             className="hover-scale flex-fill"
+            title="Add to Cart"
             style={{
-              borderRadius: "8px",
-              fontWeight: "500",
-              padding: "8px 16px",
+              borderRadius: "10px",
+              fontWeight: "600",
+              padding: "10px",
               background: "var(--secondary-color)",
-              border: "none"
+              border: "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
             }}
           >
-            + Add to Cart
+            <FiShoppingCart size={18} />
           </Button>
           {quantityInCart > 0 && (
             <Button
               variant="outline-danger"
               size="sm"
               onClick={() => onRemoveFromCart(product)}
-              className="hover-scale"
+              className="hover-scale flex-fill"
+              title="Remove from Cart"
               style={{
-                borderRadius: "8px",
-                fontWeight: "500",
-                padding: "8px 16px",
+                borderRadius: "10px",
+                fontWeight: "600",
+                padding: "10px",
                 borderColor: "var(--error-color)",
-                color: "var(--error-color)"
+                color: "var(--error-color)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: "42px"
               }}
             >
-              Remove
+              <FiTrash2 size={16} />
             </Button>
           )}
+          <Button
+            variant="outline-secondary"
+            size="sm"
+            onClick={handleAddToWishlist}
+            className="hover-scale flex-fill"
+            title="Add to Wishlist"
+            style={{
+              borderRadius: "10px",
+              fontWeight: "600",
+              padding: "10px",
+              borderColor: "#ef4444",
+              color: "#ef4444",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              minWidth: "42px"
+            }}
+          >
+            <FiHeart size={16} />
+          </Button>
         </div>
       </div>
     </Card.Body>
   </Card>
-));
+  );
+});
 
 // Add custom styles for better mobile experience with fixed header
 const mobileStyles = `
@@ -308,6 +362,11 @@ const ProductListing = () => {
   // Image carousel modal state
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  
+  // Toast notification state
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success'); // 'success' or 'error'
   
   const cartItems = useSelector((state) => state.cart.items);
   const isAuthenticated = useSelector((state) => state.auth.token);
@@ -439,6 +498,14 @@ const ProductListing = () => {
   const handleCloseImageModal = useCallback(() => {
     setShowImageModal(false);
     setSelectedProduct(null);
+  }, []);
+
+  // Toast handler
+  const handleShowToast = useCallback((message, type = 'success') => {
+    setToastMessage(message);
+    setToastType(type);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000); // Auto hide after 3 seconds
   }, []);
 
   // Generate dynamic SEO based on filters and search
@@ -784,6 +851,7 @@ const ProductListing = () => {
                               onAddToCart={handleAddToCart}
                               onRemoveFromCart={handleRemoveFromCart}
                               onImageClick={handleImageClick}
+                              onShowToast={handleShowToast}
                             />
                           </Col>
                         );
@@ -807,6 +875,30 @@ const ProductListing = () => {
           initialIndex={0}
         />
       </Suspense>
+
+      {/* Toast Notification */}
+      <ToastContainer 
+        position="top-end" 
+        className="p-3"
+        style={{ zIndex: 9999, position: 'fixed', top: '80px', right: '20px' }}
+      >
+        <Toast 
+          show={showToast} 
+          onClose={() => setShowToast(false)}
+          bg={toastType === 'success' ? 'success' : 'danger'}
+          autohide
+          delay={3000}
+        >
+          <Toast.Header closeButton>
+            <strong className="me-auto">
+              {toastType === 'success' ? '✓ Success' : '⚠ Error'}
+            </strong>
+          </Toast.Header>
+          <Toast.Body style={{ color: 'white', fontWeight: '500' }}>
+            {toastMessage}
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
     </div>
   );
 };
