@@ -187,7 +187,11 @@ export const generateSitemapEntry = (
 
 // Performance optimization for SEO
 export const preloadCriticalResources = () => {
-  const criticalResources = ["/favicon.ico", "/logo192.png", "/manifest.json"];
+  const criticalResources = [
+    "/favicon.ico",
+    "/ICS_Logo.jpeg.png",
+    "/manifest.json",
+  ];
 
   criticalResources.forEach((resource) => {
     const link = document.createElement("link");
