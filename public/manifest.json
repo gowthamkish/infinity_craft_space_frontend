@@ -15,7 +15,7 @@
       "purpose": "any maskable"
     },
     {
-      "src": "logo512.png",
+      "src": "ICS_Logo.jpeg",
       "type": "image/png",
       "sizes": "512x512"
     }
@@ -29,7 +29,7 @@
   "categories": ["shopping", "business", "lifestyle"],
   "screenshots": [
     {
-      "src": "logo512.png",
+      "src": "ICS_Logo.jpeg",
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "wide"
