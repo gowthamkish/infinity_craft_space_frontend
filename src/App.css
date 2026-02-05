@@ -364,29 +364,77 @@
 } */
 
 /* Compact spacing and global typography */
-body, .App {
+body,
+.App {
   font-size: var(--font-size-base);
   line-height: 1.4;
 }
 
-h1 { font-size: clamp(1.25rem, 2.2vw, 1.6rem); font-weight: 700; }
-h2 { font-size: clamp(1.05rem, 1.6vw, 1.25rem); font-weight: 600; }
-h3, h4, h5, h6 { font-size: var(--font-size-medium); font-weight: 600; }
+h1 {
+  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+  font-weight: 700;
+}
+h2 {
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+  font-weight: 600;
+}
+h3,
+h4,
+h5,
+h6 {
+  font-size: var(--font-size-medium);
+  font-weight: 600;
+}
 
-.card { padding: var(--card-padding); }
-.card .card-body { padding: calc(var(--card-padding) - 0.1rem); }
-.btn { padding: var(--btn-padding-vertical) var(--btn-padding-horizontal); font-size: var(--font-size-small); }
-.badge { font-size: var(--font-size-small); padding: 0.35rem 0.6rem; }
-.form-control, .form-select { padding: 0.45rem 0.6rem; font-size: var(--font-size-small); }
-.navbar-brand { font-size: clamp(1rem, 2vw, 1.25rem); }
-.breadcrumb, .breadcrumb .breadcrumb-item { font-size: var(--font-size-small); }
-.table td, .table th { padding: 0.6rem; font-size: var(--font-size-small); }
+.card {
+  padding: var(--card-padding);
+}
+.card .card-body {
+  padding: calc(var(--card-padding) - 0.1rem);
+}
+.btn {
+  padding: var(--btn-padding-vertical) var(--btn-padding-horizontal);
+  font-size: var(--font-size-small);
+}
+.badge {
+  font-size: var(--font-size-small);
+  padding: 0.35rem 0.6rem;
+}
+.form-control,
+.form-select {
+  padding: 0.45rem 0.6rem;
+  font-size: var(--font-size-small);
+}
+.navbar-brand {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+}
+.breadcrumb,
+.breadcrumb .breadcrumb-item {
+  font-size: var(--font-size-small);
+}
+.table td,
+.table th {
+  padding: 0.6rem;
+  font-size: var(--font-size-small);
+}
 
 @media (max-width: 768px) {
-  :root { --app-gap: 0.5rem; --card-padding: 0.6rem; --font-size-base: 13px; }
-  h1 { font-size: clamp(1.1rem, 3.5vw, 1.4rem); }
-  .card, .card .card-body { padding: calc(var(--card-padding)); }
-  .btn { font-size: var(--font-size-small); padding: 0.45rem 0.7rem; }
+  :root {
+    --app-gap: 0.5rem;
+    --card-padding: 0.6rem;
+    --font-size-base: 13px;
+  }
+  h1 {
+    font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+  }
+  .card,
+  .card .card-body {
+    padding: calc(var(--card-padding));
+  }
+  .btn {
+    font-size: var(--font-size-small);
+    padding: 0.45rem 0.7rem;
+  }
 }
 
 /* Responsive Design */
