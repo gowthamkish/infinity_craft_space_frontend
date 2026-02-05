@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -19,7 +19,7 @@ api.interceptors.request.use(
     }
 
     // Log large requests in development
-    if (process.env.NODE_ENV === "development" && config.data) {
+    if (import.meta.env.DEV && config.data) {
       const dataSize = JSON.stringify(config.data).length;
       if (dataSize > 1024 * 1024) {
         // > 1MB

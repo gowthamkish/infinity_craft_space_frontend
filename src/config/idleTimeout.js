@@ -2,29 +2,29 @@
 export const IDLE_TIMEOUT_CONFIG = {
   // Timeout duration in milliseconds
   TIMEOUT_DURATION: 30000, // 30 seconds
-  
+
   // Warning time before logout (show modal)
   WARNING_TIME: 10000, // 10 seconds
-  
+
   // Events to track for user activity
   ACTIVITY_EVENTS: [
-    'mousedown',
-    'mousemove', 
-    'keypress',
-    'scroll',
-    'touchstart',
-    'click',
-    'keydown'
+    "mousedown",
+    "mousemove",
+    "keypress",
+    "scroll",
+    "touchstart",
+    "click",
+    "keydown",
   ],
-  
+
   // Debug mode (shows countdown in corner)
-  DEBUG_MODE: process.env.NODE_ENV === 'development',
-  
+  DEBUG_MODE: import.meta.env.DEV,
+
   // Auto redirect after logout
   AUTO_REDIRECT: true,
-  
+
   // Redirect URL after logout
-  REDIRECT_URL: '/login'
+  REDIRECT_URL: "/login",
 };
 
 // For production, you might want longer timeouts:

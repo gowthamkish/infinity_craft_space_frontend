@@ -9,7 +9,7 @@ export class PerformanceTester {
   startMeasurement(name) {
     this.metrics.set(name, {
       startTime: performance.now(),
-      startMemory: this.getMemoryUsage()
+      startMemory: this.getMemoryUsage(),
     });
   }
 
@@ -23,11 +23,11 @@ export class PerformanceTester {
 
     const endTime = performance.now();
     const endMemory = this.getMemoryUsage();
-    
+
     const result = {
       duration: endTime - metric.startTime,
       memoryDelta: endMemory - metric.startMemory,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     this.metrics.delete(name);
@@ -47,11 +47,14 @@ export class PerformanceTester {
     this.startMeasurement(`component_${componentName}`);
     const result = renderFn();
     const metrics = this.endMeasurement(`component_${componentName}`);
-    
-    if (metrics && metrics.duration > 16) { // More than one frame
-      console.warn(`[Performance] ${componentName} render took ${metrics.duration.toFixed(2)}ms`);
+
+    if (metrics && metrics.duration > 16) {
+      // More than one frame
+      console.warn(
+        `[Performance] ${componentName} render took ${metrics.duration.toFixed(2)}ms`,
+      );
     }
-    
+
     return result;
   }
 
@@ -61,11 +64,16 @@ export class PerformanceTester {
     try {
       const result = await asyncFn();
       const metrics = this.endMeasurement(name);
-      console.log(`[Performance] ${name} completed in ${metrics.duration.toFixed(2)}ms`);
+      console.log(
+        `[Performance] ${name} completed in ${metrics.duration.toFixed(2)}ms`,
+      );
       return result;
     } catch (error) {
       const metrics = this.endMeasurement(name);
-      console.error(`[Performance] ${name} failed after ${metrics.duration.toFixed(2)}ms`, error);
+      console.error(
+        `[Performance] ${name} failed after ${metrics.duration.toFixed(2)}ms`,
+        error,
+      );
       throw error;
     }
   }
@@ -73,12 +81,14 @@ export class PerformanceTester {
   // Measure bundle loading time
   measureBundleLoad() {
     if (performance.getEntriesByType) {
-      const navigation = performance.getEntriesByType('navigation')[0];
+      const navigation = performance.getEntriesByType("navigation")[0];
       if (navigation) {
         return {
-          domContentLoaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
+          domContentLoaded:
+            navigation.domContentLoadedEventEnd -
+            navigation.domContentLoadedEventStart,
           loadComplete: navigation.loadEventEnd - navigation.loadEventStart,
-          totalLoadTime: navigation.loadEventEnd - navigation.fetchStart
+          totalLoadTime: navigation.loadEventEnd - navigation.fetchStart,
         };
       }
     }
@@ -87,75 +97,77 @@ export class PerformanceTester {
 
   // Monitor long tasks (tasks taking > 50ms)
   observeLongTasks() {
-    if ('PerformanceObserver' in window) {
+    if ("PerformanceObserver" in window) {
       const observer = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          console.warn(`[Long Task] Duration: ${entry.duration}ms, Start: ${entry.startTime}`);
-          
+          console.warn(
+            `[Long Task] Duration: ${entry.duration}ms, Start: ${entry.startTime}`,
+          );
+
           // Log stack trace for long tasks in development
-          if (process.env.NODE_ENV === 'development') {
-            console.trace('Long task stack trace');
+          if (import.meta.env.DEV) {
+            console.trace("Long task stack trace");
           }
         }
       });
 
       try {
-        observer.observe({ entryTypes: ['longtask'] });
-        this.observers.set('longtask', observer);
+        observer.observe({ entryTypes: ["longtask"] });
+        this.observers.set("longtask", observer);
       } catch (error) {
-        console.log('Long task observer not supported');
+        console.log("Long task observer not supported");
       }
     }
   }
 
   // Monitor largest contentful paint
   observeLCP() {
-    if ('PerformanceObserver' in window) {
+    if ("PerformanceObserver" in window) {
       const observer = new PerformanceObserver((list) => {
         const entries = list.getEntries();
         const lastEntry = entries[entries.length - 1];
         console.log(`[LCP] ${lastEntry.startTime}ms`);
-        
+
         if (lastEntry.startTime > 2500) {
-          console.warn('[LCP] Poor Largest Contentful Paint performance');
+          console.warn("[LCP] Poor Largest Contentful Paint performance");
         }
       });
 
       try {
-        observer.observe({ entryTypes: ['largest-contentful-paint'] });
-        this.observers.set('lcp', observer);
+        observer.observe({ entryTypes: ["largest-contentful-paint"] });
+        this.observers.set("lcp", observer);
       } catch (error) {
-        console.log('LCP observer not supported');
+        console.log("LCP observer not supported");
       }
     }
   }
 
   // Monitor first input delay
   observeFID() {
-    if ('PerformanceObserver' in window) {
+    if ("PerformanceObserver" in window) {
       const observer = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
           const fid = entry.processingStart - entry.startTime;
           console.log(`[FID] ${fid}ms`);
-          
+
           if (fid > 100) {
-            console.warn('[FID] Poor First Input Delay performance');
+            console.warn("[FID] Poor First Input Delay performance");
           }
         }
       });
 
       try {
-        observer.observe({ entryTypes: ['first-input'] });
-        this.observers.set('fid', observer);
+        observer.observe({ entryTypes: ["first-input"] });
+        this.observers.set("fid", observer);
       } catch (error) {
-        console.log('FID observer not supported');
+        console.log("FID observer not supported");
       }
     }
   }
 
   // Monitor cumulative layout shift
   observeCLS() {
-    if ('PerformanceObserver' in window) {
+    if ("PerformanceObserver" in window) {
       let clsValue = 0;
       const observer = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
@@ -163,19 +175,19 @@ export class PerformanceTester {
             clsValue += entry.value;
           }
         }
-        
+
         console.log(`[CLS] Current: ${clsValue}`);
-        
+
         if (clsValue > 0.1) {
-          console.warn('[CLS] Poor Cumulative Layout Shift performance');
+          console.warn("[CLS] Poor Cumulative Layout Shift performance");
         }
       });
 
       try {
-        observer.observe({ entryTypes: ['layout-shift'] });
-        this.observers.set('cls', observer);
+        observer.observe({ entryTypes: ["layout-shift"] });
+        this.observers.set("cls", observer);
       } catch (error) {
-        console.log('CLS observer not supported');
+        console.log("CLS observer not supported");
       }
     }
   }
@@ -186,19 +198,19 @@ export class PerformanceTester {
     this.observeLCP();
     this.observeFID();
     this.observeCLS();
-    
+
     // Log bundle loading metrics
-    window.addEventListener('load', () => {
+    window.addEventListener("load", () => {
       const bundleMetrics = this.measureBundleLoad();
       if (bundleMetrics) {
-        console.log('[Bundle Performance]', bundleMetrics);
+        console.log("[Bundle Performance]", bundleMetrics);
       }
     });
   }
 
   // Stop all monitoring
   stopMonitoring() {
-    this.observers.forEach(observer => observer.disconnect());
+    this.observers.forEach((observer) => observer.disconnect());
     this.observers.clear();
     this.metrics.clear();
   }
@@ -209,12 +221,14 @@ export class PerformanceTester {
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
       memory: this.getMemoryUsage(),
-      connection: navigator.connection ? {
-        effectiveType: navigator.connection.effectiveType,
-        downlink: navigator.connection.downlink,
-        rtt: navigator.connection.rtt
-      } : null,
-      bundle: this.measureBundleLoad()
+      connection: navigator.connection
+        ? {
+            effectiveType: navigator.connection.effectiveType,
+            downlink: navigator.connection.downlink,
+            rtt: navigator.connection.rtt,
+          }
+        : null,
+      bundle: this.measureBundleLoad(),
     };
 
     console.table(report);
@@ -226,7 +240,7 @@ export class PerformanceTester {
 export const performanceTester = new PerformanceTester();
 
 // Auto-start monitoring in development
-if (process.env.NODE_ENV === 'development') {
+if (import.meta.env.DEV) {
   performanceTester.startMonitoring();
 }
 
