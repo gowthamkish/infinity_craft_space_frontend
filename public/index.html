@@ -5,6 +5,17 @@
     <link rel="icon" href="%PUBLIC_URL%/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
+
+    <!-- Preconnect to external domains for faster loading -->
+    <link rel="preconnect" href="https://checkout.razorpay.com" crossorigin />
+    <link
+      rel="preconnect"
+      href="https://www.googletagmanager.com"
+      crossorigin
+    />
+    <link rel="dns-prefetch" href="https://checkout.razorpay.com" />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
     <meta
       name="google-site-verification"
       content="fOPCPLGcZ0AEWW0dPrIZsbqJvTHsOPj59xD_tsMV4gE"
@@ -68,7 +79,8 @@
     -->
     <title>Infinity Craft Space - Premium Craft Supplies &amp; Materials</title>
 
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <!-- Defer non-critical scripts to improve page load performance -->
+    <script defer src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=G-GXBTKCX0Y6"
@@ -154,7 +166,7 @@
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
+    <main id="root"></main>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
