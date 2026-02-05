@@ -14,7 +14,6 @@ export const CheckoutProgressBar = ({ steps, currentStep }) => (
           fontSize: "clamp(0.8rem, 2vw, 0.9rem)",
           boxShadow: "var(--shadow-md)",
           textAlign: "center",
-          maxWidth: "90%",
         }}
       >
         🔒 Your payment information is secure and encrypted. Complete your order

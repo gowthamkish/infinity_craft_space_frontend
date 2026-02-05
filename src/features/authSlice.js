@@ -29,6 +29,17 @@ export const register = createAsyncThunk("auth/register", async (details, { reje
   }
 });
 
+// Fetch current authenticated user's profile using stored token
+export const fetchCurrentUser = createAsyncThunk('auth/fetchCurrentUser', async (_, { rejectWithValue }) => {
+  try {
+    const res = await api.get('/api/auth/profile');
+    return res.data;
+  } catch (error) {
+    console.error('Failed to fetch current user:', error.response?.data || error.message);
+    return rejectWithValue(error.response?.data?.error || error.message || 'Failed to fetch user');
+  }
+});
+
 const authSlice = createSlice({
   name: "auth",
   initialState: { user: null, token: null, loading: false, error: null },
@@ -57,8 +68,9 @@ const authSlice = createSlice({
       });
     },
     setAuthFromStorage: (state, action) => {
-      state.user = action.payload.user;
+      // Only set token from storage; user will be fetched via `fetchCurrentUser`
       state.token = action.payload.token;
+      state.user = null;
     },
     clearError: (state) => {
       state.error = null;

@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
+// layout handled by CSS grid in App.css
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Badge from "react-bootstrap/Badge";
@@ -108,11 +107,18 @@ export default function Account() {
   return (
     <div>
       <Header />
-      <Container style={{ paddingTop: 110 }}>
-        <h2 className="mb-4">My Account</h2>
-        <Row>
-          <Col md={6} className="mb-4">
-            <Card>
+      <Container className="main-container">
+        <div className="account-header">
+          <div className="account-avatar">IC</div>
+          <div className="profile-meta">
+            <div className="name">My Account</div>
+            <div className="subtitle">Manage addresses and wishlist</div>
+          </div>
+        </div>
+
+        <div className="account-grid">
+          <div>
+            <Card className="compact-card address-gradient">
               <Card.Header>
                 <strong>Address Book</strong>
               </Card.Header>
@@ -120,62 +126,45 @@ export default function Account() {
                 {addresses.length === 0 ? (
                   <div>No saved addresses yet.</div>
                 ) : (
-                  <div style={{ display: "grid", gap: "0.75rem" }}>
+                  <div style={{ display: "grid", gap: "0.6rem" }}>
                     {addresses.map((a) => (
-                      <div
-                        key={a._id}
-                        style={{
-                          border: "1px solid var(--border-color)",
-                          padding: "0.75rem",
-                          borderRadius: 8,
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                          }}
-                        >
-                          <div>
-                            <div style={{ fontWeight: 600 }}>
-                              {a.label || `${a.city}, ${a.state}`}
-                              {a.isDefault && (
-                                <Badge bg="success" className="ms-2">
-                                  Default
-                                </Badge>
-                              )}
-                            </div>
-                            <div style={{ color: "var(--text-secondary)" }}>
-                              {a.street}, {a.city}, {a.state} {a.zipCode}
-                            </div>
-                            <div style={{ color: "var(--text-secondary)" }}>
-                              📞 {a.phone}
-                            </div>
+                      <div key={a._id} className="address-item">
+                        <div className="address-details">
+                          <div style={{ fontWeight: 600 }}>
+                            {a.label || `${a.city}, ${a.state}`}
+                            {a.isDefault && (
+                              <Badge bg="success" className="ms-2">
+                                Default
+                              </Badge>
+                            )}
                           </div>
-                          <div style={{ display: "flex", gap: 8 }}>
-                            <Button
-                              size="sm"
-                              variant="outline-primary"
-                              onClick={() => openEdit(a)}
-                            >
-                              Edit
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline-secondary"
-                              onClick={() => handleSetDefault(a._id)}
-                            >
-                              Set Default
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline-danger"
-                              onClick={() => handleDeleteAddress(a._id)}
-                            >
-                              Delete
-                            </Button>
+                          <div className="address-line">
+                            {a.street}, {a.city}, {a.state} {a.zipCode}
                           </div>
+                          <div className="address-line">📞 {a.phone}</div>
+                        </div>
+                        <div className="address-actions">
+                          <Button
+                            size="sm"
+                            variant="outline-primary"
+                            onClick={() => openEdit(a)}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline-secondary"
+                            onClick={() => handleSetDefault(a._id)}
+                          >
+                            Default
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline-danger"
+                            onClick={() => handleDeleteAddress(a._id)}
+                          >
+                            Delete
+                          </Button>
                         </div>
                       </div>
                     ))}
@@ -183,9 +172,10 @@ export default function Account() {
                 )}
               </Card.Body>
             </Card>
-          </Col>
-          <Col md={6} className="mb-4">
-            <Card>
+          </div>
+
+          <div>
+            <Card className="compact-card wishlist-gradient">
               <Card.Header>
                 <strong>Wishlist</strong>
               </Card.Header>
@@ -193,26 +183,14 @@ export default function Account() {
                 {wishlist.length === 0 ? (
                   <div>Your wishlist is empty.</div>
                 ) : (
-                  <div style={{ display: "grid", gap: "0.75rem" }}>
+                  <div style={{ display: "grid", gap: "0.6rem" }}>
                     {wishlist.map((p) => (
-                      <div
-                        key={p._id}
-                        style={{
-                          border: "1px solid var(--border-color)",
-                          padding: "0.75rem",
-                          borderRadius: 8,
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
+                      <div key={p._id} className="wishlist-item">
                         <div>
                           <div style={{ fontWeight: 600 }}>{p.name}</div>
-                          <div style={{ color: "var(--text-secondary)" }}>
-                            ₹{p.price}
-                          </div>
+                          <div className="address-line">₹{p.price}</div>
                         </div>
-                        <div style={{ display: "flex", gap: 8 }}>
+                        <div className="address-actions">
                           <Button
                             size="sm"
                             variant="outline-primary"
@@ -234,8 +212,8 @@ export default function Account() {
                 )}
               </Card.Body>
             </Card>
-          </Col>
-        </Row>
+          </div>
+        </div>
 
         <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
           <Modal.Header closeButton>

@@ -94,7 +94,7 @@ function App() {
                     fallback={<LoadingFallback message="Loading products..." />}
                   >
                     {/* PWA Install Prompt - Shows on mobile devices */}
-                    <PWAInstallPrompt />
+                    {/* <PWAInstallPrompt /> */}
                     <ProductListing />
                   </Suspense>
                 }

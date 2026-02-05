@@ -36,7 +36,7 @@ export const ShippingStep = ({
           border: "none",
           borderRadius: "16px",
           boxShadow: "var(--shadow-lg)",
-          marginBottom: "2rem",
+          marginBottom: "clamp(1rem, 4vw, 2rem)",
         }}
       >
         <Card.Header
@@ -45,7 +45,7 @@ export const ShippingStep = ({
               "linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary))",
             border: "none",
             borderRadius: "16px 16px 0 0",
-            padding: "1.5rem",
+            padding: "clamp(0.75rem, 3vw, 1.5rem)",
           }}
         >
           <div className="d-flex align-items-center">
@@ -55,23 +55,33 @@ export const ShippingStep = ({
             />
             <h4
               className="mb-0"
-              style={{ color: "var(--text-primary)", fontWeight: "600" }}
+              style={{
+                color: "var(--text-primary)",
+                fontWeight: "600",
+                fontSize: "clamp(1rem, 4vw, 1.35rem)",
+              }}
             >
               Shipping Address
             </h4>
           </div>
           <p
             className="mb-0 mt-1"
-            style={{ color: "var(--text-secondary)", fontSize: "0.875rem" }}
+            style={{
+              color: "var(--text-secondary)",
+              fontSize: "clamp(0.8rem, 2vw, 0.875rem)",
+            }}
           >
             Where should we deliver your order?
           </p>
         </Card.Header>
-        <Card.Body style={{ padding: "2rem" }}>
+        <Card.Body style={{ padding: "clamp(1rem, 4vw, 2rem)" }}>
           {loadingAddresses ? (
             <div
               className="mb-4 text-center"
-              style={{ padding: "2rem", color: "var(--text-secondary)" }}
+              style={{
+                padding: "clamp(1rem, 4vw, 2rem)",
+                color: "var(--text-secondary)",
+              }}
             >
               <div
                 className="spinner-border spinner-border-sm me-2"
@@ -381,21 +391,26 @@ export const ShippingStep = ({
             color: "white",
             border: "none",
             borderRadius: "16px 16px 0 0",
-            padding: "1.5rem",
+            padding: "clamp(0.75rem, 3vw, 1.5rem)",
           }}
         >
           <div className="d-flex align-items-center">
             <Package className="me-2" />
-            <h5 className="mb-0 fw-bold">Order Summary</h5>
+            <h5
+              className="mb-0 fw-bold"
+              style={{ fontSize: "clamp(0.95rem, 3vw, 1.15rem)" }}
+            >
+              Order Summary
+            </h5>
           </div>
           <p
             className="mb-0 mt-1"
-            style={{ fontSize: "0.875rem", opacity: "0.9" }}
+            style={{ fontSize: "clamp(0.8rem, 2vw, 0.875rem)", opacity: "0.9" }}
           >
             Review your items before checkout
           </p>
         </Card.Header>
-        <Card.Body style={{ padding: "1.5rem" }}>
+        <Card.Body style={{ padding: "clamp(0.75rem, 3vw, 1.5rem)" }}>
           {cartItems.slice(0, 3).map((item) => (
             <div
               key={item.product._id}

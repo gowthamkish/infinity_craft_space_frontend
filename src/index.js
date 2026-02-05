@@ -5,7 +5,19 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { Provider } from "react-redux";
 import { store } from "./app/store";
+import { setAuthFromStorage, fetchCurrentUser } from "./features/authSlice";
 import "bootstrap/dist/css/bootstrap.min.css";
+
+// Hydrate auth state from localStorage if available
+try {
+  const token = localStorage.getItem('token');
+  if (token) {
+    store.dispatch(setAuthFromStorage({ token }));
+    store.dispatch(fetchCurrentUser());
+  }
+} catch (e) {
+  // ignore storage errors
+}
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

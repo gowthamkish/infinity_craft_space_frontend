@@ -23,7 +23,7 @@ export const CartReviewStep = ({
           border: "none",
           borderRadius: "16px",
           boxShadow: "var(--shadow-lg)",
-          marginBottom: "2rem",
+          marginBottom: "clamp(1rem, 4vw, 2rem)",
         }}
       >
         <Card.Header
@@ -32,7 +32,7 @@ export const CartReviewStep = ({
               "linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary))",
             border: "none",
             borderRadius: "16px 16px 0 0",
-            padding: "1.5rem",
+            padding: "clamp(0.75rem, 3vw, 1.5rem)",
           }}
         >
           <div className="d-flex align-items-center">
@@ -42,7 +42,11 @@ export const CartReviewStep = ({
             />
             <h4
               className="mb-0"
-              style={{ color: "var(--text-primary)", fontWeight: "600" }}
+              style={{
+                color: "var(--text-primary)",
+                fontWeight: "600",
+                fontSize: "clamp(1rem, 4vw, 1.35rem)",
+              }}
             >
               Review Your Cart
             </h4>
@@ -50,8 +54,9 @@ export const CartReviewStep = ({
               bg="primary"
               style={{
                 marginLeft: "auto",
-                fontSize: "0.8rem",
-                padding: "0.5rem 1rem",
+                fontSize: "clamp(0.7rem, 2vw, 0.8rem)",
+                padding:
+                  "clamp(0.35rem, 1.5vw, 0.5rem) clamp(0.6rem, 2vw, 1rem)",
                 borderRadius: "20px",
               }}
             >
@@ -64,7 +69,7 @@ export const CartReviewStep = ({
             <div
               key={item.product._id}
               style={{
-                padding: "1.5rem",
+                padding: "clamp(0.75rem, 3vw, 1.5rem)",
                 borderBottom:
                   index < cartItems.length - 1
                     ? "1px solid var(--border-light)"
@@ -354,21 +359,26 @@ export const CartReviewStep = ({
             color: "white",
             border: "none",
             borderRadius: "16px 16px 0 0",
-            padding: "1.5rem",
+            padding: "clamp(0.75rem, 3vw, 1.5rem)",
           }}
         >
           <div className="d-flex align-items-center">
             <Package className="me-2" />
-            <h5 className="mb-0 fw-bold">Order Summary</h5>
+            <h5
+              className="mb-0 fw-bold"
+              style={{ fontSize: "clamp(0.95rem, 3vw, 1.15rem)" }}
+            >
+              Order Summary
+            </h5>
           </div>
           <p
             className="mb-0 mt-1"
-            style={{ fontSize: "0.875rem", opacity: "0.9" }}
+            style={{ fontSize: "clamp(0.8rem, 2vw, 0.875rem)", opacity: "0.9" }}
           >
             Review your items before checkout
           </p>
         </Card.Header>
-        <Card.Body style={{ padding: "1.5rem" }}>
+        <Card.Body style={{ padding: "clamp(0.75rem, 3vw, 1.5rem)" }}>
           <div className="mb-3">
             <div className="d-flex justify-content-between mb-2">
               <span style={{ color: "var(--text-secondary)" }}>Subtotal:</span>

@@ -1,123 +1,224 @@
 /* Mobile-first responsive design optimizations */
 
+:root{
+  --app-gap: 0.75rem;
+  --card-padding: 0.75rem;
+  --font-size-base: 14px;
+  --font-size-small: 13px;
+  --font-size-medium: 15px;
+  --btn-padding-vertical: 0.45rem;
+  --btn-padding-horizontal: 0.8rem;
+}
+
 /* PWA and Mobile Device Optimizations */
 @media (max-width: 768px) {
-  /* Touch targets should be at least 44px */
-  .btn, .nav-link, .form-control, .dropdown-item {
-    min-height: 44px;
-    padding: 12px 16px;
-  }
-  
-  /* Larger tap targets for mobile */
-  .btn-sm {
+  /* Touch targets adjusted for mobile */
+  .btn,
+  .nav-link,
+  .form-control,
+  .dropdown-item {
     min-height: 40px;
-    padding: 8px 12px;
+    padding: var(--btn-padding-vertical) var(--btn-padding-horizontal);
+    font-size: var(--font-size-small);
   }
-  
+
+  /* Smaller tap targets for mobile */
+  .btn-sm {
+    min-height: 36px;
+    padding: 0.35rem 0.6rem;
+    font-size: var(--font-size-small);
+  }
+
   /* Mobile navigation improvements */
   .navbar-brand {
-    font-size: 1.2rem !important;
+    font-size: 1rem !important;
   }
-  
-  /* Mobile card optimizations */
+
+  /* Mobile card optimizations - reduced padding */
   .card {
-    margin-bottom: 1rem;
+    margin-bottom: var(--app-gap);
     border-radius: 12px;
   }
-  
+
   .card-body {
-    padding: 1rem;
+    padding: var(--card-padding);
   }
-  
+
+  .card-header {
+    padding: 0.75rem !important;
+  }
+
   /* Mobile form improvements */
   .form-control {
-    font-size: 16px; /* Prevents zoom on iOS */
+    font-size: var(--font-size-base); /* Prevents zoom on iOS */
     border-radius: 8px;
+    padding: 0.5rem 0.6rem !important;
   }
-  
+
   /* Mobile table responsiveness */
   .table-responsive {
     border-radius: 8px;
   }
-  
+
   /* Mobile spacing adjustments */
   .container-fluid {
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: calc(var(--app-gap));
+    padding-right: calc(var(--app-gap));
   }
-  
-  /* Mobile typography */
+
+  /* Mobile typography - reduced sizes */
   h1 {
-    font-size: 1.8rem;
+    font-size: clamp(1.25rem, 3.5vw, 1.5rem) !important;
   }
-  
+
   h2 {
-    font-size: 1.5rem;
+    font-size: clamp(1.05rem, 2.2vw, 1.25rem) !important;
   }
-  
+
   h3 {
-    font-size: 1.3rem;
+    font-size: var(--font-size-medium) !important;
   }
-  
+
+  h4 {
+    font-size: var(--font-size-medium) !important;
+  }
+
+  h5 {
+    font-size: var(--font-size-small) !important;
+  }
+
+  h6 {
+    font-size: var(--font-size-small) !important;
+  }
+
+  p {
+    font-size: var(--font-size-small);
+  }
+
   /* Mobile product cards */
   .product-card {
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
   }
-  
+
   .product-card .card-img-top {
-    height: 200px;
+    height: 180px;
     object-fit: contain;
   }
-  
+
   /* Mobile checkout improvements */
   .checkout-container {
-    padding: 1rem !important;
+    padding: var(--card-padding) !important;
+  }
+
+  /* Reduce margins and paddings globally */
+  .mt-1,
+  .mt-2,
+  .mt-3,
+  .mt-4,
+  .mt-5 {
+    margin-top: 0.5rem !important;
+  }
+
+  .mb-1,
+  .mb-2,
+  .mb-3,
+  .mb-4,
+  .mb-5 {
+    margin-bottom: 0.5rem !important;
+  }
+
+  .p-1,
+  .p-2,
+  .p-3,
+  .p-4,
+  .p-5 {
+    padding: calc(var(--card-padding) * 0.66) !important;
   }
 }
 
 /* Extra small devices (phones, less than 576px) */
 @media (max-width: 575.98px) {
-  .container, .container-fluid {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
+  .container,
+  .container-fluid {
+    padding-left: calc(var(--app-gap) * 0.66);
+    padding-right: calc(var(--app-gap) * 0.66);
   }
-  
+
   /* Mobile header adjustments */
   .navbar {
-    padding: 0.5rem 0;
+    padding: 0.35rem 0;
   }
-  
+
   .navbar-brand {
+    font-size: 0.95rem !important;
+  }
+
+  /* Global font size reduction for extra small screens */
+  h1 {
+    font-size: clamp(1.1rem, 4.5vw, 1.3rem) !important;
+  }
+  h2 {
     font-size: 1.1rem !important;
   }
-  
+  h3 {
+    font-size: 0.95rem !important;
+  }
+  h4 {
+    font-size: 0.9rem !important;
+  }
+  h5 {
+    font-size: 0.85rem !important;
+  }
+  h6 {
+    font-size: 0.8rem !important;
+  }
+  p {
+    font-size: var(--font-size-small);
+  }
+
   /* Mobile modal improvements */
   .modal-dialog {
-    margin: 0.5rem;
+    margin: 0.35rem;
   }
-  
+
   .modal-content {
     border-radius: 16px;
   }
-  
+
   /* Mobile alert improvements */
   .alert {
-    margin: 0.5rem;
+    margin: 0.35rem;
     border-radius: 12px;
+    padding: calc(var(--card-padding) * 0.9);
+    font-size: var(--font-size-small);
   }
-  
+
   /* Mobile button groups */
   .btn-group-vertical .btn {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.35rem;
   }
-  
-  /* Mobile spacing */
-  .mb-4 {
-    margin-bottom: 1.5rem !important;
+
+  /* Mobile spacing - reduced for extra small devices */
+  .mb-4,
+  .mb-5 {
+    margin-bottom: calc(var(--app-gap)) !important;
   }
-  
+
   .mb-3 {
-    margin-bottom: 1rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .mb-2 {
+    margin-bottom: 0.35rem !important;
+  }
+
+  /* Reduce card gaps */
+  .d-grid.gap-3 {
+    gap: calc(var(--app-gap)) !important;
+  }
+
+  .d-grid.gap-2 {
+    gap: calc(var(--app-gap) * 0.66) !important;
   }
 }
 
@@ -127,7 +228,7 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
   }
-  
+
   .admin-card {
     margin-bottom: 1.5rem;
   }
@@ -139,12 +240,12 @@
   .pwa-hide {
     display: none !important;
   }
-  
+
   /* Adjust for PWA status bar */
   .main-container {
-    padding-top: calc(90px + env(safe-area-inset-top));
+    padding-top: calc(70px + env(safe-area-inset-top));
   }
-  
+
   /* PWA splash screen support */
   body {
     background-color: #f8fafc;
@@ -154,9 +255,9 @@
 /* iOS PWA specific styles */
 @supports (-webkit-touch-callout: none) {
   .main-container {
-    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
   }
-  
+
   /* iOS safe area adjustments */
   .navbar {
     padding-top: calc(0.75rem + env(safe-area-inset-top));
@@ -183,11 +284,11 @@
   .main-container {
     padding-top: 70px;
   }
-  
+
   .product-grid {
     grid-template-columns: repeat(3, 1fr);
   }
-  
+
   .mobile-hide-landscape {
     display: none;
   }
@@ -200,7 +301,7 @@
     --mobile-text: #f8fafc;
     --mobile-border: #334155;
   }
-  
+
   .mobile-dark .card {
     background-color: var(--mobile-bg);
     color: var(--mobile-text);
@@ -214,16 +315,16 @@
   .hover-scale:hover {
     transform: none;
   }
-  
+
   .hover-shadow:hover {
     box-shadow: inherit;
   }
-  
+
   /* Add active states for touch feedback */
   .btn:active {
     transform: scale(0.98);
   }
-  
+
   .card:active {
     background-color: rgba(0, 0, 0, 0.02);
   }
@@ -266,7 +367,7 @@
     outline: 3px solid rgba(37, 99, 235, 0.5) !important;
     outline-offset: 2px;
   }
-  
+
   /* Skip navigation for screen readers */
   .skip-nav {
     position: absolute;
@@ -278,7 +379,7 @@
     text-decoration: none;
     z-index: 9999;
   }
-  
+
   .skip-nav:focus {
     top: 6px;
   }
@@ -297,7 +398,7 @@
 
 .image-carousel-modal .modal-header {
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border-bottom: 1px solid rgba(0,0,0,0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .image-carousel-modal .modal-body {
@@ -311,7 +412,7 @@
 }
 
 .product-card:hover {
-  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
   transition: all 0.3s ease;
 }
@@ -321,23 +422,23 @@
 }
 
 .hover-shadow:hover {
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 /* Mobile Modal Optimizations */
 @media (max-width: 768px) {
   .image-carousel-modal .modal-dialog {
     max-width: 95vw;
-    margin: 1rem;
+    margin: 0.5rem;
   }
-  
+
   .image-carousel-modal .modal-title {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
   }
-  
+
   .image-carousel-modal .btn-close-custom {
-    width: 35px;
-    height: 35px;
+    width: 32px;
+    height: 32px;
   }
 }
 
@@ -347,7 +448,7 @@
   .image-carousel-modal .position-absolute.end-0 {
     display: block;
     opacity: 1;
-    background: rgba(255,255,255,0.9);
+    background: rgba(255, 255, 255, 0.9);
   }
 }
 
@@ -356,11 +457,11 @@
   .mobile-hide-print {
     display: none !important;
   }
-  
+
   .main-container {
     padding-top: 0 !important;
   }
-  
+
   .navbar {
     display: none !important;
   }
