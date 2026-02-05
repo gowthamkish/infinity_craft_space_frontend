@@ -257,7 +257,7 @@ function Header() {
                   <div className="text-light d-flex align-items-center">
                     {/* <FiUser size={16} className="me-2" /> */}
                     <span style={{ fontWeight: "500", fontSize: "0.9rem" }}>
-                      {user?.username || user?.email?.split("@")[0]}
+                      {/* {user?.username || user?.email?.split("@")[0]} */}
                     </span>
                   </div>
                   <Button
@@ -484,7 +484,7 @@ function Header() {
           {/* Mobile User Actions */}
           {isAuthenticated ? (
             <div>
-              <div
+              {/* <div
                 className="d-flex align-items-center mb-3 p-3"
                 style={{
                   backgroundColor: "rgba(255,255,255,0.1)",
@@ -495,7 +495,7 @@ function Header() {
                 <span style={{ fontWeight: "500" }}>
                   {user?.username || user?.email?.split("@")[0]}
                 </span>
-              </div>
+              </div> */}
               <Button
                 variant="outline-light"
                 onClick={() => {

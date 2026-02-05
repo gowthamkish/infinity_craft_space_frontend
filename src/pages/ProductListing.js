@@ -1,4 +1,11 @@
-import React, { useState, useMemo, useCallback, lazy, Suspense } from "react";
+import React, {
+  useState,
+  useMemo,
+  useCallback,
+  lazy,
+  Suspense,
+  useEffect,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { addToCart, removeFromCart } from "../features/cartSlice";
@@ -41,30 +48,47 @@ const ProductCard = React.memo(
     onRemoveFromCart,
     onImageClick,
     onShowToast,
+    isWishlisted,
+    onWishlistToggle,
   }) => {
     const navigate = useNavigate();
+    const [cartLoading, setCartLoading] = useState(false);
+    const [wishlistLoading, setWishlistLoading] = useState(false);
 
-    const handleAddToWishlist = async () => {
+    const handleToggleWishlist = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
         navigate("/login");
         return;
       }
+      setWishlistLoading(true);
       try {
-        await api.post(
-          "/api/auth/wishlist",
-          { productId: product._id },
-          {
+        if (isWishlisted) {
+          // remove
+          await api.delete(`/api/auth/wishlist/${product._id}`, {
             headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-        onShowToast("✓ Added to wishlist!", "success");
+          });
+          onShowToast("Removed from wishlist", "success");
+          if (onWishlistToggle) onWishlistToggle(product._id, false);
+        } else {
+          // add
+          await api.post(
+            "/api/auth/wishlist",
+            { productId: product._id },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          );
+          onShowToast("✓ Added to wishlist!", "success");
+          if (onWishlistToggle) onWishlistToggle(product._id, true);
+        }
       } catch (err) {
-        onShowToast("Failed to add to wishlist", "error");
+        onShowToast("Wishlist action failed", "error");
         console.error(err);
+      } finally {
+        setWishlistLoading(false);
       }
     };
-
     return (
       <Card className="h-100 product-card hover-shadow">
         <div
@@ -84,11 +108,11 @@ const ProductCard = React.memo(
                 src={product.images[0].url}
                 loading="lazy"
                 style={{
-                  objectFit: "contain",
+                  width: "100%",
+                  objectFit: "cover",
                   height: "220px",
                   background:
                     "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
-                  padding: "1rem",
                   transition: "transform 0.3s ease",
                 }}
                 onError={(e) => {
@@ -151,11 +175,11 @@ const ProductCard = React.memo(
                 }
                 loading="lazy"
                 style={{
-                  objectFit: "contain",
+                  width: "100%",
+                  objectFit: "cover",
                   height: "220px",
                   background:
                     "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
-                  padding: "1rem",
                   transition: "transform 0.3s ease",
                 }}
                 onError={(e) => {
@@ -252,63 +276,114 @@ const ProductCard = React.memo(
               <Button
                 variant="success"
                 size="sm"
-                onClick={() => onAddToCart(product)}
+                onClick={async () => {
+                  setCartLoading(true);
+                  try {
+                    await Promise.resolve(onAddToCart(product));
+                  } catch (err) {
+                    console.error(err);
+                  } finally {
+                    setCartLoading(false);
+                  }
+                }}
                 className="hover-scale flex-fill"
-                title="Add to Cart"
+                title={cartLoading ? "Processing..." : "Add to Cart"}
+                disabled={cartLoading}
                 style={{
                   borderRadius: "10px",
                   fontWeight: "600",
-                  padding: "10px",
-                  background: "var(--secondary-color)",
+                  height: "36px",
+                  padding: "0 8px",
+                  minWidth: "36px",
+                  background: "linear-gradient(45deg,#3b82f6,#10b981)",
                   border: "none",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <FiShoppingCart size={18} />
+                {cartLoading ? (
+                  <Spinner animation="border" size="sm" variant="light" />
+                ) : (
+                  <FiShoppingCart size={16} />
+                )}
               </Button>
               {quantityInCart > 0 && (
                 <Button
                   variant="outline-danger"
                   size="sm"
-                  onClick={() => onRemoveFromCart(product)}
+                  onClick={async () => {
+                    setCartLoading(true);
+                    try {
+                      await Promise.resolve(onRemoveFromCart(product));
+                    } catch (err) {
+                      console.error(err);
+                    } finally {
+                      setCartLoading(false);
+                    }
+                  }}
                   className="hover-scale flex-fill"
-                  title="Remove from Cart"
+                  title={cartLoading ? "Processing..." : "Remove from Cart"}
+                  disabled={cartLoading}
                   style={{
                     borderRadius: "10px",
                     fontWeight: "600",
-                    padding: "10px",
-                    borderColor: "var(--error-color)",
-                    color: "var(--error-color)",
+                    height: "36px",
+                    padding: "0 8px",
+                    border: "none",
+                    background: "linear-gradient(45deg,#ef4444,#6366f1)",
+                    color: "white",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    minWidth: "42px",
+                    minWidth: "36px",
                   }}
                 >
-                  <FiTrash2 size={16} />
+                  {cartLoading ? (
+                    <Spinner animation="border" size="sm" variant="light" />
+                  ) : (
+                    <FiTrash2 size={16} />
+                  )}
                 </Button>
               )}
               <Button
-                variant="outline-secondary"
+                variant={isWishlisted ? "primary" : "outline-secondary"}
                 size="sm"
-                onClick={handleAddToWishlist}
+                onClick={handleToggleWishlist}
                 className="hover-scale flex-fill"
-                title="Add to Wishlist"
+                title={
+                  wishlistLoading
+                    ? "Processing..."
+                    : isWishlisted
+                      ? "In Wishlist"
+                      : "Add to Wishlist"
+                }
+                disabled={wishlistLoading}
                 style={{
                   borderRadius: "10px",
                   fontWeight: "600",
-                  padding: "10px",
-                  borderColor: "#ef4444",
-                  color: "#ef4444",
+                  height: "36px",
+                  padding: "0 8px",
+                  border: isWishlisted ? "none" : "2px solid #ef4444",
+                  background: isWishlisted
+                    ? "linear-gradient(45deg,#06b6d4,#3b82f6)"
+                    : "transparent",
+                  color: isWishlisted ? "white" : "#ef4444",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  minWidth: "42px",
+                  minWidth: "36px",
                 }}
               >
-                <FiHeart size={16} />
+                {wishlistLoading ? (
+                  <Spinner
+                    animation="border"
+                    size="sm"
+                    variant={isWishlisted ? "light" : "danger"}
+                  />
+                ) : (
+                  <FiHeart size={16} />
+                )}
               </Button>
             </div>
           </div>
@@ -396,6 +471,34 @@ const ProductListing = () => {
 
   const cartItems = useSelector((state) => state.cart.items);
   const isAuthenticated = useSelector((state) => state.auth.token);
+
+  // Wishlist IDs set
+  const [wishlistIds, setWishlistIds] = useState(new Set());
+
+  // Fetch wishlist when authenticated
+  useEffect(() => {
+    let mounted = true;
+    const fetchWishlist = async () => {
+      if (!isAuthenticated) {
+        if (mounted) setWishlistIds(new Set());
+        return;
+      }
+      try {
+        const token = localStorage.getItem("token");
+        const res = await api.get("/api/auth/wishlist", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const ids = new Set((res.data.wishlist || []).map((p) => p._id));
+        if (mounted) setWishlistIds(ids);
+      } catch (err) {
+        // ignore
+      }
+    };
+    fetchWishlist();
+    return () => {
+      mounted = false;
+    };
+  }, [isAuthenticated]);
 
   // Memoized calculations for better performance
   const totalCartItems = useMemo(
@@ -949,6 +1052,15 @@ const ProductListing = () => {
                                 onRemoveFromCart={handleRemoveFromCart}
                                 onImageClick={handleImageClick}
                                 onShowToast={handleShowToast}
+                                isWishlisted={wishlistIds.has(product._id)}
+                                onWishlistToggle={(id, added) => {
+                                  setWishlistIds((prev) => {
+                                    const s = new Set(prev);
+                                    if (added) s.add(id);
+                                    else s.delete(id);
+                                    return s;
+                                  });
+                                }}
                               />
                             </Col>
                           );
