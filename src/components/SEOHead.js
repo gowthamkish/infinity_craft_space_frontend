@@ -255,8 +255,13 @@ export const generateProductStructuredData = (product, reviews = []) => {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
-    description: product.description,
-    image: product.images?.[0]?.url || product.image?.url,
+    description:
+      product.description ||
+      `${product.name} - Premium craft supply from Infinity Craft Space`,
+    image:
+      product.images?.[0]?.url ||
+      product.image?.url ||
+      "https://infinitycraftspace.com/ICS_Logo.jpeg",
     sku: product._id,
     brand: {
       "@type": "Brand",

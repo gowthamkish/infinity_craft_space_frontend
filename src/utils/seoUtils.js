@@ -1,12 +1,19 @@
 // SEO utility functions for dynamic content optimization
 
 export const generateProductJsonLD = (product) => {
+  const productImage =
+    product.images?.[0]?.url ||
+    product.image?.url ||
+    product.image ||
+    "https://infinitycraftspace.com/ICS_Logo.jpeg";
   return {
     "@context": "https://schema.org/",
     "@type": "Product",
     name: product.name,
-    description: product.description,
-    image: product.image,
+    description:
+      product.description ||
+      `${product.name} - Premium craft supply from Infinity Craft Space`,
+    image: productImage,
     offers: {
       "@type": "Offer",
       price: product.price,
