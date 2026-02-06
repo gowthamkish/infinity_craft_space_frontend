@@ -49,7 +49,7 @@ const SEOHead = ({
       },
       sameAs: [
         "https://facebook.com/infinitycraftspace",
-        "https://instagram.com/infinitycraftspace",
+        "https://www.instagram.com/infinity_craft_space?igsh=MXh0cmI0czF3NXhuNg==",
         "https://twitter.com/infinitycraftspace",
       ],
     };
@@ -58,6 +58,8 @@ const SEOHead = ({
       return structuredData;
     }
 
+    const sdImage = image || "https://infinitycraftspace.com/ICS_Logo.jpeg";
+
     // Default structured data based on page type
     if (type === "product") {
       return {
@@ -65,7 +67,7 @@ const SEOHead = ({
         "@type": "Product",
         name: title.replace(" - Infinity Craft Space", ""),
         description: optimizedDescription,
-        image: image,
+        image: [sdImage],
         brand: {
           "@type": "Brand",
           name: "Infinity Craft Space",
@@ -115,7 +117,7 @@ const SEOHead = ({
         "@type": "Article",
         headline: title.replace(" - Infinity Craft Space", ""),
         description: optimizedDescription,
-        image: image,
+        image: [sdImage],
         author: {
           "@type": "Person",
           name: author,
@@ -154,7 +156,14 @@ const SEOHead = ({
       <meta property="og:description" content={optimizedDescription} />
       <meta property="og:url" content={url} />
       <meta property="og:type" content={type} />
-      <meta property="og:image" content={image} />
+      {/* Open Graph image with explicit size/type and fallback */}
+      <meta
+        property="og:image"
+        content={image || "https://infinitycraftspace.com/ICS_Logo.jpeg"}
+      />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta property="og:image:type" content="image/jpeg" />
       <meta
         property="og:image:alt"
         content={`${title} - Infinity Craft Space`}
@@ -166,7 +175,10 @@ const SEOHead = ({
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={optimizedTitle} />
       <meta name="twitter:description" content={optimizedDescription} />
-      <meta name="twitter:image" content={image} />
+      <meta
+        name="twitter:image"
+        content={image || "https://infinitycraftspace.com/ICS_Logo.jpeg"}
+      />
       <meta
         name="twitter:image:alt"
         content={`${title} - Infinity Craft Space`}
@@ -258,10 +270,11 @@ export const generateProductStructuredData = (product, reviews = []) => {
     description:
       product.description ||
       `${product.name} - Premium craft supply from Infinity Craft Space`,
-    image:
+    image: [
       product.images?.[0]?.url ||
-      product.image?.url ||
-      "https://infinitycraftspace.com/ICS_Logo.jpeg",
+        product.image?.url ||
+        "https://infinitycraftspace.com/ICS_Logo.jpeg",
+    ],
     sku: product._id,
     brand: {
       "@type": "Brand",
@@ -309,5 +322,6 @@ export const SEO_CONFIG = {
   DEFAULT_IMAGE: "https://infinitycraftspace.com/ICS_Logo.jpeg",
   TWITTER_HANDLE: "@infinitycraftspace",
   FACEBOOK_PAGE: "https://facebook.com/infinitycraftspace",
-  INSTAGRAM_PAGE: "https://www.instagram.com/infinity_craft_space",
+  INSTAGRAM_PAGE:
+    "https://www.instagram.com/infinity_craft_space?igsh=MXh0cmI0czF3NXhuNg==",
 };

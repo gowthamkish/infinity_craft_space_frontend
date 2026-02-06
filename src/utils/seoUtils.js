@@ -81,7 +81,7 @@ export const generateOrganizationJsonLD = () => {
     },
     sameAs: [
       "https://www.facebook.com/infinitycraftspace",
-      "https://www.instagram.com/infinitycraftspace",
+      "https://www.instagram.com/infinity_craft_space?igsh=MXh0cmI0czF3NXhuNg==",
       "https://www.twitter.com/infinitycraftspace",
       "https://www.pinterest.com/infinitycraftspace",
     ],
