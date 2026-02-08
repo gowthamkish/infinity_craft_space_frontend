@@ -8,6 +8,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Badge from "react-bootstrap/Badge";
 import Modal from "react-bootstrap/Modal";
+import Spinner from "react-bootstrap/Spinner";
 import api from "../api/axios";
 import Header from "../components/header";
 import { addToCart } from "../features/cartSlice";
@@ -18,6 +19,7 @@ export default function Account() {
 
   const [addresses, setAddresses] = useState([]);
   const [wishlist, setWishlist] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [editingAddress, setEditingAddress] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -47,8 +49,12 @@ export default function Account() {
   };
 
   useEffect(() => {
-    fetchAddresses();
-    fetchWishlist();
+    const fetchData = async () => {
+      setLoading(true);
+      await Promise.all([fetchAddresses(), fetchWishlist()]);
+      setLoading(false);
+    };
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -108,112 +114,125 @@ export default function Account() {
     <div>
       <Header />
       <Container className="main-container">
-        <div className="account-header">
-          <div className="account-avatar">IC</div>
-          <div className="profile-meta">
-            <div className="name">My Account</div>
-            <div className="subtitle">Manage addresses and wishlist</div>
+        {loading ? (
+          <div
+            className="d-flex justify-content-center align-items-center"
+            style={{ minHeight: "50vh" }}
+          >
+            <Spinner animation="border" role="status" variant="primary">
+              <span className="visually-hidden">Loading...</span>
+            </Spinner>
           </div>
-        </div>
+        ) : (
+          <>
+            <div className="account-header">
+              <div className="account-avatar">IC</div>
+              <div className="profile-meta">
+                <div className="name">My Account</div>
+                <div className="subtitle">Manage addresses and wishlist</div>
+              </div>
+            </div>
 
-        <div className="account-grid">
-          <div>
-            <Card className="compact-card address-gradient">
-              <Card.Header>
-                <strong>Address Book</strong>
-              </Card.Header>
-              <Card.Body>
-                {addresses.length === 0 ? (
-                  <div>No saved addresses yet.</div>
-                ) : (
-                  <div style={{ display: "grid", gap: "0.6rem" }}>
-                    {addresses.map((a) => (
-                      <div key={a._id} className="address-item">
-                        <div className="address-details">
-                          <div style={{ fontWeight: 600 }}>
-                            {a.label || `${a.city}, ${a.state}`}
-                            {a.isDefault && (
-                              <Badge bg="success" className="ms-2">
+            <div className="account-grid">
+              <div>
+                <Card className="compact-card address-gradient">
+                  <Card.Header>
+                    <strong>Address Book</strong>
+                  </Card.Header>
+                  <Card.Body>
+                    {addresses.length === 0 ? (
+                      <div>No saved addresses yet.</div>
+                    ) : (
+                      <div style={{ display: "grid", gap: "0.6rem" }}>
+                        {addresses.map((a) => (
+                          <div key={a._id} className="address-item">
+                            <div className="address-details">
+                              <div style={{ fontWeight: 600 }}>
+                                {a.label || `${a.city}, ${a.state}`}
+                                {a.isDefault && (
+                                  <Badge bg="success" className="ms-2">
+                                    Default
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="address-line">
+                                {a.street}, {a.city}, {a.state} {a.zipCode}
+                              </div>
+                              <div className="address-line">📞 {a.phone}</div>
+                            </div>
+                            <div className="address-actions">
+                              <Button
+                                size="sm"
+                                variant="outline-primary"
+                                onClick={() => openEdit(a)}
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline-secondary"
+                                onClick={() => handleSetDefault(a._id)}
+                              >
                                 Default
-                              </Badge>
-                            )}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline-danger"
+                                onClick={() => handleDeleteAddress(a._id)}
+                              >
+                                Delete
+                              </Button>
+                            </div>
                           </div>
-                          <div className="address-line">
-                            {a.street}, {a.city}, {a.state} {a.zipCode}
-                          </div>
-                          <div className="address-line">📞 {a.phone}</div>
-                        </div>
-                        <div className="address-actions">
-                          <Button
-                            size="sm"
-                            variant="outline-primary"
-                            onClick={() => openEdit(a)}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline-secondary"
-                            onClick={() => handleSetDefault(a._id)}
-                          >
-                            Default
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline-danger"
-                            onClick={() => handleDeleteAddress(a._id)}
-                          >
-                            Delete
-                          </Button>
-                        </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                )}
-              </Card.Body>
-            </Card>
-          </div>
+                    )}
+                  </Card.Body>
+                </Card>
+              </div>
 
-          <div>
-            <Card className="compact-card wishlist-gradient">
-              <Card.Header>
-                <strong>Wishlist</strong>
-              </Card.Header>
-              <Card.Body>
-                {wishlist.length === 0 ? (
-                  <div>Your wishlist is empty.</div>
-                ) : (
-                  <div style={{ display: "grid", gap: "0.6rem" }}>
-                    {wishlist.map((p) => (
-                      <div key={p._id} className="wishlist-item">
-                        <div>
-                          <div style={{ fontWeight: 600 }}>{p.name}</div>
-                          <div className="address-line">₹{p.price}</div>
-                        </div>
-                        <div className="address-actions">
-                          <Button
-                            size="sm"
-                            variant="outline-primary"
-                            onClick={() => moveToCart(p)}
-                          >
-                            View
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline-danger"
-                            onClick={() => handleRemoveWishlist(p._id)}
-                          >
-                            Remove
-                          </Button>
-                        </div>
+              <div>
+                <Card className="compact-card wishlist-gradient">
+                  <Card.Header>
+                    <strong>Wishlist</strong>
+                  </Card.Header>
+                  <Card.Body>
+                    {wishlist.length === 0 ? (
+                      <div>Your wishlist is empty.</div>
+                    ) : (
+                      <div style={{ display: "grid", gap: "0.6rem" }}>
+                        {wishlist.map((p) => (
+                          <div key={p._id} className="wishlist-item">
+                            <div>
+                              <div style={{ fontWeight: 600 }}>{p.name}</div>
+                              <div className="address-line">₹{p.price}</div>
+                            </div>
+                            <div className="address-actions">
+                              <Button
+                                size="sm"
+                                variant="outline-primary"
+                                onClick={() => moveToCart(p)}
+                              >
+                                View
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline-danger"
+                                onClick={() => handleRemoveWishlist(p._id)}
+                              >
+                                Remove
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                )}
-              </Card.Body>
-            </Card>
-          </div>
-        </div>
+                    )}
+                  </Card.Body>
+                </Card>
+              </div>
+            </div>
+          </>
+        )}
 
         <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
           <Modal.Header closeButton>
