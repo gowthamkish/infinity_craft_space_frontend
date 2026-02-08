@@ -101,7 +101,7 @@ function App() {
                 }
               />
               <Route
-                path="/logina"
+                path="/login"
                 element={
                   <Suspense
                     fallback={<LoadingFallback message="Loading login..." />}
