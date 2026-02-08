@@ -26,6 +26,27 @@ export const generateProductJsonLD = (product) => {
         "@type": "Organization",
         name: "Infinity Craft Space",
       },
+      // Merchant listings helpers
+      hasMerchantReturnPolicy: "https://infinitycraftspace.com/return-policy",
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingDestination: {
+          "@type": "DefinedRegion",
+          addressCountry: "IN",
+        },
+        shippingRate: {
+          "@type": "MonetaryAmount",
+          price:
+            product.shippingPrice != null ? String(product.shippingPrice) : "0",
+          priceCurrency: "INR",
+        },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          minValue: 2,
+          maxValue: 7,
+          unitText: "day",
+        },
+      },
     },
     brand: {
       "@type": "Brand",

@@ -79,6 +79,26 @@ const SEOHead = ({
               priceCurrency: currency,
               availability: availability || "https://schema.org/InStock",
               url: url,
+              hasMerchantReturnPolicy:
+                "https://infinitycraftspace.com/return-policy",
+              shippingDetails: {
+                "@type": "OfferShippingDetails",
+                shippingDestination: {
+                  "@type": "DefinedRegion",
+                  addressCountry: "IN",
+                },
+                shippingRate: {
+                  "@type": "MonetaryAmount",
+                  price: "0",
+                  priceCurrency: currency,
+                },
+                deliveryTime: {
+                  "@type": "ShippingDeliveryTime",
+                  minValue: 2,
+                  maxValue: 7,
+                  unitText: "day",
+                },
+              },
             }
           : undefined,
         aggregateRating:
