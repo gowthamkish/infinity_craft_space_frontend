@@ -3,7 +3,9 @@ import { Helmet } from "react-helmet-async";
 
 // Helper to get base URL (works on localhost and production)
 export const getBaseUrl = () =>
-  typeof window !== "undefined" ? window.location.origin : "https://infinitycraftspace.com";
+  typeof window !== "undefined"
+    ? window.location.origin
+    : "https://infinitycraftspace.com";
 
 const SEOHead = ({
   title = "Infinity Craft Space — Craft Supplies Online | Art, DIY & Jewelry",
