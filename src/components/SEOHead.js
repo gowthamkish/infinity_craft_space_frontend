@@ -2,9 +2,9 @@ import React from "react";
 import { Helmet } from "react-helmet-async";
 
 const SEOHead = ({
-  title = "Infinity Craft Space - Premium Craft Supplies & Materials",
-  description = "Discover premium craft supplies, materials, and tools at Infinity Craft Space. Browse our extensive collection of art supplies, jewelry making materials, and more.",
-  keywords = "craft supplies, art materials, jewelry making, DIY crafts, craft tools, art supplies online, handmade materials",
+  title = "Infinity Craft Space — Craft Supplies Online | Art, DIY & Jewelry",
+  description = "Infinity Craft Space (infinitycraftspace) — India's online destination for craft supplies, art materials, DIY kits, pottery, jewelry-making tools and handmade craft materials. Shop paints, brushes, clay, beads, sewing & knitting supplies.",
+  keywords = "Infinity Craft Space, infinitycraftspace, craft supplies online, art supplies online India, DIY craft kits, jewelry making supplies, painting supplies, pottery supplies, handmade craft materials, craft tools",
   url = "https://infinitycraftspace.com",
   image = "https://infinitycraftspace.com/ICS_Logo.jpeg",
   type = "website",
@@ -316,9 +316,9 @@ export const SEO_CONFIG = {
   SITE_NAME: "Infinity Craft Space",
   SITE_URL: "https://infinitycraftspace.com",
   DEFAULT_DESCRIPTION:
-    "Discover premium craft supplies, materials, and tools at Infinity Craft Space. Browse our extensive collection of art supplies, jewelry making materials, and more.",
+    "Infinity Craft Space — India's online destination for craft supplies, art materials, DIY kits, pottery and jewelry-making tools. Shop paints, brushes, clay, beads, sewing & knitting supplies.",
   DEFAULT_KEYWORDS:
-    "craft supplies, art materials, jewelry making, DIY crafts, craft tools, art supplies online, handmade materials",
+    "Infinity Craft Space, infinitycraftspace, craft supplies online, art supplies online India, DIY craft kits, jewelry making supplies, painting supplies, pottery supplies, handmade craft materials, craft tools",
   DEFAULT_IMAGE: "https://infinitycraftspace.com/ICS_Logo.jpeg",
   TWITTER_HANDLE: "@infinitycraftspace",
   FACEBOOK_PAGE: "https://facebook.com/infinitycraftspace",

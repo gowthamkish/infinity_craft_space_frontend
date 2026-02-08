@@ -74,7 +74,9 @@ export default function Home() {
       <div>
         <Header />
         <Container style={{ marginTop: "90px", paddingTop: "1rem" }}>
-          <h1 className="mb-4 text-center">Product Listings</h1>
+          <h1 className="mb-4 text-center">
+            Infinity Craft Space — Product Listings
+          </h1>
           {loading ? (
             <div
               className="d-flex justify-content-center align-items-center"
@@ -100,6 +102,7 @@ export default function Home() {
                             product.image ||
                             "https://via.placeholder.com/200x200?text=No+Image"
                           }
+                          alt={product.name || "Product image"}
                           style={{
                             objectFit: "contain",
                             height: "200px",
