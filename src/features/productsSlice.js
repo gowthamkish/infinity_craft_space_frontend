@@ -1,64 +1,74 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../api/axios';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import api from "../api/axios";
 
 // Fetch all products
 export const fetchProducts = createAsyncThunk(
-  'products/fetchProducts', 
+  "products/fetchProducts",
   async (_, { getState, rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await api.get('/api/products', {
+      const res = await api.get("/api/products", {
         headers: { Authorization: `Bearer ${token}` },
       });
       // Handle both old format (array) and new format (object with products array)
       return res.data.products || res.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch products');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch products",
+      );
     }
-  }
+  },
 );
 
 // Add new product
 export const addProduct = createAsyncThunk(
-  'products/addProduct',
+  "products/addProduct",
   async (productData, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await api.post('/api/products', productData, {
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      const res = await api.post("/api/products", productData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
       });
       return res.data.product || res.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error || error.response?.data?.message || 'Failed to add product');
+      return rejectWithValue(
+        error.response?.data?.error ||
+          error.response?.data?.message ||
+          "Failed to add product",
+      );
     }
-  }
+  },
 );
 
 // Update product
 export const updateProduct = createAsyncThunk(
-  'products/updateProduct',
+  "products/updateProduct",
   async ({ id, productData }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
       const res = await api.put(`/api/products/${id}`, productData, {
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
       });
       return res.data.product || res.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error || error.response?.data?.message || 'Failed to update product');
+      return rejectWithValue(
+        error.response?.data?.error ||
+          error.response?.data?.message ||
+          "Failed to update product",
+      );
     }
-  }
+  },
 );
 
 // Delete product
 export const deleteProduct = createAsyncThunk(
-  'products/deleteProduct',
+  "products/deleteProduct",
   async (productId, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
@@ -67,19 +77,21 @@ export const deleteProduct = createAsyncThunk(
       });
       return productId;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to delete product');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to delete product",
+      );
     }
-  }
+  },
 );
 
 const productsSlice = createSlice({
-  name: 'products',
-  initialState: { 
-    items: [], 
-    loading: false, 
+  name: "products",
+  initialState: {
+    items: [],
+    loading: false,
     error: null,
     lastFetched: null,
-    isStale: true
+    isStale: true,
   },
   reducers: {
     clearError: (state) => {
@@ -92,7 +104,7 @@ const productsSlice = createSlice({
       state.items = [];
       state.lastFetched = null;
       state.isStale = true;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -111,6 +123,8 @@ const productsSlice = createSlice({
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.isStale = false; // Prevent infinite retry loop on error
+        state.lastFetched = Date.now(); // Mark as fetched to prevent immediate retry
       })
       // Add product
       .addCase(addProduct.pending, (state) => {
@@ -132,7 +146,9 @@ const productsSlice = createSlice({
         state.error = null;
       })
       .addCase(updateProduct.fulfilled, (state, action) => {
-        const index = state.items.findIndex(item => item._id === action.payload._id);
+        const index = state.items.findIndex(
+          (item) => item._id === action.payload._id,
+        );
         if (index !== -1) {
           state.items[index] = action.payload;
         }
@@ -149,7 +165,7 @@ const productsSlice = createSlice({
         state.error = null;
       })
       .addCase(deleteProduct.fulfilled, (state, action) => {
-        state.items = state.items.filter(item => item._id !== action.payload);
+        state.items = state.items.filter((item) => item._id !== action.payload);
         state.loading = false;
         state.error = null;
       })

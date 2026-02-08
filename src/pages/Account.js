@@ -228,7 +228,7 @@ export default function Account() {
                                 variant="outline-primary"
                                 onClick={() => moveToCart(p)}
                               >
-                                View
+                                Add to Cart
                               </Button>
                               <Button
                                 size="sm"

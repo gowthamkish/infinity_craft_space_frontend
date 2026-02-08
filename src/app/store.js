@@ -4,6 +4,7 @@ import productsReducer from "../features/productsSlice";
 import cartReducer from "../features/cartSlice";
 import adminReducer from "../features/adminSlice";
 import categoriesReducer from "../features/categoriesSlice";
+import reviewsReducer from "../features/reviewsSlice";
 
 // Performance monitoring middleware
 const performanceMiddleware = (store) => (next) => (action) => {
@@ -47,6 +48,7 @@ export const store = configureStore({
     cart: cartReducer,
     admin: adminReducer,
     categories: categoriesReducer,
+    reviews: reviewsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -5,9 +5,11 @@ import { useDispatch } from "react-redux";
 import { setAuthFromStorage } from "./features/authSlice";
 import { Spinner, Container } from "react-bootstrap";
 import { HelmetProvider } from "react-helmet-async";
+import OfflineIndicator from "./components/OfflineIndicator";
 
 // Lazy load components for better performance
 const ProductListing = lazy(() => import("./pages/ProductListing"));
+const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
@@ -31,7 +33,6 @@ const IdleTimeoutManager = lazy(
   () => import("./components/IdleTimeoutManager"),
 );
 const PWAInstallPrompt = lazy(() => import("./components/PWAInstallPrompt"));
-const OfflineIndicator = lazy(() => import("./components/OfflineIndicator"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Loading fallback component
@@ -97,6 +98,16 @@ function App() {
                     {/* PWA Install Prompt - Shows on mobile devices */}
                     {/* <PWAInstallPrompt /> */}
                     <ProductListing />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/product/:id"
+                element={
+                  <Suspense
+                    fallback={<LoadingFallback message="Loading product..." />}
+                  >
+                    <ProductDetail />
                   </Suspense>
                 }
               />

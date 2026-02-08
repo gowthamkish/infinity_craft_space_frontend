@@ -246,6 +246,21 @@ const ProductCard = React.memo(
 
           <div className="price-tag mb-2">₹{product.price}</div>
 
+          {/* View Details Link */}
+          <div
+            className="mb-2"
+            onClick={() => navigate(`/product/${product._id}`)}
+            style={{
+              color: "var(--primary-color)",
+              fontSize: "0.85rem",
+              fontWeight: "600",
+              cursor: "pointer",
+              textDecoration: "underline",
+            }}
+          >
+            View Details & Reviews
+          </div>
+
           <Card.Text
             className="text-muted-custom"
             style={{
