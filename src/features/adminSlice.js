@@ -1,13 +1,13 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../api/axios';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import api from "../api/axios";
 
 // Fetch dashboard counts
 export const fetchDashboardCounts = createAsyncThunk(
-  'admin/fetchDashboardCounts',
+  "admin/fetchDashboardCounts",
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      
+
       // Use the dedicated dashboard endpoint
       const res = await api.get("/api/admin/dashboard", {
         headers: { Authorization: `Bearer ${token}` },
@@ -15,18 +15,20 @@ export const fetchDashboardCounts = createAsyncThunk(
       return {
         userCount: res.data.userCount || 0,
         productCount: res.data.productCount || 0,
-        orderCount: res.data.orderCount || 0
+        orderCount: res.data.orderCount || 0,
       };
     } catch (error) {
       console.error("Dashboard counts error:", error);
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch dashboard data');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch dashboard data",
+      );
     }
-  }
+  },
 );
 
 // Fetch users list
 export const fetchUsers = createAsyncThunk(
-  'admin/fetchUsers',
+  "admin/fetchUsers",
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
@@ -35,14 +37,16 @@ export const fetchUsers = createAsyncThunk(
       });
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch users');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch users",
+      );
     }
-  }
+  },
 );
 
 // Fetch orders list (admin - all orders)
 export const fetchOrders = createAsyncThunk(
-  'admin/fetchOrders',
+  "admin/fetchOrders",
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
@@ -51,70 +55,84 @@ export const fetchOrders = createAsyncThunk(
       });
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch orders');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch orders",
+      );
     }
-  }
+  },
 );
 
 // Update order status
 export const updateOrderStatus = createAsyncThunk(
-  'admin/updateOrderStatus',
+  "admin/updateOrderStatus",
   async ({ orderId, status }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await api.put(`/api/orders/${orderId}/status`, { status }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.put(
+        `/api/orders/${orderId}/status`,
+        { status },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to update order status');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update order status",
+      );
     }
-  }
+  },
 );
 
 // Update user role (make admin/user)
 export const updateUserRole = createAsyncThunk(
-  'admin/updateUserRole',
+  "admin/updateUserRole",
   async ({ userId, isAdmin }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await api.put(`/api/admin/users/${userId}/role`, { isAdmin }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.put(
+        `/api/admin/users/${userId}/role`,
+        { isAdmin },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Failed to update user role');
+      return rejectWithValue(
+        error.response?.data?.error || "Failed to update user role",
+      );
     }
-  }
+  },
 );
 
 const adminSlice = createSlice({
-  name: 'admin',
+  name: "admin",
   initialState: {
     // Dashboard counts
     dashboardCounts: {
       userCount: 0,
       productCount: 0,
-      orderCount: 0
+      orderCount: 0,
     },
     dashboardLoading: false,
     dashboardError: null,
     dashboardLastFetched: null,
     dashboardIsStale: true,
-    
+
     // Users data
     users: [],
     usersLoading: false,
     usersError: null,
     usersLastFetched: null,
     usersIsStale: true,
-    
+
     // Orders data
     orders: { orders: [] },
     ordersLoading: false,
     ordersError: null,
     ordersLastFetched: null,
-    ordersIsStale: true
+    ordersIsStale: true,
   },
   reducers: {
     clearDashboardError: (state) => {
@@ -145,7 +163,7 @@ const adminSlice = createSlice({
       state.dashboardIsStale = true;
       state.usersIsStale = true;
       state.ordersIsStale = true;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -190,7 +208,9 @@ const adminSlice = createSlice({
       })
       .addCase(fetchOrders.fulfilled, (state, action) => {
         // Handle both array and object responses
-        const ordersData = Array.isArray(action.payload) ? action.payload : action.payload.orders || [];
+        const ordersData = Array.isArray(action.payload)
+          ? action.payload
+          : action.payload.orders || [];
         state.orders = { orders: ordersData };
         state.ordersLoading = false;
         state.ordersError = null;
@@ -214,10 +234,12 @@ const adminSlice = createSlice({
         if (!state.orders.orders) {
           state.orders = { orders: [] };
         }
-        
+
         // Find and update the order
         const orderToUpdate = updatedOrder.order || updatedOrder;
-        const index = state.orders.orders.findIndex(order => order._id === orderToUpdate._id);
+        const index = state.orders.orders.findIndex(
+          (order) => order._id === orderToUpdate._id,
+        );
         if (index !== -1) {
           state.orders.orders[index] = orderToUpdate;
         }
@@ -236,7 +258,9 @@ const adminSlice = createSlice({
       .addCase(updateUserRole.fulfilled, (state, action) => {
         const updatedUser = action.payload.user;
         // Find and update the user in the users array
-        const index = state.users.findIndex(user => user._id === updatedUser._id);
+        const index = state.users.findIndex(
+          (user) => user._id === updatedUser._id,
+        );
         if (index !== -1) {
           state.users[index] = updatedUser;
         }
@@ -250,14 +274,14 @@ const adminSlice = createSlice({
   },
 });
 
-export const { 
-  clearDashboardError, 
-  clearUsersError, 
+export const {
+  clearDashboardError,
+  clearUsersError,
   clearOrdersError,
-  markDashboardAsStale, 
-  markUsersAsStale, 
+  markDashboardAsStale,
+  markUsersAsStale,
   markOrdersAsStale,
-  clearAdminData 
+  clearAdminData,
 } = adminSlice.actions;
 
 export default adminSlice.reducer;
