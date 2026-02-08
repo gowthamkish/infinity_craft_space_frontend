@@ -1,12 +1,16 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
 
+// Helper to get base URL (works on localhost and production)
+export const getBaseUrl = () =>
+  typeof window !== "undefined" ? window.location.origin : "https://infinitycraftspace.com";
+
 const SEOHead = ({
   title = "Infinity Craft Space — Craft Supplies Online | Art, DIY & Jewelry",
   description = "Infinity Craft Space (infinitycraftspace) — India's online destination for craft supplies, art materials, DIY kits, pottery, jewelry-making tools and handmade craft materials. Shop paints, brushes, clay, beads, sewing & knitting supplies.",
   keywords = "Infinity Craft Space, infinitycraftspace, craft supplies online, art supplies online India, DIY craft kits, jewelry making supplies, painting supplies, pottery supplies, handmade craft materials, craft tools",
-  url = "https://infinitycraftspace.com",
-  image = "https://infinitycraftspace.com/ICS_Logo.jpeg",
+  url,
+  image,
   type = "website",
   structuredData = null,
   canonical = null,
@@ -32,20 +36,25 @@ const SEOHead = ({
       ? description.substring(0, 157) + "..."
       : description;
 
+  // Get dynamic base URL
+  const baseUrl = getBaseUrl();
+  const resolvedUrl = url || baseUrl;
+  const resolvedImage = image || `${baseUrl}/ICS_Logo.jpeg`;
+
   // Generate structured data based on page type
   const generateStructuredData = () => {
     const baseOrganization = {
       "@context": "https://schema.org",
       "@type": "Organization",
       name: "Infinity Craft Space",
-      url: "https://infinitycraftspace.com",
-      logo: "https://infinitycraftspace.com/ICS_Logo.jpeg",
+      url: baseUrl,
+      logo: `${baseUrl}/ICS_Logo.jpeg`,
       description:
         "Premium craft supplies and materials for artists and crafters",
       contactPoint: {
         "@type": "ContactPoint",
         contactType: "customer service",
-        url: "https://infinitycraftspace.com/contact",
+        url: `${baseUrl}/contact`,
       },
       sameAs: [
         "https://facebook.com/infinitycraftspace",
@@ -58,7 +67,7 @@ const SEOHead = ({
       return structuredData;
     }
 
-    const sdImage = image || "https://infinitycraftspace.com/ICS_Logo.jpeg";
+    const sdImage = resolvedImage;
 
     // Default structured data based on page type
     if (type === "product") {
@@ -119,13 +128,12 @@ const SEOHead = ({
         "@context": "https://schema.org",
         "@type": "WebSite",
         name: "Infinity Craft Space",
-        url: "https://infinitycraftspace.com",
+        url: baseUrl,
         description: optimizedDescription,
         publisher: baseOrganization,
         potentialAction: {
           "@type": "SearchAction",
-          target:
-            "https://infinitycraftspace.com/search?q={search_term_string}",
+          target: `${baseUrl}/search?q={search_term_string}`,
           "query-input": "required name=search_term_string",
         },
       };
@@ -174,13 +182,10 @@ const SEOHead = ({
       {/* Open Graph Meta Tags */}
       <meta property="og:title" content={optimizedTitle} />
       <meta property="og:description" content={optimizedDescription} />
-      <meta property="og:url" content={url} />
+      <meta property="og:url" content={resolvedUrl} />
       <meta property="og:type" content={type} />
       {/* Open Graph image with explicit size/type and fallback */}
-      <meta
-        property="og:image"
-        content={image || "https://infinitycraftspace.com/ICS_Logo.jpeg"}
-      />
+      <meta property="og:image" content={resolvedImage} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta property="og:image:type" content="image/jpeg" />
@@ -195,10 +200,7 @@ const SEOHead = ({
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={optimizedTitle} />
       <meta name="twitter:description" content={optimizedDescription} />
-      <meta
-        name="twitter:image"
-        content={image || "https://infinitycraftspace.com/ICS_Logo.jpeg"}
-      />
+      <meta name="twitter:image" content={resolvedImage} />
       <meta
         name="twitter:image:alt"
         content={`${title} - Infinity Craft Space`}
@@ -254,6 +256,7 @@ export default SEOHead;
 
 // Utility function to generate product-specific structured data
 export const generateProductStructuredData = (product, reviews = []) => {
+  const baseUrl = getBaseUrl();
   const aggregateRating =
     reviews.length > 0
       ? {
@@ -293,7 +296,7 @@ export const generateProductStructuredData = (product, reviews = []) => {
     image: [
       product.images?.[0]?.url ||
         product.image?.url ||
-        "https://infinitycraftspace.com/ICS_Logo.jpeg",
+        `${baseUrl}/ICS_Logo.jpeg`,
     ],
     sku: product._id,
     brand: {
@@ -306,7 +309,7 @@ export const generateProductStructuredData = (product, reviews = []) => {
       price: product.price,
       priceCurrency: "INR",
       availability: "https://schema.org/InStock",
-      url: `https://infinitycraftspace.com/product/${product._id}`,
+      url: `${baseUrl}/product/${product._id}`,
       seller: {
         "@type": "Organization",
         name: "Infinity Craft Space",
@@ -334,12 +337,16 @@ export const generateBreadcrumbStructuredData = (breadcrumbs) => {
 // SEO constants
 export const SEO_CONFIG = {
   SITE_NAME: "Infinity Craft Space",
-  SITE_URL: "https://infinitycraftspace.com",
+  get SITE_URL() {
+    return getBaseUrl();
+  },
   DEFAULT_DESCRIPTION:
     "Infinity Craft Space — India's online destination for craft supplies, art materials, DIY kits, pottery and jewelry-making tools. Shop paints, brushes, clay, beads, sewing & knitting supplies.",
   DEFAULT_KEYWORDS:
     "Infinity Craft Space, infinitycraftspace, craft supplies online, art supplies online India, DIY craft kits, jewelry making supplies, painting supplies, pottery supplies, handmade craft materials, craft tools",
-  DEFAULT_IMAGE: "https://infinitycraftspace.com/ICS_Logo.jpeg",
+  get DEFAULT_IMAGE() {
+    return `${getBaseUrl()}/ICS_Logo.jpeg`;
+  },
   TWITTER_HANDLE: "@infinitycraftspace",
   FACEBOOK_PAGE: "https://facebook.com/infinitycraftspace",
   INSTAGRAM_PAGE:
