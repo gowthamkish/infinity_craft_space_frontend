@@ -116,12 +116,27 @@ export default function Account() {
       <Container className="main-container">
         {loading ? (
           <div
-            className="d-flex justify-content-center align-items-center"
-            style={{ minHeight: "50vh" }}
+            className="d-flex flex-column justify-content-center align-items-center"
+            style={{ minHeight: "60vh" }}
           >
-            <Spinner animation="border" role="status" variant="primary">
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
+            <div className="text-center">
+              <Spinner
+                animation="border"
+                role="status"
+                variant="primary"
+                style={{
+                  width: "4rem",
+                  height: "4rem",
+                  borderWidth: "0.3em",
+                }}
+              >
+                <span className="visually-hidden">Loading account...</span>
+              </Spinner>
+              <h4 className="mt-3 text-muted">Loading your account...</h4>
+              <p className="text-muted">
+                Please wait while we fetch your addresses and wishlist
+              </p>
+            </div>
           </div>
         ) : (
           <>
