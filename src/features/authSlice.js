@@ -62,14 +62,22 @@ export const fetchCurrentUser = createAsyncThunk(
 
 const authSlice = createSlice({
   name: "auth",
-  initialState: { user: null, token: null, loading: false, error: null },
+  initialState: {
+    user: null,
+    token: null,
+    refreshToken: null,
+    loading: false,
+    error: null,
+  },
   reducers: {
     logout: (state) => {
       state.user = null;
       state.token = null;
+      state.refreshToken = null;
       state.error = null;
       // Clear localStorage on logout
       localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
     },
     autoLogout: (state, action) => {
@@ -79,9 +87,11 @@ const authSlice = createSlice({
       );
       state.user = null;
       state.token = null;
+      state.refreshToken = null;
       state.error = null;
       // Clear all auth-related localStorage items
       localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
       // Clear any other potential auth items
       Object.keys(localStorage).forEach((key) => {
@@ -97,6 +107,7 @@ const authSlice = createSlice({
     setAuthFromStorage: (state, action) => {
       // Only set token from storage; user will be fetched via `fetchCurrentUser`
       state.token = action.payload.token;
+      state.refreshToken = action.payload.refreshToken || null;
       state.user = null;
     },
     clearError: (state) => {
@@ -112,9 +123,13 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.user = action.payload.user;
         state.token = action.payload.token;
+        state.refreshToken = action.payload.refreshToken || null;
         state.loading = false;
         state.error = null;
         localStorage.setItem("token", action.payload.token);
+        if (action.payload.refreshToken) {
+          localStorage.setItem("refreshToken", action.payload.refreshToken);
+        }
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -128,9 +143,13 @@ const authSlice = createSlice({
       .addCase(register.fulfilled, (state, action) => {
         state.user = action.payload.user;
         state.token = action.payload.token;
+        state.refreshToken = action.payload.refreshToken || null;
         state.loading = false;
         state.error = null;
         localStorage.setItem("token", action.payload.token);
+        if (action.payload.refreshToken) {
+          localStorage.setItem("refreshToken", action.payload.refreshToken);
+        }
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
