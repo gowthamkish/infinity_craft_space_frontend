@@ -40,13 +40,13 @@ export const fetchUsers = createAsyncThunk(
   }
 );
 
-// Fetch orders list
+// Fetch orders list (admin - all orders)
 export const fetchOrders = createAsyncThunk(
   'admin/fetchOrders',
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await api.get("/api/orders", {
+      const res = await api.get("/api/admin/orders", {
         headers: { Authorization: `Bearer ${token}` },
       });
       return res.data;

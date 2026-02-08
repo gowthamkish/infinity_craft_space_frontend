@@ -32,11 +32,11 @@ export const register = createAsyncThunk(
         "Registration error details:",
         error.response?.data || error.message,
       );
-      // Return the actual error message from backend
-      if (error.response?.data?.error) {
-        return rejectWithValue(error.response.data.error);
+      // Return the full error response to handle validation errors
+      if (error.response?.data) {
+        return rejectWithValue(error.response.data);
       }
-      return rejectWithValue(error.message || "Registration failed");
+      return rejectWithValue({ error: error.message || "Registration failed" });
     }
   },
 );

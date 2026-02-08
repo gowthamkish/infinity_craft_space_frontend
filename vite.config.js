@@ -3,7 +3,14 @@ import react from "@vitejs/plugin-react";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react({
+      // Use React Fast Refresh
+      fastRefresh: true,
+      // Include all .js and .jsx files
+      include: "**/*.{js,jsx,ts,tsx}",
+    }),
+  ],
   // Treat .js files as JSX (CRA compatibility)
   esbuild: {
     loader: "jsx",
