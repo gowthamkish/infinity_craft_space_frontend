@@ -32,6 +32,7 @@ const IdleTimeoutManager = lazy(
 );
 const PWAInstallPrompt = lazy(() => import("./components/PWAInstallPrompt"));
 const OfflineIndicator = lazy(() => import("./components/OfflineIndicator"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Loading fallback component
 const LoadingFallback = ({ message = "Loading..." }) => (
@@ -100,7 +101,7 @@ function App() {
                 }
               />
               <Route
-                path="/login"
+                path="/logina"
                 element={
                   <Suspense
                     fallback={<LoadingFallback message="Loading login..." />}
@@ -278,6 +279,16 @@ function App() {
                     <AdminRoute>
                       <AdminNotifications />
                     </AdminRoute>
+                  </Suspense>
+                }
+              />
+
+              {/* 404 Not Found - Catch all unmatched routes */}
+              <Route
+                path="*"
+                element={
+                  <Suspense fallback={<LoadingFallback message="Loading..." />}>
+                    <NotFound />
                   </Suspense>
                 }
               />
