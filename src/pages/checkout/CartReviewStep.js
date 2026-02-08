@@ -169,6 +169,16 @@ export const CartReviewStep = ({
                           item.quantity + 1,
                         )
                       }
+                      disabled={
+                        item.product.trackInventory !== false &&
+                        item.quantity >= item.product.stock
+                      }
+                      title={
+                        item.product.trackInventory !== false &&
+                        item.quantity >= item.product.stock
+                          ? `Only ${item.product.stock} available`
+                          : "Add one"
+                      }
                       style={{
                         borderRadius: "8px",
                         width: "35px",
@@ -178,6 +188,17 @@ export const CartReviewStep = ({
                       <Plus size={14} />
                     </Button>
                   </div>
+                  {/* Stock Warning */}
+                  {item.product.trackInventory !== false &&
+                    item.product.stock <=
+                      (item.product.lowStockThreshold || 5) &&
+                    item.product.stock > 0 && (
+                      <div className="text-center mt-1">
+                        <small style={{ color: "#f59e0b", fontSize: "0.7rem" }}>
+                          Only {item.product.stock} left
+                        </small>
+                      </div>
+                    )}
                 </Col>
                 <Col md={2}>
                   <div className="text-end">
@@ -314,6 +335,10 @@ export const CartReviewStep = ({
                             item.quantity + 1,
                           )
                         }
+                        disabled={
+                          item.product.trackInventory !== false &&
+                          item.quantity >= item.product.stock
+                        }
                         style={{
                           borderRadius: "6px",
                           width: "30px",
@@ -323,6 +348,21 @@ export const CartReviewStep = ({
                       >
                         <Plus size={12} />
                       </Button>
+                      {/* Stock Warning for Mobile */}
+                      {item.product.trackInventory !== false &&
+                        item.product.stock <=
+                          (item.product.lowStockThreshold || 5) &&
+                        item.product.stock > 0 && (
+                          <small
+                            style={{
+                              color: "#f59e0b",
+                              fontSize: "0.65rem",
+                              marginLeft: "8px",
+                            }}
+                          >
+                            Only {item.product.stock} left
+                          </small>
+                        )}
                     </div>
                     <p
                       className="mb-0"

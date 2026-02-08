@@ -485,6 +485,47 @@ const ProductDetail = () => {
               </span>
             </div>
 
+            {/* Stock Status */}
+            {product.trackInventory !== false && (
+              <div className="mb-4">
+                {product.stock <= 0 ? (
+                  <Badge
+                    bg="danger"
+                    style={{
+                      fontSize: "0.9rem",
+                      padding: "8px 16px",
+                      borderRadius: "20px",
+                    }}
+                  >
+                    ⚠️ Out of Stock
+                  </Badge>
+                ) : product.stock <= (product.lowStockThreshold || 5) ? (
+                  <Badge
+                    bg="warning"
+                    text="dark"
+                    style={{
+                      fontSize: "0.9rem",
+                      padding: "8px 16px",
+                      borderRadius: "20px",
+                    }}
+                  >
+                    🔥 Only {product.stock} left in stock - Order soon!
+                  </Badge>
+                ) : (
+                  <Badge
+                    bg="success"
+                    style={{
+                      fontSize: "0.9rem",
+                      padding: "8px 16px",
+                      borderRadius: "20px",
+                    }}
+                  >
+                    ✓ In Stock
+                  </Badge>
+                )}
+              </div>
+            )}
+
             {/* Description */}
             <div className="mb-4">
               <h5
@@ -509,30 +550,49 @@ const ProductDetail = () => {
 
             {/* Action Buttons */}
             <div className="d-flex flex-wrap gap-3 mb-4">
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={handleAddToCart}
-                disabled={addingToCart}
-                style={{
-                  flex: "1 1 200px",
-                  borderRadius: "12px",
-                  fontWeight: "600",
-                  padding: "0.875rem 1.5rem",
-                  background:
-                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  border: "none",
-                }}
-              >
-                {addingToCart ? (
-                  <Spinner animation="border" size="sm" className="me-2" />
-                ) : (
-                  <FiShoppingCart className="me-2" />
-                )}
-                {quantityInCart > 0
-                  ? `Add More (${quantityInCart} in cart)`
-                  : "Add to Cart"}
-              </Button>
+              {/* Check if product is out of stock */}
+              {product.trackInventory !== false && product.stock <= 0 ? (
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  disabled
+                  style={{
+                    flex: "1 1 200px",
+                    borderRadius: "12px",
+                    fontWeight: "600",
+                    padding: "0.875rem 1.5rem",
+                    opacity: 0.7,
+                  }}
+                >
+                  <FiPackage className="me-2" />
+                  Out of Stock
+                </Button>
+              ) : (
+                <Button
+                  variant="primary"
+                  size="lg"
+                  onClick={handleAddToCart}
+                  disabled={addingToCart}
+                  style={{
+                    flex: "1 1 200px",
+                    borderRadius: "12px",
+                    fontWeight: "600",
+                    padding: "0.875rem 1.5rem",
+                    background:
+                      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    border: "none",
+                  }}
+                >
+                  {addingToCart ? (
+                    <Spinner animation="border" size="sm" className="me-2" />
+                  ) : (
+                    <FiShoppingCart className="me-2" />
+                  )}
+                  {quantityInCart > 0
+                    ? `Add More (${quantityInCart} in cart)`
+                    : "Add to Cart"}
+                </Button>
+              )}
 
               <Button
                 variant={isWishlisted ? "danger" : "outline-danger"}

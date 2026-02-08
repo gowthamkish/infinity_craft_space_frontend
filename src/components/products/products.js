@@ -55,6 +55,7 @@ const ProductList = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const handleEdit = (product) => {
+    debugger;
     navigate(`/admin/addProduct/${product?._id}`, {
       state: { product },
     });
@@ -315,6 +316,16 @@ const ProductList = () => {
                               color: "#495057",
                             }}
                           >
+                            Stock
+                          </th>
+                          <th
+                            style={{
+                              border: "none",
+                              padding: "1rem",
+                              fontWeight: "600",
+                              color: "#495057",
+                            }}
+                          >
                             Status
                           </th>
                           <th
@@ -482,6 +493,62 @@ const ProductList = () => {
                                   }}
                                 >
                                   {product?.subCategory}
+                                </Badge>
+                              )}
+                            </td>
+                            <td style={{ border: "none", padding: "1rem" }}>
+                              {product?.trackInventory === false ? (
+                                <Badge
+                                  bg="secondary"
+                                  style={{
+                                    borderRadius: "8px",
+                                    padding: "0.5rem 0.75rem",
+                                  }}
+                                >
+                                  Unlimited
+                                </Badge>
+                              ) : product?.stock === undefined ||
+                                product?.stock === null ? (
+                                <Badge
+                                  bg="info"
+                                  style={{
+                                    borderRadius: "8px",
+                                    padding: "0.5rem 0.75rem",
+                                  }}
+                                >
+                                  Not Set
+                                </Badge>
+                              ) : product?.stock <= 0 ? (
+                                <Badge
+                                  bg="danger"
+                                  style={{
+                                    borderRadius: "8px",
+                                    padding: "0.5rem 0.75rem",
+                                  }}
+                                >
+                                  Out of Stock
+                                </Badge>
+                              ) : product?.stock <=
+                                (product?.lowStockThreshold || 5) ? (
+                                <Badge
+                                  bg="warning"
+                                  text="dark"
+                                  style={{
+                                    borderRadius: "8px",
+                                    padding: "0.5rem 0.75rem",
+                                  }}
+                                >
+                                  Low: {product?.stock}
+                                </Badge>
+                              ) : (
+                                <Badge
+                                  bg="success"
+                                  style={{
+                                    borderRadius: "8px",
+                                    padding: "0.5rem 0.75rem",
+                                  }}
+                                >
+                                  {product?.stock}
                                 </Badge>
                               )}
                             </td>
@@ -696,26 +763,69 @@ const ProductList = () => {
                               >
                                 ₹{product?.price}
                               </span>
-                              <div>
-                                <Badge
-                                  bg="primary"
-                                  className="me-1"
-                                  style={{ borderRadius: "8px" }}
-                                >
-                                  {product?.category}
-                                </Badge>
-                                {product?.subCategory && (
+                              <div className="d-flex align-items-center gap-2">
+                                {/* Stock Badge */}
+                                {product?.trackInventory === false ? (
                                   <Badge
                                     bg="secondary"
-                                    style={{
-                                      borderRadius: "8px",
-                                      fontSize: "0.7rem",
-                                    }}
+                                    style={{ borderRadius: "8px" }}
                                   >
-                                    {product?.subCategory}
+                                    Unlimited
+                                  </Badge>
+                                ) : product?.stock === undefined ||
+                                  product?.stock === null ? (
+                                  <Badge
+                                    bg="info"
+                                    style={{ borderRadius: "8px" }}
+                                  >
+                                    Not Set
+                                  </Badge>
+                                ) : product?.stock <= 0 ? (
+                                  <Badge
+                                    bg="danger"
+                                    style={{ borderRadius: "8px" }}
+                                  >
+                                    Out of Stock
+                                  </Badge>
+                                ) : product?.stock <=
+                                  (product?.lowStockThreshold || 5) ? (
+                                  <Badge
+                                    bg="warning"
+                                    text="dark"
+                                    style={{ borderRadius: "8px" }}
+                                  >
+                                    Low: {product?.stock}
+                                  </Badge>
+                                ) : (
+                                  <Badge
+                                    bg="success"
+                                    style={{ borderRadius: "8px" }}
+                                  >
+                                    Stock: {product?.stock}
                                   </Badge>
                                 )}
                               </div>
+                            </div>
+
+                            <div className="d-flex flex-wrap gap-1 mb-3">
+                              <Badge
+                                bg="primary"
+                                className="me-1"
+                                style={{ borderRadius: "8px" }}
+                              >
+                                {product?.category}
+                              </Badge>
+                              {product?.subCategory && (
+                                <Badge
+                                  bg="secondary"
+                                  style={{
+                                    borderRadius: "8px",
+                                    fontSize: "0.7rem",
+                                  }}
+                                >
+                                  {product?.subCategory}
+                                </Badge>
+                              )}
                             </div>
 
                             {/* Last Edited Info for Mobile */}

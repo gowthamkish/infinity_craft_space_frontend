@@ -246,6 +246,36 @@ const ProductCard = React.memo(
 
           <div className="price-tag mb-2">₹{product.price}</div>
 
+          {/* Stock Status Indicator */}
+          {product.trackInventory !== false && (
+            <div className="mb-2">
+              {product.stock <= 0 ? (
+                <Badge
+                  bg="danger"
+                  style={{
+                    fontSize: "0.75rem",
+                    padding: "4px 10px",
+                    borderRadius: "12px",
+                  }}
+                >
+                  Out of Stock
+                </Badge>
+              ) : product.stock <= (product.lowStockThreshold || 5) ? (
+                <Badge
+                  bg="warning"
+                  text="dark"
+                  style={{
+                    fontSize: "0.75rem",
+                    padding: "4px 10px",
+                    borderRadius: "12px",
+                  }}
+                >
+                  Only {product.stock} left!
+                </Badge>
+              ) : null}
+            </div>
+          )}
+
           {/* View Details Link */}
           <div
             className="mb-2"
@@ -288,49 +318,31 @@ const ProductCard = React.memo(
           </div>
         )} */}
             <div className="d-flex gap-2 justify-content-center">
-              <Button
-                variant="success"
-                size="sm"
-                onClick={async () => {
-                  setCartLoading(true);
-                  try {
-                    await Promise.resolve(onAddToCart(product));
-                  } catch (err) {
-                    console.error(err);
-                  } finally {
-                    setCartLoading(false);
-                  }
-                }}
-                className="hover-scale flex-fill"
-                title={cartLoading ? "Processing..." : "Add to Cart"}
-                disabled={cartLoading}
-                style={{
-                  borderRadius: "10px",
-                  fontWeight: "600",
-                  height: "36px",
-                  padding: "0 8px",
-                  minWidth: "36px",
-                  background: "linear-gradient(45deg,#3b82f6,#10b981)",
-                  border: "none",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                {cartLoading ? (
-                  <Spinner animation="border" size="sm" variant="light" />
-                ) : (
-                  <FiShoppingCart size={16} />
-                )}
-              </Button>
-              {quantityInCart > 0 && (
+              {/* Check if product is out of stock */}
+              {product.trackInventory !== false && product.stock <= 0 ? (
                 <Button
-                  variant="outline-danger"
+                  variant="secondary"
+                  size="sm"
+                  disabled
+                  className="flex-fill"
+                  style={{
+                    borderRadius: "10px",
+                    fontWeight: "600",
+                    height: "36px",
+                    padding: "0 12px",
+                    opacity: 0.7,
+                  }}
+                >
+                  Out of Stock
+                </Button>
+              ) : (
+                <Button
+                  variant="success"
                   size="sm"
                   onClick={async () => {
                     setCartLoading(true);
                     try {
-                      await Promise.resolve(onRemoveFromCart(product));
+                      await Promise.resolve(onAddToCart(product));
                     } catch (err) {
                       console.error(err);
                     } finally {
@@ -338,29 +350,67 @@ const ProductCard = React.memo(
                     }
                   }}
                   className="hover-scale flex-fill"
-                  title={cartLoading ? "Processing..." : "Remove from Cart"}
+                  title={cartLoading ? "Processing..." : "Add to Cart"}
                   disabled={cartLoading}
                   style={{
                     borderRadius: "10px",
                     fontWeight: "600",
                     height: "36px",
                     padding: "0 8px",
+                    minWidth: "36px",
+                    background: "linear-gradient(45deg,#3b82f6,#10b981)",
                     border: "none",
-                    background: "linear-gradient(45deg,#ef4444,#6366f1)",
-                    color: "white",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    minWidth: "36px",
                   }}
                 >
                   {cartLoading ? (
                     <Spinner animation="border" size="sm" variant="light" />
                   ) : (
-                    <FiTrash2 size={16} />
+                    <FiShoppingCart size={16} />
                   )}
                 </Button>
               )}
+              {quantityInCart > 0 &&
+                !(product.trackInventory !== false && product.stock <= 0) && (
+                  <Button
+                    variant="outline-danger"
+                    size="sm"
+                    onClick={async () => {
+                      setCartLoading(true);
+                      try {
+                        await Promise.resolve(onRemoveFromCart(product));
+                      } catch (err) {
+                        console.error(err);
+                      } finally {
+                        setCartLoading(false);
+                      }
+                    }}
+                    className="hover-scale flex-fill"
+                    title={cartLoading ? "Processing..." : "Remove from Cart"}
+                    disabled={cartLoading}
+                    style={{
+                      borderRadius: "10px",
+                      fontWeight: "600",
+                      height: "36px",
+                      padding: "0 8px",
+                      border: "none",
+                      background: "linear-gradient(45deg,#ef4444,#6366f1)",
+                      color: "white",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      minWidth: "36px",
+                    }}
+                  >
+                    {cartLoading ? (
+                      <Spinner animation="border" size="sm" variant="light" />
+                    ) : (
+                      <FiTrash2 size={16} />
+                    )}
+                  </Button>
+                )}
               <Button
                 variant={isWishlisted ? "primary" : "outline-secondary"}
                 size="sm"
