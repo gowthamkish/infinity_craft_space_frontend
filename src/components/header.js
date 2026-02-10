@@ -105,7 +105,6 @@ function Header() {
           zIndex: 1030,
           backdropFilter: "blur(10px)",
           WebkitBackdropFilter: "blur(10px)",
-          position: "sticky",
         }}
         variant="dark"
       >
