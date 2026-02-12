@@ -88,9 +88,9 @@ export const generateOrganizationJsonLD = () => {
     logo: "https://infinitycraftspace.com/ICS_Logo.jpeg",
     contactPoint: {
       "@type": "ContactPoint",
-      telephone: "+1-555-CRAFT-01",
+      telephone: "+91 8925083167",
       contactType: "Customer Service",
-      email: "support@infinitycraftspace.com",
+      email: "jsaginfinitycraftspace@gmail.com",
     },
     address: {
       "@type": "PostalAddress",

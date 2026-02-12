@@ -5,23 +5,17 @@ User-agent: *
 
 # Allow all crawlers to access public pages
 Allow: /
-Allow: /products
-Allow: /categories/
 Allow: /product/
-Allow: /about
-Allow: /contact
-Allow: /craft-guides
-Allow: /tutorials
-Allow: /shipping-info
+Allow: /contact-us
 Allow: /return-policy
-Allow: /privacy-policy
-Allow: /terms-of-service
+Allow: /terms-and-conditions
 
 # Disallow private/user-specific pages
 Disallow: /admin/
-Disallow: /dashboard/
+Disallow: /home
 Disallow: /checkout
 Disallow: /orders
+Disallow: /account
 Disallow: /profile
 Disallow: /cart
 Disallow: /my-account

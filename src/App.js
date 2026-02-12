@@ -6,6 +6,7 @@ import { setAuthFromStorage } from "./features/authSlice";
 import { Spinner, Container } from "react-bootstrap";
 import { HelmetProvider } from "react-helmet-async";
 import OfflineIndicator from "./components/OfflineIndicator";
+import Footer from "./components/Footer";
 
 // Lazy load components for better performance
 const ProductListing = lazy(() => import("./pages/ProductListing"));
@@ -34,6 +35,9 @@ const IdleTimeoutManager = lazy(
 );
 const PWAInstallPrompt = lazy(() => import("./components/PWAInstallPrompt"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const ReturnPolicy = lazy(() => import("./pages/ReturnPolicy"));
+const ContactUs = lazy(() => import("./pages/ContactUs"));
+const TermsAndConditions = lazy(() => import("./pages/TermsAndConditions"));
 
 // Loading fallback component
 const LoadingFallback = ({ message = "Loading..." }) => (
@@ -130,6 +134,40 @@ function App() {
                     }
                   >
                     <Register />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/return-policy"
+                element={
+                  <Suspense
+                    fallback={
+                      <LoadingFallback message="Loading return policy..." />
+                    }
+                  >
+                    <ReturnPolicy />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/contact-us"
+                element={
+                  <Suspense
+                    fallback={<LoadingFallback message="Loading contact..." />}
+                  >
+                    <ContactUs />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/terms-and-conditions"
+                element={
+                  <Suspense
+                    fallback={
+                      <LoadingFallback message="Loading terms & conditions..." />
+                    }
+                  >
+                    <TermsAndConditions />
                   </Suspense>
                 }
               />
@@ -304,6 +342,8 @@ function App() {
                 }
               />
             </Routes>
+
+            <Footer />
           </Suspense>
         </Router>
       </HelmetProvider>

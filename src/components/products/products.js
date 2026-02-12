@@ -55,7 +55,6 @@ const ProductList = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const handleEdit = (product) => {
-    debugger;
     navigate(`/admin/addProduct/${product?._id}`, {
       state: { product },
     });

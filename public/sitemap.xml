@@ -4,122 +4,48 @@
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 
-  <!-- Homepage - Highest priority -->
+  <!-- Homepage / Product Listing - Highest priority -->
   <url>
     <loc>https://infinitycraftspace.com/</loc>
-    <lastmod>2026-02-06</lastmod>
+    <lastmod>2026-02-12</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <!-- Product Listing Page -->
-  <url>
-    <loc>https://infinitycraftspace.com/products</loc>
-    <lastmod>2026-02-06</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <!-- Categories -->
-  <url>
-    <loc>https://infinitycraftspace.com/categories/painting-supplies</loc>
-    <lastmod>2026-02-06</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://infinitycraftspace.com/categories/sculpting-tools</loc>
-    <lastmod>2026-02-06</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://infinitycraftspace.com/categories/jewelry-making</loc>
-    <lastmod>2026-02-06</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://infinitycraftspace.com/categories/pottery-ceramics</loc>
-    <lastmod>2026-02-06</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://infinitycraftspace.com/categories/fabric-textiles</loc>
-    <lastmod>2026-02-06</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://infinitycraftspace.com/categories/wood-working</loc>
-    <lastmod>2026-02-06</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <!-- Static/Informational Pages -->
   <url>
-    <loc>https://infinitycraftspace.com/about</loc>
-    <lastmod>2026-02-06</lastmod>
+    <loc>https://infinitycraftspace.com/contact-us</loc>
+    <lastmod>2026-02-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://infinitycraftspace.com/contact</loc>
-    <lastmod>2026-02-06</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://infinitycraftspace.com/privacy-policy</loc>
-    <lastmod>2026-02-06</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.4</priority>
-  </url>
-
-  <url>
-    <loc>https://infinitycraftspace.com/terms-of-service</loc>
-    <lastmod>2026-02-06</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.4</priority>
-  </url>
-
-  <!-- Help and Support -->
-  <url>
-    <loc>https://infinitycraftspace.com/shipping-info</loc>
-    <lastmod>2026-02-06</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
   </url>
 
   <url>
     <loc>https://infinitycraftspace.com/return-policy</loc>
-    <lastmod>2026-02-06</lastmod>
+    <lastmod>2026-02-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
-  <!-- Blog/Resources (if implemented) -->
   <url>
-    <loc>https://infinitycraftspace.com/craft-guides</loc>
-    <lastmod>2026-02-06</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <loc>https://infinitycraftspace.com/terms-and-conditions</loc>
+    <lastmod>2026-02-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
 
-  <url>
-    <loc>https://infinitycraftspace.com/tutorials</loc>
-    <lastmod>2026-02-06</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
+  <!-- 
+    Note: Dynamic product pages (/product/:id) should be added programmatically
+    as new products are created. Individual product URLs can be generated from
+    your backend product database.
+    
+    Example format:
+    <url>
+      <loc>https://infinitycraftspace.com/product/[product-id]</loc>
+      <lastmod>YYYY-MM-DD</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.8</priority>
+    </url>
+  -->
 
 </urlset>

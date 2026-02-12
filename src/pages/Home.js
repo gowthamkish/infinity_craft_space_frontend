@@ -29,7 +29,7 @@ export default function Home() {
           description:
             "Premium craft supplies and art materials for creative enthusiasts",
           url: SEO_CONFIG.SITE_URL,
-          telephone: "+1-555-CRAFT-01",
+          telephone: "+91 8925083167",
           address: {
             "@type": "PostalAddress",
             streetAddress: "123 Creative Lane",
