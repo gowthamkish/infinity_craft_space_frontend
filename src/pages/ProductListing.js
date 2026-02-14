@@ -94,9 +94,9 @@ const ProductCard = React.memo(
         className="h-100 product-card hover-shadow"
         style={{
           border: "none",
-          borderRadius: "20px",
+          borderRadius: "14px",
           overflow: "hidden",
-          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
           transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
         }}
         onMouseEnter={(e) => {
@@ -241,17 +241,27 @@ const ProductCard = React.memo(
             </>
           )}
         </div>
-        <Card.Body className="d-flex flex-column" style={{ padding: "1.5rem" }}>
-          <div className="d-flex justify-content-between align-items-start mb-3">
+        <Card.Body
+          className="d-flex flex-column"
+          style={{ padding: "0.75rem 1rem" }}
+        >
+          <div className="d-flex justify-content-between align-items-start mb-2">
             <Card.Title
               className="mb-0"
               style={{
-                fontSize: "1.15rem",
+                fontSize: "0.98rem",
                 fontWeight: "700",
                 color: "#1f2937",
-                lineHeight: "1.3",
+                lineHeight: "1.2",
                 letterSpacing: "-0.01em",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                maxWidth: "160px",
+                display: "block",
+                cursor: "pointer",
               }}
+              title={product.name}
             >
               {product.name}
             </Card.Title>
@@ -274,140 +284,198 @@ const ProductCard = React.memo(
           </div>
 
           <div
-            className="price-tag mb-3"
+            className="price-tag mb-2"
             style={{
-              fontSize: "1.5rem",
-              fontWeight: "900",
+              fontSize: "1rem",
+              fontWeight: "800",
               background: "linear-gradient(135deg, #10b981, #059669)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
-              letterSpacing: "-0.02em",
+              letterSpacing: "-0.01em",
             }}
           >
             ₹{product.price}
           </div>
 
-          {/* Stock Status Indicator */}
-          {product.trackInventory !== false && (
-            <div className="mb-3">
-              {product.stock <= 0 ? (
+          {/* Stock Status & Estimated Delivery - Single Row */}
+          {(product.trackInventory !== false || product.estimatedDelivery) && (
+            <div
+              className="mb-2 d-flex align-items-center"
+              style={{
+                flexWrap: "nowrap",
+                overflowX: "auto",
+                overflowY: "hidden",
+                gap: "4px",
+                minHeight: "28px",
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
+              }}
+            >
+              {/* Out of Stock */}
+              {product.trackInventory !== false && product.stock <= 0 && (
                 <Badge
                   style={{
-                    fontSize: "0.8rem",
-                    padding: "8px 16px",
-                    borderRadius: "20px",
+                    fontSize: "0.75rem",
+                    padding: "4px 8px",
+                    borderRadius: "16px",
                     background: "linear-gradient(135deg, #ef4444, #dc2626)",
                     color: "white",
                     fontWeight: "700",
                     border: "none",
                     display: "inline-flex",
                     alignItems: "center",
-                    gap: "6px",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   ❌ Out of Stock
                 </Badge>
-              ) : product.stock <= (product.lowStockThreshold || 5) ? (
+              )}
+              {/* Only X left */}
+              {product.trackInventory !== false &&
+                product.stock > 0 &&
+                product.stock <= (product.lowStockThreshold || 5) && (
+                  <Badge
+                    style={{
+                      fontSize: "0.75rem",
+                      padding: "4px 8px",
+                      borderRadius: "16px",
+                      background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                      color: "white",
+                      fontWeight: "700",
+                      border: "none",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    ⚠️ Only {product.stock} left!
+                  </Badge>
+                )}
+              {/* Estimated Delivery */}
+              {product.estimatedDelivery && (
                 <Badge
                   style={{
-                    fontSize: "0.8rem",
-                    padding: "8px 16px",
-                    borderRadius: "20px",
-                    background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                    fontSize: "0.75rem",
+                    padding: "4px 8px",
+                    borderRadius: "16px",
+                    background: "linear-gradient(135deg, #3b82f6, #2563eb)",
                     color: "white",
                     fontWeight: "700",
                     border: "none",
                     display: "inline-flex",
                     alignItems: "center",
-                    gap: "6px",
+                    whiteSpace: "nowrap",
+                    boxShadow: "0 2px 8px rgba(59, 130, 246, 0.25)",
                   }}
                 >
-                  ⚠️ Only {product.stock} left!
+                  🚚 Delivery in {product.estimatedDelivery}{" "}
+                  {product.estimatedDelivery === 1 ? "day" : "days"}
                 </Badge>
-              ) : null}
+              )}
             </div>
           )}
 
-          {/* View Details Link */}
           <div
-            className="mb-3"
+            className="mb-2"
             onClick={() => navigate(`/product/${product._id}`)}
             style={{
               color: "#10b981",
-              fontSize: "0.9rem",
+              fontSize: "0.78rem",
               fontWeight: "700",
               cursor: "pointer",
               textDecoration: "none",
               display: "inline-flex",
               alignItems: "center",
-              gap: "6px",
+              gap: "5px",
               transition: "all 0.2s",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.gap = "10px";
+              e.currentTarget.style.gap = "8px";
               e.currentTarget.style.color = "#059669";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.gap = "6px";
+              e.currentTarget.style.gap = "5px";
               e.currentTarget.style.color = "#10b981";
             }}
           >
             View Details & Reviews →
           </div>
-
-          <Card.Text
-            className="text-muted-custom"
-            style={{
-              fontSize: "0.95rem",
-              lineHeight: "1.6",
-              flex: "1",
-              color: "#6b7280",
-            }}
-          >
-            {product.description}
-          </Card.Text>
-
-          <div className="mt-auto">
-            {/* {quantityInCart > 0 && (
-          <div className="text-center mb-2">
-            <Badge 
-              style={{
-                background: "var(--primary-color)",
-                fontSize: "0.75rem",
-                padding: "4px 10px",
-                borderRadius: "20px"
-              }}
-            >
-              {quantityInCart} in cart
-            </Badge>
-          </div>
-        )} */}
-            <div className="d-flex gap-2 justify-content-center">
-              {/* Check if product is out of stock */}
-              {product.trackInventory !== false && product.stock <= 0 ? (
+          <div className="d-flex gap-1 justify-content-center">
+            {/* Check if product is out of stock */}
+            {product.trackInventory !== false && product.stock <= 0 ? (
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled
+                className="flex-fill"
+                style={{
+                  borderRadius: "10px",
+                  fontWeight: "600",
+                  height: "36px",
+                  padding: "0 12px",
+                  opacity: 0.7,
+                }}
+              >
+                Out of Stock
+              </Button>
+            ) : (
+              <Button
+                variant="success"
+                size="sm"
+                onClick={async () => {
+                  setCartLoading(true);
+                  try {
+                    await Promise.resolve(onAddToCart(product));
+                  } catch (err) {
+                    console.error(err);
+                  } finally {
+                    setCartLoading(false);
+                  }
+                }}
+                className="hover-scale flex-fill"
+                title={cartLoading ? "Processing..." : "Add to Cart"}
+                disabled={cartLoading}
+                style={{
+                  borderRadius: "14px",
+                  fontWeight: "700",
+                  height: "44px",
+                  padding: "0 12px",
+                  minWidth: "44px",
+                  background: "linear-gradient(135deg, #10b981, #059669)",
+                  border: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)",
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 6px 16px rgba(16, 185, 129, 0.4)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 12px rgba(16, 185, 129, 0.3)";
+                }}
+              >
+                {cartLoading ? (
+                  <Spinner animation="border" size="sm" variant="light" />
+                ) : (
+                  <FiShoppingCart size={18} strokeWidth={2.5} />
+                )}
+              </Button>
+            )}
+            {quantityInCart > 0 &&
+              !(product.trackInventory !== false && product.stock <= 0) && (
                 <Button
-                  variant="secondary"
-                  size="sm"
-                  disabled
-                  className="flex-fill"
-                  style={{
-                    borderRadius: "10px",
-                    fontWeight: "600",
-                    height: "36px",
-                    padding: "0 12px",
-                    opacity: 0.7,
-                  }}
-                >
-                  Out of Stock
-                </Button>
-              ) : (
-                <Button
-                  variant="success"
+                  variant="outline-danger"
                   size="sm"
                   onClick={async () => {
                     setCartLoading(true);
                     try {
-                      await Promise.resolve(onAddToCart(product));
+                      await Promise.resolve(onRemoveFromCart(product));
                     } catch (err) {
                       console.error(err);
                     } finally {
@@ -415,160 +483,109 @@ const ProductCard = React.memo(
                     }
                   }}
                   className="hover-scale flex-fill"
-                  title={cartLoading ? "Processing..." : "Add to Cart"}
+                  title={cartLoading ? "Processing..." : "Remove from Cart"}
                   disabled={cartLoading}
                   style={{
                     borderRadius: "14px",
                     fontWeight: "700",
                     height: "44px",
                     padding: "0 12px",
-                    minWidth: "44px",
-                    background: "linear-gradient(135deg, #10b981, #059669)",
-                    border: "none",
+                    border: "2px solid #fee2e2",
+                    background: "#fef2f2",
+                    color: "#dc2626",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)",
+                    minWidth: "44px",
                     transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "translateY(-2px)";
-                    e.currentTarget.style.boxShadow =
-                      "0 6px 16px rgba(16, 185, 129, 0.4)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow =
-                      "0 4px 12px rgba(16, 185, 129, 0.3)";
-                  }}
-                >
-                  {cartLoading ? (
-                    <Spinner animation="border" size="sm" variant="light" />
-                  ) : (
-                    <FiShoppingCart size={18} strokeWidth={2.5} />
-                  )}
-                </Button>
-              )}
-              {quantityInCart > 0 &&
-                !(product.trackInventory !== false && product.stock <= 0) && (
-                  <Button
-                    variant="outline-danger"
-                    size="sm"
-                    onClick={async () => {
-                      setCartLoading(true);
-                      try {
-                        await Promise.resolve(onRemoveFromCart(product));
-                      } catch (err) {
-                        console.error(err);
-                      } finally {
-                        setCartLoading(false);
-                      }
-                    }}
-                    className="hover-scale flex-fill"
-                    title={cartLoading ? "Processing..." : "Remove from Cart"}
-                    disabled={cartLoading}
-                    style={{
-                      borderRadius: "14px",
-                      fontWeight: "700",
-                      height: "44px",
-                      padding: "0 12px",
-                      border: "2px solid #fee2e2",
-                      background: "#fef2f2",
-                      color: "#dc2626",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      minWidth: "44px",
-                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background =
-                        "linear-gradient(135deg, #ef4444, #dc2626)";
-                      e.currentTarget.style.color = "white";
-                      e.currentTarget.style.borderColor = "#ef4444";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = "#fef2f2";
-                      e.currentTarget.style.color = "#dc2626";
-                      e.currentTarget.style.borderColor = "#fee2e2";
-                    }}
-                  >
-                    {cartLoading ? (
-                      <Spinner animation="border" size="sm" variant="danger" />
-                    ) : (
-                      <FiTrash2 size={18} strokeWidth={2.5} />
-                    )}
-                  </Button>
-                )}
-              <Button
-                variant={isWishlisted ? "primary" : "outline-secondary"}
-                size="sm"
-                onClick={handleToggleWishlist}
-                className="hover-scale flex-fill"
-                title={
-                  wishlistLoading
-                    ? "Processing..."
-                    : isWishlisted
-                      ? "In Wishlist"
-                      : "Add to Wishlist"
-                }
-                disabled={wishlistLoading}
-                style={{
-                  borderRadius: "14px",
-                  fontWeight: "700",
-                  height: "44px",
-                  padding: "0 12px",
-                  border: isWishlisted ? "none" : "2px solid #ef4444",
-                  background: isWishlisted
-                    ? "linear-gradient(135deg, #ef4444, #dc2626)"
-                    : "#fef2f2",
-                  color: isWishlisted ? "white" : "#ef4444",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  minWidth: "44px",
-                  boxShadow: isWishlisted
-                    ? "0 4px 12px rgba(239, 68, 68, 0.3)"
-                    : "none",
-                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                }}
-                onMouseEnter={(e) => {
-                  if (isWishlisted) {
-                    e.currentTarget.style.transform = "scale(1.05)";
-                    e.currentTarget.style.boxShadow =
-                      "0 6px 16px rgba(239, 68, 68, 0.4)";
-                  } else {
                     e.currentTarget.style.background =
                       "linear-gradient(135deg, #ef4444, #dc2626)";
                     e.currentTarget.style.color = "white";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (isWishlisted) {
-                    e.currentTarget.style.transform = "scale(1)";
-                    e.currentTarget.style.boxShadow =
-                      "0 4px 12px rgba(239, 68, 68, 0.3)";
-                  } else {
+                    e.currentTarget.style.borderColor = "#ef4444";
+                  }}
+                  onMouseLeave={(e) => {
                     e.currentTarget.style.background = "#fef2f2";
-                    e.currentTarget.style.color = "#ef4444";
-                  }
-                }}
-              >
-                {wishlistLoading ? (
-                  <Spinner
-                    animation="border"
-                    size="sm"
-                    variant={isWishlisted ? "light" : "danger"}
-                  />
-                ) : (
-                  <FiHeart
-                    size={18}
-                    strokeWidth={2.5}
-                    fill={isWishlisted ? "white" : "none"}
-                  />
-                )}
-              </Button>
-            </div>
+                    e.currentTarget.style.color = "#dc2626";
+                    e.currentTarget.style.borderColor = "#fee2e2";
+                  }}
+                >
+                  {cartLoading ? (
+                    <Spinner animation="border" size="sm" variant="danger" />
+                  ) : (
+                    <FiTrash2 size={18} strokeWidth={2.5} />
+                  )}
+                </Button>
+              )}
+            <Button
+              variant={isWishlisted ? "primary" : "outline-secondary"}
+              size="sm"
+              onClick={handleToggleWishlist}
+              className="hover-scale flex-fill"
+              title={
+                wishlistLoading
+                  ? "Processing..."
+                  : isWishlisted
+                    ? "In Wishlist"
+                    : "Add to Wishlist"
+              }
+              disabled={wishlistLoading}
+              style={{
+                borderRadius: "14px",
+                fontWeight: "700",
+                height: "44px",
+                padding: "0 12px",
+                border: isWishlisted ? "none" : "2px solid #ef4444",
+                background: isWishlisted
+                  ? "linear-gradient(135deg, #ef4444, #dc2626)"
+                  : "#fef2f2",
+                color: isWishlisted ? "white" : "#ef4444",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: "44px",
+                boxShadow: isWishlisted
+                  ? "0 4px 12px rgba(239, 68, 68, 0.3)"
+                  : "none",
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              }}
+              onMouseEnter={(e) => {
+                if (isWishlisted) {
+                  e.currentTarget.style.transform = "scale(1.05)";
+                  e.currentTarget.style.boxShadow =
+                    "0 6px 16px rgba(239, 68, 68, 0.4)";
+                } else {
+                  e.currentTarget.style.background =
+                    "linear-gradient(135deg, #ef4444, #dc2626)";
+                  e.currentTarget.style.color = "white";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (isWishlisted) {
+                  e.currentTarget.style.transform = "scale(1)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 12px rgba(239, 68, 68, 0.3)";
+                } else {
+                  e.currentTarget.style.background = "#fef2f2";
+                  e.currentTarget.style.color = "#ef4444";
+                }
+              }}
+            >
+              {wishlistLoading ? (
+                <Spinner
+                  animation="border"
+                  size="sm"
+                  variant={isWishlisted ? "light" : "danger"}
+                />
+              ) : (
+                <FiHeart
+                  size={18}
+                  strokeWidth={2.5}
+                  fill={isWishlisted ? "white" : "none"}
+                />
+              )}
+            </Button>
           </div>
         </Card.Body>
       </Card>
@@ -580,20 +597,20 @@ const ProductCard = React.memo(
 const mobileStyles = `
   @media (max-width: 767.98px) {
     .main-container {
-      padding: 90px 1rem 1rem 1rem !important;
-      padding-top: 90px !important;
+      padding: 80px 0.5rem 0.5rem 0.5rem !important;
+      padding-top: 80px !important;
     }
     .filter-offcanvas .offcanvas-header {
-      padding: 1.5rem;
+      padding: 1rem;
     }
     .filter-offcanvas .offcanvas-body {
-      padding: 0 1.5rem 1.5rem;
+      padding: 0 1rem 1rem;
     }
     .product-card .card-body {
-      padding: 1rem !important;
+      padding: 0.5rem !important;
     }
     .product-card .card-img-top {
-      height: 180px !important;
+      height: 140px !important;
     }
   }
   

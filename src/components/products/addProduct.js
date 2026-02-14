@@ -50,6 +50,7 @@ const AddProduct = () => {
     stock: "",
     lowStockThreshold: "5",
     trackInventory: true,
+    estimatedDelivery: "5",
   });
 
   const [editingId] = useState(params?.id ?? null);
@@ -280,6 +281,7 @@ const AddProduct = () => {
           stock: "",
           lowStockThreshold: "5",
           trackInventory: true,
+          estimatedDelivery: "5",
         });
         handleRemoveAllImages();
         setValidated(false);
@@ -416,20 +418,35 @@ const AddProduct = () => {
             </Breadcrumb.Item>
           </Breadcrumb>
 
-          <div className="text-center mb-4">
-            <h1
-              className="text-dark mb-2"
+          <div className="text-center mb-5">
+            <div
+              className="d-inline-flex align-items-center justify-content-center mb-3"
               style={{
-                fontSize: "clamp(1.8rem, 4vw, 2.5rem)",
-                fontWeight: "700",
+                width: "80px",
+                height: "80px",
+                borderRadius: "20px",
+                background: "linear-gradient(135deg, #667eea, #764ba2)",
+                boxShadow: "0 10px 30px rgba(102, 126, 234, 0.3)",
               }}
             >
-              <FiPackage className="me-3" />
+              <FiPackage size={36} color="white" />
+            </div>
+            <h1
+              className="text-dark mb-3"
+              style={{
+                fontSize: "clamp(2rem, 4vw, 2.8rem)",
+                fontWeight: "800",
+                letterSpacing: "-0.02em",
+              }}
+            >
               {editingId ? "Edit Product" : "Add New Product"}
             </h1>
             <p
               className="text-muted mb-0"
-              style={{ fontSize: "clamp(0.9rem, 2vw, 1.1rem)" }}
+              style={{
+                fontSize: "clamp(1rem, 2vw, 1.15rem)",
+                fontWeight: "500",
+              }}
             >
               {editingId
                 ? "Update product information"
@@ -442,15 +459,49 @@ const AddProduct = () => {
         <Row className="justify-content-center">
           <Col xs={12} md={10} lg={8} xl={6}>
             <Card
-              className="border-0 shadow-lg"
-              style={{ borderRadius: "20px" }}
+              className="border-0"
+              style={{
+                borderRadius: "24px",
+                boxShadow: "0 20px 60px rgba(0, 0, 0, 0.1)",
+                background: "white",
+                overflow: "hidden",
+              }}
             >
+              {/* Card Header with Gradient */}
+              <div
+                style={{
+                  background: "linear-gradient(135deg, #667eea, #764ba2)",
+                  padding: "1.5rem 2rem",
+                  color: "white",
+                }}
+              >
+                <h4
+                  className="mb-0"
+                  style={{ fontWeight: "700", fontSize: "1.3rem" }}
+                >
+                  Product Information
+                </h4>
+                <small style={{ opacity: 0.9 }}>
+                  Fill in the details below
+                </small>
+              </div>
               <Card.Body className="p-4 p-md-5">
                 {alert.show && (
                   <Alert
                     variant={alert.variant}
                     className="mb-4"
-                    style={{ borderRadius: "12px" }}
+                    style={{
+                      borderRadius: "16px",
+                      border: "none",
+                      padding: "1rem 1.25rem",
+                      boxShadow:
+                        alert.variant === "success"
+                          ? "0 4px 16px rgba(16, 185, 129, 0.2)"
+                          : alert.variant === "danger"
+                            ? "0 4px 16px rgba(239, 68, 68, 0.2)"
+                            : "0 4px 16px rgba(59, 130, 246, 0.2)",
+                      fontWeight: "600",
+                    }}
                   >
                     {alert.message}
                   </Alert>
@@ -476,13 +527,25 @@ const AddProduct = () => {
                           }
                           required
                           style={{
-                            borderRadius: "12px",
-                            border: "2px solid #e9ecef",
+                            borderRadius: "14px",
+                            border: "2px solid #e2e8f0",
                             fontSize: "1rem",
-                            padding: "12px 16px",
+                            padding: "14px 18px",
                             transition: "all 0.3s ease",
+                            backgroundColor: "#f8fafc",
                           }}
                           className="form-control-lg"
+                          onFocus={(e) => {
+                            e.target.style.border = "2px solid #667eea";
+                            e.target.style.backgroundColor = "white";
+                            e.target.style.boxShadow =
+                              "0 0 0 4px rgba(102, 126, 234, 0.1)";
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.border = "2px solid #e2e8f0";
+                            e.target.style.backgroundColor = "#f8fafc";
+                            e.target.style.boxShadow = "none";
+                          }}
                         />
                         <Form.Control.Feedback type="invalid">
                           Please provide a valid product name.
@@ -512,13 +575,25 @@ const AddProduct = () => {
                           min="0"
                           step="0.01"
                           style={{
-                            borderRadius: "12px",
-                            border: "2px solid #e9ecef",
+                            borderRadius: "14px",
+                            border: "2px solid #e2e8f0",
                             fontSize: "1rem",
-                            padding: "12px 16px",
+                            padding: "14px 18px",
                             transition: "all 0.3s ease",
+                            backgroundColor: "#f8fafc",
                           }}
                           className="form-control-lg"
+                          onFocus={(e) => {
+                            e.target.style.border = "2px solid #10b981";
+                            e.target.style.backgroundColor = "white";
+                            e.target.style.boxShadow =
+                              "0 0 0 4px rgba(16, 185, 129, 0.1)";
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.border = "2px solid #e2e8f0";
+                            e.target.style.backgroundColor = "#f8fafc";
+                            e.target.style.boxShadow = "none";
+                          }}
                         />
                         <Form.Control.Feedback type="invalid">
                           Please provide a valid price.
@@ -544,13 +619,25 @@ const AddProduct = () => {
                           }
                           min="0"
                           style={{
-                            borderRadius: "12px",
-                            border: "2px solid #e9ecef",
+                            borderRadius: "14px",
+                            border: "2px solid #e2e8f0",
                             fontSize: "1rem",
-                            padding: "12px 16px",
+                            padding: "14px 18px",
                             transition: "all 0.3s ease",
+                            backgroundColor: "#f8fafc",
                           }}
                           className="form-control-lg"
+                          onFocus={(e) => {
+                            e.target.style.border = "2px solid #667eea";
+                            e.target.style.backgroundColor = "white";
+                            e.target.style.boxShadow =
+                              "0 0 0 4px rgba(102, 126, 234, 0.1)";
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.border = "2px solid #e2e8f0";
+                            e.target.style.backgroundColor = "#f8fafc";
+                            e.target.style.boxShadow = "none";
+                          }}
                         />
                         <Form.Text className="text-muted">
                           Number of items available in stock
@@ -583,13 +670,25 @@ const AddProduct = () => {
                           }
                           min="0"
                           style={{
-                            borderRadius: "12px",
-                            border: "2px solid #e9ecef",
+                            borderRadius: "14px",
+                            border: "2px solid #e2e8f0",
                             fontSize: "1rem",
-                            padding: "12px 16px",
+                            padding: "14px 18px",
                             transition: "all 0.3s ease",
+                            backgroundColor: "#f8fafc",
                           }}
                           className="form-control-lg"
+                          onFocus={(e) => {
+                            e.target.style.border = "2px solid #f59e0b";
+                            e.target.style.backgroundColor = "white";
+                            e.target.style.boxShadow =
+                              "0 0 0 4px rgba(245, 158, 11, 0.1)";
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.border = "2px solid #e2e8f0";
+                            e.target.style.backgroundColor = "#f8fafc";
+                            e.target.style.boxShadow = "none";
+                          }}
                         />
                         <Form.Text className="text-muted">
                           Show "Only X left" when stock is at or below this
@@ -640,6 +739,59 @@ const AddProduct = () => {
 
                   <Row>
                     <Col md={6}>
+                      <Form.Group
+                        className="mb-4"
+                        controlId="formEstimatedDelivery"
+                      >
+                        <Form.Label
+                          className="fw-semibold text-dark mb-2"
+                          style={{ fontSize: "1rem" }}
+                        >
+                          <FiPackage className="me-2" />
+                          Estimated Delivery (Days)
+                        </Form.Label>
+                        <Form.Control
+                          type="number"
+                          placeholder="5"
+                          value={form.estimatedDelivery}
+                          onChange={(e) =>
+                            setForm({
+                              ...form,
+                              estimatedDelivery: e.target.value,
+                            })
+                          }
+                          min="1"
+                          max="90"
+                          style={{
+                            borderRadius: "14px",
+                            border: "2px solid #e2e8f0",
+                            fontSize: "1rem",
+                            padding: "14px 18px",
+                            transition: "all 0.3s ease",
+                            backgroundColor: "#f8fafc",
+                          }}
+                          className="form-control-lg"
+                          onFocus={(e) => {
+                            e.target.style.border = "2px solid #3b82f6";
+                            e.target.style.backgroundColor = "white";
+                            e.target.style.boxShadow =
+                              "0 0 0 4px rgba(59, 130, 246, 0.1)";
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.border = "2px solid #e2e8f0";
+                            e.target.style.backgroundColor = "#f8fafc";
+                            e.target.style.boxShadow = "none";
+                          }}
+                        />
+                        <Form.Text className="text-muted">
+                          Number of days for estimated delivery (1-90 days)
+                        </Form.Text>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
+                  <Row>
+                    <Col md={6}>
                       <Form.Group className="mb-4" controlId="formCategory">
                         <Form.Label
                           className="fw-semibold text-dark mb-2"
@@ -653,13 +805,25 @@ const AddProduct = () => {
                           onChange={handleCategoryChange}
                           required
                           style={{
-                            borderRadius: "12px",
-                            border: "2px solid #e9ecef",
+                            borderRadius: "14px",
+                            border: "2px solid #e2e8f0",
                             fontSize: "1rem",
-                            padding: "12px 16px",
+                            padding: "14px 18px",
                             transition: "all 0.3s ease",
+                            backgroundColor: "#f8fafc",
                           }}
                           className="form-control-lg"
+                          onFocus={(e) => {
+                            e.target.style.border = "2px solid #667eea";
+                            e.target.style.backgroundColor = "white";
+                            e.target.style.boxShadow =
+                              "0 0 0 4px rgba(102, 126, 234, 0.1)";
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.border = "2px solid #e2e8f0";
+                            e.target.style.backgroundColor = "#f8fafc";
+                            e.target.style.boxShadow = "none";
+                          }}
                         >
                           <option value="">Select Category</option>
                           {categoriesLoading ? (
@@ -696,16 +860,31 @@ const AddProduct = () => {
                           }
                           disabled={!form.category}
                           style={{
-                            borderRadius: "12px",
-                            border: "2px solid #e9ecef",
+                            borderRadius: "14px",
+                            border: "2px solid #e2e8f0",
                             fontSize: "1rem",
-                            padding: "12px 16px",
+                            padding: "14px 18px",
                             transition: "all 0.3s ease",
                             backgroundColor: !form.category
                               ? "#f8f9fa"
-                              : "#fff",
+                              : "#f8fafc",
                           }}
                           className="form-control-lg"
+                          onFocus={(e) => {
+                            if (form.category) {
+                              e.target.style.border = "2px solid #667eea";
+                              e.target.style.backgroundColor = "white";
+                              e.target.style.boxShadow =
+                                "0 0 0 4px rgba(102, 126, 234, 0.1)";
+                            }
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.border = "2px solid #e2e8f0";
+                            e.target.style.backgroundColor = form.category
+                              ? "#f8fafc"
+                              : "#f8f9fa";
+                            e.target.style.boxShadow = "none";
+                          }}
                         >
                           <option value="">Select Subcategory</option>
                           {subCategoryOptions.map((sub) => (
@@ -740,12 +919,24 @@ const AddProduct = () => {
                             setForm({ ...form, description: e.target.value })
                           }
                           style={{
-                            borderRadius: "12px",
-                            border: "2px solid #e9ecef",
+                            borderRadius: "14px",
+                            border: "2px solid #e2e8f0",
                             fontSize: "1rem",
-                            padding: "12px 16px",
+                            padding: "14px 18px",
                             transition: "all 0.3s ease",
                             resize: "vertical",
+                            backgroundColor: "#f8fafc",
+                          }}
+                          onFocus={(e) => {
+                            e.target.style.border = "2px solid #667eea";
+                            e.target.style.backgroundColor = "white";
+                            e.target.style.boxShadow =
+                              "0 0 0 4px rgba(102, 126, 234, 0.1)";
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.border = "2px solid #e2e8f0";
+                            e.target.style.backgroundColor = "#f8fafc";
+                            e.target.style.boxShadow = "none";
                           }}
                         />
                       </Form.Group>
@@ -766,29 +957,51 @@ const AddProduct = () => {
 
                         {/* Drag & Drop Zone */}
                         <div
-                          className={`border-2 border-dashed rounded-3 p-4 text-center mb-3 ${
-                            dragOver
-                              ? "border-primary bg-light"
-                              : "border-secondary"
-                          }`}
+                          className={`rounded-4 p-5 text-center mb-4`}
                           style={{
-                            borderStyle: "dashed",
+                            border: dragOver
+                              ? "3px dashed #667eea"
+                              : "3px dashed #cbd5e1",
                             cursor: "pointer",
                             transition: "all 0.3s ease",
+                            background: dragOver
+                              ? "linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05))"
+                              : "#f8fafc",
+                            borderRadius: "20px",
                           }}
                           onDragOver={handleDragOver}
                           onDragLeave={handleDragLeave}
                           onDrop={handleDrop}
                           onClick={() => fileInputRef.current?.click()}
                         >
-                          <FiCamera size={48} className="text-muted mb-2" />
-                          <p className="mb-2 text-muted">
+                          <div
+                            style={{
+                              width: "80px",
+                              height: "80px",
+                              margin: "0 auto 1rem",
+                              borderRadius: "50%",
+                              background:
+                                "linear-gradient(135deg, #667eea, #764ba2)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <FiCamera size={36} color="white" />
+                          </div>
+                          <h5
+                            className="mb-3"
+                            style={{ fontWeight: "700", color: "#1f2937" }}
+                          >
                             <strong>Click to upload</strong> or drag and drop
-                            images here
+                          </h5>
+                          <p
+                            className="text-muted mb-0"
+                            style={{ fontSize: "0.95rem" }}
+                          >
+                            JPEG, PNG, GIF, WebP up to 10MB each (Maximum 10
+                            images)
                           </p>
-                          <small className="text-muted">
-                            JPEG, PNG, GIF, WebP up to 10MB each
-                          </small>
                         </div>
 
                         {/* Hidden File Input */}
@@ -815,7 +1028,11 @@ const AddProduct = () => {
                                 variant="outline-danger"
                                 size="sm"
                                 onClick={handleRemoveAllImages}
-                                style={{ borderRadius: "8px" }}
+                                style={{
+                                  borderRadius: "12px",
+                                  fontWeight: "600",
+                                  padding: "6px 14px",
+                                }}
                               >
                                 <FiX className="me-1" />
                                 Remove All
@@ -831,7 +1048,13 @@ const AddProduct = () => {
                                   md={3}
                                   key={`existing-${index}`}
                                 >
-                                  <div className="position-relative">
+                                  <div
+                                    className="position-relative"
+                                    style={{
+                                      borderRadius: "12px",
+                                      overflow: "hidden",
+                                    }}
+                                  >
                                     <Image
                                       src={img.url}
                                       alt={
@@ -841,20 +1064,24 @@ const AddProduct = () => {
                                       thumbnail
                                       style={{
                                         width: "100%",
-                                        height: "120px",
+                                        height: "130px",
                                         objectFit: "cover",
-                                        borderRadius: "8px",
+                                        borderRadius: "12px",
+                                        border: "3px solid #e2e8f0",
                                       }}
                                     />
                                     {img.isPrimary && (
                                       <div
-                                        className="position-absolute top-0 start-0 bg-primary text-white px-2 py-1"
+                                        className="position-absolute top-0 start-0 text-white px-2 py-1"
                                         style={{
                                           fontSize: "0.7rem",
-                                          borderRadius: "8px 0 8px 0",
+                                          borderRadius: "12px 0 12px 0",
+                                          background:
+                                            "linear-gradient(135deg, #10b981, #059669)",
+                                          fontWeight: "700",
                                         }}
                                       >
-                                        Primary
+                                        ⭐ Primary
                                       </div>
                                     )}
                                     <div
@@ -875,16 +1102,23 @@ const AddProduct = () => {
                               {/* New Image Previews */}
                               {imagePreviews.map((imgData, index) => (
                                 <Col xs={6} sm={4} md={3} key={`new-${index}`}>
-                                  <div className="position-relative">
+                                  <div
+                                    className="position-relative"
+                                    style={{
+                                      borderRadius: "12px",
+                                      overflow: "hidden",
+                                    }}
+                                  >
                                     <Image
                                       src={imgData.preview}
                                       alt={imgData.name}
                                       thumbnail
                                       style={{
                                         width: "100%",
-                                        height: "120px",
+                                        height: "130px",
                                         objectFit: "cover",
-                                        borderRadius: "8px",
+                                        borderRadius: "12px",
+                                        border: "3px solid #e2e8f0",
                                       }}
                                     />
                                     <Button
@@ -892,30 +1126,38 @@ const AddProduct = () => {
                                       size="sm"
                                       className="position-absolute"
                                       style={{
-                                        top: "5px",
-                                        right: "5px",
+                                        top: "8px",
+                                        right: "8px",
                                         borderRadius: "50%",
-                                        width: "25px",
-                                        height: "25px",
+                                        width: "30px",
+                                        height: "30px",
                                         padding: "0",
                                         display: "flex",
                                         alignItems: "center",
                                         justifyContent: "center",
+                                        background:
+                                          "linear-gradient(135deg, #ef4444, #dc2626)",
+                                        border: "none",
+                                        boxShadow:
+                                          "0 2px 8px rgba(239, 68, 68, 0.3)",
                                       }}
                                       onClick={() => handleRemoveImage(index)}
                                     >
-                                      <FiX size={12} />
+                                      <FiX size={14} />
                                     </Button>
                                     {index === 0 &&
                                       existingImages.length === 0 && (
                                         <div
-                                          className="position-absolute top-0 start-0 bg-success text-white px-2 py-1"
+                                          className="position-absolute top-0 start-0 text-white px-2 py-1"
                                           style={{
                                             fontSize: "0.7rem",
-                                            borderRadius: "8px 0 8px 0",
+                                            borderRadius: "12px 0 12px 0",
+                                            background:
+                                              "linear-gradient(135deg, #10b981, #059669)",
+                                            fontWeight: "700",
                                           }}
                                         >
-                                          Primary
+                                          ⭐ Primary
                                         </div>
                                       )}
                                     <div
@@ -948,21 +1190,32 @@ const AddProduct = () => {
                     </Col>
                   </Row>
 
-                  <div className="d-grid gap-2 mt-4">
+                  <div className="d-grid gap-3 mt-5">
                     <Button
                       variant="primary"
                       type="submit"
                       disabled={loading || imageUploading}
                       size="lg"
                       style={{
-                        borderRadius: "12px",
-                        fontWeight: "600",
-                        padding: "16px",
+                        borderRadius: "16px",
+                        fontWeight: "700",
+                        padding: "18px",
                         background:
                           "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                         border: "none",
-                        fontSize: "1.1rem",
+                        fontSize: "1.15rem",
                         transition: "all 0.3s ease",
+                        boxShadow: "0 8px 24px rgba(102, 126, 234, 0.3)",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.transform = "translateY(-2px)";
+                        e.target.style.boxShadow =
+                          "0 12px 32px rgba(102, 126, 234, 0.4)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.transform = "translateY(0)";
+                        e.target.style.boxShadow =
+                          "0 8px 24px rgba(102, 126, 234, 0.3)";
                       }}
                     >
                       {loading || imageUploading ? (
@@ -997,10 +1250,21 @@ const AddProduct = () => {
                       disabled={loading || imageUploading}
                       size="lg"
                       style={{
-                        borderRadius: "12px",
-                        fontWeight: "500",
-                        padding: "16px",
+                        borderRadius: "16px",
+                        fontWeight: "600",
+                        padding: "18px",
                         fontSize: "1rem",
+                        border: "2px solid #e2e8f0",
+                        color: "#64748b",
+                        transition: "all 0.3s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.background = "#f8fafc";
+                        e.target.style.borderColor = "#cbd5e1";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.background = "white";
+                        e.target.style.borderColor = "#e2e8f0";
                       }}
                     >
                       <FiArrowLeft className="me-2" />
