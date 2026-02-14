@@ -195,7 +195,7 @@ const ProductDetail = () => {
         </Suspense>
         <Container
           className="d-flex justify-content-center align-items-center"
-          style={{ minHeight: "60vh" }}
+          style={{ minHeight: "60vh", marginTop: "90px" }}
         >
           <div className="text-center">
             <Spinner
@@ -215,7 +215,7 @@ const ProductDetail = () => {
         <Suspense fallback={null}>
           <Header />
         </Suspense>
-        <Container className="py-5">
+        <Container className="py-5" style={{ marginTop: "90px" }}>
           <Alert variant="danger" className="text-center">
             <h5>Error Loading Product</h5>
             <p>{error}</p>
@@ -234,7 +234,7 @@ const ProductDetail = () => {
         <Suspense fallback={null}>
           <Header />
         </Suspense>
-        <Container className="py-5">
+        <Container className="py-5" style={{ marginTop: "90px" }}>
           <Alert variant="warning" className="text-center">
             <h5>Product Not Found</h5>
             <p>The product you're looking for doesn't exist.</p>
@@ -260,8 +260,7 @@ const ProductDetail = () => {
         <Header />
       </Suspense>
 
-      <Container className="py-4">
-        {/* Breadcrumb */}
+      <Container className="py-4" style={{ marginTop: "90px" }}>
         <Breadcrumb className="mb-4">
           <Breadcrumb.Item
             onClick={() => navigate("/")}
