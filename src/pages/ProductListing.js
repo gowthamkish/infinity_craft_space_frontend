@@ -90,13 +90,31 @@ const ProductCard = React.memo(
       }
     };
     return (
-      <Card className="h-100 product-card hover-shadow">
+      <Card
+        className="h-100 product-card hover-shadow"
+        style={{
+          border: "none",
+          borderRadius: "20px",
+          overflow: "hidden",
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+          transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = "translateY(-8px)";
+          e.currentTarget.style.boxShadow = "0 12px 40px rgba(0, 0, 0, 0.15)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow = "0 4px 20px rgba(0, 0, 0, 0.08)";
+        }}
+      >
         <div
           style={{
             overflow: "hidden",
-            borderRadius: "12px 12px 0 0",
+            borderRadius: "0",
             position: "relative",
             cursor: "pointer",
+            background: "linear-gradient(135deg, #f8fafc 0%, #e8edf2 100%)",
           }}
           onClick={() => onImageClick && onImageClick(product)}
         >
@@ -110,14 +128,20 @@ const ProductCard = React.memo(
                 style={{
                   width: "100%",
                   objectFit: "cover",
-                  height: "220px",
+                  height: "260px",
                   background:
                     "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
-                  transition: "transform 0.3s ease",
+                  transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
                 }}
                 onError={(e) => {
                   e.target.src =
                     "https://via.placeholder.com/200x200?text=No+Image";
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "scale(1.08)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "scale(1)";
                 }}
               />
               {/* Images Count Indicator */}
@@ -125,15 +149,18 @@ const ProductCard = React.memo(
                 <div
                   style={{
                     position: "absolute",
-                    top: "10px",
-                    right: "10px",
-                    background: "rgba(0,0,0,0.8)",
+                    top: "14px",
+                    right: "14px",
+                    background: "linear-gradient(135deg, #667eea, #764ba2)",
                     color: "white",
-                    padding: "6px 10px",
-                    borderRadius: "15px",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
+                    padding: "8px 14px",
+                    borderRadius: "20px",
+                    fontSize: "13px",
+                    fontWeight: "700",
+                    boxShadow: "0 4px 12px rgba(102, 126, 234, 0.4)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
                   }}
                 >
                   📸 {product.images.length}
@@ -214,29 +241,31 @@ const ProductCard = React.memo(
             </>
           )}
         </div>
-        <Card.Body className="d-flex flex-column p-4">
-          <div className="d-flex justify-content-between align-items-start mb-2">
+        <Card.Body className="d-flex flex-column" style={{ padding: "1.5rem" }}>
+          <div className="d-flex justify-content-between align-items-start mb-3">
             <Card.Title
               className="mb-0"
               style={{
-                fontSize: "1rem",
-                fontWeight: "600",
-                color: "var(--text-primary)",
-                lineHeight: "1.4",
+                fontSize: "1.15rem",
+                fontWeight: "700",
+                color: "#1f2937",
+                lineHeight: "1.3",
+                letterSpacing: "-0.01em",
               }}
             >
               {product.name}
             </Card.Title>
             {product.category && (
               <Badge
-                bg="light"
-                text="dark"
                 style={{
                   fontSize: "0.75rem",
-                  padding: "4px 8px",
-                  borderRadius: "12px",
-                  backgroundColor: "var(--secondary-color)",
-                  color: "var(--text-secondary)",
+                  padding: "6px 12px",
+                  borderRadius: "16px",
+                  background: "linear-gradient(135deg, #10b981, #059669)",
+                  color: "white",
+                  fontWeight: "700",
+                  border: "none",
+                  boxShadow: "0 2px 8px rgba(16, 185, 129, 0.25)",
                 }}
               >
                 {product.category}
@@ -244,33 +273,56 @@ const ProductCard = React.memo(
             )}
           </div>
 
-          <div className="price-tag mb-2">₹{product.price}</div>
+          <div
+            className="price-tag mb-3"
+            style={{
+              fontSize: "1.5rem",
+              fontWeight: "900",
+              background: "linear-gradient(135deg, #10b981, #059669)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              letterSpacing: "-0.02em",
+            }}
+          >
+            ₹{product.price}
+          </div>
 
           {/* Stock Status Indicator */}
           {product.trackInventory !== false && (
-            <div className="mb-2">
+            <div className="mb-3">
               {product.stock <= 0 ? (
                 <Badge
-                  bg="danger"
                   style={{
-                    fontSize: "0.75rem",
-                    padding: "4px 10px",
-                    borderRadius: "12px",
+                    fontSize: "0.8rem",
+                    padding: "8px 16px",
+                    borderRadius: "20px",
+                    background: "linear-gradient(135deg, #ef4444, #dc2626)",
+                    color: "white",
+                    fontWeight: "700",
+                    border: "none",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
                   }}
                 >
-                  Out of Stock
+                  ❌ Out of Stock
                 </Badge>
               ) : product.stock <= (product.lowStockThreshold || 5) ? (
                 <Badge
-                  bg="warning"
-                  text="dark"
                   style={{
-                    fontSize: "0.75rem",
-                    padding: "4px 10px",
-                    borderRadius: "12px",
+                    fontSize: "0.8rem",
+                    padding: "8px 16px",
+                    borderRadius: "20px",
+                    background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                    color: "white",
+                    fontWeight: "700",
+                    border: "none",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
                   }}
                 >
-                  Only {product.stock} left!
+                  ⚠️ Only {product.stock} left!
                 </Badge>
               ) : null}
             </div>
@@ -278,25 +330,38 @@ const ProductCard = React.memo(
 
           {/* View Details Link */}
           <div
-            className="mb-2"
+            className="mb-3"
             onClick={() => navigate(`/product/${product._id}`)}
             style={{
-              color: "var(--primary-color)",
-              fontSize: "0.85rem",
-              fontWeight: "600",
+              color: "#10b981",
+              fontSize: "0.9rem",
+              fontWeight: "700",
               cursor: "pointer",
-              textDecoration: "underline",
+              textDecoration: "none",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              transition: "all 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.gap = "10px";
+              e.currentTarget.style.color = "#059669";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.gap = "6px";
+              e.currentTarget.style.color = "#10b981";
             }}
           >
-            View Details & Reviews
+            View Details & Reviews →
           </div>
 
           <Card.Text
             className="text-muted-custom"
             style={{
-              fontSize: "0.9rem",
-              lineHeight: "1.5",
+              fontSize: "0.95rem",
+              lineHeight: "1.6",
               flex: "1",
+              color: "#6b7280",
             }}
           >
             {product.description}
@@ -353,22 +418,34 @@ const ProductCard = React.memo(
                   title={cartLoading ? "Processing..." : "Add to Cart"}
                   disabled={cartLoading}
                   style={{
-                    borderRadius: "10px",
-                    fontWeight: "600",
-                    height: "36px",
-                    padding: "0 8px",
-                    minWidth: "36px",
-                    background: "linear-gradient(45deg,#3b82f6,#10b981)",
+                    borderRadius: "14px",
+                    fontWeight: "700",
+                    height: "44px",
+                    padding: "0 12px",
+                    minWidth: "44px",
+                    background: "linear-gradient(135deg, #10b981, #059669)",
                     border: "none",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)",
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow =
+                      "0 6px 16px rgba(16, 185, 129, 0.4)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 12px rgba(16, 185, 129, 0.3)";
                   }}
                 >
                   {cartLoading ? (
                     <Spinner animation="border" size="sm" variant="light" />
                   ) : (
-                    <FiShoppingCart size={16} />
+                    <FiShoppingCart size={18} strokeWidth={2.5} />
                   )}
                 </Button>
               )}
@@ -391,23 +468,35 @@ const ProductCard = React.memo(
                     title={cartLoading ? "Processing..." : "Remove from Cart"}
                     disabled={cartLoading}
                     style={{
-                      borderRadius: "10px",
-                      fontWeight: "600",
-                      height: "36px",
-                      padding: "0 8px",
-                      border: "none",
-                      background: "linear-gradient(45deg,#ef4444,#6366f1)",
-                      color: "white",
+                      borderRadius: "14px",
+                      fontWeight: "700",
+                      height: "44px",
+                      padding: "0 12px",
+                      border: "2px solid #fee2e2",
+                      background: "#fef2f2",
+                      color: "#dc2626",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      minWidth: "36px",
+                      minWidth: "44px",
+                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background =
+                        "linear-gradient(135deg, #ef4444, #dc2626)";
+                      e.currentTarget.style.color = "white";
+                      e.currentTarget.style.borderColor = "#ef4444";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "#fef2f2";
+                      e.currentTarget.style.color = "#dc2626";
+                      e.currentTarget.style.borderColor = "#fee2e2";
                     }}
                   >
                     {cartLoading ? (
-                      <Spinner animation="border" size="sm" variant="light" />
+                      <Spinner animation="border" size="sm" variant="danger" />
                     ) : (
-                      <FiTrash2 size={16} />
+                      <FiTrash2 size={18} strokeWidth={2.5} />
                     )}
                   </Button>
                 )}
@@ -425,19 +514,44 @@ const ProductCard = React.memo(
                 }
                 disabled={wishlistLoading}
                 style={{
-                  borderRadius: "10px",
-                  fontWeight: "600",
-                  height: "36px",
-                  padding: "0 8px",
+                  borderRadius: "14px",
+                  fontWeight: "700",
+                  height: "44px",
+                  padding: "0 12px",
                   border: isWishlisted ? "none" : "2px solid #ef4444",
                   background: isWishlisted
-                    ? "linear-gradient(45deg,#06b6d4,#3b82f6)"
-                    : "transparent",
+                    ? "linear-gradient(135deg, #ef4444, #dc2626)"
+                    : "#fef2f2",
                   color: isWishlisted ? "white" : "#ef4444",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  minWidth: "36px",
+                  minWidth: "44px",
+                  boxShadow: isWishlisted
+                    ? "0 4px 12px rgba(239, 68, 68, 0.3)"
+                    : "none",
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                }}
+                onMouseEnter={(e) => {
+                  if (isWishlisted) {
+                    e.currentTarget.style.transform = "scale(1.05)";
+                    e.currentTarget.style.boxShadow =
+                      "0 6px 16px rgba(239, 68, 68, 0.4)";
+                  } else {
+                    e.currentTarget.style.background =
+                      "linear-gradient(135deg, #ef4444, #dc2626)";
+                    e.currentTarget.style.color = "white";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (isWishlisted) {
+                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 12px rgba(239, 68, 68, 0.3)";
+                  } else {
+                    e.currentTarget.style.background = "#fef2f2";
+                    e.currentTarget.style.color = "#ef4444";
+                  }
                 }}
               >
                 {wishlistLoading ? (
@@ -447,7 +561,11 @@ const ProductCard = React.memo(
                     variant={isWishlisted ? "light" : "danger"}
                   />
                 ) : (
-                  <FiHeart size={16} />
+                  <FiHeart
+                    size={18}
+                    strokeWidth={2.5}
+                    fill={isWishlisted ? "white" : "none"}
+                  />
                 )}
               </Button>
             </div>
@@ -874,15 +992,20 @@ const ProductListing = () => {
               <Offcanvas.Header
                 style={{
                   background:
-                    "linear-gradient(135deg, var(--primary-color), #3b82f6)",
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                   color: "white",
                   borderBottom: "none",
+                  padding: "1.5rem",
                 }}
               >
                 <Offcanvas.Title
-                  style={{ fontWeight: "600", fontSize: "1.3rem" }}
+                  style={{
+                    fontWeight: "700",
+                    fontSize: "1.4rem",
+                    letterSpacing: "-0.01em",
+                  }}
                 >
-                  <FiFilter size={20} className="me-2" />
+                  <FiFilter size={22} className="me-2" strokeWidth={2.5} />
                   Filter Products
                 </Offcanvas.Title>
                 <Button
@@ -919,12 +1042,14 @@ const ProductListing = () => {
                     variant="primary"
                     onClick={handleCloseMobileFilters}
                     style={{
-                      borderRadius: "12px",
-                      fontWeight: "600",
-                      padding: "12px",
+                      borderRadius: "16px",
+                      fontWeight: "700",
+                      padding: "14px",
                       background:
-                        "linear-gradient(45deg, var(--primary-color), #3b82f6)",
+                        "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                       border: "none",
+                      boxShadow: "0 8px 20px rgba(102, 126, 234, 0.35)",
+                      fontSize: "1rem",
                     }}
                   >
                     Apply Filters
@@ -938,28 +1063,44 @@ const ProductListing = () => {
               <div
                 style={{
                   backgroundColor: "white",
-                  padding: "clamp(1rem, 3vw, 2rem)",
-                  borderRadius: "16px",
-                  boxShadow:
-                    "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
-                  border: "1px solid #e2e8f0",
+                  padding: "clamp(1.25rem, 3vw, 2.25rem)",
+                  borderRadius: "20px",
+                  boxShadow: "0 10px 40px rgba(0, 0, 0, 0.08)",
+                  border: "none",
                 }}
               >
-                <div className="d-flex justify-content-between align-items-start align-items-md-center mb-4 flex-column flex-md-row gap-3">
+                <div className="d-flex justify-content-between align-items-start align-items-md-center mb-5 flex-column flex-md-row gap-3">
                   <div className="d-flex align-items-center gap-3 flex-wrap">
                     <h1
                       className="mb-0"
                       style={{
-                        color: "#1e293b",
-                        fontWeight: "700",
-                        fontSize: "clamp(1.5rem, 4vw, 2rem)",
+                        color: "#1f2937",
+                        fontWeight: "800",
+                        fontSize: "clamp(1.75rem, 4vw, 2.25rem)",
+                        letterSpacing: "-0.02em",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.75rem",
                       }}
                     >
-                      <FiGrid
-                        size={32}
-                        className="me-2"
-                        style={{ color: "#3b82f6" }}
-                      />
+                      <div
+                        style={{
+                          background:
+                            "linear-gradient(135deg, #667eea, #764ba2)",
+                          borderRadius: "16px",
+                          padding: "12px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          boxShadow: "0 8px 20px rgba(102, 126, 234, 0.35)",
+                        }}
+                      >
+                        <FiGrid
+                          size={28}
+                          style={{ color: "white" }}
+                          strokeWidth={2.5}
+                        />
+                      </div>
                       Products
                     </h1>
                     <Button
@@ -968,25 +1109,32 @@ const ProductListing = () => {
                       className="d-md-none hover-scale"
                       onClick={handleShowMobileFilters}
                       style={{
-                        borderRadius: "8px",
-                        fontWeight: "500",
-                        border: "2px solid var(--primary-color)",
-                        color: "var(--primary-color)",
+                        borderRadius: "14px",
+                        fontWeight: "700",
+                        border: "2px solid #667eea",
+                        color: "#667eea",
+                        padding: "10px 16px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
                       }}
                     >
-                      <FiFilter size={16} />
-                      <span className="ms-1">Filters</span>
+                      <FiFilter size={18} strokeWidth={2.5} />
+                      <span>Filters</span>
                       {(filters.categories.length > 0 ||
                         filters.priceRange ||
                         filters.searchTerm ||
                         filters.sortBy) && (
                         <Badge
-                          bg="danger"
-                          className="ms-2 filter-badge-active"
                           style={{
-                            fontSize: "0.7rem",
-                            padding: "2px 6px",
-                            borderRadius: "10px",
+                            fontSize: "0.75rem",
+                            padding: "4px 10px",
+                            borderRadius: "12px",
+                            background:
+                              "linear-gradient(135deg, #ef4444, #dc2626)",
+                            color: "white",
+                            fontWeight: "700",
+                            border: "none",
                           }}
                         >
                           {

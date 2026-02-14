@@ -1,11 +1,13 @@
-yes.payment-method-card:hover {
-  border-color: var(--secondary-color) !important;
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+.payment-method-card:hover {
+  border-color: #10b981 !important;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(16, 185, 129, 0.2);
 }
 
 .cart-item-hover:hover {
-  background-color: var(--bg-tertiary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08) !important;
+  border-color: #10b981 !important;
 }
 
 .address-delete-btn:hover {

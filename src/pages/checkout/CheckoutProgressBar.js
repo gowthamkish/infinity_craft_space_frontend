@@ -2,22 +2,28 @@ import { Check } from "react-feather";
 
 export const CheckoutProgressBar = ({ steps, currentStep }) => (
   <div className="mb-4">
-    <div className="d-flex justify-content-center align-items-center mb-4">
+    <div className="d-flex justify-content-center align-items-center mb-5">
       <div
         style={{
-          background:
-            "linear-gradient(135deg, var(--primary-color), var(--secondary-color))",
-          padding: "clamp(0.75rem, 2vw, 1rem) clamp(1rem, 4vw, 2rem)",
-          borderRadius: "50px",
+          background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+          padding: "clamp(0.85rem, 2vw, 1.15rem) clamp(1.25rem, 4vw, 2.25rem)",
+          borderRadius: "60px",
           color: "white",
-          fontWeight: "600",
-          fontSize: "clamp(0.8rem, 2vw, 0.9rem)",
-          boxShadow: "var(--shadow-md)",
+          fontWeight: "700",
+          fontSize: "clamp(0.85rem, 2vw, 0.95rem)",
+          boxShadow: "0 10px 30px rgba(16, 185, 129, 0.25)",
           textAlign: "center",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "0.75rem",
+          border: "3px solid rgba(255, 255, 255, 0.2)",
         }}
       >
-        🔒 Your payment information is secure and encrypted. Complete your order
-        with confidence.
+        <span style={{ fontSize: "1.25rem" }}>🔒</span>
+        <span>
+          Your payment information is secure and encrypted. Complete your order
+          with confidence.
+        </span>
       </div>
     </div>
 
@@ -27,35 +33,45 @@ export const CheckoutProgressBar = ({ steps, currentStep }) => (
           <div className="text-center">
             <div
               style={{
-                width: "50px",
-                height: "50px",
+                width: "60px",
+                height: "60px",
                 borderRadius: "50%",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: "1.2rem",
-                fontWeight: "600",
+                fontSize: "1.4rem",
+                fontWeight: "800",
                 color: "white",
                 background:
                   currentStep >= step.number
-                    ? "var(--secondary-color)"
+                    ? "linear-gradient(135deg, #10b981, #059669)"
                     : "#e5e7eb",
-                transition: "all 0.3s ease",
+                transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                 position: "relative",
                 zIndex: 2,
+                boxShadow:
+                  currentStep >= step.number
+                    ? "0 8px 20px rgba(16, 185, 129, 0.35)"
+                    : "0 2px 8px rgba(0, 0, 0, 0.08)",
+                border:
+                  currentStep >= step.number
+                    ? "4px solid rgba(255, 255, 255, 0.3)"
+                    : "3px solid #f3f4f6",
               }}
             >
-              {currentStep > step.number ? <Check size={20} /> : step.number}
+              {currentStep > step.number ? (
+                <Check size={28} strokeWidth={3} />
+              ) : (
+                step.number
+              )}
             </div>
             <div
               style={{
-                color:
-                  currentStep >= step.number
-                    ? "var(--secondary-color)"
-                    : "var(--text-secondary)",
-                fontSize: "0.875rem",
-                fontWeight: currentStep === step.number ? "600" : "500",
-                marginTop: "0.5rem",
+                color: currentStep >= step.number ? "#10b981" : "#9ca3af",
+                fontSize: "0.95rem",
+                fontWeight: currentStep === step.number ? "800" : "600",
+                marginTop: "0.75rem",
+                letterSpacing: "-0.01em",
               }}
             >
               {step.title}
@@ -64,16 +80,17 @@ export const CheckoutProgressBar = ({ steps, currentStep }) => (
           {index < steps.length - 1 && (
             <div
               style={{
-                width: "100px",
-                height: "3px",
+                width: "120px",
+                height: "4px",
                 background:
                   currentStep > step.number
-                    ? "var(--secondary-color)"
+                    ? "linear-gradient(90deg, #10b981, #059669)"
                     : "#e5e7eb",
-                margin: "0 1rem",
-                transition: "all 0.3s ease",
+                margin: "0 1.5rem",
+                transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                 position: "relative",
-                top: "-12px",
+                top: "-18px",
+                borderRadius: "2px",
               }}
             />
           )}
