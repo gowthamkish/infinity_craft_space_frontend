@@ -217,7 +217,7 @@ export default function ProductFilters({
           </div>
         )}
       </Card.Header>
-      <Card.Body style={{ padding: "1.75rem" }}>
+      <Card.Body style={{ padding: "1rem 0.5rem" }}>
         {/* Search */}
         <div className="mb-4">
           <Form.Label

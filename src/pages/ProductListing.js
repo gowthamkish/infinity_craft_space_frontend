@@ -1080,7 +1080,7 @@ const ProductListing = () => {
               <div
                 style={{
                   backgroundColor: "white",
-                  padding: "clamp(1.25rem, 3vw, 2.25rem)",
+                  padding: "clamp(1.25rem, 3vw, 1.25rem)",
                   borderRadius: "20px",
                   boxShadow: "0 10px 40px rgba(0, 0, 0, 0.08)",
                   border: "none",
