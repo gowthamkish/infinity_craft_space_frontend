@@ -31,6 +31,7 @@ import {
   FiTrash2,
 } from "react-icons/fi";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
+import "./ProductListing.css";
 
 // Lazy load components
 const Header = lazy(() => import("../components/header"));
@@ -90,32 +91,9 @@ const ProductCard = React.memo(
       }
     };
     return (
-      <Card
-        className="h-100 product-card hover-shadow"
-        style={{
-          border: "none",
-          borderRadius: "14px",
-          overflow: "hidden",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-          transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "translateY(-8px)";
-          e.currentTarget.style.boxShadow = "0 12px 40px rgba(0, 0, 0, 0.15)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "translateY(0)";
-          e.currentTarget.style.boxShadow = "0 4px 20px rgba(0, 0, 0, 0.08)";
-        }}
-      >
+      <Card className="h-100 product-card">
         <div
-          style={{
-            overflow: "hidden",
-            borderRadius: "0",
-            position: "relative",
-            cursor: "pointer",
-            background: "linear-gradient(135deg, #f8fafc 0%, #e8edf2 100%)",
-          }}
+          className="product-card-image-wrapper"
           onClick={() => onImageClick && onImageClick(product)}
         >
           {/* Multiple Images Display */}
@@ -125,69 +103,20 @@ const ProductCard = React.memo(
                 variant="top"
                 src={product.images[0].url}
                 loading="lazy"
-                style={{
-                  width: "100%",
-                  objectFit: "cover",
-                  height: "260px",
-                  background:
-                    "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
-                  transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
-                }}
+                className="product-card-img"
                 onError={(e) => {
                   e.target.src =
                     "https://via.placeholder.com/200x200?text=No+Image";
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "scale(1.08)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "scale(1)";
-                }}
               />
               {/* Images Count Indicator */}
               {product.images.length > 1 && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "14px",
-                    right: "14px",
-                    background: "linear-gradient(135deg, #667eea, #764ba2)",
-                    color: "white",
-                    padding: "8px 14px",
-                    borderRadius: "20px",
-                    fontSize: "13px",
-                    fontWeight: "700",
-                    boxShadow: "0 4px 12px rgba(102, 126, 234, 0.4)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                  }}
-                >
+                <div className="product-image-count-badge">
                   📸 {product.images.length}
                 </div>
               )}
               {/* Click to View Overlay */}
-              <div
-                className="position-absolute w-100 h-100 d-flex align-items-center justify-content-center"
-                style={{
-                  top: 0,
-                  left: 0,
-                  background: "rgba(0,0,0,0)",
-                  color: "white",
-                  opacity: 0,
-                  transition: "opacity 0.3s ease",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(0,0,0,0.5)";
-                  e.currentTarget.style.opacity = "1";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(0,0,0,0)";
-                  e.currentTarget.style.opacity = "0";
-                }}
-              >
+              <div className="product-image-overlay">
                 🔍 Click to view all images
               </div>
             </>
@@ -201,173 +130,51 @@ const ProductCard = React.memo(
                   "https://via.placeholder.com/200x200?text=No+Image"
                 }
                 loading="lazy"
-                style={{
-                  width: "100%",
-                  objectFit: "cover",
-                  height: "220px",
-                  background:
-                    "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
-                  transition: "transform 0.3s ease",
-                }}
+                className="product-card-img"
                 onError={(e) => {
                   e.target.src =
                     "https://via.placeholder.com/200x200?text=No+Image";
                 }}
               />
               {/* Click to View Overlay for single image */}
-              <div
-                className="position-absolute w-100 h-100 d-flex align-items-center justify-content-center"
-                style={{
-                  top: 0,
-                  left: 0,
-                  background: "rgba(0,0,0,0)",
-                  color: "white",
-                  opacity: 0,
-                  transition: "opacity 0.3s ease",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(0,0,0,0.5)";
-                  e.currentTarget.style.opacity = "1";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(0,0,0,0)";
-                  e.currentTarget.style.opacity = "0";
-                }}
-              >
+              <div className="product-image-overlay">
                 🔍 Click to view image
               </div>
             </>
           )}
         </div>
-        <Card.Body
-          className="d-flex flex-column"
-          style={{ padding: "0.75rem 1rem" }}
-        >
+        <Card.Body className="d-flex flex-column product-card-body">
           <div className="d-flex justify-content-between align-items-start mb-2">
-            <Card.Title
-              className="mb-0"
-              style={{
-                fontSize: "0.98rem",
-                fontWeight: "700",
-                color: "#1f2937",
-                lineHeight: "1.2",
-                letterSpacing: "-0.01em",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                maxWidth: "160px",
-                display: "block",
-                cursor: "pointer",
-              }}
-              title={product.name}
-            >
+            <Card.Title className="mb-0 product-title" title={product.name}>
               {product.name}
             </Card.Title>
             {product.category && (
-              <Badge
-                style={{
-                  fontSize: "0.75rem",
-                  padding: "6px 12px",
-                  borderRadius: "16px",
-                  background: "linear-gradient(135deg, #10b981, #059669)",
-                  color: "white",
-                  fontWeight: "700",
-                  border: "none",
-                  boxShadow: "0 2px 8px rgba(16, 185, 129, 0.25)",
-                }}
-              >
+              <Badge className="product-category-badge">
                 {product.category}
               </Badge>
             )}
           </div>
 
-          <div
-            className="price-tag mb-2"
-            style={{
-              fontSize: "1rem",
-              fontWeight: "800",
-              background: "linear-gradient(135deg, #10b981, #059669)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              letterSpacing: "-0.01em",
-            }}
-          >
-            ₹{product.price}
-          </div>
+          <div className="product-price mb-2">₹{product.price}</div>
 
           {/* Stock Status & Estimated Delivery - Single Row */}
           {(product.trackInventory !== false || product.estimatedDelivery) && (
-            <div
-              className="mb-2 d-flex align-items-center"
-              style={{
-                flexWrap: "nowrap",
-                overflowX: "auto",
-                overflowY: "hidden",
-                gap: "4px",
-                minHeight: "28px",
-                scrollbarWidth: "none",
-                msOverflowStyle: "none",
-              }}
-            >
+            <div className="mb-2 d-flex align-items-center product-stock-delivery-row">
               {/* Out of Stock */}
               {product.trackInventory !== false && product.stock <= 0 && (
-                <Badge
-                  style={{
-                    fontSize: "0.75rem",
-                    padding: "4px 8px",
-                    borderRadius: "16px",
-                    background: "linear-gradient(135deg, #ef4444, #dc2626)",
-                    color: "white",
-                    fontWeight: "700",
-                    border: "none",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  ❌ Out of Stock
-                </Badge>
+                <Badge className="stock-badge-out">❌ Out of Stock</Badge>
               )}
               {/* Only X left */}
               {product.trackInventory !== false &&
                 product.stock > 0 &&
                 product.stock <= (product.lowStockThreshold || 5) && (
-                  <Badge
-                    style={{
-                      fontSize: "0.75rem",
-                      padding: "4px 8px",
-                      borderRadius: "16px",
-                      background: "linear-gradient(135deg, #f59e0b, #d97706)",
-                      color: "white",
-                      fontWeight: "700",
-                      border: "none",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
+                  <Badge className="stock-badge-low">
                     ⚠️ Only {product.stock} left!
                   </Badge>
                 )}
               {/* Estimated Delivery */}
               {product.estimatedDelivery && (
-                <Badge
-                  style={{
-                    fontSize: "0.75rem",
-                    padding: "4px 8px",
-                    borderRadius: "16px",
-                    background: "linear-gradient(135deg, #3b82f6, #2563eb)",
-                    color: "white",
-                    fontWeight: "700",
-                    border: "none",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    whiteSpace: "nowrap",
-                    boxShadow: "0 2px 8px rgba(59, 130, 246, 0.25)",
-                  }}
-                >
+                <Badge className="delivery-badge">
                   🚚 Delivery in {product.estimatedDelivery}{" "}
                   {product.estimatedDelivery === 1 ? "day" : "days"}
                 </Badge>
@@ -376,45 +183,19 @@ const ProductCard = React.memo(
           )}
 
           <div
-            className="mb-2"
+            className="mb-2 product-details-link"
             onClick={() => navigate(`/product/${product._id}`)}
-            style={{
-              color: "#10b981",
-              fontSize: "0.78rem",
-              fontWeight: "700",
-              cursor: "pointer",
-              textDecoration: "none",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "5px",
-              transition: "all 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.gap = "8px";
-              e.currentTarget.style.color = "#059669";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.gap = "5px";
-              e.currentTarget.style.color = "#10b981";
-            }}
           >
             View Details & Reviews →
           </div>
-          <div className="d-flex gap-1 justify-content-center">
+          <div className="d-flex product-action-buttons justify-content-center">
             {/* Check if product is out of stock */}
             {product.trackInventory !== false && product.stock <= 0 ? (
               <Button
                 variant="secondary"
                 size="sm"
                 disabled
-                className="flex-fill"
-                style={{
-                  borderRadius: "10px",
-                  fontWeight: "600",
-                  height: "36px",
-                  padding: "0 12px",
-                  opacity: 0.7,
-                }}
+                className="flex-fill btn-out-of-stock"
               >
                 Out of Stock
               </Button>
@@ -432,33 +213,9 @@ const ProductCard = React.memo(
                     setCartLoading(false);
                   }
                 }}
-                className="hover-scale flex-fill"
+                className="hover-scale flex-fill btn-add-to-cart"
                 title={cartLoading ? "Processing..." : "Add to Cart"}
                 disabled={cartLoading}
-                style={{
-                  borderRadius: "14px",
-                  fontWeight: "700",
-                  height: "44px",
-                  padding: "0 12px",
-                  minWidth: "44px",
-                  background: "linear-gradient(135deg, #10b981, #059669)",
-                  border: "none",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)",
-                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 6px 16px rgba(16, 185, 129, 0.4)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 12px rgba(16, 185, 129, 0.3)";
-                }}
               >
                 {cartLoading ? (
                   <Spinner animation="border" size="sm" variant="light" />
@@ -482,34 +239,9 @@ const ProductCard = React.memo(
                       setCartLoading(false);
                     }
                   }}
-                  className="hover-scale flex-fill"
+                  className="hover-scale flex-fill btn-remove-from-cart"
                   title={cartLoading ? "Processing..." : "Remove from Cart"}
                   disabled={cartLoading}
-                  style={{
-                    borderRadius: "14px",
-                    fontWeight: "700",
-                    height: "44px",
-                    padding: "0 12px",
-                    border: "2px solid #fee2e2",
-                    background: "#fef2f2",
-                    color: "#dc2626",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    minWidth: "44px",
-                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background =
-                      "linear-gradient(135deg, #ef4444, #dc2626)";
-                    e.currentTarget.style.color = "white";
-                    e.currentTarget.style.borderColor = "#ef4444";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "#fef2f2";
-                    e.currentTarget.style.color = "#dc2626";
-                    e.currentTarget.style.borderColor = "#fee2e2";
-                  }}
                 >
                   {cartLoading ? (
                     <Spinner animation="border" size="sm" variant="danger" />
@@ -522,7 +254,7 @@ const ProductCard = React.memo(
               variant={isWishlisted ? "primary" : "outline-secondary"}
               size="sm"
               onClick={handleToggleWishlist}
-              className="hover-scale flex-fill"
+              className={`hover-scale flex-fill btn-wishlist ${isWishlisted ? "btn-wishlist-active" : "btn-wishlist-inactive"}`}
               title={
                 wishlistLoading
                   ? "Processing..."
@@ -531,46 +263,6 @@ const ProductCard = React.memo(
                     : "Add to Wishlist"
               }
               disabled={wishlistLoading}
-              style={{
-                borderRadius: "14px",
-                fontWeight: "700",
-                height: "44px",
-                padding: "0 12px",
-                border: isWishlisted ? "none" : "2px solid #ef4444",
-                background: isWishlisted
-                  ? "linear-gradient(135deg, #ef4444, #dc2626)"
-                  : "#fef2f2",
-                color: isWishlisted ? "white" : "#ef4444",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                minWidth: "44px",
-                boxShadow: isWishlisted
-                  ? "0 4px 12px rgba(239, 68, 68, 0.3)"
-                  : "none",
-                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-              }}
-              onMouseEnter={(e) => {
-                if (isWishlisted) {
-                  e.currentTarget.style.transform = "scale(1.05)";
-                  e.currentTarget.style.boxShadow =
-                    "0 6px 16px rgba(239, 68, 68, 0.4)";
-                } else {
-                  e.currentTarget.style.background =
-                    "linear-gradient(135deg, #ef4444, #dc2626)";
-                  e.currentTarget.style.color = "white";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (isWishlisted) {
-                  e.currentTarget.style.transform = "scale(1)";
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 12px rgba(239, 68, 68, 0.3)";
-                } else {
-                  e.currentTarget.style.background = "#fef2f2";
-                  e.currentTarget.style.color = "#ef4444";
-                }
-              }}
             >
               {wishlistLoading ? (
                 <Spinner
@@ -592,61 +284,6 @@ const ProductCard = React.memo(
     );
   },
 );
-
-// Add custom styles for better mobile experience with fixed header
-const mobileStyles = `
-  @media (max-width: 767.98px) {
-    .main-container {
-      padding: 80px 0.5rem 0.5rem 0.5rem !important;
-      padding-top: 80px !important;
-    }
-    .filter-offcanvas .offcanvas-header {
-      padding: 1rem;
-    }
-    .filter-offcanvas .offcanvas-body {
-      padding: 0 1rem 1rem;
-    }
-    .product-card .card-body {
-      padding: 0.5rem !important;
-    }
-    .product-card .card-img-top {
-      height: 140px !important;
-    }
-  }
-  
-  /* Ensure content scrolls properly with fixed header */
-  .main-container {
-    height: 100vh;
-    overflow-y: auto;
-  }
-  
-  .filter-offcanvas {
-    --bs-offcanvas-width: 320px;
-  }
-  
-  .filter-badge-active {
-    animation: pulse 2s infinite;
-  }
-  
-  @keyframes pulse {
-    0% {
-      box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
-    }
-    70% {
-      box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
-    }
-    100% {
-      box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
-    }
-  }
-`;
-
-// Inject styles
-if (typeof document !== "undefined") {
-  const styleElement = document.createElement("style");
-  styleElement.innerHTML = mobileStyles;
-  document.head.appendChild(styleElement);
-}
 
 const ProductListing = () => {
   const dispatch = useDispatch();
@@ -955,30 +592,12 @@ const ProductListing = () => {
       </Suspense>
 
       {/* Main Content with top margin to account for fixed header */}
-      <div
-        className="main-container"
-        style={{
-          backgroundColor: "#f8fafc",
-          minHeight: "100vh",
-          paddingTop: "90px", // Account for fixed header height
-          padding: "90px 1rem 1rem 1rem",
-          overflowY: "auto",
-          maxHeight: "100vh",
-        }}
-      >
-        <Container fluid style={{ padding: "0" }}>
+      <div className="main-container">
+        <Container fluid className="p-0">
           <Row>
             {/* Desktop Filter Panel - Hidden on mobile */}
             <Col lg={3} md={4} className="d-none d-md-block mb-4">
-              <div
-                className="filter-panel"
-                style={{
-                  position: "sticky",
-                  top: "0", // Account for fixed header (70px + 20px margin + 20px buffer)
-                  maxHeight: "calc(100vh - 130px)", // Adjust for header and margins
-                  overflowY: "auto",
-                }}
-              >
+              <div className="filter-panel">
                 <Suspense
                   fallback={
                     <div className="p-3">
@@ -1004,42 +623,21 @@ const ProductListing = () => {
               backdrop={true}
               scroll={false}
               className="d-md-none filter-offcanvas"
-              style={{ width: "320px" }}
             >
-              <Offcanvas.Header
-                style={{
-                  background:
-                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  color: "white",
-                  borderBottom: "none",
-                  padding: "1.5rem",
-                }}
-              >
-                <Offcanvas.Title
-                  style={{
-                    fontWeight: "700",
-                    fontSize: "1.4rem",
-                    letterSpacing: "-0.01em",
-                  }}
-                >
+              <Offcanvas.Header className="filter-offcanvas-header">
+                <Offcanvas.Title className="filter-offcanvas-title">
                   <FiFilter size={22} className="me-2" strokeWidth={2.5} />
                   Filter Products
                 </Offcanvas.Title>
                 <Button
                   variant="link"
                   onClick={handleCloseMobileFilters}
-                  style={{
-                    color: "white",
-                    textDecoration: "none",
-                    padding: "0.25rem",
-                    fontSize: "1.5rem",
-                  }}
-                  className="ms-auto"
+                  className="ms-auto filter-offcanvas-close"
                 >
                   <FiX size={24} />
                 </Button>
               </Offcanvas.Header>
-              <Offcanvas.Body style={{ padding: "1.5rem" }}>
+              <Offcanvas.Body className="filter-offcanvas-body">
                 <Suspense
                   fallback={
                     <div className="p-3">
@@ -1058,16 +656,7 @@ const ProductListing = () => {
                   <Button
                     variant="primary"
                     onClick={handleCloseMobileFilters}
-                    style={{
-                      borderRadius: "16px",
-                      fontWeight: "700",
-                      padding: "14px",
-                      background:
-                        "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                      border: "none",
-                      boxShadow: "0 8px 20px rgba(102, 126, 234, 0.35)",
-                      fontSize: "1rem",
-                    }}
+                    className="apply-filters-btn"
                   >
                     Apply Filters
                   </Button>
@@ -1077,44 +666,14 @@ const ProductListing = () => {
 
             {/* Main Content */}
             <Col lg={9} md={8} xs={12}>
-              <div
-                style={{
-                  backgroundColor: "white",
-                  padding: "clamp(1.25rem, 3vw, 1.25rem)",
-                  borderRadius: "20px",
-                  boxShadow: "0 10px 40px rgba(0, 0, 0, 0.08)",
-                  border: "none",
-                }}
-              >
+              <div className="content-card">
                 <div className="d-flex justify-content-between align-items-start align-items-md-center mb-5 flex-column flex-md-row gap-3">
                   <div className="d-flex align-items-center gap-3 flex-wrap">
-                    <h1
-                      className="mb-0"
-                      style={{
-                        color: "#1f2937",
-                        fontWeight: "800",
-                        fontSize: "clamp(1.75rem, 4vw, 2.25rem)",
-                        letterSpacing: "-0.02em",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.75rem",
-                      }}
-                    >
-                      <div
-                        style={{
-                          background:
-                            "linear-gradient(135deg, #667eea, #764ba2)",
-                          borderRadius: "16px",
-                          padding: "12px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          boxShadow: "0 8px 20px rgba(102, 126, 234, 0.35)",
-                        }}
-                      >
+                    <h1 className="mb-0 page-title">
+                      <div className="page-title-icon">
                         <FiGrid
                           size={28}
-                          style={{ color: "white" }}
+                          className="text-white"
                           strokeWidth={2.5}
                         />
                       </div>
@@ -1123,18 +682,8 @@ const ProductListing = () => {
                     <Button
                       variant="outline-primary"
                       size="sm"
-                      className="d-md-none hover-scale"
+                      className="d-md-none hover-scale mobile-filter-btn"
                       onClick={handleShowMobileFilters}
-                      style={{
-                        borderRadius: "14px",
-                        fontWeight: "700",
-                        border: "2px solid #667eea",
-                        color: "#667eea",
-                        padding: "10px 16px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                      }}
                     >
                       <FiFilter size={18} strokeWidth={2.5} />
                       <span>Filters</span>
@@ -1142,18 +691,7 @@ const ProductListing = () => {
                         filters.priceRange ||
                         filters.searchTerm ||
                         filters.sortBy) && (
-                        <Badge
-                          style={{
-                            fontSize: "0.75rem",
-                            padding: "4px 10px",
-                            borderRadius: "12px",
-                            background:
-                              "linear-gradient(135deg, #ef4444, #dc2626)",
-                            color: "white",
-                            fontWeight: "700",
-                            border: "none",
-                          }}
-                        >
+                        <Badge className="filter-count-badge">
                           {
                             [
                               ...filters.categories,
@@ -1165,15 +703,7 @@ const ProductListing = () => {
                         </Badge>
                       )}
                     </Button>
-                    <Badge
-                      bg="primary"
-                      style={{
-                        fontSize: "0.9rem",
-                        padding: "8px 12px",
-                        borderRadius: "20px",
-                        background: "var(--primary-color)",
-                      }}
-                    >
+                    <Badge bg="primary" className="products-count-badge">
                       {filteredAndSortedProducts.length} of {products.length}
                     </Badge>
                   </div>
@@ -1181,14 +711,7 @@ const ProductListing = () => {
                     <Button
                       variant="success"
                       onClick={handleCheckout}
-                      className="hover-scale"
-                      style={{
-                        borderRadius: "12px",
-                        padding: "10px 20px",
-                        fontWeight: "600",
-                        boxShadow: "var(--shadow-md)",
-                        whiteSpace: "nowrap",
-                      }}
+                      className="hover-scale checkout-btn"
                     >
                       <FiShoppingCart size={18} className="me-2" />
                       <span className="d-none d-sm-inline">Cart </span>
@@ -1202,27 +725,13 @@ const ProductListing = () => {
                 </div>
 
                 {!isAuthenticated && (
-                  <Alert
-                    variant="info"
-                    className="mb-4"
-                    style={{
-                      backgroundColor: "#f0f9ff",
-                      border: "1px solid #0ea5e9",
-                      borderRadius: "12px",
-                      color: "#0c4a6e",
-                    }}
-                  >
-                    <Alert.Heading
-                      style={{ color: "#0c4a6e", fontSize: "1.2rem" }}
-                    >
+                  <Alert variant="info" className="mb-4 welcome-alert">
+                    <Alert.Heading className="welcome-alert-heading">
                       Welcome to Infinity Craft Space! 👋
                     </Alert.Heading>
                     Browse our products and add them to your cart. You'll need
                     to{" "}
-                    <Alert.Link
-                      href="/login"
-                      style={{ color: "#0ea5e9", fontWeight: "600" }}
-                    >
+                    <Alert.Link href="/login" className="welcome-alert-link">
                       login
                     </Alert.Link>{" "}
                     to complete your purchase.
@@ -1324,11 +833,7 @@ const ProductListing = () => {
       </Suspense>
 
       {/* Toast Notification */}
-      <ToastContainer
-        position="top-end"
-        className="p-3"
-        style={{ zIndex: 9999, position: "fixed", top: "80px", right: "20px" }}
-      >
+      <ToastContainer position="top-end" className="p-3 toast-container-custom">
         <Toast
           show={showToast}
           onClose={() => setShowToast(false)}
@@ -1341,9 +846,7 @@ const ProductListing = () => {
               {toastType === "success" ? "✓ Success" : "⚠ Error"}
             </strong>
           </Toast.Header>
-          <Toast.Body style={{ color: "white", fontWeight: "500" }}>
-            {toastMessage}
-          </Toast.Body>
+          <Toast.Body className="toast-body-custom">{toastMessage}</Toast.Body>
         </Toast>
       </ToastContainer>
     </div>

@@ -30,9 +30,9 @@ const CategoryManagement = lazy(
 const AdminNotifications = lazy(
   () => import("./components/admin/Notifications"),
 );
-const IdleTimeoutManager = lazy(
-  () => import("./components/IdleTimeoutManager"),
-);
+// const IdleTimeoutManager = lazy(
+//   () => import("./components/IdleTimeoutManager"),
+// );
 const PWAInstallPrompt = lazy(() => import("./components/PWAInstallPrompt"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ReturnPolicy = lazy(() => import("./pages/ReturnPolicy"));
@@ -89,7 +89,7 @@ function App() {
             <OfflineIndicator />
 
             {/* Idle Timeout Manager - Active globally for all authenticated users */}
-            <IdleTimeoutManager />
+            {/* <IdleTimeoutManager /> */}
 
             <Routes>
               {/* Public Routes */}
