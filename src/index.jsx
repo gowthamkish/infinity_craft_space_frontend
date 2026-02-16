@@ -25,8 +25,8 @@ root.render(
   </Provider>,
 );
 
-// Register service worker for performance optimization
-if ("serviceWorker" in navigator) {
+// Register service worker only in production builds to avoid caching during development
+if (import.meta.env.VITE_ENV === "production" && "serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register("/sw.js");
