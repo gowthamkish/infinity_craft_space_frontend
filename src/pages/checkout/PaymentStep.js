@@ -4,7 +4,7 @@ import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 import Badge from "react-bootstrap/Badge";
-import { Lock, CreditCard, CheckCircle, Check } from "react-feather";
+import { Lock, CreditCard, Check } from "react-feather";
 
 export const PaymentStep = ({
   cartItems,
@@ -16,7 +16,6 @@ export const PaymentStep = ({
   error,
   loading,
   handlePayment,
-  handleDemoPayment,
   setCurrentStep,
 }) => (
   <Row className="justify-content-center">
@@ -168,99 +167,7 @@ export const PaymentStep = ({
                 </Card.Body>
               </Card>
 
-              <Card
-                className="payment-method-card"
-                style={{
-                  border: "2px solid var(--border-color)",
-                  borderRadius: "12px",
-                  cursor: "pointer",
-                  transition: "all 0.3s ease",
-                }}
-                onClick={handleDemoPayment}
-              >
-                <Card.Body style={{ padding: "clamp(1rem, 4vw, 1.5rem)" }}>
-                  <div className="d-none d-md-flex align-items-center">
-                    <div
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        background: "linear-gradient(135deg, #10b981, #059669)",
-                        borderRadius: "12px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        marginRight: "1rem",
-                      }}
-                    >
-                      <CheckCircle size={24} color="white" />
-                    </div>
-                    <div className="flex-grow-1">
-                      <h6 className="mb-1" style={{ fontWeight: "600" }}>
-                        Demo Payment (For Testing)
-                      </h6>
-                      <p
-                        className="mb-0"
-                        style={{
-                          fontSize: "0.875rem",
-                          color: "var(--text-secondary)",
-                        }}
-                      >
-                        Skip actual payment for demo purposes
-                      </p>
-                    </div>
-                    <Badge
-                      bg="warning"
-                      style={{ padding: "0.5rem 1rem", borderRadius: "20px" }}
-                    >
-                      Demo Only
-                    </Badge>
-                  </div>
-
-                  <div className="d-flex d-md-none flex-column text-center">
-                    <div
-                      style={{
-                        width: "60px",
-                        height: "60px",
-                        background: "linear-gradient(135deg, #10b981, #059669)",
-                        borderRadius: "12px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        margin: "0 auto 1rem",
-                      }}
-                    >
-                      <CheckCircle size={28} color="white" />
-                    </div>
-                    <div className="mb-2">
-                      <h6
-                        className="mb-1"
-                        style={{ fontWeight: "600", fontSize: "1rem" }}
-                      >
-                        Demo Payment (For Testing)
-                      </h6>
-                      <p
-                        className="mb-2"
-                        style={{
-                          fontSize: "0.85rem",
-                          color: "var(--text-secondary)",
-                        }}
-                      >
-                        Skip actual payment for demo purposes
-                      </p>
-                      <Badge
-                        bg="warning"
-                        style={{
-                          padding: "0.4rem 0.8rem",
-                          borderRadius: "20px",
-                          fontSize: "0.75rem",
-                        }}
-                      >
-                        Demo Only
-                      </Badge>
-                    </div>
-                  </div>
-                </Card.Body>
-              </Card>
+              {/* Demo payment removed for testing — only real gateway remains */}
             </div>
           </div>
 

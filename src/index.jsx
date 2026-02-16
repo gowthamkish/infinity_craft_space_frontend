@@ -25,8 +25,8 @@ root.render(
   </Provider>,
 );
 
-// Register service worker for performance optimization
-if ("serviceWorker" in navigator) {
+// Register service worker only in production builds to avoid caching during development
+if (import.meta.env.VITE_ENV === "production" && "serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register("/sw.js");
@@ -53,6 +53,19 @@ if ("serviceWorker" in navigator) {
       });
     } catch (error) {
       console.error("Service Worker registration failed:", error);
+    }
+  });
+} else if ("serviceWorker" in navigator && import.meta.env.DEV) {
+  // If a service worker was previously registered during development, attempt to unregister it
+  window.addEventListener("load", async () => {
+    try {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for (const reg of regs) {
+        await reg.unregister();
+        console.log("Unregistered service worker:", reg.scope);
+      }
+    } catch (err) {
+      // ignore
     }
   });
 }
