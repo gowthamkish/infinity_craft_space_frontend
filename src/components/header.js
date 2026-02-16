@@ -4,12 +4,7 @@ import { clearCart } from "../features/cartSlice";
 import { clearProducts } from "../features/productsSlice";
 import { clearAdminData } from "../features/adminSlice";
 import { useNavigate, useLocation } from "react-router-dom";
-import Navbar from "react-bootstrap/Navbar";
-import Nav from "react-bootstrap/Nav";
-import Container from "react-bootstrap/Container";
-import Button from "react-bootstrap/Button";
-import Badge from "react-bootstrap/Badge";
-import Offcanvas from "react-bootstrap/Offcanvas";
+import { Navbar, Nav, Container, Button, Badge, Offcanvas } from "./ui";
 import {
   FiLogOut,
   FiShoppingCart,

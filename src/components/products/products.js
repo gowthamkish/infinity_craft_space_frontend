@@ -2,10 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import Header from "../header";
-import Table from "react-bootstrap/Table";
 import {
+  Table,
   Container,
-  Breadcrumb,
   Button,
   Spinner,
   Card,
@@ -13,7 +12,8 @@ import {
   Col,
   Badge,
   Modal,
-} from "react-bootstrap";
+} from "../ui";
+import Breadcrumb from "@mui/material/Breadcrumb";
 import {
   FiArrowLeft,
   FiEdit2,

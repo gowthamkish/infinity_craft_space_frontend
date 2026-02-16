@@ -1,6 +1,5 @@
 import React from "react";
-import Container from "react-bootstrap/Container";
-import Card from "react-bootstrap/Card";
+import { Container, Card } from "../components/ui";
 import Header from "../components/header";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 

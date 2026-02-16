@@ -1,10 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Card from "react-bootstrap/Card";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import Badge from "react-bootstrap/Badge";
-import Spinner from "react-bootstrap/Spinner";
+import { Card, Form, Button, Badge, Spinner } from "./ui";
 import { FiFilter, FiX, FiChevronDown, FiChevronRight } from "react-icons/fi";
 import { fetchPublicCategories } from "../features/categoriesSlice";
 
@@ -236,22 +232,6 @@ export default function ProductFilters({
             placeholder="Search by name or description..."
             value={searchTerm}
             onChange={(e) => handleSearchChange(e.target.value)}
-            style={{
-              borderRadius: "14px",
-              border: "2px solid #e5e7eb",
-              padding: "12px 16px",
-              fontSize: "0.95rem",
-              transition: "all 0.3s",
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.borderColor = "#667eea";
-              e.currentTarget.style.boxShadow =
-                "0 0 0 3px rgba(102, 126, 234, 0.1)";
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.borderColor = "#e5e7eb";
-              e.currentTarget.style.boxShadow = "none";
-            }}
           />
         </div>
 

@@ -1,18 +1,20 @@
 import { useEffect, useState, useMemo } from "react";
 import Header from "../components/header";
-import Container from "react-bootstrap/Container";
-import Card from "react-bootstrap/Card";
-import Badge from "react-bootstrap/Badge";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Spinner from "react-bootstrap/Spinner";
-import Alert from "react-bootstrap/Alert";
-import ListGroup from "react-bootstrap/ListGroup";
-import Table from "react-bootstrap/Table";
-import Pagination from "react-bootstrap/Pagination";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
-import InputGroup from "react-bootstrap/InputGroup";
+import {
+  Container,
+  Card,
+  Badge,
+  Row,
+  Col,
+  Spinner,
+  Alert,
+  ListGroup,
+  Table,
+  Pagination,
+  Button,
+  Form,
+  InputGroup,
+} from "../components/ui";
 import {
   FiPackage,
   FiCalendar,

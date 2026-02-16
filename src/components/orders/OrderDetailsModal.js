@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, Card, Row, Col } from "react-bootstrap";
+import { Modal, Card, Row, Col } from "../ui";
 import {
   FiShoppingBag,
   FiUser,

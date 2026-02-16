@@ -10,18 +10,20 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { addToCart, removeFromCart } from "../features/cartSlice";
 import { useProducts } from "../hooks/useSmartFetch";
-import Card from "react-bootstrap/Card";
-import Button from "react-bootstrap/Button";
+import {
+  Card,
+  Button,
+  Row,
+  Col,
+  Container,
+  Spinner,
+  Badge,
+  Alert,
+  Toast,
+  ToastContainer,
+  Offcanvas,
+} from "../components/ui";
 import api from "../api/axios";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Container from "react-bootstrap/Container";
-import Spinner from "react-bootstrap/Spinner";
-import Badge from "react-bootstrap/Badge";
-import Alert from "react-bootstrap/Alert";
-import Toast from "react-bootstrap/Toast";
-import ToastContainer from "react-bootstrap/ToastContainer";
-import Offcanvas from "react-bootstrap/Offcanvas";
 import {
   FiGrid,
   FiFilter,

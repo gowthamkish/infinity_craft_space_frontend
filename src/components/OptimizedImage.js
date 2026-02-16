@@ -1,5 +1,5 @@
 import React, { useState, useCallback, memo } from "react";
-import { Spinner } from "react-bootstrap";
+import { Spinner } from "./ui";
 
 const OptimizedImage = memo(
   ({

@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import Container from "react-bootstrap/Container";
-import Card from "react-bootstrap/Card";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
-import Badge from "react-bootstrap/Badge";
-import Modal from "react-bootstrap/Modal";
-import Spinner from "react-bootstrap/Spinner";
+import {
+  Container,
+  Card,
+  Button,
+  Form,
+  Badge,
+  Modal,
+  Spinner,
+} from "../components/ui";
 import {
   FiUser,
   FiMapPin,

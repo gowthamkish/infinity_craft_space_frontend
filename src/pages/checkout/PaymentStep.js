@@ -1,9 +1,4 @@
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Card from "react-bootstrap/Card";
-import Button from "react-bootstrap/Button";
-import Alert from "react-bootstrap/Alert";
-import Badge from "react-bootstrap/Badge";
+import { Row, Col, Card, Button, Alert, Badge } from "../../components/ui";
 import { Lock, CreditCard, Check } from "react-feather";
 
 export const PaymentStep = ({
