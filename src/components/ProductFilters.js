@@ -343,8 +343,6 @@ export default function ProductFilters({
           ) : categories && categories.length > 0 ? (
             <div
               style={{
-                maxHeight: "320px",
-                overflowY: "auto",
                 background: "#f9fafb",
                 padding: "1rem",
                 borderRadius: "14px",
