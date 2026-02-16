@@ -3,7 +3,6 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Link, useLocation } from "react-router-dom";
-// Use public asset at /ICS_Logo.jpeg so it's served directly without bundling
 
 export default function Footer() {
   const location = useLocation();
@@ -23,16 +22,8 @@ export default function Footer() {
     >
       <Container>
         <Row className="gy-4">
-          <Col md={4} className="d-flex flex-column align-items-start">
-            <img
-              src="/ICS_Logo.jpeg"
-              alt="Infinity Craft Space"
-              style={{
-                width: "150px",
-                maxWidth: "100%",
-                marginBottom: "0.5rem",
-              }}
-            />
+          <Col md={4}>
+            <h5 style={{ color: "#22d3ee" }}>Infinity Craft Space</h5>
             <p className="mb-0" style={{ color: "#cbd5f5" }}>
               Premium craft supplies, materials, and tools for creative minds.
             </p>

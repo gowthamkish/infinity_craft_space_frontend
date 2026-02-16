@@ -397,7 +397,52 @@ export default function Checkout() {
     }
   };
 
-  // Demo payment removed — using real payment gateway only
+  // For demo purposes - simulate successful payment without actual gateway
+  const handleDemoPayment = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const newOrderData = {
+        items: cartItems.map((item) => ({
+          product: item.product._id,
+          productName: item.product.name,
+          quantity: item.quantity,
+          unitPrice: item.product.price,
+          totalPrice: item.totalPrice,
+        })),
+        shippingAddress,
+        subtotal,
+        tax,
+        shipping,
+        total,
+        paymentDetails: {
+          payment_id: `demo_pay_${Date.now()}`,
+          payment_status: "completed",
+          payment_method: "demo",
+        },
+        orderDate: new Date().toISOString(),
+        orderId: `ORD-${Date.now()}`,
+        status: "confirmed",
+      };
+
+      // Simulate API call delay
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      setOrderData(newOrderData);
+      setPaymentData({
+        payment_id: `demo_pay_${Date.now()}`,
+        payment_status: "completed",
+      });
+      setCurrentStep(4);
+      dispatch(clearCart());
+    } catch (err) {
+      console.error("Demo order error:", err);
+      setError("Failed to place order. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (cartItems.length === 0 && currentStep === 1) {
     return (
@@ -474,6 +519,7 @@ export default function Checkout() {
                 error={error}
                 loading={loading}
                 handlePayment={handlePayment}
+                handleDemoPayment={handleDemoPayment}
                 setCurrentStep={setCurrentStep}
               />
             )}
