@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 /**
  * Breadcrumb wrapper component
  * Maps React-Bootstrap Breadcrumb to MUI Breadcrumbs
- *
+ * 
  * Usage:
  *   <Breadcrumb>
  *     <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
