@@ -1,12 +1,10 @@
-import {
-  Row,
-  Col,
-  Card,
-  Button,
-  Form,
-  Alert,
-  Badge,
-} from "../../components/ui";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import Alert from "react-bootstrap/Alert";
+import Badge from "react-bootstrap/Badge";
 import { Trash2, CreditCard, Package } from "react-feather";
 
 export const ShippingStep = ({

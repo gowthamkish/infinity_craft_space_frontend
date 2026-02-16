@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Button } from "../ui";
+import { Card, Button } from "react-bootstrap";
 import {
   FiShoppingBag,
   FiUser,

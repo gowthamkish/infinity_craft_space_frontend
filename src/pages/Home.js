@@ -1,7 +1,12 @@
 import { useDispatch } from "react-redux";
 import { addToCart, removeFromCart } from "../features/cartSlice";
 import Header from "../components/header";
-import { Card, Button, Row, Col, Container, Spinner } from "../components/ui";
+import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
+import Spinner from "react-bootstrap/Spinner";
 import { useProducts } from "../hooks/useSmartFetch";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 

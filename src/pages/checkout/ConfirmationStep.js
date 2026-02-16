@@ -1,4 +1,8 @@
-import { Row, Col, Card, Button, Badge } from "../../components/ui";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button";
+import Badge from "react-bootstrap/Badge";
 import { Check } from "react-feather";
 
 export const ConfirmationStep = ({

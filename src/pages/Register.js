@@ -2,16 +2,14 @@ import { useDispatch } from "react-redux";
 import { register } from "../features/authSlice";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Form,
-  Button,
-  Card,
-  Container,
-  Row,
-  Col,
-  Spinner,
-  Alert,
-} from "../components/ui";
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Spinner from "react-bootstrap/Spinner";
+import Alert from "react-bootstrap/Alert";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 
 export default function Register() {

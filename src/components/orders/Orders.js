@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import Header from "../header";
-import { Container, Spinner, Card, Badge } from "../ui";
+import { Container, Spinner, Breadcrumb, Card, Badge } from "react-bootstrap";
 import {
   FiArrowLeft,
   FiShoppingBag,

@@ -7,7 +7,7 @@ import {
   removeItemCompletely,
 } from "../features/cartSlice";
 import Header from "../components/header";
-import { Container } from "../components/ui";
+import Container from "react-bootstrap/Container";
 import api from "../api/axios";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 import { CartReviewStep } from "./checkout/CartReviewStep";

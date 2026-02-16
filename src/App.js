@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useEffect, Suspense, lazy } from "react";
 import { useDispatch } from "react-redux";
 import { setAuthFromStorage } from "./features/authSlice";
-import { Spinner, Container } from "./components/ui";
+import { Spinner, Container } from "react-bootstrap";
 import { HelmetProvider } from "react-helmet-async";
 import OfflineIndicator from "./components/OfflineIndicator";
 import Footer from "./components/Footer";

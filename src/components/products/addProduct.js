@@ -1,8 +1,18 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Form, Button, Container, Row, Col, Card, Alert, Spinner } from "../ui";
-import Breadcrumb from "@mui/material/Breadcrumb";
+import {
+  Form,
+  Button,
+  Container,
+  Row,
+  Col,
+  Card,
+  Breadcrumb,
+  Alert,
+  Spinner,
+  Image,
+} from "react-bootstrap";
 import {
   FiArrowLeft,
   FiPackage,

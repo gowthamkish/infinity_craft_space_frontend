@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Alert } from "./ui";
+import { Modal, Button, Alert } from "react-bootstrap";
 import { FiSmartphone, FiDownload } from "react-icons/fi";
 
 const PWAInstallPrompt = () => {

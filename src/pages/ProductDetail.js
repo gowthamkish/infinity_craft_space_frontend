@@ -11,7 +11,7 @@ import {
   Spinner,
   Alert,
   Breadcrumb,
-} from "../components/ui";
+} from "react-bootstrap";
 import {
   FiShoppingCart,
   FiHeart,

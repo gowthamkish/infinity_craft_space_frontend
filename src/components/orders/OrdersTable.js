@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, Button } from "../ui";
+import { Table, Button } from "react-bootstrap";
 import {
   FiShoppingBag,
   FiUser,

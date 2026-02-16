@@ -1,7 +1,8 @@
 import React from "react";
-import { Container, Row, Col } from "../components/ui";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 import { Link, useLocation } from "react-router-dom";
-import Divider from "@mui/material/Divider";
 // Use public asset at /ICS_Logo.jpeg so it's served directly without bundling
 
 export default function Footer() {
@@ -20,7 +21,7 @@ export default function Footer() {
         marginTop: "auto",
       }}
     >
-      <Container fluid>
+      <Container>
         <Row className="gy-4">
           <Col md={4} className="d-flex flex-column align-items-start">
             <img
@@ -87,7 +88,7 @@ export default function Footer() {
             </p>
           </Col>
         </Row>
-        <Divider
+        <hr
           style={{ borderColor: "rgba(255,255,255,0.2)", margin: "1.5rem 0" }}
         />
         <div className="text-center" style={{ color: "#94a3b8" }}>

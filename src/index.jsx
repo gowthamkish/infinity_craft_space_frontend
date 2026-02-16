@@ -5,9 +5,6 @@ import App from "./App";
 import { Provider } from "react-redux";
 import { store } from "./app/store";
 import { setAuthFromStorage, fetchCurrentUser } from "./features/authSlice";
-import { ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import muiTheme from "./theme/muiTheme";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 // Hydrate auth state from localStorage if available
@@ -23,12 +20,9 @@ try {
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <ThemeProvider theme={muiTheme}>
-    <CssBaseline />
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </ThemeProvider>,
+  <Provider store={store}>
+    <App />
+  </Provider>,
 );
 
 // Register service worker only in production builds to avoid caching during development

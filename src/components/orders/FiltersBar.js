@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col } from "../ui";
+import { Row, Col } from "react-bootstrap";
 import { FiSearch, FiFilter } from "react-icons/fi";
 
 const FiltersBar = ({

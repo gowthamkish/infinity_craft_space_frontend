@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Spinner, Form, Button, Modal } from "../ui";
+import { Spinner, Form, Button, Modal } from "react-bootstrap";
 import { FiMessageSquare, FiAlertCircle } from "react-icons/fi";
 import {
   fetchProductReviews,
