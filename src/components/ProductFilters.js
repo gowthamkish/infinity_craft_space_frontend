@@ -217,7 +217,15 @@ export default function ProductFilters({
           </div>
         )}
       </Card.Header>
-      <Card.Body style={{ padding: "1rem 0.5rem" }}>
+      <Card.Body
+        style={{
+          padding: "1rem 0.5rem",
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          gap: "0.75rem",
+        }}
+      >
         {/* Search */}
         <div className="mb-4">
           <Form.Label
@@ -347,6 +355,8 @@ export default function ProductFilters({
                 padding: "1rem",
                 borderRadius: "14px",
                 border: "2px solid #e5e7eb",
+                flex: "1 1 auto",
+                minHeight: 0,
               }}
               className="custom-scrollbar"
             >
