@@ -10,6 +10,14 @@ import Header from "../components/header";
 import Container from "react-bootstrap/Container";
 import api from "../api/axios";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
+import {
+  trackBeginCheckout,
+  trackAddShippingInfo,
+  trackAddPaymentInfo,
+  trackPurchase,
+  trackPaymentFailed,
+  trackViewCart,
+} from "../utils/analytics";
 import { CartReviewStep } from "./checkout/CartReviewStep";
 import { CheckoutProgressBar } from "./checkout/CheckoutProgressBar";
 import { ShippingStep } from "./checkout/ShippingStep";
@@ -186,6 +194,14 @@ export default function Checkout() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Track view cart when checkout page loads
+  useEffect(() => {
+    if (cartItems.length > 0 && currentStep === 1) {
+      trackViewCart(cartItems, total);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleQuantityChange = (productId, newQuantity) => {
     if (newQuantity > 0) {
       dispatch(updateCartItemQuantity({ productId, quantity: newQuantity }));
@@ -201,6 +217,8 @@ export default function Checkout() {
       setError("Your cart is empty!");
       return;
     }
+    // Track begin checkout event
+    trackBeginCheckout(cartItems, total);
     setCurrentStep(2);
     setError(null);
   };
@@ -219,6 +237,8 @@ export default function Checkout() {
       return;
     }
 
+    // Track shipping info added
+    trackAddShippingInfo(cartItems, total, shipping === 0 ? 'free' : 'standard');
     setCurrentStep(3);
     setError(null);
   };
@@ -240,6 +260,9 @@ export default function Checkout() {
   const handlePayment = async () => {
     setLoading(true);
     setError(null);
+
+    // Track payment info added
+    trackAddPaymentInfo(cartItems, total, 'razorpay');
 
     try {
       // Initialize Razorpay
@@ -295,12 +318,12 @@ export default function Checkout() {
             if (verifyResponse.data.success) {
               // Payment successful, create the actual order
               await completeOrder(response);
-            } else {
-              console.error("Verification failed:", verifyResponse.data);
+            console.error("Verification failed:", verifyResponse.data);
               setError(
                 "Payment verification failed. " +
                   (verifyResponse.data.message || "Please try again."),
               );
+              trackPaymentFailed(cartItems, total, 'Verification failed');
               setLoading(false);
             }
           } catch (error) {
@@ -386,6 +409,9 @@ export default function Checkout() {
       setPaymentData(paymentResponse);
       setCurrentStep(4);
       setError(null);
+
+      // Track successful purchase - REVENUE TRACKING
+      trackPurchase(finalOrderData);
     } catch (err) {
       console.error("Order completion error:", err);
       setError(
@@ -436,6 +462,9 @@ export default function Checkout() {
       });
       setCurrentStep(4);
       dispatch(clearCart());
+
+      // Track successful purchase - REVENUE TRACKING (demo)
+      trackPurchase(newOrderData);
     } catch (err) {
       console.error("Demo order error:", err);
       setError("Failed to place order. Please try again.");

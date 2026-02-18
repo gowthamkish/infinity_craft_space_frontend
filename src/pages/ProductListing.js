@@ -31,6 +31,7 @@ import {
   FiTrash2,
 } from "react-icons/fi";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
+import { trackAddToCart, trackRemoveFromCart, trackSearch } from "../utils/analytics";
 import "./ProductListing.css";
 
 // Lazy load components
@@ -449,6 +450,7 @@ const ProductListing = () => {
   const handleAddToCart = useCallback(
     (product) => {
       dispatch(addToCart({ product, quantity: 1 }));
+      trackAddToCart(product, 1);
     },
     [dispatch],
   );
@@ -456,6 +458,7 @@ const ProductListing = () => {
   const handleRemoveFromCart = useCallback(
     (product) => {
       dispatch(removeFromCart({ product }));
+      trackRemoveFromCart(product, 1);
     },
     [dispatch],
   );
