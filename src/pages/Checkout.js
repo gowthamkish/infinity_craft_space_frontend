@@ -238,7 +238,11 @@ export default function Checkout() {
     }
 
     // Track shipping info added
-    trackAddShippingInfo(cartItems, total, shipping === 0 ? 'free' : 'standard');
+    trackAddShippingInfo(
+      cartItems,
+      total,
+      shipping === 0 ? "free" : "standard",
+    );
     setCurrentStep(3);
     setError(null);
   };
@@ -262,7 +266,7 @@ export default function Checkout() {
     setError(null);
 
     // Track payment info added
-    trackAddPaymentInfo(cartItems, total, 'razorpay');
+    trackAddPaymentInfo(cartItems, total, "razorpay");
 
     try {
       // Initialize Razorpay
@@ -318,12 +322,12 @@ export default function Checkout() {
             if (verifyResponse.data.success) {
               // Payment successful, create the actual order
               await completeOrder(response);
-            console.error("Verification failed:", verifyResponse.data);
+              console.error("Verification failed:", verifyResponse.data);
               setError(
                 "Payment verification failed. " +
                   (verifyResponse.data.message || "Please try again."),
               );
-              trackPaymentFailed(cartItems, total, 'Verification failed');
+              trackPaymentFailed(cartItems, total, "Verification failed");
               setLoading(false);
             }
           } catch (error) {

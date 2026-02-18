@@ -31,7 +31,11 @@ import {
   FiTrash2,
 } from "react-icons/fi";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
-import { trackAddToCart, trackRemoveFromCart, trackSearch } from "../utils/analytics";
+import {
+  trackAddToCart,
+  trackRemoveFromCart,
+  trackSearch,
+} from "../utils/analytics";
 import "./ProductListing.css";
 
 // Lazy load components
