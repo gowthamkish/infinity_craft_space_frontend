@@ -31,6 +31,9 @@ const CategoryManagement = lazy(
 const AdminNotifications = lazy(
   () => import("./components/admin/Notifications"),
 );
+const AnalyticsDashboard = lazy(
+  () => import("./components/admin/AnalyticsDashboard"),
+);
 // const IdleTimeoutManager = lazy(
 //   () => import("./components/IdleTimeoutManager"),
 // );
@@ -384,6 +387,22 @@ function App() {
                       >
                         <AdminRoute>
                           <AdminNotifications />
+                        </AdminRoute>
+                      </Suspense>
+                    </RouteErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/admin/analytics"
+                  element={
+                    <RouteErrorBoundary>
+                      <Suspense
+                        fallback={
+                          <LoadingFallback message="Loading analytics..." />
+                        }
+                      >
+                        <AdminRoute>
+                          <AnalyticsDashboard />
                         </AdminRoute>
                       </Suspense>
                     </RouteErrorBoundary>

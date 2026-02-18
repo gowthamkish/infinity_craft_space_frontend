@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -17,7 +18,15 @@ export default defineConfig({
     include: /src\/.*\.[jt]sx?$/,
     exclude: [],
   },
+  resolve: {
+    alias: {
+      react: path.resolve("./node_modules/react"),
+      "react-dom": path.resolve("./node_modules/react-dom"),
+    },
+    dedupe: ["react", "react-dom"],
+  },
   optimizeDeps: {
+    include: ["c3", "d3", "react", "react-dom", "react-redux"],
     esbuildOptions: {
       loader: {
         ".js": "jsx",
