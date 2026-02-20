@@ -156,6 +156,22 @@ const authSlice = createSlice({
         // Use the payload from rejectWithValue, fallback to error.message
         state.error =
           action.payload || action.error?.message || "Registration failed";
+      })
+      // Handle fetchCurrentUser
+      .addCase(fetchCurrentUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchCurrentUser.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(fetchCurrentUser.rejected, (state, action) => {
+        state.loading = false;
+        state.user = null;
+        state.token = null;
+        // Clear invalid token
+        localStorage.removeItem("token");
       });
   },
 });

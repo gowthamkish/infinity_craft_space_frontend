@@ -5,6 +5,7 @@ import App from "./App";
 import { Provider } from "react-redux";
 import { store } from "./app/store";
 import { setAuthFromStorage, fetchCurrentUser } from "./features/authSlice";
+import { fetchUserCart } from "./features/cartSlice";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 // Hydrate auth state from localStorage if available
@@ -12,7 +13,12 @@ try {
   const token = localStorage.getItem("token");
   if (token) {
     store.dispatch(setAuthFromStorage({ token }));
-    store.dispatch(fetchCurrentUser());
+    // Fetch user first, then fetch cart after user is loaded
+    store.dispatch(fetchCurrentUser()).then((result) => {
+      if (result.payload?.user?._id || result.payload?._id) {
+        store.dispatch(fetchUserCart());
+      }
+    });
   }
 } catch (e) {
   // ignore storage errors

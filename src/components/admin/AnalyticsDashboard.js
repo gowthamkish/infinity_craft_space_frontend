@@ -26,6 +26,8 @@ import {
   FiBarChart2,
   FiPieChart,
   FiCalendar,
+  FiTarget,
+  FiActivity,
 } from "react-icons/fi";
 
 // Custom hook for fetching analytics data
@@ -55,6 +57,35 @@ const useAnalytics = (period = 30) => {
   }, [fetchAnalytics]);
 
   return { data, loading, error, refetch: fetchAnalytics };
+};
+
+// Custom hook for fetching predictions data
+const usePredictions = () => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchPredictions = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.get("/api/admin/predictions", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setData(res.data);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to fetch predictions");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPredictions();
+  }, [fetchPredictions]);
+
+  return { data, loading, error, refetch: fetchPredictions };
 };
 
 // Stat Card Component
@@ -428,9 +459,225 @@ const C3CategoryChart = ({
   return <div ref={chartRef} />;
 };
 
+// C3 Prediction Chart Component - Grouped bar chart comparing last month vs predicted
+const C3PredictionChart = ({ data, height = 350 }) => {
+  const chartRef = useRef(null);
+  const chartInstance = useRef(null);
+
+  useEffect(() => {
+    if (!data || data.length === 0 || !chartRef.current) return;
+
+    // Prepare data for C3 - grouped bar chart
+    const categories = data.map((item) => {
+      const name = item.productName || "Unknown";
+      return name.length > 15 ? name.substring(0, 15) + "..." : name;
+    });
+
+    const lastMonthData = [
+      "Last Month",
+      ...data.map((item) => item.lastMonthQuantity || 0),
+    ];
+    const predictedData = [
+      "Predicted",
+      ...data.map((item) => item.predictedQuantity || 0),
+    ];
+    const currentMonthData = [
+      "Current (So Far)",
+      ...data.map((item) => item.currentMonthQuantity || 0),
+    ];
+
+    // Destroy existing chart safely
+    if (chartInstance.current) {
+      try {
+        chartInstance.current.destroy();
+      } catch (e) {
+        // Ignore destroy errors
+      }
+      chartInstance.current = null;
+    }
+
+    // Create new chart
+    const chart = c3.generate({
+      bindto: chartRef.current,
+      data: {
+        columns: [lastMonthData, predictedData, currentMonthData],
+        type: "bar",
+        colors: {
+          "Last Month": "#94a3b8",
+          Predicted: "#3b82f6",
+          "Current (So Far)": "#10b981",
+        },
+        groups: [],
+      },
+      bar: {
+        width: {
+          ratio: 0.7,
+        },
+      },
+      axis: {
+        x: {
+          type: "category",
+          categories: categories,
+          tick: {
+            rotate: -45,
+            multiline: false,
+          },
+          height: 80,
+        },
+        y: {
+          label: {
+            text: "Quantity",
+            position: "outer-middle",
+          },
+          tick: {
+            format: (d) => Math.round(d),
+          },
+        },
+      },
+      legend: {
+        position: "top",
+      },
+      tooltip: {
+        format: {
+          value: (value) => `${value} units`,
+        },
+      },
+      size: {
+        height: height,
+      },
+      padding: {
+        bottom: 20,
+        right: 20,
+      },
+      grid: {
+        y: {
+          show: true,
+        },
+      },
+    });
+    chartInstance.current = chart;
+
+    return () => {
+      if (chart) {
+        try {
+          chart.destroy();
+        } catch (e) {
+          // Ignore destroy errors
+        }
+      }
+    };
+  }, [data, height]);
+
+  if (!data || data.length === 0) {
+    return (
+      <p className="text-muted text-center py-4">
+        No prediction data available
+      </p>
+    );
+  }
+
+  return <div ref={chartRef} />;
+};
+
+// C3 Category Prediction Donut Chart
+const C3CategoryPredictionChart = ({ data, height = 280 }) => {
+  const chartRef = useRef(null);
+  const chartInstance = useRef(null);
+
+  const categoryColors = {
+    Paintings: "#3b82f6",
+    Sculptures: "#10b981",
+    "Handmade Crafts": "#f59e0b",
+    "Digital Art": "#8b5cf6",
+    Textiles: "#ef4444",
+    Jewelry: "#ec4899",
+    Pottery: "#14b8a6",
+    Woodwork: "#84cc16",
+  };
+
+  useEffect(() => {
+    if (!data || data.length === 0 || !chartRef.current) return;
+
+    // Prepare data for C3
+    const columns = data
+      .slice(0, 6)
+      .map((item) => [item.category || "Other", item.predictedQuantity || 0]);
+
+    // Prepare color pattern
+    const colorPattern = {};
+    data.slice(0, 6).forEach((item, i) => {
+      const name = item.category || "Other";
+      colorPattern[name] = categoryColors[name] || `hsl(${i * 60}, 70%, 50%)`;
+    });
+
+    // Destroy existing chart safely
+    if (chartInstance.current) {
+      try {
+        chartInstance.current.destroy();
+      } catch (e) {
+        // Ignore destroy errors
+      }
+      chartInstance.current = null;
+    }
+
+    // Create new chart
+    const chart = c3.generate({
+      bindto: chartRef.current,
+      data: {
+        columns: columns,
+        type: "donut",
+        colors: colorPattern,
+      },
+      donut: {
+        title: "Predicted",
+        width: 40,
+        label: {
+          format: (value) => value,
+        },
+      },
+      legend: {
+        position: "right",
+      },
+      tooltip: {
+        format: {
+          value: (value, ratio) =>
+            `${value} units (${(ratio * 100).toFixed(1)}%)`,
+        },
+      },
+      size: {
+        height: height,
+      },
+    });
+    chartInstance.current = chart;
+
+    return () => {
+      if (chart) {
+        try {
+          chart.destroy();
+        } catch (e) {
+          // Ignore destroy errors
+        }
+      }
+    };
+  }, [data, height]);
+
+  if (!data || data.length === 0) {
+    return (
+      <p className="text-muted text-center py-4">No category data available</p>
+    );
+  }
+
+  return <div ref={chartRef} />;
+};
+
 export default function AnalyticsDashboard() {
   const [period, setPeriod] = useState(30);
   const { data, loading, error, refetch } = useAnalytics(period);
+  const {
+    data: predictionsData,
+    loading: predictionsLoading,
+    refetch: refetchPredictions,
+  } = usePredictions();
 
   const formatCurrency = (value) => {
     if (value >= 100000) {
@@ -876,6 +1123,399 @@ export default function AnalyticsDashboard() {
                             </tbody>
                           </Table>
                         </div>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                </Row>
+
+                {/* Product Predictions Section */}
+                <Row className="g-4 mb-4 mt-2">
+                  <Col xs={12}>
+                    <Card
+                      className="border-0 shadow-sm"
+                      style={{ borderRadius: "16px" }}
+                    >
+                      <Card.Body className="p-4">
+                        <div className="d-flex justify-content-between align-items-center mb-4">
+                          <div>
+                            <h4 className="mb-1 fw-bold">
+                              <FiTarget
+                                size={24}
+                                className="me-2"
+                                style={{ color: "#8b5cf6" }}
+                              />
+                              Product Order Predictions
+                            </h4>
+                            <p className="text-muted mb-0">
+                              AI-powered predictions for current month based on
+                              historical order patterns
+                            </p>
+                          </div>
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={refetchPredictions}
+                            disabled={predictionsLoading}
+                          >
+                            <FiRefreshCw
+                              size={16}
+                              className={
+                                predictionsLoading ? "spin me-1" : "me-1"
+                              }
+                            />
+                            Refresh
+                          </Button>
+                        </div>
+
+                        {predictionsLoading ? (
+                          <div className="text-center py-5">
+                            <Spinner animation="border" variant="primary" />
+                            <p className="mt-3 text-muted">
+                              Analyzing order patterns...
+                            </p>
+                          </div>
+                        ) : predictionsData?.predictions?.length > 0 ? (
+                          <>
+                            {/* Prediction Summary Cards */}
+                            <Row className="g-3 mb-4">
+                              <Col xs={12} sm={6} md={3}>
+                                <div
+                                  className="p-3 rounded-3 text-center"
+                                  style={{
+                                    background:
+                                      "linear-gradient(135deg, #8b5cf620, #8b5cf640)",
+                                    border: "1px solid #8b5cf630",
+                                  }}
+                                >
+                                  <FiActivity
+                                    size={24}
+                                    style={{ color: "#8b5cf6" }}
+                                  />
+                                  <h5
+                                    className="mt-2 mb-0 fw-bold"
+                                    style={{ color: "#8b5cf6" }}
+                                  >
+                                    {predictionsData.metadata?.summary
+                                      ?.totalProductsAnalyzed || 0}
+                                  </h5>
+                                  <small className="text-muted">
+                                    Products Analyzed
+                                  </small>
+                                </div>
+                              </Col>
+                              <Col xs={12} sm={6} md={3}>
+                                <div
+                                  className="p-3 rounded-3 text-center"
+                                  style={{
+                                    background:
+                                      "linear-gradient(135deg, #94a3b820, #94a3b840)",
+                                    border: "1px solid #94a3b830",
+                                  }}
+                                >
+                                  <FiPackage
+                                    size={24}
+                                    style={{ color: "#64748b" }}
+                                  />
+                                  <h5
+                                    className="mt-2 mb-0 fw-bold"
+                                    style={{ color: "#64748b" }}
+                                  >
+                                    {predictionsData.metadata?.summary
+                                      ?.totalLastMonthOrders || 0}
+                                  </h5>
+                                  <small className="text-muted">
+                                    Last Month Orders
+                                  </small>
+                                </div>
+                              </Col>
+                              <Col xs={12} sm={6} md={3}>
+                                <div
+                                  className="p-3 rounded-3 text-center"
+                                  style={{
+                                    background:
+                                      "linear-gradient(135deg, #3b82f620, #3b82f640)",
+                                    border: "1px solid #3b82f630",
+                                  }}
+                                >
+                                  <FiTarget
+                                    size={24}
+                                    style={{ color: "#3b82f6" }}
+                                  />
+                                  <h5
+                                    className="mt-2 mb-0 fw-bold"
+                                    style={{ color: "#3b82f6" }}
+                                  >
+                                    {predictionsData.metadata?.summary
+                                      ?.totalPredictedThisMonth || 0}
+                                  </h5>
+                                  <small className="text-muted">
+                                    Predicted This Month
+                                  </small>
+                                </div>
+                              </Col>
+                              <Col xs={12} sm={6} md={3}>
+                                <div
+                                  className="p-3 rounded-3 text-center"
+                                  style={{
+                                    background:
+                                      "linear-gradient(135deg, #10b98120, #10b98140)",
+                                    border: "1px solid #10b98130",
+                                  }}
+                                >
+                                  <FiTrendingUp
+                                    size={24}
+                                    style={{ color: "#10b981" }}
+                                  />
+                                  <h5
+                                    className="mt-2 mb-0 fw-bold"
+                                    style={{ color: "#10b981" }}
+                                  >
+                                    {predictionsData.metadata
+                                      ?.currentMonthProgress?.percentComplete ||
+                                      0}
+                                    %
+                                  </h5>
+                                  <small className="text-muted">
+                                    Month Progress
+                                  </small>
+                                </div>
+                              </Col>
+                            </Row>
+
+                            <Row className="g-4">
+                              {/* Main Prediction Chart */}
+                              <Col xs={12} lg={8}>
+                                <Card
+                                  className="border-0 h-100"
+                                  style={{
+                                    borderRadius: "12px",
+                                    background: "#f8fafc",
+                                  }}
+                                >
+                                  <Card.Body className="p-3">
+                                    <h6 className="mb-3 fw-bold">
+                                      <FiBarChart2
+                                        size={18}
+                                        className="me-2"
+                                        style={{ color: "#3b82f6" }}
+                                      />
+                                      Top 10 Product Predictions
+                                    </h6>
+                                    <C3PredictionChart
+                                      data={predictionsData.predictions}
+                                      height={380}
+                                    />
+                                    <div className="d-flex justify-content-center gap-4 mt-2">
+                                      <div className="d-flex align-items-center">
+                                        <div
+                                          className="me-2"
+                                          style={{
+                                            width: "12px",
+                                            height: "12px",
+                                            borderRadius: "3px",
+                                            backgroundColor: "#94a3b8",
+                                          }}
+                                        />
+                                        <small className="text-muted">
+                                          Last Month Actual
+                                        </small>
+                                      </div>
+                                      <div className="d-flex align-items-center">
+                                        <div
+                                          className="me-2"
+                                          style={{
+                                            width: "12px",
+                                            height: "12px",
+                                            borderRadius: "3px",
+                                            backgroundColor: "#3b82f6",
+                                          }}
+                                        />
+                                        <small className="text-muted">
+                                          Predicted
+                                        </small>
+                                      </div>
+                                      <div className="d-flex align-items-center">
+                                        <div
+                                          className="me-2"
+                                          style={{
+                                            width: "12px",
+                                            height: "12px",
+                                            borderRadius: "3px",
+                                            backgroundColor: "#10b981",
+                                          }}
+                                        />
+                                        <small className="text-muted">
+                                          Current Month (So Far)
+                                        </small>
+                                      </div>
+                                    </div>
+                                  </Card.Body>
+                                </Card>
+                              </Col>
+
+                              {/* Category Prediction Donut */}
+                              <Col xs={12} lg={4}>
+                                <Card
+                                  className="border-0 h-100"
+                                  style={{
+                                    borderRadius: "12px",
+                                    background: "#f8fafc",
+                                  }}
+                                >
+                                  <Card.Body className="p-3">
+                                    <h6 className="mb-3 fw-bold">
+                                      <FiPieChart
+                                        size={18}
+                                        className="me-2"
+                                        style={{ color: "#8b5cf6" }}
+                                      />
+                                      Predictions by Category
+                                    </h6>
+                                    <C3CategoryPredictionChart
+                                      data={predictionsData.categoryPredictions}
+                                      height={300}
+                                    />
+                                  </Card.Body>
+                                </Card>
+                              </Col>
+                            </Row>
+
+                            {/* Detailed Predictions Table */}
+                            <Card
+                              className="border-0 mt-4"
+                              style={{
+                                borderRadius: "12px",
+                                background: "#f8fafc",
+                              }}
+                            >
+                              <Card.Body className="p-3">
+                                <h6 className="mb-3 fw-bold">
+                                  <FiPackage
+                                    size={18}
+                                    className="me-2"
+                                    style={{ color: "#f59e0b" }}
+                                  />
+                                  Detailed Product Predictions
+                                </h6>
+                                <div className="table-responsive">
+                                  <Table hover className="mb-0" size="sm">
+                                    <thead
+                                      style={{ backgroundColor: "#e2e8f0" }}
+                                    >
+                                      <tr>
+                                        <th>Product</th>
+                                        <th>Category</th>
+                                        <th className="text-center">
+                                          Last Month
+                                        </th>
+                                        <th className="text-center">
+                                          Predicted
+                                        </th>
+                                        <th className="text-center">Current</th>
+                                        <th className="text-center">Trend</th>
+                                        <th className="text-center">
+                                          Confidence
+                                        </th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {predictionsData.predictions.map(
+                                        (item, index) => (
+                                          <tr key={index}>
+                                            <td>
+                                              <span
+                                                className="fw-medium"
+                                                title={item.productName}
+                                              >
+                                                {item.productName?.length > 25
+                                                  ? item.productName.substring(
+                                                      0,
+                                                      25,
+                                                    ) + "..."
+                                                  : item.productName}
+                                              </span>
+                                            </td>
+                                            <td>
+                                              <Badge
+                                                bg="light"
+                                                text="dark"
+                                                className="fw-normal"
+                                              >
+                                                {item.category}
+                                              </Badge>
+                                            </td>
+                                            <td className="text-center">
+                                              <span className="text-muted">
+                                                {item.lastMonthQuantity}
+                                              </span>
+                                            </td>
+                                            <td className="text-center">
+                                              <span className="fw-bold text-primary">
+                                                {item.predictedQuantity}
+                                              </span>
+                                            </td>
+                                            <td className="text-center">
+                                              <span className="text-success">
+                                                {item.currentMonthQuantity}
+                                              </span>
+                                            </td>
+                                            <td className="text-center">
+                                              {item.trendPercentage >= 0 ? (
+                                                <Badge
+                                                  bg="success"
+                                                  className="d-inline-flex align-items-center"
+                                                >
+                                                  <FiTrendingUp
+                                                    size={12}
+                                                    className="me-1"
+                                                  />
+                                                  +{item.trendPercentage}%
+                                                </Badge>
+                                              ) : (
+                                                <Badge
+                                                  bg="danger"
+                                                  className="d-inline-flex align-items-center"
+                                                >
+                                                  <FiTrendingDown
+                                                    size={12}
+                                                    className="me-1"
+                                                  />
+                                                  {item.trendPercentage}%
+                                                </Badge>
+                                              )}
+                                            </td>
+                                            <td className="text-center">
+                                              <Badge
+                                                bg={
+                                                  item.confidence === "High"
+                                                    ? "success"
+                                                    : item.confidence ===
+                                                        "Medium"
+                                                      ? "warning"
+                                                      : "secondary"
+                                                }
+                                              >
+                                                {item.confidence}
+                                              </Badge>
+                                            </td>
+                                          </tr>
+                                        ),
+                                      )}
+                                    </tbody>
+                                  </Table>
+                                </div>
+                              </Card.Body>
+                            </Card>
+                          </>
+                        ) : (
+                          <div className="text-center py-5">
+                            <FiTarget size={48} className="text-muted mb-3" />
+                            <p className="text-muted">
+                              No prediction data available. Predictions require
+                              order history from previous months.
+                            </p>
+                          </div>
+                        )}
                       </Card.Body>
                     </Card>
                   </Col>

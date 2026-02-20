@@ -1,10 +1,46 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../features/authSlice";
 import productsReducer from "../features/productsSlice";
-import cartReducer from "../features/cartSlice";
+import cartReducer, { syncCartToBackend } from "../features/cartSlice";
 import adminReducer from "../features/adminSlice";
 import categoriesReducer from "../features/categoriesSlice";
 import reviewsReducer from "../features/reviewsSlice";
+
+// Cart actions that should trigger a sync to backend
+const CART_SYNC_ACTIONS = [
+  "cart/addToCart",
+  "cart/removeFromCart",
+  "cart/updateCartItemQuantity",
+  "cart/removeItemCompletely",
+  "cart/clearCart",
+];
+
+// Debounce timer for cart sync
+let cartSyncTimeout = null;
+
+// Cart sync middleware - automatically syncs cart to backend after cart changes
+const cartSyncMiddleware = (store) => (next) => (action) => {
+  const result = next(action);
+
+  // Check if this is a cart-modifying action
+  if (CART_SYNC_ACTIONS.includes(action.type)) {
+    const { auth } = store.getState();
+
+    // Only sync if user is logged in
+    if (auth.user?._id) {
+      // Debounce sync to prevent excessive API calls
+      if (cartSyncTimeout) {
+        clearTimeout(cartSyncTimeout);
+      }
+
+      cartSyncTimeout = setTimeout(() => {
+        store.dispatch(syncCartToBackend());
+      }, 500);
+    }
+  }
+
+  return result;
+};
 
 // Performance monitoring middleware
 const performanceMiddleware = (store) => (next) => (action) => {
@@ -29,7 +65,7 @@ const performanceMiddleware = (store) => (next) => (action) => {
 const serializationMiddleware = {
   serializableCheck: {
     // Ignore these action types
-    ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
+    ignoredActions: [],
     // Ignore these field paths in all actions
     ignoredActionsPaths: ["meta.arg", "payload.timestamp"],
     // Ignore these paths in the state
@@ -56,6 +92,8 @@ export const store = configureStore({
       // Disable immutability and serialization checks in production for better performance
       immutableCheck: import.meta.env.DEV,
     }).concat(
+      // Add cart sync middleware
+      cartSyncMiddleware,
       // Add performance monitoring in development
       import.meta.env.DEV ? performanceMiddleware : [],
     ),
