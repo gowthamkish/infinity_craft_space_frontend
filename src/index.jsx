@@ -61,6 +61,26 @@ if (import.meta.env.VITE_ENV === "production" && "serviceWorker" in navigator) {
       console.error("Service Worker registration failed:", error);
     }
   });
+} else if (import.meta.env.DEV && "serviceWorker" in navigator) {
+  // In development, unregister any existing service workers to prevent caching
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    registrations.forEach((registration) => {
+      registration.unregister().then(() => {
+        console.log("Service Worker unregistered for development");
+      });
+    });
+  });
+
+  // Clear caches in development
+  if ("caches" in window) {
+    caches.keys().then((cacheNames) => {
+      cacheNames.forEach((cacheName) => {
+        caches.delete(cacheName).then(() => {
+          console.log(`Cache '${cacheName}' cleared for development`);
+        });
+      });
+    });
+  }
 }
 
 // Performance observer for additional metrics

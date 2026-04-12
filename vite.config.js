@@ -43,11 +43,40 @@ export default defineConfig({
         secure: false,
       },
     },
+    middlewares: [
+      (req, res, next) => {
+        // Disable caching for HTML and dynamic assets in development
+        if (req.url.endsWith(".html") || req.url === "/") {
+          res.setHeader(
+            "Cache-Control",
+            "no-store, no-cache, must-revalidate, proxy-revalidate",
+          );
+          res.setHeader("Pragma", "no-cache");
+          res.setHeader("Expires", "0");
+        }
+        // Disable service worker caching during development
+        if (req.url === "/sw.js") {
+          res.setHeader(
+            "Cache-Control",
+            "no-store, no-cache, must-revalidate, proxy-revalidate",
+          );
+        }
+        next();
+      },
+    ],
   },
   preview: {
     port: 3000,
   },
   build: {
+    rollupOptions: {
+      output: {
+        // Add hash to all assets for cache-busting in production
+        entryFileNames: "assets/[name]-[hash].js",
+        chunkFileNames: "assets/[name]-[hash].js",
+        assetFileNames: "assets/[name]-[hash][extname]",
+      },
+    },
     outDir: "build",
     sourcemap: false,
     // Optimize chunk splitting

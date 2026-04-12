@@ -1,6 +1,9 @@
 // Service Worker for performance optimization
 const CACHE_NAME = "infinity-craft-v1";
 const API_CACHE_NAME = "infinity-craft-api-v1";
+const DEVELOPMENT_MODE =
+  !location.hostname.includes("production") &&
+  (location.hostname === "localhost" || location.hostname === "127.0.0.1");
 
 // Assets to cache immediately
 const STATIC_ASSETS = [
@@ -47,6 +50,20 @@ self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
+  // Skip caching HTML files and use network-first approach in development
+  if (
+    DEVELOPMENT_MODE ||
+    request.url.endsWith(".html") ||
+    url.pathname === "/"
+  ) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => response)
+        .catch(() => caches.match(request)),
+    );
+    return;
+  }
+
   // Handle API requests with network-first strategy
   if (url.pathname.startsWith("/api/")) {
     event.respondWith(
@@ -69,8 +86,8 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Handle static assets with cache-first strategy
-  if (request.method === "GET") {
+  // Handle static assets with cache-first strategy (production only)
+  if (request.method === "GET" && !DEVELOPMENT_MODE) {
     event.respondWith(
       caches.match(request).then((response) => {
         if (response) {

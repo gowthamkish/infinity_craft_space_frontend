@@ -13,11 +13,17 @@
 /static/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Cache JavaScript and CSS for 1 year
-*.js
+# Cache hashed JavaScript and CSS for 1 year (production builds only)
+/assets/*-[hash].js
   Cache-Control: public, max-age=31536000, immutable
-*.css
+/assets/*-[hash].css
   Cache-Control: public, max-age=31536000, immutable
+
+# Don't cache non-hashed assets (development)
+/assets/*.js
+  Cache-Control: no-cache, no-store, must-revalidate
+/assets/*.css
+  Cache-Control: no-cache, no-store, must-revalidate
 
 # Cache images for 1 year
 *.jpg
