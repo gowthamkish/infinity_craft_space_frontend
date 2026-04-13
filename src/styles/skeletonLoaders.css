@@ -1,0 +1,126 @@
+/* Skeleton Loader Patterns */
+
+.skeleton-loader {
+  background: linear-gradient(90deg, var(--neutral-200) 25%, var(--neutral-100) 50%, var(--neutral-200) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 2s infinite;
+  border-radius: var(--radius-md);
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Skeleton variants */
+.skeleton-text {
+  height: 0.75rem;
+  width: 100%;
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+}
+
+.skeleton-text-lg {
+  height: 1.25rem;
+}
+
+.skeleton-title {
+  height: 1.5rem;
+  width: 60%;
+  margin-bottom: var(--spacing-md);
+}
+
+.skeleton-image {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--radius-md);
+}
+
+.skeleton-card {
+  padding: var(--spacing-md);
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.skeleton-card > div {
+  margin-bottom: var(--spacing-md);
+}
+
+.skeleton-card > div:last-child {
+  margin-bottom: 0;
+}
+
+.skeleton-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+}
+
+.skeleton-button {
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+  width: 100%;
+}
+
+.skeleton-list-item {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.skeleton-list-item .skeleton-avatar {
+  flex-shrink: 0;
+}
+
+.skeleton-list-item .skeleton-text {
+  flex: 1;
+}
+
+/* Product Card Skeleton */
+.skeleton-product-card {
+  padding: var(--spacing-md);
+}
+
+.skeleton-product-image {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.skeleton-product-title {
+  height: 1rem;
+  width: 90%;
+  margin-bottom: var(--spacing-sm);
+}
+
+.skeleton-product-description {
+  height: 0.75rem;
+  width: 100%;
+  margin-bottom: var(--spacing-md);
+}
+
+.skeleton-product-price {
+  height: 1.25rem;
+  width: 30%;
+}
+
+/* Pulse animation for attention */
+.skeleton-pulse {
+  animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

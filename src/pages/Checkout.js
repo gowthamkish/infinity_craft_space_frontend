@@ -36,6 +36,7 @@ export default function Checkout() {
   const [currentStep, setCurrentStep] = useState(1); // 1: Cart Review, 2: Checkout, 3: Payment, 4: Confirmation
   const [orderData, setOrderData] = useState(null);
   const [paymentData, setPaymentData] = useState(null);
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
 
   const [shippingAddress, setShippingAddress] = useState({
     street: "",
@@ -210,6 +211,15 @@ export default function Checkout() {
 
   const handleRemoveItem = (productId) => {
     dispatch(removeItemCompletely(productId));
+  };
+
+  const handleCouponApplied = (coupon) => {
+    setAppliedCoupon(coupon);
+    setError(null);
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
   };
 
   const proceedToCheckout = () => {
@@ -427,56 +437,6 @@ export default function Checkout() {
     }
   };
 
-  // For demo purposes - simulate successful payment without actual gateway
-  const handleDemoPayment = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const newOrderData = {
-        items: cartItems.map((item) => ({
-          product: item.product._id,
-          productName: item.product.name,
-          quantity: item.quantity,
-          unitPrice: item.product.price,
-          totalPrice: item.totalPrice,
-        })),
-        shippingAddress,
-        subtotal,
-        tax,
-        shipping,
-        total,
-        paymentDetails: {
-          payment_id: `demo_pay_${Date.now()}`,
-          payment_status: "completed",
-          payment_method: "demo",
-        },
-        orderDate: new Date().toISOString(),
-        orderId: `ORD-${Date.now()}`,
-        status: "confirmed",
-      };
-
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      setOrderData(newOrderData);
-      setPaymentData({
-        payment_id: `demo_pay_${Date.now()}`,
-        payment_status: "completed",
-      });
-      setCurrentStep(4);
-      dispatch(clearCart());
-
-      // Track successful purchase - REVENUE TRACKING (demo)
-      trackPurchase(newOrderData);
-    } catch (err) {
-      console.error("Demo order error:", err);
-      setError("Failed to place order. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   if (cartItems.length === 0 && currentStep === 1) {
     return (
       <div className="App">
@@ -515,6 +475,9 @@ export default function Checkout() {
                 navigate={navigate}
                 handleQuantityChange={handleQuantityChange}
                 handleRemoveItem={handleRemoveItem}
+                onCouponApplied={handleCouponApplied}
+                onRemoveCoupon={handleRemoveCoupon}
+                appliedCoupon={appliedCoupon}
               />
             )}
             {currentStep === 2 && (
@@ -552,7 +515,6 @@ export default function Checkout() {
                 error={error}
                 loading={loading}
                 handlePayment={handlePayment}
-                handleDemoPayment={handleDemoPayment}
                 setCurrentStep={setCurrentStep}
               />
             )}

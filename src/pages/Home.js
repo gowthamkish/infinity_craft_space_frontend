@@ -9,6 +9,7 @@ import Container from "react-bootstrap/Container";
 import Spinner from "react-bootstrap/Spinner";
 import { useProducts } from "../hooks/useSmartFetch";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
+import RecentlyViewed from "../components/RecentlyViewed";
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -144,6 +145,8 @@ export default function Home() {
             </>
           )}
         </Container>
+        {/* Recently Viewed Products Section */}
+        <RecentlyViewed />
       </div>
     </>
   );

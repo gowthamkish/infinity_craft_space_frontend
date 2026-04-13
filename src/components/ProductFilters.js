@@ -29,16 +29,8 @@ export default function ProductFilters({
 
   // Fetch categories on component mount
   useEffect(() => {
-    console.log("Fetching public categories...");
     dispatch(fetchPublicCategories());
   }, [dispatch]);
-
-  // Debug categories data
-  useEffect(() => {
-    console.log("Categories data:", categories);
-    console.log("Categories loading:", categoriesLoading);
-    console.log("Categories error:", categoriesError);
-  }, [categories, categoriesLoading, categoriesError]);
 
   // Sync local state with active filters
   useEffect(() => {

@@ -22,7 +22,7 @@ export const usePerformanceMonitor = (
     }
 
     renderStartTime.current = Date.now();
-  });
+  }); // intentionally no deps — measures every render cycle
 
   const measureAsync = useCallback(
     async (operationName, asyncOperation) => {

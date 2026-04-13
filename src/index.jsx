@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App";
 import { Provider } from "react-redux";
 import { store } from "./app/store";
+import { ToastProvider } from "./context/ToastContext";
 import { setAuthFromStorage, fetchCurrentUser } from "./features/authSlice";
 import { fetchUserCart } from "./features/cartSlice";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -27,7 +28,9 @@ try {
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <Provider store={store}>
-    <App />
+    <ToastProvider>
+      <App />
+    </ToastProvider>
   </Provider>,
 );
 

@@ -28,6 +28,10 @@ import { addToCart } from "../features/cartSlice";
 import { StarRating } from "../components/reviews/StarRating";
 import api from "../api/axios";
 import SEOHead, { generateProductStructuredData } from "../components/SEOHead";
+import { useRecentlyViewed } from "../hooks/useRecentlyViewed";
+import Breadcrumbs from "../components/Breadcrumbs";
+import ProductRecommendations from "../components/ProductRecommendations";
+import ProductQnA from "../components/ProductQnA";
 
 // Lazy load components
 const Header = lazy(() => import("../components/header"));
@@ -40,9 +44,13 @@ const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { addProduct } = useRecentlyViewed();
 
   const isAuthenticated = useSelector((state) => !!state.auth.token);
   const cartItems = useSelector((state) => state.cart.items);
+  const userName = useSelector(
+    (state) => state.auth.user?.name || state.auth.user?.email || "Customer",
+  );
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -60,8 +68,12 @@ const ProductDetail = () => {
       try {
         setLoading(true);
         const response = await api.get(`/api/products/${id}`);
-        setProduct(response.data.product || response.data);
+        const productData = response.data.product || response.data;
+        setProduct(productData);
         setError(null);
+
+        // Track product in recently viewed
+        addProduct(productData);
       } catch (err) {
         console.error("Error fetching product:", err);
         setError(err.response?.data?.error || "Failed to load product");
@@ -261,18 +273,12 @@ const ProductDetail = () => {
       </Suspense>
 
       <Container className="py-4" style={{ marginTop: "90px" }}>
-        <Breadcrumb className="mb-4">
-          <Breadcrumb.Item
-            onClick={() => navigate("/")}
-            style={{ cursor: "pointer" }}
-          >
-            Home
-          </Breadcrumb.Item>
-          {product.category && (
-            <Breadcrumb.Item active>{product.category}</Breadcrumb.Item>
-          )}
-          <Breadcrumb.Item active>{product.name}</Breadcrumb.Item>
-        </Breadcrumb>
+        <Breadcrumbs
+          category={product.category}
+          subCategory={product.subCategory}
+          productName={product.name}
+          style={{ marginBottom: "var(--spacing-lg)" }}
+        />
 
         <Row>
           {/* Product Images */}
@@ -810,6 +816,55 @@ const ProductDetail = () => {
                 </Suspense>
               </Card.Body>
             </Card>
+          </Col>
+        </Row>
+
+        {/* Q&A Section */}
+        <Row className="mt-5">
+          <Col xs={12}>
+            <Card
+              style={{
+                border: "none",
+                borderRadius: "16px",
+                boxShadow: "var(--shadow-lg)",
+              }}
+            >
+              <Card.Body className="p-4">
+                <Suspense
+                  fallback={
+                    <div className="text-center py-5">
+                      <Spinner animation="border" />
+                      <p className="mt-2 text-muted">Loading Q&A...</p>
+                    </div>
+                  }
+                >
+                  <ProductQnA
+                    productId={id}
+                    isAuthenticated={isAuthenticated}
+                    userName={userName}
+                  />
+                </Suspense>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Recommendations Section */}
+        <Row className="mt-5">
+          <Col xs={12}>
+            <Suspense
+              fallback={
+                <div className="text-center py-5">
+                  <Spinner animation="border" />
+                  <p className="mt-2 text-muted">Loading recommendations...</p>
+                </div>
+              }
+            >
+              <ProductRecommendations
+                productId={id}
+                currentProductCategory={product.category}
+              />
+            </Suspense>
           </Col>
         </Row>
       </Container>

@@ -5,6 +5,7 @@ import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 import Badge from "react-bootstrap/Badge";
 import { Trash2, Plus, Minus, Package } from "react-feather";
+import CouponInput from "../../components/CouponInput";
 
 export const CartReviewStep = ({
   cartItems,
@@ -15,6 +16,9 @@ export const CartReviewStep = ({
   navigate,
   handleQuantityChange,
   handleRemoveItem,
+  onCouponApplied,
+  onRemoveCoupon,
+  appliedCoupon,
 }) => (
   <Row>
     <Col lg={8} xs={12}>
@@ -552,6 +556,14 @@ export const CartReviewStep = ({
               {error}
             </Alert>
           )}
+
+          {/* Coupon Input Section */}
+          <CouponInput
+            cartTotal={subtotal}
+            onCouponApplied={onCouponApplied}
+            appliedCoupon={appliedCoupon}
+            onRemoveCoupon={onRemoveCoupon}
+          />
 
           <div className="d-grid gap-3">
             <Button

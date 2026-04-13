@@ -1,6 +1,6 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useEffect, Suspense, lazy } from "react";
+import { useEffect, Suspense, lazy, useContext } from "react";
 import { useDispatch } from "react-redux";
 import { setAuthFromStorage } from "./features/authSlice";
 import { Spinner, Container } from "react-bootstrap";
@@ -8,6 +8,9 @@ import { HelmetProvider } from "react-helmet-async";
 import OfflineIndicator from "./components/OfflineIndicator";
 import Footer from "./components/Footer";
 import ErrorBoundary, { RouteErrorBoundary } from "./components/ErrorBoundary";
+import ToastContainer from "./components/ToastContainer";
+import { ToastContext } from "./context/ToastContext";
+import RecentlyViewed from "./components/RecentlyViewed";
 
 // Lazy load components for better performance
 const ProductListing = lazy(() => import("./pages/ProductListing"));
@@ -34,9 +37,9 @@ const AdminNotifications = lazy(
 const AnalyticsDashboard = lazy(
   () => import("./components/admin/AnalyticsDashboard"),
 );
-// const IdleTimeoutManager = lazy(
-//   () => import("./components/IdleTimeoutManager"),
-// );
+const IdleTimeoutManager = lazy(
+  () => import("./components/IdleTimeoutManager"),
+);
 const PWAInstallPrompt = lazy(() => import("./components/PWAInstallPrompt"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ReturnPolicy = lazy(() => import("./pages/ReturnPolicy"));
@@ -64,6 +67,7 @@ const LoadingFallback = ({ message = "Loading..." }) => (
 
 function App() {
   const dispatch = useDispatch();
+  const { toasts, removeToast } = useContext(ToastContext);
 
   useEffect(() => {
     // Check for existing token and user data on app load
@@ -93,8 +97,15 @@ function App() {
               {/* Offline Indicator - Shows connection status */}
               <OfflineIndicator />
 
+              {/* Toast Notification Container - Global toast display */}
+              <ToastContainer
+                toasts={toasts}
+                onClose={removeToast}
+                position="top-right"
+              />
+
               {/* Idle Timeout Manager - Active globally for all authenticated users */}
-              {/* <IdleTimeoutManager /> */}
+              <IdleTimeoutManager />
 
               <Routes>
                 {/* Public Routes */}
