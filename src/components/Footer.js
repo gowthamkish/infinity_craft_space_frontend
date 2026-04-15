@@ -138,7 +138,7 @@ export default function Footer() {
                 </a>
                 <div className="footer-contact-item footer-contact-static">
                   <FiMapPin size={16} />
-                  <span>Chennai, Tamil Nadu, India</span>
+                  <span>Bangalore, Karnataka, India</span>
                 </div>
               </div>
             </div>

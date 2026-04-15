@@ -285,7 +285,7 @@ a {
 
 a:hover {
   color: var(--primary-dark);
-  text-decoration: underline;
+  /* text-decoration: underline; */
   text-decoration-thickness: 2px;
   text-underline-offset: 4px;
 }
@@ -508,18 +508,18 @@ pre {
 
 /* ── 6. Cards ──────────────────────────────────────────────── */
 .card {
-  border: 1px solid var(--border-color);
+  /* border: 1px solid var(--border-color); */
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  background-color: var(--bg-primary);
-  padding: var(--card-padding);
+  /* box-shadow: var(--shadow-sm);
+  background-color: var(--bg-primary); */
+  /* padding: var(--card-padding); */
   transition:
     box-shadow var(--transition-base),
     transform var(--transition-base);
 }
 
 .card .card-body {
-  padding: calc(var(--card-padding) - 0.125rem);
+  /* padding: calc(var(--card-padding) - 0.125rem); */
 }
 
 .card-header {
@@ -559,7 +559,7 @@ pre {
   background: var(--bg-tertiary);
 }
 .compact-card .card-body {
-  padding: 0.5rem 0.75rem !important;
+  /* padding: 0.5rem 0.75rem !important; */
   font-size: 0.92rem;
 }
 @media (max-width: 768px) {

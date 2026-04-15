@@ -26,7 +26,6 @@ import "./Header.css";
 
 const NAV_LINKS = [
   { path: "/", label: "Products", icon: FiHome, showWhen: "always" },
-  { path: "/home", label: "Home", icon: FiHome, showWhen: "always" },
   { path: "/orders", label: "My Orders", icon: FiPackage, showWhen: "auth" },
   { path: "/account", label: "My Account", icon: FiUser, showWhen: "auth" },
 ];

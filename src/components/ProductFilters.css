@@ -2,7 +2,7 @@
    PRODUCT FILTERS PANEL — Modern, Accessible Design
    ────────────────────────────────────────────────────────────── */
 
-.pf-card {
+/* .pf-card {
   border: none !important;
   border-radius: var(--radius-xl) !important;
   background: var(--bg-primary) !important;
@@ -10,7 +10,7 @@
   overflow: hidden;
   height: 100%;
   transition: box-shadow var(--transition-base) !important;
-}
+} */
 
 .pf-card:hover {
   box-shadow: var(--shadow-lg) !important;
@@ -94,12 +94,12 @@
 
 /* ── BODY ────────────────────────────────────────────────────────── */
 .pf-body {
-  padding: var(--space-4) var(--space-5) !important;
+  /* padding: var(--space-4) var(--space-5) !important; */
   display: flex;
   flex-direction: column;
   gap: 0;
   overflow-y: auto;
-  max-height: calc(100vh - 300px);
+  /* max-height: calc(100vh - 300px); */
 }
 
 /* ── SECTION ─────────────────────────────────────────────────– */
