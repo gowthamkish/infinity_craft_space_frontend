@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { OrbitLoader, DotsLoader } from "../Loader";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -12,7 +13,6 @@ import {
   Modal,
   Form,
   Alert,
-  Spinner,
   Badge,
 } from "react-bootstrap";
 import {
@@ -378,15 +378,9 @@ const CategoryManagement = () => {
         <Card className="shadow-sm border-0" style={{ borderRadius: "16px" }}>
           <Card.Body className="p-0">
             {loading ? (
-              <div className="text-center py-5">
-                <Spinner
-                  animation="border"
-                  role="status"
-                  style={{ color: "var(--primary-color)" }}
-                >
-                  <span className="visually-hidden">Loading categories...</span>
-                </Spinner>
-                <p className="mt-3 text-muted">Loading categories...</p>
+              <div className="text-center py-5 d-flex flex-column align-items-center gap-3">
+                <OrbitLoader size="lg" />
+                <p className="text-muted mb-0">Loading categories…</p>
               </div>
             ) : categories.length === 0 ? (
               <div className="text-center py-5">
@@ -785,7 +779,7 @@ const CategoryManagement = () => {
               >
                 {creating || updating ? (
                   <>
-                    <Spinner animation="border" size="sm" className="me-2" />
+                    <DotsLoader size="sm" />
                     {editingCategory ? "Updating..." : "Creating..."}
                   </>
                 ) : (
@@ -872,7 +866,7 @@ const CategoryManagement = () => {
               >
                 {creating || updating ? (
                   <>
-                    <Spinner animation="border" size="sm" className="me-2" />
+                    <DotsLoader size="sm" />
                     {editingSubcategory ? "Updating..." : "Adding..."}
                   </>
                 ) : (
@@ -924,7 +918,7 @@ const CategoryManagement = () => {
             <Button variant="danger" onClick={handleDelete} disabled={deleting}>
               {deleting ? (
                 <>
-                  <Spinner animation="border" size="sm" className="me-2" />
+                  <DotsLoader size="sm" />
                   Deleting...
                 </>
               ) : (

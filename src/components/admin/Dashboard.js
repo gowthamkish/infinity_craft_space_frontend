@@ -1,4 +1,4 @@
-import { Spinner } from "react-bootstrap";
+import { OrbitLoader } from "../../components/Loader";
 import {
   FiUsers, FiPackage, FiTrendingUp, FiPlus, FiBarChart2,
   FiShoppingCart, FiTag, FiPieChart,
@@ -53,7 +53,7 @@ export default function Dashboard() {
 
           {loading ? (
             <div className="admin-loading">
-              <Spinner animation="border" style={{ width: "2.5rem", height: "2.5rem", color: "var(--primary)" }} />
+              <OrbitLoader size="lg" />
               <span>Loading dashboard data…</span>
             </div>
           ) : (

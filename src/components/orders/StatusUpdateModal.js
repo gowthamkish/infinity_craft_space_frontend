@@ -1,5 +1,6 @@
 import React from "react";
-import { Modal, Card, Row, Col, Form, Button, Spinner } from "react-bootstrap";
+import { Modal, Card, Row, Col, Form, Button } from "react-bootstrap";
+import { DotsLoader } from "../Loader";
 import {
   FiShoppingBag,
   FiUser,
@@ -25,33 +26,9 @@ const StatusUpdateModal = ({
 }) => {
   return (
     <Modal show={show} onHide={onHide} centered className="status-update-modal">
-      <Modal.Header
-        closeButton
-        style={{
-          background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
-          color: "white",
-          border: "none",
-          borderRadius: "12px 12px 0 0",
-          padding: "1rem 1.5rem",
-        }}
-      >
-        <Modal.Title
-          style={{
-            fontSize: "1.1rem",
-            fontWeight: "600",
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <div
-            style={{
-              background: "rgba(255,255,255,0.2)",
-              borderRadius: 8,
-              padding: 6,
-              marginRight: 8,
-              display: "flex",
-            }}
-          >
+      <Modal.Header closeButton>
+        <Modal.Title style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
+          <div style={{ background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: 6, display: "flex" }}>
             <FiEdit size={16} />
           </div>
           Update Order Status
@@ -68,17 +45,16 @@ const StatusUpdateModal = ({
                 style={{
                   width: 45,
                   height: 45,
-                  background:
-                    "linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)",
+                  background: "rgba(37,99,235,0.1)",
                   borderRadius: "50%",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   margin: "0 auto 0.75rem auto",
-                  border: "2px solid #4f46e5",
+                  border: "2px solid rgba(37,99,235,0.3)",
                 }}
               >
-                <FiShoppingBag size={20} style={{ color: "#4f46e5" }} />
+                <FiShoppingBag size={20} style={{ color: "#2563eb" }} />
               </div>
               <h6
                 style={{
@@ -348,14 +324,7 @@ const StatusUpdateModal = ({
         >
           {updating ? (
             <>
-              <Spinner
-                as="span"
-                animation="border"
-                size="sm"
-                role="status"
-                aria-hidden="true"
-                className="me-1"
-              />
+              <DotsLoader size="sm" />
               Updating...
             </>
           ) : (

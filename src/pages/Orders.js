@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import Header from "../components/Header";
-import { Spinner, Alert, Pagination, Badge } from "react-bootstrap";
+import { Alert, Pagination, Badge } from "react-bootstrap";
+import { OrbitLoader } from "../components/Loader";
 import { FiPackage, FiSearch, FiShoppingBag } from "react-icons/fi";
 import api from "../api/axios";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
@@ -97,7 +98,9 @@ export default function Orders() {
         <Header />
         <div className="orders-page">
           <div className="orders-container orders-loading">
-            <Spinner animation="border" style={{ width: "3rem", height: "3rem", color: "var(--primary)" }} />
+            <div className="orders-loading-spinner">
+              <OrbitLoader size="lg" />
+            </div>
             <h4>Loading your orders…</h4>
             <p>Please wait while we fetch your order history</p>
           </div>

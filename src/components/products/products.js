@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import Header from "../Header";
+import { OrbitLoader, DotsLoader } from "../Loader";
 import Table from "react-bootstrap/Table";
 import {
   Container,
   Breadcrumb,
   Button,
-  Spinner,
   Card,
   Row,
   Col,
@@ -233,13 +233,9 @@ const ProductList = () => {
                 className="d-flex justify-content-center align-items-center"
                 style={{ minHeight: "300px" }}
               >
-                <div className="text-center">
-                  <Spinner
-                    animation="border"
-                    role="status"
-                    style={{ width: "3rem", height: "3rem" }}
-                  />
-                  <p className="mt-3 text-muted">Loading products...</p>
+                <div className="text-center d-flex flex-column align-items-center gap-3">
+                  <OrbitLoader size="lg" />
+                  <p className="text-muted mb-0">Loading products…</p>
                 </div>
               </div>
             </Card.Body>
@@ -976,15 +972,8 @@ const ProductList = () => {
             >
               {deleteLoading ? (
                 <>
-                  <Spinner
-                    as="span"
-                    animation="border"
-                    size="sm"
-                    role="status"
-                    aria-hidden="true"
-                    className="me-1"
-                  />
-                  Deleting...
+                  <DotsLoader size="sm" />
+                  Deleting…
                 </>
               ) : (
                 <>

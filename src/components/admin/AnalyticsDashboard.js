@@ -5,7 +5,7 @@ import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import Badge from "react-bootstrap/Badge";
 import Table from "react-bootstrap/Table";
-import Spinner from "react-bootstrap/Spinner";
+import { OrbitLoader } from "../Loader";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
@@ -777,9 +777,9 @@ export default function AnalyticsDashboard() {
             </Row>
 
             {loading && !data ? (
-              <div className="text-center py-5">
-                <Spinner animation="border" variant="primary" />
-                <p className="mt-3 text-muted">Loading analytics...</p>
+              <div className="text-center py-5 d-flex flex-column align-items-center gap-3">
+                <OrbitLoader size="lg" />
+                <p className="text-muted mb-0">Loading analytics…</p>
               </div>
             ) : error ? (
               <Alert variant="danger">
@@ -1162,10 +1162,10 @@ export default function AnalyticsDashboard() {
                         </div>
 
                         {predictionsLoading ? (
-                          <div className="text-center py-5">
-                            <Spinner animation="border" variant="primary" />
-                            <p className="mt-3 text-muted">
-                              Analyzing order patterns...
+                          <div className="text-center py-5 d-flex flex-column align-items-center gap-3">
+                            <OrbitLoader />
+                            <p className="text-muted mb-0">
+                              Analyzing order patterns…
                             </p>
                           </div>
                         ) : predictionsData?.predictions?.length > 0 ? (

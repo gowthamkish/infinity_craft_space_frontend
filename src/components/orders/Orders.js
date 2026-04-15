@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import Header from "../Header";
-import { Container, Spinner, Breadcrumb, Card, Badge } from "react-bootstrap";
+import { Container, Breadcrumb, Card, Badge } from "react-bootstrap";
+import { OrbitLoader } from "../Loader";
 import { FiArrowLeft, FiShoppingBag, FiX } from "react-icons/fi";
 import { useOrders } from "../../hooks/useSmartFetch";
 import { updateOrderStatus } from "../../features/adminSlice";
@@ -130,7 +131,7 @@ const Orders = () => {
                   fontWeight: "700",
                 }}
               >
-                <FiShoppingBag className="me-3" style={{ color: "#4f46e5" }} />
+                <FiShoppingBag className="me-3" style={{ color: "#2563eb" }} />
                 Order Management
               </h1>
               <p
@@ -173,13 +174,9 @@ const Orders = () => {
                 className="d-flex justify-content-center align-items-center"
                 style={{ minHeight: "300px" }}
               >
-                <div className="text-center">
-                  <Spinner
-                    animation="border"
-                    role="status"
-                    style={{ width: "3rem", height: "3rem", color: "#4f46e5" }}
-                  />
-                  <p className="mt-3 text-muted">Loading orders...</p>
+                <div className="text-center d-flex flex-column align-items-center gap-3">
+                  <OrbitLoader size="lg" />
+                  <p className="text-muted mb-0">Loading orders…</p>
                 </div>
               </div>
             </Card.Body>

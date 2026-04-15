@@ -4,6 +4,7 @@
 
 .cpb-wrap {
   margin-bottom: var(--space-8);
+  text-align: center;
 }
 
 /* Security banner */

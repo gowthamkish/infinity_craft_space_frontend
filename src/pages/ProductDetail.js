@@ -1,7 +1,8 @@
 import React, { useState, useEffect, lazy, Suspense } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Container, Row, Col, Card, Spinner, Alert } from "react-bootstrap";
+import { Container, Row, Col, Card, Alert } from "react-bootstrap";
+import { OrbitLoader, DotsLoader, PageLoader } from "../components/Loader";
 import {
   FiShoppingCart,
   FiHeart,
@@ -167,7 +168,7 @@ const ProductDetail = () => {
         {headerFallback}
         <div className="pd-state-container">
           <div className="pd-loading-inner">
-            <Spinner animation="border" className="pd-loading-spinner" />
+            <OrbitLoader size="lg" />
             <p className="mt-3 text-muted">Loading product…</p>
           </div>
         </div>
@@ -329,7 +330,7 @@ const ProductDetail = () => {
                       disabled={addingToCart}
                     >
                       {addingToCart ? (
-                        <Spinner animation="border" size="sm" />
+                        <DotsLoader size="sm" />
                       ) : (
                         <FiShoppingCart />
                       )}
@@ -344,7 +345,7 @@ const ProductDetail = () => {
                     aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
                   >
                     {wishlistLoading ? (
-                      <Spinner animation="border" size="sm" />
+                      <DotsLoader size="sm" />
                     ) : (
                       <FiHeart style={{ fill: isWishlisted ? "currentColor" : "none" }} />
                     )}
@@ -378,7 +379,7 @@ const ProductDetail = () => {
             <Col>
               <Card className="pd-section-card">
                 <Card.Body>
-                  <Suspense fallback={<div className="text-center py-5"><Spinner animation="border" /></div>}>
+                  <Suspense fallback={<PageLoader variant="card" label="Loading…" />}>
                     <ReviewList productId={id} productName={product.name} />
                   </Suspense>
                 </Card.Body>
@@ -391,7 +392,7 @@ const ProductDetail = () => {
             <Col>
               <Card className="pd-section-card">
                 <Card.Body>
-                  <Suspense fallback={<div className="text-center py-5"><Spinner animation="border" /></div>}>
+                  <Suspense fallback={<PageLoader variant="card" label="Loading…" />}>
                     <ProductQnA productId={id} isAuthenticated={isAuthenticated} userName={userName} />
                   </Suspense>
                 </Card.Body>
@@ -402,7 +403,7 @@ const ProductDetail = () => {
           {/* Recommendations */}
           <Row className="mt-4">
             <Col>
-              <Suspense fallback={<div className="text-center py-5"><Spinner animation="border" /></div>}>
+              <Suspense fallback={<PageLoader variant="card" label="Loading…" />}>
                 <ProductRecommendations productId={id} currentProductCategory={product.category} />
               </Suspense>
             </Col>

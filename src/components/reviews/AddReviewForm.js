@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Form, Button, Alert, Spinner } from "react-bootstrap";
+import { Form, Button, Alert } from "react-bootstrap";
+import { DotsLoader } from "../Loader";
 import { FiCamera, FiX, FiCheck } from "react-icons/fi";
 import {
   createReview,
@@ -327,8 +328,8 @@ const AddReviewForm = ({ productId, productName, onReviewSubmitted }) => {
         >
           {createLoading ? (
             <>
-              <Spinner animation="border" size="sm" className="me-2" />
-              Submitting Review...
+              <DotsLoader size="sm" />
+              Submitting Review…
             </>
           ) : (
             "Submit Review"

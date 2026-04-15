@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Container, Form, Button, Spinner, Alert } from "react-bootstrap";
+import { Container, Form, Button, Alert } from "react-bootstrap";
+import { DotsLoader } from "./Loader";
 import { FiThumbsUp, FiMessageSquare, FiCheckCircle } from "react-icons/fi";
 import { qnaAPI } from "../api/features";
 import { ToastContext } from "../context/ToastContext";
@@ -161,8 +162,8 @@ const ProductQnA = ({ productId, isAuthenticated, userName }) => {
               >
                 {asking ? (
                   <>
-                    <Spinner animation="border" size="sm" className="me-2" />
-                    Posting...
+                    <DotsLoader size="sm" />
+                    Posting…
                   </>
                 ) : (
                   <>

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { Modal, Spinner } from "react-bootstrap";
+import { Modal } from "react-bootstrap";
+import { OrbitLoader, DotsLoader } from "../components/Loader";
 import {
   FiMapPin, FiHeart, FiEdit2, FiTrash2, FiShoppingCart,
   FiCheckCircle, FiPhone, FiMap, FiUser,
@@ -91,7 +92,7 @@ export default function Account() {
         {loading ? (
           <div className="account-loading">
             <div className="account-loading-spinner">
-              <Spinner animation="border" variant="light" style={{ width: "2.5rem", height: "2.5rem" }} />
+              <OrbitLoader size="lg" />
             </div>
             <h5>Loading your account…</h5>
             <p>Fetching addresses and wishlist</p>

@@ -7,6 +7,7 @@ import Form from "react-bootstrap/Form";
 import Alert from "react-bootstrap/Alert";
 import Badge from "react-bootstrap/Badge";
 import { Trash2, CreditCard, Package } from "react-feather";
+import { DotsLoader } from "../../components/Loader";
 
 export const ShippingStep = ({
   cartItems,
@@ -199,13 +200,8 @@ export const ShippingStep = ({
                   color: "var(--text-secondary)",
                 }}
               >
-                <div
-                  className="spinner-border spinner-border-sm me-2"
-                  role="status"
-                >
-                  <span className="visually-hidden">Loading...</span>
-                </div>
-                Loading your saved addresses...
+                <DotsLoader size="sm" />
+                Loading your saved addresses…
               </div>
             ) : savedAddresses.length > 0 ? (
               <div className="saved-addresses-section">

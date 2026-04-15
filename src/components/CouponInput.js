@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Form, Button, Alert, Spinner } from "react-bootstrap";
+import { Form, Button, Alert } from "react-bootstrap";
+import { DotsLoader } from "./Loader";
 import { FiCheck, FiX } from "react-icons/fi";
 import { couponAPI } from "../api/features";
 import "../styles/toastNotifications.css";
@@ -144,8 +145,8 @@ const CouponInput = ({
             >
               {loading ? (
                 <>
-                  <Spinner animation="border" size="sm" className="me-2" />
-                  Checking...
+                  <DotsLoader size="sm" />
+                  Checking…
                 </>
               ) : (
                 "Apply"

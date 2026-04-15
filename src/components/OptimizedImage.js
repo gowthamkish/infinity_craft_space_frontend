@@ -1,5 +1,5 @@
 import React, { useState, useCallback, memo } from "react";
-import { Spinner } from "react-bootstrap";
+import { DotsLoader } from "./Loader";
 
 const OptimizedImage = memo(
   ({
@@ -57,7 +57,7 @@ const OptimizedImage = memo(
               borderRadius: "12px 12px 0 0",
             }}
           >
-            <Spinner animation="border" size="sm" variant="primary" />
+            <DotsLoader size="sm" />
           </div>
         )}
         <img

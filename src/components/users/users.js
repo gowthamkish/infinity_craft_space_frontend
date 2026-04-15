@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import Header from "../Header";
+import { OrbitLoader, DotsLoader } from "../Loader";
 import Table from "react-bootstrap/Table";
 import {
   Container,
-  Spinner,
   Breadcrumb,
   Card,
   Row,
@@ -159,7 +159,7 @@ const UsersList = () => {
                   fontWeight: "700",
                 }}
               >
-                <FiUsers className="me-3" style={{ color: "#4f46e5" }} />
+                <FiUsers className="me-3" style={{ color: "#2563eb" }} />
                 User Management
               </h1>
               <p
@@ -232,13 +232,9 @@ const UsersList = () => {
                 className="d-flex justify-content-center align-items-center"
                 style={{ minHeight: "300px" }}
               >
-                <div className="text-center">
-                  <Spinner
-                    animation="border"
-                    role="status"
-                    style={{ width: "3rem", height: "3rem", color: "#4f46e5" }}
-                  />
-                  <p className="mt-3 text-muted">Loading users...</p>
+                <div className="text-center d-flex flex-column align-items-center gap-3">
+                  <OrbitLoader size="lg" />
+                  <p className="text-muted mb-0">Loading users…</p>
                 </div>
               </div>
             </Card.Body>
@@ -341,7 +337,7 @@ const UsersList = () => {
                           >
                             <FiSettings
                               className="me-2"
-                              style={{ color: "#6366f1" }}
+                              style={{ color: "#2563eb" }}
                             />
                             Actions
                           </th>
@@ -668,8 +664,8 @@ const UsersList = () => {
           >
             {roleActionLoading ? (
               <>
-                <Spinner size="sm" />
-                Updating...
+                <DotsLoader size="sm" />
+                Updating…
               </>
             ) : (
               <>

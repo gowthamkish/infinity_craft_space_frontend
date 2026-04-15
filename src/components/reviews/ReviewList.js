@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Spinner, Form, Button, Modal } from "react-bootstrap";
+import { Form, Button, Modal } from "react-bootstrap";
+import { OrbitLoader, DotsLoader } from "../Loader";
 import { FiMessageSquare, FiAlertCircle } from "react-icons/fi";
 import {
   fetchProductReviews,
@@ -182,12 +183,9 @@ const ReviewList = ({ productId, productName }) => {
 
       {/* Loading State */}
       {loading && reviews.length === 0 && (
-        <div className="text-center py-5">
-          <Spinner
-            animation="border"
-            style={{ color: "var(--primary-color)" }}
-          />
-          <p className="mt-3 text-muted">Loading reviews...</p>
+        <div className="text-center py-5 d-flex flex-column align-items-center gap-3">
+          <OrbitLoader />
+          <p className="text-muted mb-0">Loading reviews…</p>
         </div>
       )}
 
@@ -211,8 +209,8 @@ const ReviewList = ({ productId, productName }) => {
             >
               {loading ? (
                 <>
-                  <Spinner animation="border" size="sm" className="me-2" />
-                  Loading...
+                  <DotsLoader size="sm" />
+                  Loading…
                 </>
               ) : (
                 `Load More Reviews (${pagination.totalReviews - reviews.length} remaining)`

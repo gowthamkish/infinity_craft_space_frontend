@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useEffect, Suspense, lazy, useContext } from "react";
 import { useDispatch } from "react-redux";
 import { fetchCurrentUser } from "./features/authSlice";
-import { Spinner, Container } from "react-bootstrap";
+import { PageLoader } from "./components/Loader";
 import { HelmetProvider } from "react-helmet-async";
 import OfflineIndicator from "./components/OfflineIndicator";
 import Footer from "./components/Footer";
@@ -46,23 +46,8 @@ const ReturnPolicy = lazy(() => import("./pages/ReturnPolicy"));
 const ContactUs = lazy(() => import("./pages/ContactUs"));
 const TermsAndConditions = lazy(() => import("./pages/TermsAndConditions"));
 
-// Loading fallback component
-const LoadingFallback = ({ message = "Loading..." }) => (
-  <Container
-    className="d-flex flex-column justify-content-center align-items-center"
-    style={{ minHeight: "50vh" }}
-  >
-    <Spinner
-      animation="border"
-      role="status"
-      style={{
-        width: "3rem",
-        height: "3rem",
-        color: "#3b82f6",
-      }}
-    />
-    <p className="mt-3 text-muted">{message}</p>
-  </Container>
+const LoadingFallback = ({ message }) => (
+  <PageLoader label={message || "Loading…"} variant="section" />
 );
 
 function App() {

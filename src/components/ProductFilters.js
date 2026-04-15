@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Spinner } from "react-bootstrap";
+import { BarsLoader } from "./Loader";
 import { FiFilter, FiX, FiChevronDown, FiChevronRight } from "react-icons/fi";
 import { fetchPublicCategories } from "../features/categoriesSlice";
 import "./ProductFilters.css";
@@ -80,10 +80,17 @@ export default function ProductFilters({
   ].filter(Boolean).length;
 
   return (
-    <div className="pf-card card">
-      {/* Body */}
-      <div className="pf-body card-body">
-        {/* Sort */}
+    <div className="pf-panel">
+      {/* Clear all — only when filters active */}
+      {activeCount > 0 && (
+        <div className="pf-clear-row">
+          <button className="pf-clear-btn" onClick={onClearFilters}>
+            <FiX size={12} /> Clear all filters
+          </button>
+        </div>
+      )}
+
+      {/* Sort */}
         <div className="pf-section">
           <label className="pf-section-label">Sort by</label>
           <select
@@ -106,11 +113,7 @@ export default function ProductFilters({
           <label className="pf-section-label">Categories</label>
           {categoriesLoading ? (
             <div className="pf-state text-center">
-              <Spinner
-                animation="border"
-                size="sm"
-                style={{ color: "var(--primary)" }}
-              />
+              <BarsLoader size="sm" />
               <div className="mt-2" style={{ color: "var(--text-muted)" }}>
                 Loading…
               </div>
@@ -247,35 +250,6 @@ export default function ProductFilters({
           </button>
         </div>
 
-        {/* Active filter chips */}
-        {activeCount > 0 && (
-          <div className="pf-active-section">
-            <div className="pf-active-title">Active filters</div>
-            <div className="pf-chips">
-              {activeFilters.categories?.map((c) => (
-                <span key={c} className="pf-chip pf-chip--cat">
-                  {c}
-                </span>
-              ))}
-              {activeFilters.priceRange && (
-                <span className="pf-chip pf-chip--price">
-                  ₹{activeFilters.priceRange.min}–
-                  {activeFilters.priceRange.max === Infinity
-                    ? "Max"
-                    : `₹${activeFilters.priceRange.max}`}
-                </span>
-              )}
-              {activeFilters.sortBy && (
-                <span className="pf-chip pf-chip--sort">
-                  {activeFilters.sortBy
-                    .replace(/-/g, " ")
-                    .replace(/\b\w/g, (l) => l.toUpperCase())}
-                </span>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 }

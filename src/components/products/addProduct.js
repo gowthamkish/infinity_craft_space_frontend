@@ -10,9 +10,9 @@ import {
   Card,
   Breadcrumb,
   Alert,
-  Spinner,
   Image,
 } from "react-bootstrap";
+import { DotsLoader } from "../Loader";
 import {
   FiArrowLeft,
   FiPackage,
@@ -1220,14 +1220,7 @@ const AddProduct = () => {
                     >
                       {loading || imageUploading ? (
                         <>
-                          <Spinner
-                            as="span"
-                            animation="border"
-                            size="sm"
-                            role="status"
-                            aria-hidden="true"
-                            className="me-2"
-                          />
+                          <DotsLoader size="sm" />
                           {imageUploading
                             ? `Uploading ${imageFiles.length} image${imageFiles.length > 1 ? "s" : ""}...`
                             : loading

@@ -34,7 +34,7 @@ const OrdersTable = ({
                 color: "#495057",
               }}
             >
-              <FiShoppingBag className="me-2" style={{ color: "#4f46e5" }} />
+              <FiShoppingBag className="me-2" style={{ color: "#2563eb" }} />
               Order
             </th>
             <th

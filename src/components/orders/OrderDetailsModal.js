@@ -24,35 +24,9 @@ const OrderDetailsModal = ({
       centered
       className="order-details-modal"
     >
-      <Modal.Header
-        closeButton
-        style={{
-          background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
-          color: "white",
-          border: "none",
-          borderRadius: "12px 12px 0 0",
-          padding: "1rem 1.5rem",
-        }}
-      >
-        <Modal.Title
-          style={{
-            fontSize: "1.25rem",
-            fontWeight: "600",
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <div
-            style={{
-              background: "rgba(255,255,255,0.2)",
-              borderRadius: 8,
-              padding: 8,
-              marginRight: 12,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+      <Modal.Header closeButton>
+        <Modal.Title style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <div style={{ background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: 8, display: "flex", alignItems: "center" }}>
             <FiShoppingBag size={20} />
           </div>
           Order #{selectedOrder?.orderNumber || selectedOrder?._id?.slice(-6)}
@@ -311,7 +285,7 @@ const OrderDetailsModal = ({
                 <div
                   style={{
                     background:
-                      "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+                      "linear-gradient(135deg, #0f172a, #1e293b)",
                     color: "white",
                     padding: "0.875rem 1rem",
                   }}

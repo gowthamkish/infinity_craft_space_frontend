@@ -5,6 +5,7 @@ import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 import Badge from "react-bootstrap/Badge";
 import { Lock, CreditCard, Check } from "react-feather";
+import { DotsLoader } from "../../components/Loader";
 
 export const PaymentStep = ({
   cartItems,
@@ -445,14 +446,9 @@ export const PaymentStep = ({
               className="text-center"
               style={{ borderRadius: "12px" }}
             >
-              <div className="d-flex align-items-center justify-content-center">
-                <div
-                  className="spinner-border spinner-border-sm me-2"
-                  role="status"
-                >
-                  <span className="visually-hidden">Loading...</span>
-                </div>
-                Processing Payment...
+              <div className="d-flex align-items-center justify-content-center gap-2">
+                <DotsLoader size="sm" />
+                Processing Payment…
               </div>
             </Alert>
           )}
