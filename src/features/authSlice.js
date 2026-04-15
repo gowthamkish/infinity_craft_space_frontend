@@ -64,51 +64,23 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: null,
-    token: null,
-    refreshToken: null,
+    // Tokens are stored in httpOnly cookies — NOT in state or localStorage
     loading: false,
     error: null,
   },
   reducers: {
     logout: (state) => {
       state.user = null;
-      state.token = null;
-      state.refreshToken = null;
       state.error = null;
-      // Clear localStorage on logout
-      localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("user");
+      // Token cookies are cleared by the backend /api/auth/logout endpoint
     },
     autoLogout: (state, action) => {
       console.log(
-        "🚪 Auto-logout triggered:",
+        "Auto-logout triggered:",
         action.payload?.reason || "Inactivity",
       );
       state.user = null;
-      state.token = null;
-      state.refreshToken = null;
       state.error = null;
-      // Clear all auth-related localStorage items
-      localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("user");
-      // Clear any other potential auth items
-      Object.keys(localStorage).forEach((key) => {
-        if (
-          key.includes("auth") ||
-          key.includes("token") ||
-          key.includes("user")
-        ) {
-          localStorage.removeItem(key);
-        }
-      });
-    },
-    setAuthFromStorage: (state, action) => {
-      // Only set token from storage; user will be fetched via `fetchCurrentUser`
-      state.token = action.payload.token;
-      state.refreshToken = action.payload.refreshToken || null;
-      state.user = null;
     },
     clearError: (state) => {
       state.error = null;
@@ -122,14 +94,9 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.refreshToken = action.payload.refreshToken || null;
         state.loading = false;
         state.error = null;
-        localStorage.setItem("token", action.payload.token);
-        if (action.payload.refreshToken) {
-          localStorage.setItem("refreshToken", action.payload.refreshToken);
-        }
+        // Tokens are set as httpOnly cookies by the backend — nothing to store here
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -142,14 +109,9 @@ const authSlice = createSlice({
       })
       .addCase(register.fulfilled, (state, action) => {
         state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.refreshToken = action.payload.refreshToken || null;
         state.loading = false;
         state.error = null;
-        localStorage.setItem("token", action.payload.token);
-        if (action.payload.refreshToken) {
-          localStorage.setItem("refreshToken", action.payload.refreshToken);
-        }
+        // Tokens are set as httpOnly cookies by the backend — nothing to store here
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
@@ -166,16 +128,13 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = null;
       })
-      .addCase(fetchCurrentUser.rejected, (state, action) => {
+      .addCase(fetchCurrentUser.rejected, (state) => {
         state.loading = false;
         state.user = null;
-        state.token = null;
-        // Clear invalid token
-        localStorage.removeItem("token");
+        // Cookie expiry/invalidity handled by backend
       });
   },
 });
 
-export const { logout, autoLogout, setAuthFromStorage, clearError } =
-  authSlice.actions;
+export const { logout, autoLogout, clearError } = authSlice.actions;
 export default authSlice.reducer;

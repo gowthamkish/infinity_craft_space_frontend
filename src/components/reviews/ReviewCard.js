@@ -8,7 +8,7 @@ import "./reviews.css";
 const ReviewCard = ({ review, onImageClick }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
-  const isAuthenticated = useSelector((state) => !!state.auth.token);
+  const isAuthenticated = useSelector((state) => !!state.auth.user);
   const [helpfulLoading, setHelpfulLoading] = useState(false);
 
   const formatDate = (dateString) => {

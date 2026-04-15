@@ -2,7 +2,7 @@ import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useEffect, Suspense, lazy, useContext } from "react";
 import { useDispatch } from "react-redux";
-import { setAuthFromStorage } from "./features/authSlice";
+import { fetchCurrentUser } from "./features/authSlice";
 import { Spinner, Container } from "react-bootstrap";
 import { HelmetProvider } from "react-helmet-async";
 import OfflineIndicator from "./components/OfflineIndicator";
@@ -23,7 +23,7 @@ const Orders = lazy(() => import("./pages/Orders"));
 const Account = lazy(() => import("./pages/Account"));
 const ProtectedRoute = lazy(() => import("./components/ProtectedRoute"));
 const AdminRoute = lazy(() => import("./components/AdminRoute"));
-const AdminDashboard = lazy(() => import("./components/admin/dashboard"));
+const AdminDashboard = lazy(() => import("./components/admin/Dashboard"));
 const UsersList = lazy(() => import("./components/users/users"));
 const ProductList = lazy(() => import("./components/products/products"));
 const AddProduct = lazy(() => import("./components/products/addProduct"));
@@ -37,9 +37,9 @@ const AdminNotifications = lazy(
 const AnalyticsDashboard = lazy(
   () => import("./components/admin/AnalyticsDashboard"),
 );
-const IdleTimeoutManager = lazy(
-  () => import("./components/IdleTimeoutManager"),
-);
+// const IdleTimeoutManager = lazy(
+//   () => import("./components/IdleTimeoutManager"),
+// );
 const PWAInstallPrompt = lazy(() => import("./components/PWAInstallPrompt"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ReturnPolicy = lazy(() => import("./pages/ReturnPolicy"));
@@ -70,20 +70,8 @@ function App() {
   const { toasts, removeToast } = useContext(ToastContext);
 
   useEffect(() => {
-    // Check for existing token and user data on app load
-    const token = localStorage.getItem("token");
-    if (token) {
-      // You might want to validate the token with the server here
-      // For now, we'll just set it in the state
-      try {
-        // Decode the token or fetch user data if needed
-        // This is a simplified approach - in production, you should validate the token
-        dispatch(setAuthFromStorage({ token, user: null }));
-      } catch (error) {
-        console.error("Invalid token found:", error);
-        localStorage.removeItem("token");
-      }
-    }
+    // Restore session from httpOnly cookie (no localStorage needed)
+    dispatch(fetchCurrentUser());
   }, [dispatch]);
 
   return (
@@ -105,7 +93,7 @@ function App() {
               />
 
               {/* Idle Timeout Manager - Active globally for all authenticated users */}
-              <IdleTimeoutManager />
+              {/* <IdleTimeoutManager /> */}
 
               <Routes>
                 {/* Public Routes */}

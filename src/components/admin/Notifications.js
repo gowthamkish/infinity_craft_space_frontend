@@ -3,7 +3,7 @@ import Container from 'react-bootstrap/Container';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import Badge from 'react-bootstrap/Badge';
-import Header from '../../components/header';
+import Header from '../../components/Header';
 import api from '../../api/axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,8 +15,7 @@ export default function Notifications() {
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const res = await api.get('/api/admin/notifications', { headers: { Authorization: `Bearer ${token}` } });
+      const res = await api.get('/api/admin/notifications');
       setNotifications(res.data.notifications || []);
     } catch (err) {
       console.error('Failed to fetch notifications', err);
@@ -31,8 +30,7 @@ export default function Notifications() {
 
   const markRead = async (id) => {
     try {
-      const token = localStorage.getItem('token');
-      await api.put(`/api/admin/notifications/${id}/read`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      await api.put(`/api/admin/notifications/${id}/read`, {});
       setNotifications(prev => prev.map(n => n._id === id ? { ...n, read: true } : n));
     } catch (err) {
       console.error('Failed to mark read', err);

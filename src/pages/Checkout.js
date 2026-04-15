@@ -6,7 +6,7 @@ import {
   updateCartItemQuantity,
   removeItemCompletely,
 } from "../features/cartSlice";
-import Header from "../components/header";
+import Header from "../components/Header";
 import Container from "react-bootstrap/Container";
 import api from "../api/axios";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
@@ -101,15 +101,12 @@ export default function Checkout() {
   const fetchSavedAddresses = async () => {
     setLoadingAddresses(true);
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
+      if (!user) {
         setSavedAddresses([]);
         setLoadingAddresses(false);
         return;
       }
-      const res = await api.get("/api/auth/addresses", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get("/api/auth/addresses");
       const addrs = res.data.addresses || [];
       setSavedAddresses(addrs);
       // Auto-select address marked as default in the address book
@@ -134,15 +131,12 @@ export default function Checkout() {
   // Save current shippingAddress to user's address book
   const handleSaveAddress = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
+      if (!user) {
         setError("Please login to save addresses");
         return;
       }
       const payload = { ...shippingAddress };
-      const res = await api.post("/api/auth/addresses", payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.post("/api/auth/addresses", payload);
       setSavedAddresses(res.data.addresses || []);
       setSaveAddressToBook(false);
     } catch (err) {
@@ -156,14 +150,11 @@ export default function Checkout() {
 
   const handleDeleteAddress = async (addressId) => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
+      if (!user) {
         setError("Please login to manage addresses");
         return;
       }
-      const res = await api.delete(`/api/auth/addresses/${addressId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.delete(`/api/auth/addresses/${addressId}`);
       setSavedAddresses(res.data.addresses || []);
     } catch (err) {
       console.error(
@@ -289,19 +280,12 @@ export default function Checkout() {
         return;
       }
       // Create order on backend
-      const token = localStorage.getItem("token");
-      const orderResponse = await api.post(
-        "/api/payment",
-        {
-          amount: Math.round(total * 100), // Razorpay expects amount in paise
-          currency: "INR",
-          shippingAddress: shippingAddress,
-          items: cartItems,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const orderResponse = await api.post("/api/payment", {
+        amount: Math.round(total * 100), // Razorpay expects amount in paise
+        currency: "INR",
+        shippingAddress: shippingAddress,
+        items: cartItems,
+      });
       const { razorpayOrderId, currency } = orderResponse.data.order;
       const orderId = orderResponse.data.order.id;
 
@@ -316,18 +300,12 @@ export default function Checkout() {
         handler: async function (response) {
           try {
             // Verify payment on backend
-            const verifyResponse = await api.post(
-              "/api/payment/verify-payment",
-              {
-                razorpayOrderId: response.razorpay_order_id,
-                razorpayPaymentId: response.razorpay_payment_id,
-                razorpaySignature: response.razorpay_signature,
-                orderId: orderId,
-              },
-              {
-                headers: { Authorization: `Bearer ${token}` },
-              },
-            );
+            const verifyResponse = await api.post("/api/payment/verify-payment", {
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+              orderId: orderId,
+            });
 
             if (verifyResponse.data.success) {
               // Payment successful, create the actual order

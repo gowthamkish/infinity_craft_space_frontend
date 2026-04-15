@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import Header from "../header";
+import Header from "../Header";
 import Table from "react-bootstrap/Table";
 import {
   Container,
@@ -112,7 +112,7 @@ const ProductList = () => {
         style={{
           background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
           minHeight: "100vh",
-          paddingTop: "110px",
+          paddingTop: "20px",
         }}
       >
         {/* Header Section */}

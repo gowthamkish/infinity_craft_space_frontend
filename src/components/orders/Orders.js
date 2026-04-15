@@ -1,19 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import Header from "../header";
+import Header from "../Header";
 import { Container, Spinner, Breadcrumb, Card, Badge } from "react-bootstrap";
-import {
-  FiArrowLeft,
-  FiShoppingBag,
-  FiCheck,
-  FiX,
-  FiClock,
-  FiPackage,
-  FiTruck,
-} from "react-icons/fi";
+import { FiArrowLeft, FiShoppingBag, FiX } from "react-icons/fi";
 import { useOrders } from "../../hooks/useSmartFetch";
 import { updateOrderStatus } from "../../features/adminSlice";
+import { getStatusBadge } from "../../utils/statusHelpers";
+import { formatDateShort, formatCurrency } from "../../utils/formatters";
 import FiltersBar from "./FiltersBar";
 import OrdersTable from "./OrdersTable";
 import OrdersCardList from "./OrdersCardList";
@@ -60,69 +54,7 @@ const Orders = () => {
     }
   }, [location, orders]);
 
-  // Filter orders based on search and status
   const filteredOrders = orders.orders;
-
-  const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case "pending":
-        return "#f59e0b";
-      case "confirmed":
-        return "#3b82f6";
-      case "processing":
-        return "#8b5cf6";
-      case "shipped":
-        return "#10b981";
-      case "delivered":
-        return "#059669";
-      case "cancelled":
-        return "#ef4444";
-      default:
-        return "#6b7280";
-    }
-  };
-
-  const getStatusIcon = (status) => {
-    switch (status?.toLowerCase()) {
-      case "pending":
-        return <FiClock size={14} />;
-      case "confirmed":
-        return <FiCheck size={14} />;
-      case "processing":
-        return <FiPackage size={14} />;
-      case "shipped":
-        return <FiTruck size={14} />;
-      case "delivered":
-        return <FiCheck size={14} />;
-      case "cancelled":
-        return <FiX size={14} />;
-      default:
-        return <FiClock size={14} />;
-    }
-  };
-
-  const getStatusBadge = (status) => {
-    const color = getStatusColor(status);
-    return (
-      <Badge
-        className="d-flex align-items-center"
-        style={{
-          backgroundColor: color,
-          color: "white",
-          borderRadius: "8px",
-          fontSize: "0.75rem",
-          padding: "0.4rem 0.6rem",
-          gap: "0.25rem",
-          border: "none",
-          backgroundImage: "none", // Override Bootstrap's gradient
-        }}
-        bg="" // Remove Bootstrap's default background variant
-      >
-        {getStatusIcon(status)}
-        {status?.charAt(0).toUpperCase() + status?.slice(1)}
-      </Badge>
-    );
-  };
 
   const handleStatusUpdate = (order) => {
     setSelectedOrder(order);
@@ -156,23 +88,6 @@ const Orders = () => {
     }
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-    }).format(amount);
-  };
-
   return (
     <>
       <Header />
@@ -183,7 +98,7 @@ const Orders = () => {
         style={{
           background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
           minHeight: "100vh",
-          paddingTop: "110px",
+          paddingTop: "20px",
         }}
       >
         {/* Header Section */}
@@ -298,7 +213,7 @@ const Orders = () => {
                     filteredOrders={filteredOrders}
                     handleViewDetails={handleViewDetails}
                     handleStatusUpdate={handleStatusUpdate}
-                    formatDate={formatDate}
+                    formatDate={formatDateShort}
                     formatCurrency={formatCurrency}
                     getStatusBadge={getStatusBadge}
                   />
@@ -307,7 +222,7 @@ const Orders = () => {
                     filteredOrders={filteredOrders}
                     handleViewDetails={handleViewDetails}
                     handleStatusUpdate={handleStatusUpdate}
-                    formatDate={formatDate}
+                    formatDate={formatDateShort}
                     formatCurrency={formatCurrency}
                     getStatusBadge={getStatusBadge}
                   />
@@ -327,7 +242,7 @@ const Orders = () => {
           confirmStatusUpdate={confirmStatusUpdate}
           updating={updating}
           getStatusBadge={getStatusBadge}
-          formatDate={formatDate}
+          formatDate={formatDateShort}
           formatCurrency={formatCurrency}
         />
         <OrderDetailsModal
@@ -335,7 +250,7 @@ const Orders = () => {
           onHide={() => setShowOrderDetails(false)}
           selectedOrder={selectedOrder}
           getStatusBadge={getStatusBadge}
-          formatDate={formatDate}
+          formatDate={formatDateShort}
           formatCurrency={formatCurrency}
         />
       </Container>

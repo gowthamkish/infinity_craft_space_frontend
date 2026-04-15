@@ -1,0 +1,223 @@
+/* ──────────────────────────────────────────────────────────────
+   CHECKOUT PROGRESS BAR — Modern, Accessible Design
+   ────────────────────────────────────────────────────────────── */
+
+.cpb-wrap {
+  margin-bottom: var(--space-8);
+}
+
+/* Security banner */
+.cpb-secure-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: linear-gradient(135deg, var(--success), #059669);
+  color: white;
+  font-weight: var(--font-weight-bold);
+  font-size: clamp(var(--font-size-sm), 2vw, var(--font-size-base));
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-full);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+  border: 2.5px solid rgba(255, 255, 255, 0.2);
+  margin: 0 auto var(--space-8);
+  max-width: 600px;
+}
+
+.cpb-lock {
+  font-size: var(--font-size-lg);
+  flex-shrink: 0;
+}
+
+/* Desktop steps container */
+.cpb-steps {
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.cpb-step-group {
+  display: flex;
+  align-items: center;
+}
+
+.cpb-step-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Step circle */
+.cpb-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: white;
+  background: #e5e7eb;
+  border: 3px solid #f3f4f6;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+  position: relative;
+  z-index: 2;
+}
+
+.cpb-circle--done {
+  background: linear-gradient(135deg, var(--success), #059669);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
+}
+
+/* Step label */
+.cpb-step-label {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-muted);
+  letter-spacing: -0.01em;
+  transition: color var(--transition-base);
+}
+
+.cpb-step-label--active {
+  color: var(--success);
+}
+
+.cpb-step-label--current {
+  font-weight: var(--font-weight-bold);
+}
+
+/* Connector */
+.cpb-connector {
+  width: 100px;
+  height: 4px;
+  background: #e5e7eb;
+  margin: 0 var(--space-4);
+  border-radius: 2px;
+  position: relative;
+  top: -16px;
+  transition: background var(--transition-base);
+}
+
+.cpb-connector--done {
+  background: linear-gradient(90deg, var(--success), #059669);
+}
+
+/* ── MOBILE ──────────────────────────────────────────────────– */
+.cpb-steps-mobile {
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0 var(--space-3);
+  position: relative;
+}
+
+.cpb-step-mobile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.cpb-circle-sm {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color: white;
+  background: #e5e7eb;
+  transition: all var(--transition-base);
+  position: relative;
+  z-index: 2;
+}
+
+.cpb-circle-sm.cpb-circle--done {
+  background: var(--success);
+}
+
+.cpb-step-label-sm {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-muted);
+  margin-top: var(--space-1);
+  text-align: center;
+  transition: color var(--transition-base);
+}
+
+.cpb-step-label-sm.cpb-step-label--active {
+  color: var(--success);
+  font-weight: var(--font-weight-bold);
+}
+
+.cpb-connector-mobile {
+  position: absolute;
+  top: 20px;
+  left: 55%;
+  right: -55%;
+  height: 2px;
+  background: #e5e7eb;
+  z-index: 1;
+  transition: background var(--transition-base);
+}
+
+.cpb-connector-mobile.cpb-connector--done {
+  background: var(--success);
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────– */
+@media (max-width: 768px) {
+  .cpb-secure-banner {
+    font-size: var(--font-size-sm);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .cpb-circle {
+    width: 48px;
+    height: 48px;
+    font-size: var(--font-size-base);
+  }
+
+  .cpb-connector {
+    width: 80px;
+    margin: 0 var(--space-3);
+  }
+}
+
+@media (max-width: 575px) {
+  .cpb-secure-banner {
+    font-size: var(--font-size-xs);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .cpb-circle {
+    width: 40px;
+    height: 40px;
+    font-size: var(--font-size-sm);
+  }
+
+  .cpb-step-label {
+    font-size: var(--font-size-xs);
+  }
+
+  .cpb-connector {
+    width: 60px;
+    margin: 0 var(--space-2);
+  }
+}
+
+/* ── ACCESSIBILITY ─────────────────────────────────────────────– */
+@media (prefers-reduced-motion: reduce) {
+  .cpb-circle,
+  .cpb-step-label,
+  .cpb-connector,
+  .cpb-circle-sm,
+  .cpb-step-label-sm,
+  .cpb-connector-mobile {
+    transition: none !important;
+  }
+}

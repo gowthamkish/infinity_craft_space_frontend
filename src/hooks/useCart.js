@@ -17,7 +17,7 @@ import {
 export const useCart = () => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items);
-  const isAuthenticated = useSelector((state) => !!state.auth.token);
+  const isAuthenticated = useSelector((state) => !!state.auth.user);
   const syncTimeoutRef = useRef(null);
 
   // Debounced sync to backend (waits 500ms after last cart change)

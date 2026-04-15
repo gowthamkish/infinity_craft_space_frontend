@@ -6,12 +6,7 @@ export const fetchDashboardCounts = createAsyncThunk(
   "admin/fetchDashboardCounts",
   async (_, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-
-      // Use the dedicated dashboard endpoint
-      const res = await api.get("/api/admin/dashboard", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get("/api/admin/dashboard");
       return {
         userCount: res.data.userCount || 0,
         productCount: res.data.productCount || 0,
@@ -31,10 +26,7 @@ export const fetchUsers = createAsyncThunk(
   "admin/fetchUsers",
   async (_, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await api.get("/api/admin/users", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get("/api/admin/users");
       return res.data;
     } catch (error) {
       return rejectWithValue(
@@ -49,10 +41,7 @@ export const fetchOrders = createAsyncThunk(
   "admin/fetchOrders",
   async (_, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await api.get("/api/admin/orders", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get("/api/admin/orders");
       return res.data;
     } catch (error) {
       return rejectWithValue(
@@ -67,14 +56,7 @@ export const updateOrderStatus = createAsyncThunk(
   "admin/updateOrderStatus",
   async ({ orderId, status }, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await api.put(
-        `/api/orders/${orderId}/status`,
-        { status },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const res = await api.put(`/api/orders/${orderId}/status`, { status });
       return res.data;
     } catch (error) {
       return rejectWithValue(
@@ -89,14 +71,7 @@ export const updateUserRole = createAsyncThunk(
   "admin/updateUserRole",
   async ({ userId, isAdmin }, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await api.put(
-        `/api/admin/users/${userId}/role`,
-        { isAdmin },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const res = await api.put(`/api/admin/users/${userId}/role`, { isAdmin });
       return res.data;
     } catch (error) {
       return rejectWithValue(

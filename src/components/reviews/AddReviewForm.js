@@ -15,7 +15,7 @@ const AddReviewForm = ({ productId, productName, onReviewSubmitted }) => {
   const { createLoading, error, successMessage } = useSelector(
     (state) => state.reviews,
   );
-  const isAuthenticated = useSelector((state) => !!state.auth.token);
+  const isAuthenticated = useSelector((state) => !!state.auth.user);
 
   const [rating, setRating] = useState(0);
   const [title, setTitle] = useState("");

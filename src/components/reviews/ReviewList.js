@@ -16,7 +16,7 @@ const ReviewList = ({ productId, productName }) => {
   const { reviewsByProduct, canReviewStatus, loading } = useSelector(
     (state) => state.reviews,
   );
-  const isAuthenticated = useSelector((state) => !!state.auth.token);
+  const isAuthenticated = useSelector((state) => !!state.auth.user);
 
   const [sortBy, setSortBy] = useState("newest");
   const [showAddReview, setShowAddReview] = useState(false);

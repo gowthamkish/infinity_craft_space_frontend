@@ -1,464 +1,258 @@
 import { useDispatch } from "react-redux";
 import { register } from "../features/authSlice";
+import { validateRegister } from "../utils/validation";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Spinner from "react-bootstrap/Spinner";
-import Alert from "react-bootstrap/Alert";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
+import "./auth.css";
+
+// Password strength helpers
+const PW_RULES = [
+  { key: "length",  label: "8+ characters",  test: (p) => p.length >= 8 },
+  { key: "upper",   label: "Uppercase",       test: (p) => /[A-Z]/.test(p) },
+  { key: "lower",   label: "Lowercase",       test: (p) => /[a-z]/.test(p) },
+  { key: "number",  label: "Number",          test: (p) => /\d/.test(p) },
+  { key: "special", label: "Special char",    test: (p) => /[@$!%*?&]/.test(p) },
+];
+
+function getStrength(password) {
+  if (!password) return null;
+  const met = PW_RULES.filter((r) => r.test(password)).length;
+  if (met <= 1) return { level: "weak",   label: "Weak" };
+  if (met === 2) return { level: "fair",   label: "Fair" };
+  if (met === 3) return { level: "good",   label: "Good" };
+  return { level: "strong", label: "Strong" };
+}
 
 export default function Register() {
   const [form, setForm] = useState({ username: "", email: "", password: "" });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading]           = useState(false);
+  const [error, setError]               = useState("");
   const [validationErrors, setValidationErrors] = useState({});
-  const [validated, setValidated] = useState(false);
+  const [touched, setTouched]           = useState({});
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const validateForm = () => {
-    const errors = {};
+  const strength = getStrength(form.password);
 
-    if (!form.username.trim()) {
-      errors.username = "Full name is required";
-    } else if (form.username.length < 3) {
-      errors.username = "Full name must be at least 3 characters long";
-    } else if (!/^[a-zA-Z0-9_]+$/.test(form.username)) {
-      errors.username =
-        "Username can only contain letters, numbers, and underscores";
-    }
-
-    if (!form.email.trim()) {
-      errors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
-      errors.email = "Please enter a valid email address";
-    }
-
-    if (!form.password.trim()) {
-      errors.password = "Password is required";
-    } else if (form.password.length < 8) {
-      errors.password = "Password must be at least 8 characters long";
-    } else if (
-      !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(form.password)
-    ) {
-      errors.password =
-        "Password must contain uppercase, lowercase, number, and special character (@$!%*?&)";
-    }
-
-    return errors;
-  };
+  const clearFieldError = (field) =>
+    setValidationErrors((prev) => ({ ...prev, [field]: "" }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    e.stopPropagation();
-
+    setTouched({ username: true, email: true, password: true });
     setError("");
-    setValidationErrors({});
-    setValidated(true);
 
-    const errors = validateForm();
-    if (Object.keys(errors).length > 0) {
-      setValidationErrors(errors);
-      return;
-    }
+    const errors = validateRegister(form);
+    setValidationErrors(errors);
+    if (Object.keys(errors).length > 0) return;
 
     setLoading(true);
     try {
-      const response = await dispatch(register(form));
-      setLoading(false);
-
-      // Check if registration was successful (fulfilled action)
-      if (response.type?.endsWith("/fulfilled") && response.payload?.token) {
-        // Registration successful, redirect to login page
-        // Store a success message to show on login page
-        localStorage.setItem(
-          "registrationSuccess",
-          "Account created successfully! Please log in with your credentials.",
-        );
-        navigate("/login");
-      } else if (response.type?.endsWith("/rejected")) {
-        // Handle rejected action with validation errors
-        const errorPayload = response.payload;
-        if (typeof errorPayload === "string") {
-          setError(errorPayload);
-        } else if (errorPayload?.errors && Array.isArray(errorPayload.errors)) {
-          // Handle express-validator style errors
-          const fieldErrors = {};
-          errorPayload.errors.forEach((err) => {
-            fieldErrors[err.field] = err.message;
-          });
-          setValidationErrors(fieldErrors);
-          setError("Please fix the errors below.");
-        } else {
-          setError(
-            errorPayload?.error || "Registration failed. Please try again.",
-          );
-        }
-      } else {
-        setError(
-          response?.error?.message || "Registration failed. Please try again.",
-        );
-      }
-    } catch (error) {
-      console.error("Registration error:", error);
-      setLoading(false);
-      setError(
-        "Registration failed. Please check your information and try again.",
+      // Use unwrap() — throws on rejection so we can catch it cleanly
+      await dispatch(register(form)).unwrap();
+      // Success: user object (no token) is now in the payload
+      localStorage.setItem(
+        "registrationSuccess",
+        "Account created! Please sign in with your new credentials.",
       );
+      navigate("/login");
+    } catch (err) {
+      setLoading(false);
+      if (typeof err === "string") {
+        setError(err);
+      } else if (err?.errors && Array.isArray(err.errors)) {
+        const fieldErrors = {};
+        err.errors.forEach((e) => { fieldErrors[e.field] = e.message; });
+        setValidationErrors(fieldErrors);
+        setError("Please fix the errors below.");
+      } else {
+        setError(err?.error || "Registration failed. Please try again.");
+      }
     }
   };
+
+  const isDisabled = loading || !form.username || !form.email || !form.password;
 
   return (
     <>
       <SEOHead
-        title={`Register - ${SEO_CONFIG.SITE_NAME}`}
-        description="Create your Infinity Craft Space account to access premium craft supplies, track orders, write reviews, and enjoy exclusive member benefits."
-        keywords="register, sign up, create account, craft supplies account, join community"
-        url={`${SEO_CONFIG.SITE_URL}/register`}
+        title={`Create account · ${SEO_CONFIG.SITE_NAME}`}
+        description="Join Infinity Craft Space to access premium craft supplies and more."
         noindex={true}
         canonical={`${SEO_CONFIG.SITE_URL}/register`}
       />
-      <div
-        className="d-flex align-items-center justify-content-center"
-        style={{
-          minHeight: "100vh",
-          background:
-            "linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%)",
-        }}
-      >
-        {loading ? (
-          <div
-            className="d-flex flex-column justify-content-center align-items-center"
-            style={{ minHeight: "200px" }}
-          >
-            <Spinner
-              animation="border"
-              role="status"
-              style={{
-                color: "var(--primary-color)",
-                width: "3rem",
-                height: "3rem",
-              }}
-            >
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
-            <p className="mt-3" style={{ color: "var(--text-secondary)" }}>
-              Creating your account...
+
+      <div className="auth-page">
+        {/* Left panel — brand */}
+        <div className="auth-brand-panel" aria-hidden="true">
+          <div className="auth-brand-content">
+            <img src="/ICS_Logo.jpeg" alt="Infinity Craft Space" className="auth-brand-logo" />
+            <h2 className="auth-brand-title">Join our creative community</h2>
+            <p className="auth-brand-subtitle">
+              Get access to thousands of premium craft products and exclusive member perks.
             </p>
+            <ul className="auth-brand-perks">
+              <li><span className="perk-icon">🎁</span> Exclusive member offers</li>
+              <li><span className="perk-icon">📦</span> Order tracking & history</li>
+              <li><span className="perk-icon">❤️</span> Save to wishlist</li>
+              <li><span className="perk-icon">⭐</span> Leave product reviews</li>
+            </ul>
           </div>
-        ) : (
-          <Container>
-            <Row className="justify-content-center">
-              <Col xs={12} sm={8} md={6} lg={4} xl={4}>
-                <Card
-                  className="hover-shadow"
-                  style={{
-                    border: "none",
-                    borderRadius: "20px",
-                    boxShadow: "var(--shadow-xl)",
-                    background: "var(--bg-primary)",
-                  }}
-                >
-                  <Card.Body style={{ padding: "3rem 2.5rem" }}>
-                    <div className="text-center mb-4">
-                      <h1
-                        className="mb-2"
-                        style={{
-                          background:
-                            "linear-gradient(45deg, var(--primary-color), var(--secondary-color))",
-                          WebkitBackgroundClip: "text",
-                          WebkitTextFillColor: "transparent",
-                          backgroundClip: "text",
-                          fontWeight: "700",
-                          fontSize: "2rem",
-                        }}
-                      >
-                        Join Us Today! 🚀
-                      </h1>
-                      <p
-                        style={{
-                          color: "var(--text-secondary)",
-                          fontSize: "1rem",
-                        }}
-                      >
-                        Create your Infinity Craft Space account
-                      </p>
-                    </div>
+        </div>
 
-                    {error && (
-                      <Alert
-                        variant="danger"
-                        className="mb-4"
-                        style={{
-                          borderRadius: "12px",
-                          border: "none",
-                          fontSize: "0.9rem",
-                        }}
-                      >
-                        {error}
-                      </Alert>
+        {/* Right panel — form */}
+        <div className="auth-form-panel">
+          <div className="auth-card">
+            <div className="auth-card-header">
+              <h1 className="auth-title">Create your account</h1>
+              <p className="auth-subtitle">Join Infinity Craft Space — it's free</p>
+            </div>
+
+            {error && (
+              <div className="auth-alert auth-alert--error" role="alert">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm-.75 3.75a.75.75 0 011.5 0v3.5a.75.75 0 01-1.5 0v-3.5zm.75 7a1 1 0 110-2 1 1 0 010 2z" fill="currentColor"/>
+                </svg>
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} noValidate>
+              {/* Full name */}
+              <div className="auth-field">
+                <label htmlFor="reg-username" className="auth-label">Full name</label>
+                <input
+                  id="reg-username"
+                  type="text"
+                  className={`auth-input ${touched.username && validationErrors.username ? "auth-input--error" : ""} ${touched.username && !validationErrors.username && form.username ? "auth-input--valid" : ""}`}
+                  value={form.username}
+                  onChange={(e) => { setForm({ ...form, username: e.target.value }); clearFieldError("username"); }}
+                  onBlur={() => setTouched((p) => ({ ...p, username: true }))}
+                  placeholder="Your full name"
+                  autoComplete="name"
+                  required
+                />
+                {touched.username && validationErrors.username && (
+                  <p className="auth-field-error" role="alert">{validationErrors.username}</p>
+                )}
+              </div>
+
+              {/* Email */}
+              <div className="auth-field">
+                <label htmlFor="reg-email" className="auth-label">Email address</label>
+                <input
+                  id="reg-email"
+                  type="email"
+                  className={`auth-input ${touched.email && validationErrors.email ? "auth-input--error" : ""} ${touched.email && !validationErrors.email && form.email ? "auth-input--valid" : ""}`}
+                  value={form.email}
+                  onChange={(e) => { setForm({ ...form, email: e.target.value }); clearFieldError("email"); }}
+                  onBlur={() => setTouched((p) => ({ ...p, email: true }))}
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  required
+                />
+                {touched.email && validationErrors.email && (
+                  <p className="auth-field-error" role="alert">{validationErrors.email}</p>
+                )}
+              </div>
+
+              {/* Password */}
+              <div className="auth-field">
+                <label htmlFor="reg-password" className="auth-label">Password</label>
+                <div className="auth-input-wrapper">
+                  <input
+                    id="reg-password"
+                    type={showPassword ? "text" : "password"}
+                    className={`auth-input auth-input--with-icon ${touched.password && validationErrors.password ? "auth-input--error" : ""} ${touched.password && !validationErrors.password && form.password ? "auth-input--valid" : ""}`}
+                    value={form.password}
+                    onChange={(e) => { setForm({ ...form, password: e.target.value }); clearFieldError("password"); }}
+                    onBlur={() => setTouched((p) => ({ ...p, password: true }))}
+                    placeholder="Create a strong password"
+                    autoComplete="new-password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="auth-eye-btn"
+                    onClick={() => setShowPassword((s) => !s)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    ) : (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                     )}
+                  </button>
+                </div>
 
-                    <Form
-                      noValidate
-                      validated={validated}
-                      onSubmit={handleSubmit}
-                    >
-                      <Form.Group className="mb-4" controlId="registerUsername">
-                        <Form.Label
-                          className="fw-bold text-start d-block"
-                          style={{
-                            color: "var(--text-primary)",
-                            marginBottom: "0.75rem",
-                          }}
-                        >
-                          Full Name
-                        </Form.Label>
-                        <Form.Control
-                          type="text"
-                          value={form.username}
-                          onChange={(e) => {
-                            setForm({ ...form, username: e.target.value });
-                            if (validationErrors.username) {
-                              setValidationErrors({
-                                ...validationErrors,
-                                username: "",
-                              });
-                            }
-                          }}
-                          placeholder="Enter your full name"
-                          required
-                          minLength={2}
-                          isInvalid={!!validationErrors.username}
-                          isValid={
-                            validated &&
-                            form.username &&
-                            !validationErrors.username &&
-                            form.username.length >= 2
-                          }
-                          style={{
-                            borderRadius: "12px",
-                            padding: "12px 16px",
-                            fontSize: "1rem",
-                            transition: "all 0.3s ease",
-                          }}
-                        />
-                        <Form.Control.Feedback
-                          type="invalid"
-                          style={{ fontSize: "0.875rem" }}
-                        >
-                          {validationErrors.username ||
-                            "Please provide a valid full name (at least 2 characters)."}
-                        </Form.Control.Feedback>
-                        <Form.Control.Feedback
-                          type="valid"
-                          style={{ fontSize: "0.875rem" }}
-                        >
-                          Full name looks good!
-                        </Form.Control.Feedback>
-                      </Form.Group>
+                {/* Strength bar — shown when user starts typing */}
+                {form.password && strength && (
+                  <div className={`pw-strength pw-strength--${strength.level}`}>
+                    <div className="pw-strength-bar">
+                      <div className="pw-strength-fill" />
+                    </div>
+                    <span className="pw-strength-label">Password strength: {strength.label}</span>
+                  </div>
+                )}
 
-                      <Form.Group className="mb-4" controlId="registerEmail">
-                        <Form.Label
-                          className="fw-bold text-start d-block"
-                          style={{
-                            color: "var(--text-primary)",
-                            marginBottom: "0.75rem",
-                          }}
-                        >
-                          Email Address
-                        </Form.Label>
-                        <Form.Control
-                          type="email"
-                          value={form.email}
-                          onChange={(e) => {
-                            setForm({ ...form, email: e.target.value });
-                            if (validationErrors.email) {
-                              setValidationErrors({
-                                ...validationErrors,
-                                email: "",
-                              });
-                            }
-                          }}
-                          placeholder="Enter your email"
-                          required
-                          isInvalid={!!validationErrors.email}
-                          isValid={
-                            validated &&
-                            form.email &&
-                            !validationErrors.email &&
-                            /\S+@\S+\.\S+/.test(form.email)
-                          }
-                          style={{
-                            borderRadius: "12px",
-                            padding: "12px 16px",
-                            fontSize: "1rem",
-                            transition: "all 0.3s ease",
-                          }}
-                        />
-                        <Form.Control.Feedback
-                          type="invalid"
-                          style={{ fontSize: "0.875rem" }}
-                        >
-                          {validationErrors.email ||
-                            "Please provide a valid email address."}
-                        </Form.Control.Feedback>
-                        <Form.Control.Feedback
-                          type="valid"
-                          style={{ fontSize: "0.875rem" }}
-                        >
-                          Email looks good!
-                        </Form.Control.Feedback>
-                      </Form.Group>
+                {/* Requirements checklist — visible while typing */}
+                {(form.password || (touched.password && validationErrors.password)) && (
+                  <div className="pw-requirements" aria-label="Password requirements">
+                    {PW_RULES.map((rule) => {
+                      const met = rule.test(form.password);
+                      return (
+                        <div key={rule.key} className={`pw-req${met ? " pw-req--met" : ""}`}>
+                          <span className="pw-req-icon" aria-hidden="true">
+                            {met ? "✓" : ""}
+                          </span>
+                          {rule.label}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
 
-                      <Form.Group className="mb-4" controlId="registerPassword">
-                        <Form.Label
-                          className="fw-bold text-start d-block"
-                          style={{
-                            color: "var(--text-primary)",
-                            marginBottom: "0.75rem",
-                          }}
-                        >
-                          Password
-                        </Form.Label>
-                        <Form.Control
-                          type="password"
-                          value={form.password}
-                          onChange={(e) => {
-                            setForm({ ...form, password: e.target.value });
-                            if (validationErrors.password) {
-                              setValidationErrors({
-                                ...validationErrors,
-                                password: "",
-                              });
-                            }
-                          }}
-                          placeholder="Create a strong password"
-                          required
-                          minLength={8}
-                          isInvalid={!!validationErrors.password}
-                          isValid={
-                            validated &&
-                            form.password &&
-                            !validationErrors.password &&
-                            form.password.length >= 8 &&
-                            /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(
-                              form.password,
-                            )
-                          }
-                          style={{
-                            borderRadius: "12px",
-                            padding: "12px 16px",
-                            fontSize: "1rem",
-                            transition: "all 0.3s ease",
-                          }}
-                        />
-                        <Form.Text
-                          className="text-muted"
-                          style={{ fontSize: "0.8rem" }}
-                        >
-                          Min 8 characters with uppercase, lowercase, number,
-                          and special character (@$!%*?&)
-                        </Form.Text>
-                        <Form.Control.Feedback
-                          type="invalid"
-                          style={{ fontSize: "0.875rem" }}
-                        >
-                          {validationErrors.password ||
-                            "Password must meet all requirements."}
-                        </Form.Control.Feedback>
-                        <Form.Control.Feedback
-                          type="valid"
-                          style={{ fontSize: "0.875rem" }}
-                        >
-                          Password strength looks good!
-                        </Form.Control.Feedback>
-                      </Form.Group>
+                {touched.password && validationErrors.password && (
+                  <p className="auth-field-error" role="alert">{validationErrors.password}</p>
+                )}
+              </div>
 
-                      <div className="d-grid gap-3 mb-4">
-                        <Button
-                          variant="primary"
-                          type="submit"
-                          size="lg"
-                          disabled={
-                            loading ||
-                            !form.username ||
-                            !form.email ||
-                            !form.password
-                          }
-                          className="hover-scale"
-                          style={{
-                            borderRadius: "12px",
-                            fontWeight: "600",
-                            padding: "12px",
-                            fontSize: "1.1rem",
-                            background:
-                              loading ||
-                              !form.username ||
-                              !form.email ||
-                              !form.password
-                                ? "linear-gradient(45deg, #9ca3af, #6b7280)"
-                                : "linear-gradient(45deg, var(--secondary-color), #34d399)",
-                            border: "none",
-                            boxShadow: "var(--shadow-md)",
-                          }}
-                        >
-                          {loading ? (
-                            <>
-                              <Spinner
-                                animation="border"
-                                size="sm"
-                                className="me-2"
-                              />
-                              Creating Account...
-                            </>
-                          ) : (
-                            "Create Account"
-                          )}
-                        </Button>
+              {/* Primary CTA */}
+              <button
+                type="submit"
+                className="auth-btn auth-btn--success"
+                disabled={isDisabled}
+              >
+                {loading ? (
+                  <>
+                    <span className="auth-spinner" aria-hidden="true" />
+                    Creating account…
+                  </>
+                ) : "Create account"}
+              </button>
 
-                        <Button
-                          variant="outline-secondary"
-                          onClick={() => navigate("/login")}
-                          className="hover-scale"
-                          style={{
-                            borderRadius: "12px",
-                            fontWeight: "500",
-                            padding: "10px",
-                            borderColor: "var(--border-color)",
-                            color: "var(--text-secondary)",
-                          }}
-                        >
-                          Already have an account? Sign In
-                        </Button>
-                      </div>
+              <div className="auth-divider"><span>or</span></div>
 
-                      <div className="text-center">
-                        <Button
-                          variant="link"
-                          onClick={() => navigate("/")}
-                          style={{
-                            color: "var(--primary-color)",
-                            textDecoration: "none",
-                            fontWeight: "500",
-                          }}
-                          className="hover-scale"
-                        >
-                          Continue shopping without account →
-                        </Button>
-                      </div>
-                    </Form>
-                  </Card.Body>
-                </Card>
-              </Col>
-            </Row>
-          </Container>
-        )}
+              <button
+                type="button"
+                className="auth-btn auth-btn--outline"
+                onClick={() => navigate("/login")}
+              >
+                Sign in to existing account
+              </button>
+            </form>
+
+            <div className="auth-footer-link">
+              <button type="button" onClick={() => navigate("/")}>
+                Continue browsing without an account →
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );

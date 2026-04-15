@@ -4,12 +4,9 @@ import api from "../api/axios";
 // Fetch all products
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
-  async (_, { getState, rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await api.get("/api/products", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get("/api/products");
       // Handle both old format (array) and new format (object with products array)
       return res.data.products || res.data;
     } catch (error) {
@@ -25,13 +22,7 @@ export const addProduct = createAsyncThunk(
   "products/addProduct",
   async (productData, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await api.post("/api/products", productData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const res = await api.post("/api/products", productData);
       return res.data.product || res.data;
     } catch (error) {
       return rejectWithValue(
@@ -48,13 +39,7 @@ export const updateProduct = createAsyncThunk(
   "products/updateProduct",
   async ({ id, productData }, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await api.put(`/api/products/${id}`, productData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const res = await api.put(`/api/products/${id}`, productData);
       return res.data.product || res.data;
     } catch (error) {
       return rejectWithValue(
@@ -71,10 +56,7 @@ export const deleteProduct = createAsyncThunk(
   "products/deleteProduct",
   async (productId, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-      await api.delete(`/api/products/${productId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.delete(`/api/products/${productId}`);
       return productId;
     } catch (error) {
       return rejectWithValue(

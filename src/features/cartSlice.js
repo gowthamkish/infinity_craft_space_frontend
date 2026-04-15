@@ -11,10 +11,7 @@ export const fetchUserCart = createAsyncThunk(
         return { items: [] };
       }
 
-      const token = localStorage.getItem("token");
-      const response = await api.get(`/api/cart/${auth.user._id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get(`/api/cart/${auth.user._id}`);
 
       return response.data;
     } catch (error) {
@@ -35,12 +32,10 @@ export const syncCartToBackend = createAsyncThunk(
         return; // Don't sync if not logged in
       }
 
-      const token = localStorage.getItem("token");
-      await api.post(
-        "/api/cart/sync",
-        { userId: auth.user._id, items: cart.items },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+      await api.post("/api/cart/sync", {
+        userId: auth.user._id,
+        items: cart.items,
+      });
 
       return { success: true };
     } catch (error) {
@@ -61,10 +56,7 @@ export const clearCartOnBackend = createAsyncThunk(
         return;
       }
 
-      const token = localStorage.getItem("token");
-      await api.delete(`/api/cart/${auth.user._id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.delete(`/api/cart/${auth.user._id}`);
 
       return { success: true };
     } catch (error) {

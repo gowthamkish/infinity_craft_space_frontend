@@ -1,376 +1,214 @@
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser, clearError } from "../features/authSlice";
 import { fetchUserCart } from "../features/cartSlice";
+import { validateLogin } from "../utils/validation";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Spinner from "react-bootstrap/Spinner";
-import Alert from "react-bootstrap/Alert";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
+import "./auth.css";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [validationErrors, setValidationErrors] = useState({});
-  const [validated, setValidated] = useState(false);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const [touched, setTouched] = useState({});
 
-  // Get auth state from Redux
+  const navigate  = useNavigate();
+  const dispatch  = useDispatch();
   const { loading, error } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    // Check for registration success message
-    const registrationMessage = localStorage.getItem("registrationSuccess");
-    if (registrationMessage) {
-      setSuccessMessage(registrationMessage);
+    const msg = localStorage.getItem("registrationSuccess");
+    if (msg) {
+      setSuccessMessage(msg);
       localStorage.removeItem("registrationSuccess");
-
-      // Auto-hide success message after 5 seconds
-      setTimeout(() => {
-        setSuccessMessage("");
-      }, 5000);
+      const t = setTimeout(() => setSuccessMessage(""), 5000);
+      return () => clearTimeout(t);
     }
   }, []);
 
-  const validateForm = () => {
-    const errors = {};
-
-    if (!email.trim()) {
-      errors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      errors.email = "Please enter a valid email address";
+  const clearFieldError = (field) => {
+    if (validationErrors[field]) {
+      setValidationErrors((prev) => ({ ...prev, [field]: "" }));
     }
-
-    if (!password.trim()) {
-      errors.password = "Password is required";
-    }
-
-    return errors;
+    if (error) dispatch(clearError());
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    e.stopPropagation();
-
-    // Clear any existing errors
+    setTouched({ email: true, password: true });
     dispatch(clearError());
-    setValidationErrors({});
-    setValidated(true);
 
-    const errors = validateForm();
-    if (Object.keys(errors).length > 0) {
-      setValidationErrors(errors);
-      return;
-    }
+    const errors = validateLogin({ email, password });
+    setValidationErrors(errors);
+    if (Object.keys(errors).length > 0) return;
 
     try {
-      const response = await dispatch(loginUser({ email, password }));
-
-      // Check if login was successful
-      if (loginUser.fulfilled.match(response)) {
-        // Fetch user's cart from backend after login
-        dispatch(fetchUserCart());
-
-        const redirectPath = localStorage.getItem("redirectAfterLogin");
-
-        if (response.payload?.user?.isAdmin) {
-          navigate("/admin/dashboard");
-        } else if (redirectPath) {
-          localStorage.removeItem("redirectAfterLogin");
-          navigate(redirectPath);
-        } else {
-          navigate("/");
-        }
+      const data = await dispatch(loginUser({ email, password })).unwrap();
+      dispatch(fetchUserCart());
+      const redirect = localStorage.getItem("redirectAfterLogin");
+      if (data?.user?.isAdmin) {
+        navigate("/admin/dashboard");
+      } else if (redirect) {
+        localStorage.removeItem("redirectAfterLogin");
+        navigate(redirect);
+      } else {
+        navigate("/");
       }
-      // If rejected, error will be handled by Redux state
-    } catch (err) {
-      console.error("Unexpected error:", err);
+    } catch {
+      // error handled by Redux state (authSlice.error)
     }
   };
 
-  const navigateToRegister = () => {
-    navigate("/register");
-  };
+  const isDisabled = loading || !email || !password;
 
   return (
     <>
       <SEOHead
-        title={`Login - ${SEO_CONFIG.SITE_NAME}`}
-        description="Sign in to your Infinity Craft Space account to access exclusive features, track orders, and manage your craft supplies shopping experience."
-        keywords="login, sign in, account, craft supplies account, user login"
-        url={`${SEO_CONFIG.SITE_URL}/login`}
+        title={`Login · ${SEO_CONFIG.SITE_NAME}`}
+        description="Sign in to your Infinity Craft Space account."
         noindex={true}
         canonical={`${SEO_CONFIG.SITE_URL}/login`}
       />
-      <div
-        className="d-flex align-items-center justify-content-center"
-        style={{
-          minHeight: "100vh",
-          background:
-            "linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%)",
-        }}
-      >
-        {loading ? (
-          <div
-            className="d-flex flex-column justify-content-center align-items-center"
-            style={{ minHeight: "200px" }}
-          >
-            <Spinner
-              animation="border"
-              role="status"
-              style={{
-                color: "var(--primary-color)",
-                width: "3rem",
-                height: "3rem",
-              }}
-            >
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
-            <p className="mt-3" style={{ color: "var(--text-secondary)" }}>
-              Signing you in...
+
+      <div className="auth-page">
+        {/* Left panel — brand */}
+        <div className="auth-brand-panel" aria-hidden="true">
+          <div className="auth-brand-content">
+            <img src="/ICS_Logo.jpeg" alt="Infinity Craft Space" className="auth-brand-logo" />
+            <h2 className="auth-brand-title">Infinity Craft Space</h2>
+            <p className="auth-brand-subtitle">
+              Premium craft supplies for creative minds
             </p>
+            <ul className="auth-brand-perks">
+              <li><span className="perk-icon">🎨</span> Exclusive craft collections</li>
+              <li><span className="perk-icon">📦</span> Fast, reliable delivery</li>
+              <li><span className="perk-icon">⭐</span> Curated quality products</li>
+              <li><span className="perk-icon">🔒</span> Secure checkout</li>
+            </ul>
           </div>
-        ) : (
-          <Container>
-            <Row className="justify-content-center">
-              <Col xs={12} sm={8} md={6} lg={4} xl={4}>
-                <Card
-                  className="hover-shadow"
-                  style={{
-                    border: "none",
-                    borderRadius: "20px",
-                    boxShadow: "var(--shadow-xl)",
-                    background: "var(--bg-primary)",
-                  }}
-                >
-                  <Card.Body style={{ padding: "3rem 2.5rem" }}>
-                    <div className="text-center mb-4">
-                      <h1
-                        className="mb-2"
-                        style={{
-                          background:
-                            "linear-gradient(45deg, var(--primary-color), var(--secondary-color))",
-                          WebkitBackgroundClip: "text",
-                          WebkitTextFillColor: "transparent",
-                          backgroundClip: "text",
-                          fontWeight: "700",
-                          fontSize: "2rem",
-                        }}
-                      >
-                        Welcome Back!
-                      </h1>
-                      <p
-                        style={{
-                          color: "var(--text-secondary)",
-                          fontSize: "1rem",
-                        }}
-                      >
-                        Sign in to your Infinity Craft Space account
-                      </p>
-                    </div>
+        </div>
 
-                    {successMessage && (
-                      <Alert
-                        variant="success"
-                        className="mb-4"
-                        dismissible
-                        onClose={() => setSuccessMessage("")}
-                        style={{
-                          borderRadius: "12px",
-                          border: "none",
-                          fontSize: "0.9rem",
-                        }}
-                      >
-                        {successMessage}
-                      </Alert>
+        {/* Right panel — form */}
+        <div className="auth-form-panel">
+          <div className="auth-card">
+            <div className="auth-card-header">
+              <h1 className="auth-title">Welcome back</h1>
+              <p className="auth-subtitle">Sign in to continue shopping</p>
+            </div>
+
+            {successMessage && (
+              <div className="auth-alert auth-alert--success" role="alert">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm3.78 5.78l-4.5 4.5a.75.75 0 01-1.06 0l-2-2a.75.75 0 111.06-1.06L6.75 9.69l3.97-3.97a.75.75 0 111.06 1.06z" fill="currentColor"/>
+                </svg>
+                {successMessage}
+                <button className="auth-alert-close" onClick={() => setSuccessMessage("")} aria-label="Dismiss">×</button>
+              </div>
+            )}
+
+            {error && (
+              <div className="auth-alert auth-alert--error" role="alert">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm-.75 3.75a.75.75 0 011.5 0v3.5a.75.75 0 01-1.5 0v-3.5zm.75 7a1 1 0 110-2 1 1 0 010 2z" fill="currentColor"/>
+                </svg>
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} noValidate>
+              {/* Email */}
+              <div className="auth-field">
+                <label htmlFor="login-email" className="auth-label">
+                  Email address
+                </label>
+                <input
+                  id="login-email"
+                  type="email"
+                  className={`auth-input ${touched.email && validationErrors.email ? "auth-input--error" : ""} ${touched.email && !validationErrors.email && email ? "auth-input--valid" : ""}`}
+                  value={email}
+                  onChange={(e) => { setEmail(e.target.value); clearFieldError("email"); }}
+                  onBlur={() => setTouched((p) => ({ ...p, email: true }))}
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  required
+                />
+                {touched.email && validationErrors.email && (
+                  <p className="auth-field-error" role="alert">{validationErrors.email}</p>
+                )}
+              </div>
+
+              {/* Password */}
+              <div className="auth-field">
+                <label htmlFor="login-password" className="auth-label">
+                  Password
+                </label>
+                <div className="auth-input-wrapper">
+                  <input
+                    id="login-password"
+                    type={showPassword ? "text" : "password"}
+                    className={`auth-input auth-input--with-icon ${touched.password && validationErrors.password ? "auth-input--error" : ""} ${touched.password && !validationErrors.password && password ? "auth-input--valid" : ""}`}
+                    value={password}
+                    onChange={(e) => { setPassword(e.target.value); clearFieldError("password"); }}
+                    onBlur={() => setTouched((p) => ({ ...p, password: true }))}
+                    placeholder="Enter your password"
+                    autoComplete="current-password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="auth-eye-btn"
+                    onClick={() => setShowPassword((s) => !s)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    ) : (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                     )}
+                  </button>
+                </div>
+                {touched.password && validationErrors.password && (
+                  <p className="auth-field-error" role="alert">{validationErrors.password}</p>
+                )}
+              </div>
 
-                    {error && (
-                      <Alert
-                        variant="danger"
-                        className="mb-4"
-                        style={{
-                          borderRadius: "12px",
-                          border: "none",
-                          fontSize: "0.9rem",
-                        }}
-                      >
-                        {error}
-                      </Alert>
-                    )}
+              {/* Primary CTA */}
+              <button
+                type="submit"
+                className="auth-btn auth-btn--primary"
+                disabled={isDisabled}
+              >
+                {loading ? (
+                  <>
+                    <span className="auth-spinner" aria-hidden="true" />
+                    Signing in…
+                  </>
+                ) : "Sign in"}
+              </button>
 
-                    <Form
-                      noValidate
-                      validated={validated}
-                      onSubmit={handleSubmit}
-                    >
-                      <Form.Group className="mb-4" controlId="loginEmail">
-                        <Form.Label
-                          className="fw-bold text-start d-block"
-                          style={{
-                            color: "var(--text-primary)",
-                            marginBottom: "0.75rem",
-                          }}
-                        >
-                          Email Address
-                        </Form.Label>
-                        <Form.Control
-                          type="email"
-                          value={email}
-                          onChange={(e) => {
-                            setEmail(e.target.value);
-                            if (validationErrors.email) {
-                              setValidationErrors({
-                                ...validationErrors,
-                                email: "",
-                              });
-                            }
-                            // Clear auth error when user starts typing
-                            if (error) {
-                              dispatch(clearError());
-                            }
-                          }}
-                          placeholder="Enter your email"
-                          required
-                          isInvalid={!!validationErrors.email}
-                          isValid={
-                            validated &&
-                            email &&
-                            !validationErrors.email &&
-                            /\S+@\S+\.\S+/.test(email)
-                          }
-                          style={{
-                            borderRadius: "12px",
-                            padding: "12px 16px",
-                            fontSize: "1rem",
-                            transition: "all 0.3s ease",
-                          }}
-                        />
-                      </Form.Group>
+              <div className="auth-divider"><span>or</span></div>
 
-                      <Form.Group className="mb-4" controlId="loginPassword">
-                        <Form.Label
-                          className="fw-bold text-start d-block"
-                          style={{
-                            color: "var(--text-primary)",
-                            marginBottom: "0.75rem",
-                          }}
-                        >
-                          Password
-                        </Form.Label>
-                        <Form.Control
-                          type="password"
-                          value={password}
-                          onChange={(e) => {
-                            setPassword(e.target.value);
-                            if (validationErrors.password) {
-                              setValidationErrors({
-                                ...validationErrors,
-                                password: "",
-                              });
-                            }
-                            // Clear auth error when user starts typing
-                            if (error) {
-                              dispatch(clearError());
-                            }
-                          }}
-                          placeholder="Enter your password"
-                          required
-                          minLength={6}
-                          isInvalid={!!validationErrors.password}
-                          isValid={
-                            validated &&
-                            password &&
-                            !validationErrors.password &&
-                            password.length >= 6
-                          }
-                          style={{
-                            borderRadius: "12px",
-                            padding: "12px 16px",
-                            fontSize: "1rem",
-                            transition: "all 0.3s ease",
-                          }}
-                        />
-                      </Form.Group>
+              {/* Secondary CTA */}
+              <button
+                type="button"
+                className="auth-btn auth-btn--outline"
+                onClick={() => navigate("/register")}
+              >
+                Create a new account
+              </button>
+            </form>
 
-                      <div className="d-grid gap-3 mb-4">
-                        <Button
-                          variant="primary"
-                          type="submit"
-                          size="lg"
-                          disabled={loading || !email || !password}
-                          className="hover-scale"
-                          style={{
-                            borderRadius: "12px",
-                            fontWeight: "600",
-                            padding: "12px",
-                            fontSize: "1.1rem",
-                            background:
-                              loading || !email || !password
-                                ? "linear-gradient(45deg, #9ca3af, #6b7280)"
-                                : "linear-gradient(45deg, var(--primary-color), var(--primary-light))",
-                            border: "none",
-                            boxShadow: "var(--shadow-md)",
-                          }}
-                        >
-                          {loading ? (
-                            <>
-                              <Spinner
-                                animation="border"
-                                size="sm"
-                                className="me-2"
-                              />
-                              Signing In...
-                            </>
-                          ) : (
-                            "Sign In"
-                          )}
-                        </Button>
-
-                        <Button
-                          variant="outline-secondary"
-                          onClick={navigateToRegister}
-                          className="hover-scale"
-                          style={{
-                            borderRadius: "12px",
-                            fontWeight: "500",
-                            padding: "10px",
-                            borderColor: "var(--border-color)",
-                            color: "var(--text-secondary)",
-                          }}
-                        >
-                          Create New Account
-                        </Button>
-                      </div>
-
-                      <div className="text-center">
-                        <Button
-                          variant="link"
-                          onClick={() => navigate("/")}
-                          style={{
-                            color: "var(--primary-color)",
-                            textDecoration: "none",
-                            fontWeight: "500",
-                          }}
-                          className="hover-scale"
-                        >
-                          Continue shopping without account →
-                        </Button>
-                      </div>
-                    </Form>
-                  </Card.Body>
-                </Card>
-              </Col>
-            </Row>
-          </Container>
-        )}
+            <div className="auth-footer-link">
+              <button type="button" onClick={() => navigate("/")}>
+                Continue browsing without an account →
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );

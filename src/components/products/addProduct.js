@@ -24,7 +24,7 @@ import {
   FiCamera,
   FiX,
 } from "react-icons/fi";
-import Header from "../header";
+import Header from "../Header";
 import { addProduct, updateProduct } from "../../features/productsSlice";
 import { fetchPublicCategories } from "../../features/categoriesSlice";
 
@@ -386,7 +386,7 @@ const AddProduct = () => {
         style={{
           background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
           minHeight: "100vh",
-          paddingTop: "110px",
+          paddingTop: "20px",
         }}
       >
         {/* Header Section */}

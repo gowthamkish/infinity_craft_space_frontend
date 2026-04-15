@@ -5,6 +5,7 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true, // Send httpOnly cookies automatically
   timeout: 120000, // 2 minutes timeout for large file uploads
   maxContentLength: Infinity, // Remove content length limit
   maxBodyLength: Infinity, // Remove body length limit
@@ -25,14 +26,9 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
-// Request interceptor for adding auth token
+// Request interceptor — cookies are sent automatically via withCredentials
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
     // Log large requests in development
     if (import.meta.env.DEV && config.data) {
       const dataSize = JSON.stringify(config.data).length;
@@ -43,7 +39,6 @@ api.interceptors.request.use(
         );
       }
     }
-
     return config;
   },
   (error) => {
@@ -70,48 +65,26 @@ api.interceptors.response.use(
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
-          .then((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            return api(originalRequest);
-          })
+          .then(() => api(originalRequest))
           .catch((err) => Promise.reject(err));
       }
 
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = localStorage.getItem("refreshToken");
-
-      if (!refreshToken) {
-        // No refresh token, redirect to login
-        localStorage.removeItem("token");
-        localStorage.removeItem("refreshToken");
-        window.location.href = "/login";
-        return Promise.reject(error);
-      }
-
       try {
-        const response = await axios.post(
+        // Refresh token is in httpOnly cookie — backend reads it automatically
+        await axios.post(
           `${import.meta.env.VITE_API_URL}/api/auth/refresh-token`,
-          { refreshToken },
+          {},
+          { withCredentials: true },
         );
 
-        const { accessToken, refreshToken: newRefreshToken } = response.data;
-
-        localStorage.setItem("token", accessToken);
-        localStorage.setItem("refreshToken", newRefreshToken);
-
-        // Update the Authorization header
-        api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-
-        processQueue(null, accessToken);
+        processQueue(null, null);
 
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        localStorage.removeItem("token");
-        localStorage.removeItem("refreshToken");
         window.location.href = "/login";
         return Promise.reject(refreshError);
       } finally {
@@ -120,10 +93,16 @@ api.interceptors.response.use(
     }
 
     if (error.response?.status === 401) {
-      // Token invalid (not just expired)
-      localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
-      window.location.href = "/login";
+      // Don't redirect for profile/auth checks — these legitimately return 401
+      // for unauthenticated users and should be handled by the caller
+      const url = originalRequest?.url || "";
+      const noRedirectPaths = ["/api/auth/profile", "/api/auth/login", "/api/auth/register", "/api/auth/refresh-token"];
+      const isNoRedirect = noRedirectPaths.some((p) => url.includes(p));
+      const alreadyOnAuth = window.location.pathname === "/login" || window.location.pathname === "/register";
+
+      if (!isNoRedirect && !alreadyOnAuth) {
+        window.location.href = "/login";
+      }
     } else if (error.response?.status === 413) {
       // Payload too large
       console.error(

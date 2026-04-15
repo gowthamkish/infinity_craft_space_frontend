@@ -5,25 +5,17 @@ import App from "./App";
 import { Provider } from "react-redux";
 import { store } from "./app/store";
 import { ToastProvider } from "./context/ToastContext";
-import { setAuthFromStorage, fetchCurrentUser } from "./features/authSlice";
+import { fetchCurrentUser } from "./features/authSlice";
 import { fetchUserCart } from "./features/cartSlice";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-// Hydrate auth state from localStorage if available
-try {
-  const token = localStorage.getItem("token");
-  if (token) {
-    store.dispatch(setAuthFromStorage({ token }));
-    // Fetch user first, then fetch cart after user is loaded
-    store.dispatch(fetchCurrentUser()).then((result) => {
-      if (result.payload?.user?._id || result.payload?._id) {
-        store.dispatch(fetchUserCart());
-      }
-    });
+// Restore session from httpOnly cookie — no localStorage needed
+store.dispatch(fetchCurrentUser()).then((result) => {
+  // result.payload is the user object from /api/auth/profile
+  if (result.payload?._id) {
+    store.dispatch(fetchUserCart());
   }
-} catch (e) {
-  // ignore storage errors
-}
+});
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

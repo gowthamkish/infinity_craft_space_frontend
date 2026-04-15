@@ -10,7 +10,7 @@ import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ProgressBar from "react-bootstrap/ProgressBar";
-import Header from "../header";
+import Header from "../Header";
 import api from "../../api/axios";
 import SEOHead, { SEO_CONFIG } from "../SEOHead";
 import c3 from "c3";
@@ -40,10 +40,7 @@ const useAnalytics = (period = 30) => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
-      const res = await api.get(`/api/admin/analytics?period=${period}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get(`/api/admin/analytics?period=${period}`);
       setData(res.data);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch analytics");
@@ -69,10 +66,7 @@ const usePredictions = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
-      const res = await api.get("/api/admin/predictions", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get("/api/admin/predictions");
       setData(res.data);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch predictions");
@@ -724,7 +718,7 @@ export default function AnalyticsDashboard() {
           style={{
             backgroundColor: "#f8fafc",
             minHeight: "100vh",
-            paddingTop: "110px",
+            paddingTop: "20px",
           }}
         >
           <Container fluid className="px-3 px-md-4 pb-5">

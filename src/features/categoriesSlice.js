@@ -6,10 +6,7 @@ export const fetchCategories = createAsyncThunk(
   'categories/fetchCategories',
   async ({ includeInactive = false } = {}, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await api.get(`/api/categories?includeInactive=${includeInactive}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get(`/api/categories?includeInactive=${includeInactive}`);
       return response.data.categories || [];
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch categories');
@@ -35,10 +32,7 @@ export const createCategory = createAsyncThunk(
   'categories/createCategory',
   async (categoryData, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await api.post('/api/categories', categoryData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.post('/api/categories', categoryData);
       return response.data.category;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to create category');
@@ -51,10 +45,7 @@ export const updateCategory = createAsyncThunk(
   'categories/updateCategory',
   async ({ id, ...categoryData }, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await api.put(`/api/categories/${id}`, categoryData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.put(`/api/categories/${id}`, categoryData);
       return response.data.category;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to update category');
@@ -67,10 +58,7 @@ export const deleteCategory = createAsyncThunk(
   'categories/deleteCategory',
   async (categoryId, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-      await api.delete(`/api/categories/${categoryId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/api/categories/${categoryId}`);
       return categoryId;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to delete category');
@@ -83,10 +71,7 @@ export const addSubcategory = createAsyncThunk(
   'categories/addSubcategory',
   async ({ categoryId, subcategoryData }, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await api.post(`/api/categories/${categoryId}/subcategories`, subcategoryData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.post(`/api/categories/${categoryId}/subcategories`, subcategoryData);
       return { categoryId, category: response.data.category };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to add subcategory');
@@ -99,10 +84,7 @@ export const updateSubcategory = createAsyncThunk(
   'categories/updateSubcategory',
   async ({ categoryId, subcategoryId, subcategoryData }, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await api.put(`/api/categories/${categoryId}/subcategories/${subcategoryId}`, subcategoryData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.put(`/api/categories/${categoryId}/subcategories/${subcategoryId}`, subcategoryData);
       return { categoryId, category: response.data.category };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to update subcategory');
@@ -115,10 +97,7 @@ export const deleteSubcategory = createAsyncThunk(
   'categories/deleteSubcategory',
   async ({ categoryId, subcategoryId }, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-      await api.delete(`/api/categories/${categoryId}/subcategories/${subcategoryId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/api/categories/${categoryId}/subcategories/${subcategoryId}`);
       return { categoryId, subcategoryId };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to delete subcategory');

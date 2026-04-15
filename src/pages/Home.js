@@ -1,152 +1,139 @@
-import { useDispatch } from "react-redux";
-import { addToCart, removeFromCart } from "../features/cartSlice";
-import Header from "../components/header";
-import Card from "react-bootstrap/Card";
-import Button from "react-bootstrap/Button";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Container from "react-bootstrap/Container";
-import Spinner from "react-bootstrap/Spinner";
-import { useProducts } from "../hooks/useSmartFetch";
+/**
+ * Home.js — Lightweight landing page that redirects to the full ProductListing.
+ * ProductListing already has search, filters, cart, wishlist — duplicating it
+ * here would add maintenance burden. Instead we render a minimal hero + redirect.
+ */
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
+import { useProducts } from "../hooks/useSmartFetch";
 import RecentlyViewed from "../components/RecentlyViewed";
+import "./Home.css";
 
 export default function Home() {
-  const dispatch = useDispatch();
+  const navigate   = useNavigate();
   const { data: products, loading } = useProducts();
 
+  // If the route ever lands here instead of ProductListing, soft-redirect
+  useEffect(() => {
+    // Only redirect if there is no hash / query params that suggest we need this page
+    const hasQuery = window.location.search || window.location.hash;
+    if (!hasQuery) {
+      navigate("/products", { replace: true });
+    }
+  }, [navigate]);
+
+  // While the redirect fires, show a brief pass-through loading state
   return (
     <>
       <SEOHead
         title={SEO_CONFIG.SITE_NAME}
-        description="Discover premium craft supplies at Infinity Craft Space. From painting supplies to sculpting tools, jewelry making materials to pottery wheels - everything you need for your creative journey."
-        keywords="craft supplies, art materials, painting supplies, sculpting tools, jewelry making, pottery, crafting materials, creative supplies, art store"
+        description="Discover premium craft supplies at Infinity Craft Space."
         url={SEO_CONFIG.SITE_URL}
         canonical={SEO_CONFIG.SITE_URL}
-        structuredData={{
-          "@context": "https://schema.org",
-          "@type": "Store",
-          name: SEO_CONFIG.SITE_NAME,
-          description:
-            "Premium craft supplies and art materials for creative enthusiasts",
-          url: SEO_CONFIG.SITE_URL,
-          telephone: "+91 8925083167",
-          address: {
-            "@type": "PostalAddress",
-            streetAddress: "123 Creative Lane",
-            addressLocality: "Art District",
-            addressRegion: "Creative State",
-            postalCode: "12345",
-            addressCountry: "US",
-          },
-          potentialAction: {
-            "@type": "SearchAction",
-            target: `${SEO_CONFIG.SITE_URL}/products?search={search_term_string}`,
-            "query-input": "required name=search_term_string",
-          },
-          hasOfferCatalog: {
-            "@type": "OfferCatalog",
-            name: "Craft Supplies Catalog",
-            itemListElement:
-              products?.slice(0, 5).map((product) => ({
-                "@type": "Offer",
-                itemOffered: {
-                  "@type": "Product",
-                  name: product.name,
-                  description:
-                    product.description ||
-                    `${product.name} - Premium craft supply from Infinity Craft Space`,
-                  image:
-                    product.images?.[0]?.url ||
-                    product.image?.url ||
-                    product.image ||
-                    "https://infinitycraftspace.com/ICS_Logo.jpeg",
-                  offers: {
-                    "@type": "Offer",
-                    price: product.price,
-                    priceCurrency: "INR",
-                    availability: "https://schema.org/InStock",
-                  },
-                },
-              })) || [],
-          },
-        }}
       />
-      <div>
+      <div className="App">
         <Header />
-        <Container style={{ marginTop: "90px", paddingTop: "1rem" }}>
-          <h1 className="mb-4 text-center">
-            Infinity Craft Space — Product Listings
-          </h1>
-          {loading ? (
-            <div
-              className="d-flex justify-content-center align-items-center"
-              style={{ minHeight: "200px" }}
-            >
-              <Spinner animation="border" role="status" variant="primary">
-                <span className="visually-hidden">Loading...</span>
-              </Spinner>
+        <main className="home-main" style={{ paddingTop: "90px" }}>
+          {/* Hero */}
+          <section className="home-hero">
+            <div className="home-hero-content">
+              <span className="home-hero-eyebrow">✨ Premium craft supplies</span>
+              <h1 className="home-hero-heading">
+                Unleash your creativity
+              </h1>
+              <p className="home-hero-body">
+                Thousands of curated materials, tools, and kits for artists,
+                crafters, and makers of every skill level.
+              </p>
+              <div className="home-hero-actions">
+                <button
+                  className="home-btn home-btn--primary"
+                  onClick={() => navigate("/products")}
+                >
+                  Shop all products
+                </button>
+                <button
+                  className="home-btn home-btn--ghost"
+                  onClick={() => navigate("/products?category=new")}
+                >
+                  New arrivals →
+                </button>
+              </div>
             </div>
-          ) : (
-            <>
-              {products.length === 0 && (
-                <div className="text-center">No products available</div>
-              )}
-              <Row xs={1} sm={2} md={3} lg={4} className="g-4">
-                {products.length > 0 &&
-                  products.map((product) => (
-                    <Col key={product._id}>
-                      <Card className="h-100">
-                        <Card.Img
-                          variant="top"
-                          src={
-                            product.image ||
-                            "https://via.placeholder.com/200x200?text=No+Image"
-                          }
-                          alt={product.name || "Product image"}
-                          style={{
-                            objectFit: "contain",
-                            height: "200px",
-                            background: "#f8f8f8",
-                          }}
-                        />
-                        <Card.Body className="d-flex flex-column">
-                          <Card.Title>{product.name}</Card.Title>
-                          <Card.Text>
-                            <strong>₹{product.price}</strong>
-                            <br />
-                            <span style={{ color: "#555" }}>
-                              {product.description}
-                            </span>
-                          </Card.Text>
-                          <div className="mt-auto d-flex gap-2">
-                            <Button
-                              variant="success"
-                              onClick={() =>
-                                dispatch(addToCart({ product, quantity: 1 }))
-                              }
-                            >
-                              +
-                            </Button>
-                            <Button
-                              variant="danger"
-                              onClick={() =>
-                                dispatch(removeFromCart({ product }))
-                              }
-                            >
-                              -
-                            </Button>
-                          </div>
-                        </Card.Body>
-                      </Card>
-                    </Col>
-                  ))}
-              </Row>
-            </>
+          </section>
+
+          {/* Quick feature strip */}
+          <section className="home-features">
+            {[
+              { icon: "🚚", title: "Free shipping",    desc: "On all orders" },
+              { icon: "↩️", title: "Easy returns",     desc: "30-day hassle-free" },
+              { icon: "🔒", title: "Secure payment",   desc: "Encrypted checkout" },
+              { icon: "🎨", title: "Curated quality",  desc: "Hand-picked products" },
+            ].map((f) => (
+              <div key={f.title} className="home-feature-item">
+                <span className="home-feature-icon">{f.icon}</span>
+                <div>
+                  <p className="home-feature-title">{f.title}</p>
+                  <p className="home-feature-desc">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </section>
+
+          {/* Product preview — first 8 products */}
+          {!loading && products.length > 0 && (
+            <section className="home-preview">
+              <div className="home-preview-header">
+                <h2>Featured products</h2>
+                <button
+                  className="home-preview-all"
+                  onClick={() => navigate("/products")}
+                >
+                  View all →
+                </button>
+              </div>
+              <div className="home-preview-grid">
+                {products.slice(0, 8).map((product) => (
+                  <button
+                    key={product._id}
+                    className="home-product-card"
+                    onClick={() => navigate(`/product/${product._id}`)}
+                    aria-label={`View ${product.name}`}
+                  >
+                    <div className="home-product-img-wrap">
+                      <img
+                        src={
+                          product.images?.[0]?.url ||
+                          product.image?.url ||
+                          product.image ||
+                          "https://via.placeholder.com/300x300?text=No+Image"
+                        }
+                        alt={product.name}
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="home-product-info">
+                      <p className="home-product-name">{product.name}</p>
+                      <p className="home-product-price">₹{product.price}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <div className="home-preview-cta">
+                <button
+                  className="home-btn home-btn--primary"
+                  onClick={() => navigate("/products")}
+                >
+                  Browse all products
+                </button>
+              </div>
+            </section>
           )}
-        </Container>
-        {/* Recently Viewed Products Section */}
-        <RecentlyViewed />
+
+          <RecentlyViewed />
+        </main>
       </div>
     </>
   );
