@@ -22,9 +22,11 @@ import {
   FiPackage,
   FiSearch,
   FiFilter,
+  FiRefreshCw,
+  FiCheckCircle,
 } from "react-icons/fi";
 import { useProducts } from "../../hooks/useSmartFetch";
-import { deleteProduct } from "../../features/productsSlice";
+import { deleteProduct, restockProduct } from "../../features/productsSlice";
 
 // Helper function to format date and time
 const formatDateTime = (dateString) => {
@@ -54,6 +56,14 @@ const ProductList = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [deleteLoading, setDeleteLoading] = useState(false);
 
+  // Restock modal state
+  const [restockTarget, setRestockTarget]   = useState(null); // product being restocked
+  const [restockQty, setRestockQty]         = useState("");
+  const [restockNote, setRestockNote]       = useState("");
+  const [restockLoading, setRestockLoading] = useState(false);
+  const [restockError, setRestockError]     = useState(null);
+  const [restockDone, setRestockDone]       = useState(null); // { prev, added, newStock }
+
   const handleEdit = (product) => {
     navigate(`/admin/addProduct/${product?._id}`, {
       state: { product },
@@ -63,6 +73,44 @@ const ProductList = () => {
   const handleDeleteClick = (product) => {
     setSelectedProduct(product);
     setShowDeleteModal(true);
+  };
+
+  const openRestockModal = (product) => {
+    setRestockTarget(product);
+    setRestockQty("");
+    setRestockNote("");
+    setRestockError(null);
+    setRestockDone(null);
+  };
+
+  const closeRestockModal = () => {
+    setRestockTarget(null);
+    setRestockDone(null);
+    setRestockError(null);
+  };
+
+  const handleRestockSubmit = async () => {
+    const qty = parseInt(restockQty, 10);
+    if (!qty || qty <= 0) {
+      setRestockError("Please enter a valid quantity greater than 0.");
+      return;
+    }
+    setRestockLoading(true);
+    setRestockError(null);
+    try {
+      const result = await dispatch(
+        restockProduct({ id: restockTarget._id, quantity: qty, note: restockNote }),
+      ).unwrap();
+      setRestockDone({
+        prev: result.stock - qty,
+        added: qty,
+        newStock: result.stock,
+      });
+    } catch (err) {
+      setRestockError(err || "Failed to restock. Please try again.");
+    } finally {
+      setRestockLoading(false);
+    }
   };
 
   const handleDeleteConfirm = async () => {
@@ -607,31 +655,34 @@ const ProductList = () => {
                                 textAlign: "center",
                               }}
                             >
-                              <Button
-                                variant="outline-primary"
-                                size="sm"
-                                onClick={() => handleEdit(product)}
-                                className="me-2"
-                                style={{
-                                  borderRadius: "8px",
-                                  fontWeight: "500",
-                                }}
-                              >
-                                <FiEdit2 className="me-1" />
-                                Edit
-                              </Button>
-                              <Button
-                                variant="outline-danger"
-                                size="sm"
-                                onClick={() => handleDeleteClick(product)}
-                                style={{
-                                  borderRadius: "8px",
-                                  fontWeight: "500",
-                                }}
-                              >
-                                <FiTrash2 className="me-1" />
-                                Delete
-                              </Button>
+                              <div className="d-flex flex-column gap-1">
+                                <Button
+                                  variant="outline-primary"
+                                  size="sm"
+                                  onClick={() => handleEdit(product)}
+                                  style={{ borderRadius: "8px", fontWeight: "500" }}
+                                >
+                                  <FiEdit2 className="me-1" />Edit
+                                </Button>
+                                {product?.trackInventory !== false && (
+                                  <Button
+                                    variant="outline-success"
+                                    size="sm"
+                                    onClick={() => openRestockModal(product)}
+                                    style={{ borderRadius: "8px", fontWeight: "500" }}
+                                  >
+                                    <FiRefreshCw className="me-1" />Restock
+                                  </Button>
+                                )}
+                                <Button
+                                  variant="outline-danger"
+                                  size="sm"
+                                  onClick={() => handleDeleteClick(product)}
+                                  style={{ borderRadius: "8px", fontWeight: "500" }}
+                                >
+                                  <FiTrash2 className="me-1" />Delete
+                                </Button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -901,26 +952,29 @@ const ProductList = () => {
                                 size="sm"
                                 onClick={() => handleEdit(product)}
                                 className="flex-fill"
-                                style={{
-                                  borderRadius: "8px",
-                                  fontWeight: "500",
-                                }}
+                                style={{ borderRadius: "8px", fontWeight: "500" }}
                               >
-                                <FiEdit2 className="me-1" />
-                                Edit
+                                <FiEdit2 className="me-1" />Edit
                               </Button>
+                              {product?.trackInventory !== false && (
+                                <Button
+                                  variant="outline-success"
+                                  size="sm"
+                                  onClick={() => openRestockModal(product)}
+                                  className="flex-fill"
+                                  style={{ borderRadius: "8px", fontWeight: "500" }}
+                                >
+                                  <FiRefreshCw className="me-1" />Restock
+                                </Button>
+                              )}
                               <Button
                                 variant="outline-danger"
                                 size="sm"
                                 onClick={() => handleDeleteClick(product)}
                                 className="flex-fill"
-                                style={{
-                                  borderRadius: "8px",
-                                  fontWeight: "500",
-                                }}
+                                style={{ borderRadius: "8px", fontWeight: "500" }}
                               >
-                                <FiTrash2 className="me-1" />
-                                Delete
+                                <FiTrash2 className="me-1" />Delete
                               </Button>
                             </div>
                           </Card.Body>
@@ -933,6 +987,114 @@ const ProductList = () => {
             </Card.Body>
           </Card>
         )}
+
+        {/* ── Restock Modal ── */}
+        <Modal show={!!restockTarget} onHide={closeRestockModal} centered size="sm">
+          <Modal.Header closeButton style={{ borderBottom: "none", paddingBottom: 0 }}>
+            <Modal.Title style={{ fontWeight: 700, fontSize: "1.1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <FiRefreshCw style={{ color: "#28a745" }} />
+              Restock Product
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body style={{ paddingTop: "0.75rem" }}>
+            {restockDone ? (
+              /* Success state */
+              <div style={{ textAlign: "center", padding: "1rem 0" }}>
+                <FiCheckCircle size={48} style={{ color: "#28a745", marginBottom: "0.75rem" }} />
+                <h6 style={{ fontWeight: 700, marginBottom: "0.5rem" }}>Restock Successful!</h6>
+                <p className="text-muted mb-1" style={{ fontSize: "0.9rem" }}>
+                  <strong>{restockTarget?.name}</strong>
+                </p>
+                <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "10px", padding: "0.75rem 1rem", marginTop: "0.75rem", fontSize: "0.9rem" }}>
+                  <div className="d-flex justify-content-between mb-1">
+                    <span className="text-muted">Previous stock</span>
+                    <strong>{restockDone.prev}</strong>
+                  </div>
+                  <div className="d-flex justify-content-between mb-1">
+                    <span className="text-muted">Added</span>
+                    <strong style={{ color: "#16a34a" }}>+{restockDone.added}</strong>
+                  </div>
+                  <hr style={{ margin: "0.5rem 0", borderColor: "#bbf7d0" }} />
+                  <div className="d-flex justify-content-between">
+                    <span style={{ fontWeight: 700 }}>New stock</span>
+                    <strong style={{ color: "#16a34a", fontSize: "1.05rem" }}>{restockDone.newStock}</strong>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
+                <p className="text-muted mb-3" style={{ fontSize: "0.9rem" }}>
+                  Adding stock to <strong>{restockTarget?.name}</strong>.
+                  {restockTarget?.trackInventory && (
+                    <span> Current stock: <strong>{restockTarget?.stock ?? 0}</strong></span>
+                  )}
+                </p>
+
+                {restockError && (
+                  <div style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "8px", padding: "0.6rem 0.85rem", marginBottom: "1rem", color: "#dc2626", fontSize: "0.85rem" }}>
+                    {restockError}
+                  </div>
+                )}
+
+                <div className="mb-3">
+                  <label style={{ fontWeight: 600, fontSize: "0.9rem", display: "block", marginBottom: "0.4rem" }}>
+                    Quantity to Add <span style={{ color: "#ef4444" }}>*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={restockQty}
+                    onChange={(e) => setRestockQty(e.target.value)}
+                    placeholder="e.g. 50"
+                    className="form-control"
+                    style={{ borderRadius: "10px", border: "2px solid #e9ecef", fontSize: "1rem", padding: "0.6rem 0.85rem" }}
+                    autoFocus
+                  />
+                </div>
+
+                <div className="mb-1">
+                  <label style={{ fontWeight: 600, fontSize: "0.9rem", display: "block", marginBottom: "0.4rem" }}>
+                    Note <span style={{ color: "#94a3b8", fontWeight: 400 }}>(optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={restockNote}
+                    onChange={(e) => setRestockNote(e.target.value)}
+                    placeholder="e.g. Supplier batch #42"
+                    className="form-control"
+                    style={{ borderRadius: "10px", border: "2px solid #e9ecef", fontSize: "0.9rem", padding: "0.6rem 0.85rem" }}
+                  />
+                </div>
+              </>
+            )}
+          </Modal.Body>
+          <Modal.Footer style={{ borderTop: "none", paddingTop: 0, gap: "0.5rem" }}>
+            {restockDone ? (
+              <Button variant="success" onClick={closeRestockModal} style={{ borderRadius: "8px", fontWeight: 600, width: "100%" }}>
+                Done
+              </Button>
+            ) : (
+              <>
+                <Button variant="outline-secondary" onClick={closeRestockModal} style={{ borderRadius: "8px", flex: 1 }}>
+                  Cancel
+                </Button>
+                <Button
+                  variant="success"
+                  onClick={handleRestockSubmit}
+                  disabled={restockLoading}
+                  style={{ borderRadius: "8px", fontWeight: 600, flex: 2 }}
+                >
+                  {restockLoading ? (
+                    <><DotsLoader size="sm" /> Adding…</>
+                  ) : (
+                    <><FiRefreshCw className="me-1" />Add Stock</>
+                  )}
+                </Button>
+              </>
+            )}
+          </Modal.Footer>
+        </Modal>
 
         {/* Delete Confirmation Modal */}
         <Modal

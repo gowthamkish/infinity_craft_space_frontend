@@ -137,6 +137,21 @@ const cartSlice = createSlice({
     clearCart: (state) => {
       state.items = [];
     },
+
+    mergeGuestCart: (state, action) => {
+      const guestItems = action.payload;
+      guestItems.forEach((guestItem) => {
+        const existing = state.items.find(
+          (item) => item.product._id === guestItem.product._id,
+        );
+        if (existing) {
+          existing.quantity += guestItem.quantity;
+          existing.totalPrice = existing.quantity * existing.product.price;
+        } else {
+          state.items.push(guestItem);
+        }
+      });
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -176,5 +191,6 @@ export const {
   updateCartItemQuantity,
   removeItemCompletely,
   clearCart,
+  mergeGuestCart,
 } = cartSlice.actions;
 export default cartSlice.reducer;

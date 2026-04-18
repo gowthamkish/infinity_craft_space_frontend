@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser, clearError } from "../features/authSlice";
-import { fetchUserCart } from "../features/cartSlice";
+import { fetchUserCart, mergeGuestCart, syncCartToBackend } from "../features/cartSlice";
 import { validateLogin } from "../utils/validation";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +18,7 @@ export default function Login() {
   const navigate  = useNavigate();
   const dispatch  = useDispatch();
   const { loading, error } = useSelector((state) => state.auth);
+  const guestCartItems = useSelector((state) => state.cart.items);
 
   useEffect(() => {
     const msg = localStorage.getItem("registrationSuccess");
@@ -46,8 +47,13 @@ export default function Login() {
     if (Object.keys(errors).length > 0) return;
 
     try {
+      const preLoginCart = [...guestCartItems];
       const data = await dispatch(loginUser({ email, password })).unwrap();
-      dispatch(fetchUserCart());
+      await dispatch(fetchUserCart());
+      if (preLoginCart.length > 0) {
+        dispatch(mergeGuestCart(preLoginCart));
+        dispatch(syncCartToBackend());
+      }
       const redirect = localStorage.getItem("redirectAfterLogin");
       if (data?.user?.isAdmin) {
         navigate("/admin/dashboard");

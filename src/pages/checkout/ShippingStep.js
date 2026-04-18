@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
@@ -8,6 +8,7 @@ import Alert from "react-bootstrap/Alert";
 import Badge from "react-bootstrap/Badge";
 import { Trash2, CreditCard, Package } from "react-feather";
 import { DotsLoader } from "../../components/Loader";
+import api from "../../api/axios";
 
 export const ShippingStep = ({
   cartItems,
@@ -30,21 +31,73 @@ export const ShippingStep = ({
   loading,
   proceedToPayment,
   handleSaveAddress,
+  shippingRate,
+  onShippingRateSelected,
 }) => {
   const phoneInputRef = useRef(null);
   const itiRef = useRef(null);
   const [localError, setLocalError] = useState(null);
 
+  // ── Shipping rates state ─────────────────────────────────────
+  const [rates, setRates] = useState([]);
+  const [ratesLoading, setRatesLoading] = useState(false);
+  const [ratesError, setRatesError] = useState(null);
+  const [selectedRateIdx, setSelectedRateIdx] = useState(0);
+
+  // Calculate total weight from cart items (0.5 kg default per item unit)
+  const cartWeight = cartItems.reduce(
+    (sum, item) => sum + (item.product?.weight || 0.5) * item.quantity,
+    0,
+  );
+
+  const fetchRates = useCallback(
+    async (pincode) => {
+      if (!pincode || !/^\d{6}$/.test(pincode)) return;
+      setRatesLoading(true);
+      setRatesError(null);
+      try {
+        const res = await api.get("/api/shipping/rates", {
+          params: {
+            pincode,
+            weight: Math.max(cartWeight, 0.5).toFixed(2),
+            declaredValue: subtotal.toFixed(0),
+          },
+        });
+        const fetchedRates = res.data.rates || [];
+        setRates(fetchedRates);
+        if (fetchedRates.length > 0) {
+          setSelectedRateIdx(0);
+          onShippingRateSelected?.(fetchedRates[0]);
+        } else {
+          onShippingRateSelected?.(null);
+        }
+      } catch {
+        setRatesError(
+          "Could not fetch shipping rates. Free shipping will apply.",
+        );
+        onShippingRateSelected?.(null);
+      } finally {
+        setRatesLoading(false);
+      }
+    },
+    [cartWeight, subtotal, onShippingRateSelected],
+  );
+
+  // Auto-fetch rates when pincode reaches 6 digits
+  useEffect(() => {
+    const pin = shippingAddress.zipCode?.trim();
+    if (pin?.length === 6) {
+      fetchRates(pin);
+    } else {
+      setRates([]);
+      onShippingRateSelected?.(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shippingAddress.zipCode]);
+
   useEffect(() => {
     const input = phoneInputRef.current;
     if (!input) return;
-    // determine initial country (intl-tel-input expects ISO2 code)
-    const initialCountry =
-      shippingAddress && shippingAddress.country
-        ? shippingAddress.country.toLowerCase() === "india"
-          ? "in"
-          : undefined
-        : undefined;
 
     const CSS_HREF =
       "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css";
@@ -84,32 +137,65 @@ export const ShippingStep = ({
     ensureScript()
       .then(() => {
         if (!mounted) return;
-        // initialize
+        // Initialize with India only — no country switching allowed
         const iti = window.intlTelInput(input, {
-          initialCountry: initialCountry,
+          initialCountry: "in", // Fixed to India
           separateDialCode: true,
           utilsScript: UTILS_SRC,
+          onlyCountries: ["in"], // Restrict to India only
+          preferredCountries: ["in"],
         });
         itiRef.current = iti;
 
+        // Disable country selection but keep flag visible
+        const flagContainer = input.parentElement?.querySelector(
+          ".iti__flag-container",
+        );
+        if (flagContainer) {
+          // Prevent clicking on the flag to open country list
+          flagContainer.style.cursor = "not-allowed";
+          flagContainer.style.pointerEvents = "auto";
+          flagContainer.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+          };
+        }
+
+        // Disable the country list button
+        const countryListBtn = input.parentElement?.querySelector(
+          ".iti__selected-flag",
+        );
+        if (countryListBtn) {
+          countryListBtn.style.pointerEvents = "none";
+          countryListBtn.style.cursor = "not-allowed";
+        }
+
         // set initial input value from shippingAddress
-        if (shippingAddress && shippingAddress.phone)
-          input.value = shippingAddress.phone;
+        if (shippingAddress && shippingAddress.phone) {
+          // Strip country code if present (e.g., +91 prefix)
+          let phoneValue = shippingAddress.phone.toString().trim();
+          if (phoneValue.startsWith("+91")) {
+            phoneValue = phoneValue.substring(3);
+          }
+          input.value = phoneValue;
+        }
 
         const handleChange = () => {
-          const val = input.value;
-          const countryData =
-            (itiRef.current && itiRef.current.getSelectedCountryData()) || {};
+          const fullNumber = iti.getNumber(); // Full number with country code
+          const nationalNumber = input.value; // Just the number part
+
           setShippingAddress((prev) => ({
             ...prev,
-            phone: val,
-            country: countryData.name || prev.country,
-            countryCode: countryData.dialCode || prev.countryCode,
+            phone: nationalNumber, // Store without country code
+            country: "India",
+            countryCode: "+91",
           }));
         };
 
         input.addEventListener("change", handleChange);
         input.addEventListener("blur", handleChange);
+        input.addEventListener("keyup", handleChange);
 
         // store handler so we can remove it later
         input.__iti_handle_change = handleChange;
@@ -124,6 +210,7 @@ export const ShippingStep = ({
       if (handleChange) {
         input.removeEventListener("change", handleChange);
         input.removeEventListener("blur", handleChange);
+        input.removeEventListener("keyup", handleChange);
         delete input.__iti_handle_change;
       }
       if (itiRef.current) {
@@ -136,13 +223,24 @@ export const ShippingStep = ({
   }, [shippingAddress.country, setShippingAddress]);
 
   const validatePhone = () => {
+    const input = phoneInputRef.current;
+    if (!input || !input.value) return false;
+
+    // Indian phone validation: 10 digits, starting with 6-9
+    const phoneNumber = input.value.toString().trim();
+    const isFallbackValid = /^[6-9]\d{9}$/.test(phoneNumber);
+
+    // Try intl-tel-input validation if available
     const iti = itiRef.current;
-    if (!iti) return false;
-    try {
-      return iti.isValidNumber();
-    } catch (e) {
-      return false;
+    if (iti) {
+      try {
+        return iti.isValidNumber() || isFallbackValid;
+      } catch (e) {
+        return isFallbackValid;
+      }
     }
+
+    return isFallbackValid;
   };
 
   return (
@@ -380,20 +478,20 @@ export const ShippingStep = ({
                 </Col>
                 <Col md={6} className="mb-3">
                   <Form.Group>
-                    <Form.Label style={labelStyle}>Phone Number *</Form.Label>
+                    <Form.Label style={labelStyle}>
+                      Phone Number (India) *
+                    </Form.Label>
                     <input
                       ref={phoneInputRef}
                       type="tel"
                       name="phone"
                       defaultValue={shippingAddress.phone}
-                      placeholder="Enter phone number"
+                      placeholder="10-digit Indian mobile (e.g., 9876543210)"
                       required
                       style={{
                         ...inputStyle,
-                        padding:
-                          inputStyle && inputStyle.padding
-                            ? inputStyle.padding
-                            : undefined,
+                        width: "100%",
+                        cursor: "text",
                       }}
                       autoComplete="off"
                       spellCheck="false"
@@ -419,6 +517,165 @@ export const ShippingStep = ({
                   </Form.Group>
                 </Col>
               </Row>
+
+              {/* ── Shipping Rates Widget ── */}
+              {(ratesLoading || rates.length > 0 || ratesError) && (
+                <div
+                  style={{
+                    marginBottom: "1.25rem",
+                    border: "1.5px solid #e2e8f0",
+                    borderRadius: "12px",
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      padding: "0.75rem 1rem",
+                      background: "linear-gradient(135deg, #f8fafc, #f1f5f9)",
+                      borderBottom: "1px solid #e2e8f0",
+                      fontWeight: 600,
+                      fontSize: "0.875rem",
+                      color: "#1e293b",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.4rem",
+                    }}
+                  >
+                    🚚 Available Delivery Options
+                  </div>
+                  <div style={{ padding: "0.75rem" }}>
+                    {ratesLoading && (
+                      <div
+                        style={{
+                          textAlign: "center",
+                          padding: "1rem",
+                          color: "#64748b",
+                          fontSize: "0.875rem",
+                        }}
+                      >
+                        <DotsLoader size="sm" />
+                        Fetching delivery options for {shippingAddress.zipCode}…
+                      </div>
+                    )}
+                    {ratesError && !ratesLoading && (
+                      <div
+                        style={{
+                          color: "#d97706",
+                          fontSize: "0.8rem",
+                          padding: "0.5rem",
+                        }}
+                      >
+                        ⚠️ {ratesError}
+                      </div>
+                    )}
+                    {!ratesLoading &&
+                      rates.map((rate, idx) => (
+                        <div
+                          key={rate.courierId}
+                          onClick={() => {
+                            setSelectedRateIdx(idx);
+                            onShippingRateSelected?.(rate);
+                          }}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            padding: "0.75rem",
+                            borderRadius: "8px",
+                            marginBottom: idx < rates.length - 1 ? "0.5rem" : 0,
+                            cursor: "pointer",
+                            border:
+                              selectedRateIdx === idx
+                                ? "2px solid #10b981"
+                                : "1.5px solid #e2e8f0",
+                            background:
+                              selectedRateIdx === idx ? "#f0fdf4" : "white",
+                            transition: "all 0.15s ease",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "0.75rem",
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: 18,
+                                height: 18,
+                                borderRadius: "50%",
+                                border: `2px solid ${selectedRateIdx === idx ? "#10b981" : "#cbd5e1"}`,
+                                background:
+                                  selectedRateIdx === idx ? "#10b981" : "white",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                flexShrink: 0,
+                              }}
+                            >
+                              {selectedRateIdx === idx && (
+                                <div
+                                  style={{
+                                    width: 8,
+                                    height: 8,
+                                    borderRadius: "50%",
+                                    background: "white",
+                                  }}
+                                />
+                              )}
+                            </div>
+                            <div>
+                              <div
+                                style={{
+                                  fontWeight: 600,
+                                  fontSize: "0.875rem",
+                                  color: "#1e293b",
+                                }}
+                              >
+                                {rate.courierName}
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: "0.75rem",
+                                  color: "#64748b",
+                                }}
+                              >
+                                {rate.etd
+                                  ? `Est. delivery: ${rate.etd}`
+                                  : rate.estimatedDays
+                                    ? `${rate.estimatedDays} days`
+                                    : "ETA not available"}
+                              </div>
+                            </div>
+                          </div>
+                          <div style={{ textAlign: "right" }}>
+                            <div
+                              style={{
+                                fontWeight: 700,
+                                color: rate.rate === 0 ? "#059669" : "#1e293b",
+                                fontSize: "0.9rem",
+                              }}
+                            >
+                              {rate.rate === 0 ? "FREE" : `₹${rate.rate}`}
+                            </div>
+                            {idx === 0 && rates.length > 1 && (
+                              <div
+                                style={{
+                                  fontSize: "0.65rem",
+                                  color: "#059669",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                CHEAPEST
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
 
               {(error || localError) && (
                 <Alert
@@ -618,6 +875,26 @@ export const ShippingStep = ({
                   ₹{subtotal.toFixed(2)}
                 </span>
               </div>
+              {shippingRate && (
+                <div className="d-flex justify-content-between mb-2">
+                  <span
+                    style={{
+                      color: "var(--text-secondary)",
+                      fontSize: "0.875rem",
+                    }}
+                  >
+                    Shipping ({shippingRate.courierName}):
+                  </span>
+                  <span
+                    style={{
+                      fontWeight: "600",
+                      color: shippingRate.rate === 0 ? "#059669" : "inherit",
+                    }}
+                  >
+                    {shippingRate.rate === 0 ? "FREE" : `₹${shippingRate.rate}`}
+                  </span>
+                </div>
+              )}
               <hr style={{ border: "1px solid var(--border-color)" }} />
               <div className="d-flex justify-content-between">
                 <span
@@ -636,7 +913,7 @@ export const ShippingStep = ({
                     color: "var(--secondary-color)",
                   }}
                 >
-                  ₹{total.toFixed(2)}
+                  ₹{(subtotal + (shippingRate?.rate || 0)).toFixed(2)}
                 </span>
               </div>
             </div>

@@ -1,0 +1,323 @@
+/* ══════════════════════════════════════════════════════════════
+   TRACKING TIMELINE — Amazon-style shipment tracker
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Status Progress Bar ─────────────────────────────────────── */
+.tt-progress-wrap {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  position: relative;
+  padding: 0 0 1.5rem;
+  overflow-x: auto;
+  gap: 0;
+}
+
+.tt-progress-track {
+  position: absolute;
+  top: 20px;
+  left: 5%;
+  right: 5%;
+  height: 3px;
+  background: #e2e8f0;
+  z-index: 0;
+}
+
+.tt-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  transition: width 0.6s ease;
+  border-radius: 2px;
+}
+
+.tt-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 1;
+  flex: 1;
+  min-width: 70px;
+}
+
+.tt-step-dot {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  border: 3px solid #e2e8f0;
+  background: white;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.tt-step-dot--done {
+  border-color: #10b981;
+  background: #10b981;
+  color: white;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+}
+
+.tt-step-dot--active {
+  border-color: #3b82f6;
+  background: white;
+  color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+  animation: ttPulse 2s infinite;
+}
+
+.tt-step-dot--pending {
+  border-color: #e2e8f0;
+  background: #f8fafc;
+  color: #94a3b8;
+}
+
+.tt-step-dot--cancelled {
+  border-color: #ef4444;
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+@keyframes ttPulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
+  50%       { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.08); }
+}
+
+.tt-step-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-align: center;
+  color: #64748b;
+  line-height: 1.2;
+  max-width: 80px;
+}
+
+.tt-step-label--done   { color: #059669; }
+.tt-step-label--active { color: #2563eb; }
+.tt-step-label--cancelled { color: #ef4444; }
+
+/* ── Microcopy ───────────────────────────────────────────────── */
+.tt-microcopy {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #374151;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.65rem 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.tt-microcopy-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+.tt-microcopy-eta {
+  color: #059669;
+  font-size: 0.82rem;
+}
+
+/* ── Alerts (cancelled / returned) ──────────────────────────── */
+.tt-alert {
+  text-align: center;
+  padding: 0.875rem 1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+.tt-alert--cancelled { background: #fee2e2; color: #b91c1c; }
+.tt-alert--returned  { background: #fef3c7; color: #92400e; }
+
+/* ── Info Bar (AWB, courier, ETA) ────────────────────────────── */
+.tt-info-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-radius: 12px;
+  border: 1px solid #bbf7d0;
+  margin-bottom: 1.25rem;
+}
+
+.tt-info-bar--shipped {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-color: #bfdbfe;
+}
+
+.tt-info-bar--delivered {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-color: #bbf7d0;
+}
+
+.tt-info-bar--ofd {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border-color: #fde68a;
+}
+
+.tt-info-bar--cancelled {
+  background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+  border-color: #fecdd3;
+}
+
+.tt-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.tt-info-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+
+.tt-info-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.tt-info-value a {
+  color: #2563eb;
+  text-decoration: none;
+}
+.tt-info-value a:hover { text-decoration: underline; }
+
+.tt-info-mono { font-family: monospace; letter-spacing: 0.04em; }
+
+.tt-copy-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0 0 0.4rem;
+  font-size: 0.85rem;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+.tt-copy-btn:hover { opacity: 1; }
+
+.tt-info-eta {
+  font-size: 0.78rem;
+  color: #059669;
+  margin-left: 0.25rem;
+}
+
+/* ── Activity Timeline ───────────────────────────────────────── */
+.tt-activities {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.tt-activity {
+  display: flex;
+  gap: 1rem;
+  position: relative;
+  padding-bottom: 1.25rem;
+}
+
+.tt-activity:last-child { padding-bottom: 0; }
+
+.tt-activity-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 32px;
+}
+
+.tt-activity-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #10b981;
+  border: 2px solid white;
+  box-shadow: 0 0 0 2px #10b981;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.tt-activity-dot--first {
+  width: 16px;
+  height: 16px;
+  background: #059669;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.25);
+}
+
+.tt-activity-dot--muted {
+  background: #94a3b8;
+  box-shadow: 0 0 0 2px #94a3b8;
+}
+
+.tt-activity-line {
+  flex: 1;
+  width: 2px;
+  background: #e2e8f0;
+  margin-top: 2px;
+}
+
+.tt-activity-right {
+  flex: 1;
+  padding-bottom: 0.25rem;
+}
+
+.tt-activity-status {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.2rem;
+}
+
+.tt-activity-location {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 0.15rem;
+}
+
+.tt-activity-date {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* ── Empty / Loading States ──────────────────────────────────── */
+.tt-empty {
+  text-align: center;
+  padding: 2rem;
+  color: #94a3b8;
+}
+
+.tt-empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 576px) {
+  .tt-step-dot {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+
+  .tt-step-label {
+    font-size: 0.65rem;
+    max-width: 60px;
+  }
+
+  .tt-info-bar {
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+  }
+
+  .tt-info-value {
+    font-size: 0.8rem;
+  }
+}

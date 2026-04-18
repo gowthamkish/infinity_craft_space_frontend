@@ -1,39 +1,464 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useContext, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
-import { Alert, Pagination, Badge } from "react-bootstrap";
+import { Alert, Pagination } from "react-bootstrap";
 import { OrbitLoader } from "../components/Loader";
-import { FiPackage, FiSearch, FiShoppingBag } from "react-icons/fi";
+import { FiPackage, FiSearch, FiShoppingBag, FiTruck, FiRotateCcw, FiX, FiUploadCloud, FiImage } from "react-icons/fi";
 import api from "../api/axios";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
+import { ToastContext } from "../context/ToastContext";
 import { getStatusBadgeVariant } from "../utils/statusHelpers";
 import { formatDate, formatOrderId } from "../utils/formatters";
 import "./Orders.css";
 
+// Statuses where Track Order button is shown
+const TRACKABLE_STATUSES = ["confirmed", "processing", "shipped", "delivered"];
+
+// Return window: 3 days after delivery
+const RETURN_WINDOW_DAYS = 3;
+
+const RETURN_REASONS = [
+  { value: "defective",        label: "Defective / Damaged product" },
+  { value: "wrong_item",       label: "Wrong item received" },
+  { value: "not_as_described", label: "Not as described" },
+  { value: "size_mismatch",    label: "Size mismatch" },
+  { value: "quality_issue",    label: "Quality issue" },
+  { value: "changed_mind",     label: "Changed my mind" },
+  { value: "duplicate_order",  label: "Duplicate order" },
+  { value: "other",            label: "Other" },
+];
+
+function isReturnEligible(order) {
+  if (order.status !== "delivered") return false;
+  if (order.hasReturnRequest) return false;
+  const deliveredAt = order.deliveredAt || order.updatedAt;
+  const daysSince = (Date.now() - new Date(deliveredAt)) / (1000 * 60 * 60 * 24);
+  return daysSince <= RETURN_WINDOW_DAYS;
+}
+
+function daysLeftToReturn(order) {
+  const deliveredAt = order.deliveredAt || order.updatedAt;
+  const daysSince = (Date.now() - new Date(deliveredAt)) / (1000 * 60 * 60 * 24);
+  return Math.max(0, Math.ceil(RETURN_WINDOW_DAYS - daysSince));
+}
+
 // Map Bootstrap badge variants → semantic CSS classes
 const STATUS_CLASS_MAP = {
-  success: "delivered",
-  primary: "confirmed",
-  warning: "pending",
-  info:    "processing",
+  success:   "delivered",
+  primary:   "confirmed",
+  warning:   "pending",
+  info:      "processing",
   secondary: "shipped",
-  danger:  "cancelled",
+  danger:    "cancelled",
 };
+
+function toLabel(s) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : "Unknown";
+}
 
 function StatusBadge({ status }) {
   const variant = getStatusBadgeVariant(status);
   const cls = STATUS_CLASS_MAP[variant] || "unknown";
-  const label = status ? status.charAt(0).toUpperCase() + status.slice(1) : "Unknown";
-  return <span className={`status-badge status-badge--${cls}`}>{label}</span>;
+  return <span className={`status-badge status-badge--${cls}`}>{toLabel(status)}</span>;
+}
+
+function TrackButton({ status, onClick }) {
+  const isTrackable = TRACKABLE_STATUSES.includes(status);
+  const isDelivered = status === "delivered";
+
+  if (!isTrackable) return null;
+
+  return (
+    <button
+      onClick={!isDelivered ? onClick : undefined}
+      disabled={isDelivered}
+      title={isDelivered ? "Order already delivered" : "Track your order"}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "0.35rem",
+        padding: "0.4rem 0.85rem",
+        background: isDelivered
+          ? "linear-gradient(135deg, #94a3b8, #64748b)"
+          : "linear-gradient(135deg, #3b82f6, #2563eb)",
+        color: "white",
+        border: "none",
+        borderRadius: "8px",
+        fontSize: "0.8rem",
+        fontWeight: 600,
+        cursor: isDelivered ? "not-allowed" : "pointer",
+        opacity: isDelivered ? 0.65 : 1,
+        whiteSpace: "nowrap",
+        width: "100%",
+      }}
+    >
+      <FiTruck size={13} />
+      {isDelivered ? "Delivered" : "Track Order"}
+    </button>
+  );
+}
+
+function ReturnButton({ order, onClick }) {
+  if (order.status !== "delivered") return null;
+
+  if (order.hasReturnRequest) {
+    return (
+      <button
+        disabled
+        style={{
+          display: "flex", alignItems: "center", justifyContent: "center",
+          gap: "0.35rem", padding: "0.4rem 0.85rem",
+          background: "linear-gradient(135deg, #a78bfa, #7c3aed)",
+          color: "white", border: "none", borderRadius: "8px",
+          fontSize: "0.8rem", fontWeight: 600, cursor: "not-allowed",
+          opacity: 0.7, whiteSpace: "nowrap", width: "100%", marginTop: "0.4rem",
+        }}
+        title="Return already requested"
+      >
+        <FiRotateCcw size={13} /> Return Requested
+      </button>
+    );
+  }
+
+  const eligible = isReturnEligible(order);
+  const daysLeft = daysLeftToReturn(order);
+
+  if (!eligible) {
+    return (
+      <button
+        disabled
+        style={{
+          display: "flex", alignItems: "center", justifyContent: "center",
+          gap: "0.35rem", padding: "0.4rem 0.85rem",
+          background: "linear-gradient(135deg, #94a3b8, #64748b)",
+          color: "white", border: "none", borderRadius: "8px",
+          fontSize: "0.8rem", fontWeight: 600, cursor: "not-allowed",
+          opacity: 0.55, whiteSpace: "nowrap", width: "100%", marginTop: "0.4rem",
+        }}
+        title="Return window has expired (3 days after delivery)"
+      >
+        <FiRotateCcw size={13} /> Return Expired
+      </button>
+    );
+  }
+
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        display: "flex", alignItems: "center", justifyContent: "center",
+        gap: "0.35rem", padding: "0.4rem 0.85rem",
+        background: "linear-gradient(135deg, #f59e0b, #d97706)",
+        color: "white", border: "none", borderRadius: "8px",
+        fontSize: "0.8rem", fontWeight: 600, cursor: "pointer",
+        whiteSpace: "nowrap", width: "100%", marginTop: "0.4rem",
+      }}
+      title={`${daysLeft} day${daysLeft !== 1 ? "s" : ""} left to return`}
+    >
+      <FiRotateCcw size={13} /> Return ({daysLeft}d left)
+    </button>
+  );
+}
+
+const MAX_IMAGES = 5;
+const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
+function ReturnModal({ order, onClose, onSuccess }) {
+  const [reason, setReason] = useState("");
+  const [reasonDetails, setReasonDetails] = useState("");
+  const [returnType, setReturnType] = useState("return");
+  const [imageFiles, setImageFiles] = useState([]); // File[]
+  const [previews, setPreviews] = useState([]);      // object URL strings
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Revoke object URLs on unmount to avoid memory leaks
+  useEffect(() => {
+    return () => previews.forEach((url) => URL.revokeObjectURL(url));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleImageChange = (e) => {
+    const selected = Array.from(e.target.files || []);
+    const valid = selected.filter((f) => ACCEPTED_TYPES.includes(f.type));
+    const combined = [...imageFiles, ...valid].slice(0, MAX_IMAGES);
+    setImageFiles(combined);
+    setPreviews((prev) => {
+      prev.forEach((u) => URL.revokeObjectURL(u));
+      return combined.map((f) => URL.createObjectURL(f));
+    });
+    // reset input so same file can be re-added after removal
+    e.target.value = "";
+  };
+
+  const removeImage = (idx) => {
+    URL.revokeObjectURL(previews[idx]);
+    setImageFiles((f) => f.filter((_, i) => i !== idx));
+    setPreviews((p) => p.filter((_, i) => i !== idx));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!reason) { setError("Please select a reason."); return; }
+    if (imageFiles.length === 0) { setError("Please upload at least one product image."); return; }
+    setSubmitting(true);
+    setError(null);
+    try {
+      const items = (order.items || []).map((item) => ({
+        productId: item.product?._id,
+        productName: item.product?.name || item.name || "Product",
+        quantity: item.quantity,
+        reason,
+      }));
+
+      const formData = new FormData();
+      formData.append("orderId", order._id);
+      formData.append("reason", reason);
+      formData.append("reasonDetails", reasonDetails);
+      formData.append("returnType", returnType);
+      formData.append("items", JSON.stringify(items));
+      imageFiles.forEach((file) => formData.append("images", file));
+
+      await api.post("/api/returns", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      onSuccess();
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to submit return request. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const daysLeft = daysLeftToReturn(order);
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)",
+        zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center",
+        padding: "1rem",
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "var(--bg-card, #fff)", borderRadius: "16px",
+          padding: "1.75rem", width: "100%", maxWidth: "520px",
+          boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
+          maxHeight: "92vh", overflowY: "auto",
+        }}
+      >
+        {/* Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
+          <h5 style={{ margin: 0, fontWeight: 700, display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <FiRotateCcw style={{ color: "#f59e0b" }} />
+            Request Return / Refund
+          </h5>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", padding: "0.25rem", borderRadius: "6px" }}>
+            <FiX size={20} />
+          </button>
+        </div>
+
+        {/* Order summary strip */}
+        <div style={{ fontSize: "0.85rem", color: "var(--text-secondary, #64748b)", marginBottom: "1.25rem", padding: "0.75rem 1rem", background: "var(--bg-soft, #f8fafc)", borderRadius: "10px", borderLeft: "4px solid #f59e0b" }}>
+          <strong>Order:</strong> {formatOrderId(String(order._id))} &nbsp;·&nbsp;
+          <strong>{(order.items || []).length}</strong> item{(order.items || []).length !== 1 ? "s" : ""} &nbsp;·&nbsp;
+          <span style={{ color: daysLeft <= 1 ? "#ef4444" : "#16a34a", fontWeight: 600 }}>
+            {daysLeft} day{daysLeft !== 1 ? "s" : ""} left to return
+          </span>
+        </div>
+
+        {error && (
+          <div style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "8px", padding: "0.75rem", marginBottom: "1rem", color: "#dc2626", fontSize: "0.85rem" }}>
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          {/* Return type */}
+          <div style={{ marginBottom: "1rem" }}>
+            <label style={{ display: "block", fontWeight: 600, marginBottom: "0.45rem", fontSize: "0.9rem" }}>
+              Return Type <span style={{ color: "#ef4444" }}>*</span>
+            </label>
+            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+              {[["return", "↩ Return"], ["refund", "💳 Refund"], ["exchange", "🔁 Exchange"]].map(([val, lbl]) => (
+                <label
+                  key={val}
+                  style={{
+                    padding: "0.45rem 1rem", borderRadius: "8px", cursor: "pointer",
+                    border: `2px solid ${returnType === val ? "#f59e0b" : "var(--border-color, #e2e8f0)"}`,
+                    fontSize: "0.85rem", fontWeight: returnType === val ? 700 : 400,
+                    background: returnType === val ? "#fef3c7" : "transparent",
+                    transition: "all 0.15s",
+                  }}
+                >
+                  <input type="radio" name="returnType" value={val} checked={returnType === val} onChange={() => setReturnType(val)} style={{ display: "none" }} />
+                  {lbl}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Reason */}
+          <div style={{ marginBottom: "1rem" }}>
+            <label style={{ display: "block", fontWeight: 600, marginBottom: "0.45rem", fontSize: "0.9rem" }}>
+              Reason <span style={{ color: "#ef4444" }}>*</span>
+            </label>
+            <select
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              required
+              style={{ width: "100%", padding: "0.6rem 0.85rem", borderRadius: "10px", border: "2px solid var(--border-color, #e2e8f0)", fontSize: "0.9rem", background: "var(--bg-card, #fff)" }}
+            >
+              <option value="">Select a reason…</option>
+              {RETURN_REASONS.map((r) => (
+                <option key={r.value} value={r.value}>{r.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Additional details */}
+          <div style={{ marginBottom: "1.25rem" }}>
+            <label style={{ display: "block", fontWeight: 600, marginBottom: "0.45rem", fontSize: "0.9rem" }}>
+              Additional Details <span style={{ color: "var(--text-muted, #94a3b8)", fontWeight: 400 }}>(optional)</span>
+            </label>
+            <textarea
+              value={reasonDetails}
+              onChange={(e) => setReasonDetails(e.target.value)}
+              rows={2}
+              placeholder="Describe the issue in more detail…"
+              style={{ width: "100%", padding: "0.6rem 0.85rem", borderRadius: "10px", border: "2px solid var(--border-color, #e2e8f0)", fontSize: "0.9rem", resize: "vertical", fontFamily: "inherit", background: "var(--bg-card, #fff)" }}
+            />
+          </div>
+
+          {/* Image upload */}
+          <div style={{ marginBottom: "1.5rem" }}>
+            <label style={{ display: "block", fontWeight: 600, marginBottom: "0.45rem", fontSize: "0.9rem" }}>
+              Product Images <span style={{ color: "#ef4444" }}>*</span>
+              <span style={{ color: "var(--text-muted, #94a3b8)", fontWeight: 400, marginLeft: "0.4rem" }}>
+                (all angles — up to {MAX_IMAGES})
+              </span>
+            </label>
+
+            <div style={{ background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "8px", padding: "0.6rem 0.85rem", marginBottom: "0.75rem", fontSize: "0.82rem", color: "#92400e" }}>
+              📸 Please photograph the product from <strong>front, back, sides, and the damaged area</strong>. Our team uses these to validate your return.
+            </div>
+
+            {/* Preview grid */}
+            {previews.length > 0 && (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))", gap: "0.5rem", marginBottom: "0.75rem" }}>
+                {previews.map((url, idx) => (
+                  <div key={idx} style={{ position: "relative", borderRadius: "8px", overflow: "hidden", aspectRatio: "1", border: "2px solid #e2e8f0" }}>
+                    <img src={url} alt={`preview-${idx}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(idx)}
+                      style={{
+                        position: "absolute", top: "4px", right: "4px",
+                        background: "rgba(0,0,0,0.65)", border: "none",
+                        borderRadius: "50%", color: "white", width: "22px", height: "22px",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        cursor: "pointer", padding: 0,
+                      }}
+                    >
+                      <FiX size={12} />
+                    </button>
+                    <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "rgba(0,0,0,0.45)", color: "white", fontSize: "0.65rem", textAlign: "center", padding: "2px 0" }}>
+                      {idx === 0 ? "Front" : idx === 1 ? "Back" : idx === 2 ? "Side" : idx === 3 ? "Detail" : "Extra"}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {imageFiles.length < MAX_IMAGES && (
+              <label style={{
+                display: "flex", alignItems: "center", justifyContent: "center",
+                gap: "0.5rem", padding: "0.75rem", borderRadius: "10px",
+                border: "2px dashed #d97706", background: "#fffbeb",
+                color: "#d97706", fontWeight: 600, fontSize: "0.88rem",
+                cursor: "pointer", transition: "all 0.15s",
+              }}>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  multiple
+                  onChange={handleImageChange}
+                  style={{ display: "none" }}
+                />
+                <FiUploadCloud size={18} />
+                {imageFiles.length === 0
+                  ? "Upload product photos"
+                  : `Add more (${imageFiles.length}/${MAX_IMAGES})`}
+              </label>
+            )}
+
+            {imageFiles.length > 0 && (
+              <div style={{ marginTop: "0.4rem", fontSize: "0.78rem", color: "var(--text-muted, #94a3b8)", display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                <FiImage size={12} /> {imageFiles.length} image{imageFiles.length !== 1 ? "s" : ""} selected
+              </div>
+            )}
+          </div>
+
+          {/* Action buttons */}
+          <div style={{ display: "flex", gap: "0.75rem" }}>
+            <button
+              type="button"
+              onClick={onClose}
+              style={{ flex: 1, padding: "0.7rem", borderRadius: "10px", border: "2px solid var(--border-color, #e2e8f0)", background: "transparent", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem" }}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              style={{ flex: 2, padding: "0.7rem", borderRadius: "10px", border: "none", background: "linear-gradient(135deg, #f59e0b, #d97706)", color: "white", fontWeight: 700, cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? 0.7 : 1, fontSize: "0.9rem" }}
+            >
+              {submitting ? "Submitting…" : "🔄 Submit Return Request"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
 
 export default function Orders() {
-  const [orders,      setOrders]      = useState([]);
-  const [loading,     setLoading]     = useState(true);
-  const [error,       setError]       = useState(null);
-  const [search,      setSearch]      = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize,    setPageSize]    = useState(5);
+  const navigate   = useNavigate();
+  const { addToast } = useContext(ToastContext);
 
+  const [orders,       setOrders]      = useState([]);
+  const [loading,      setLoading]     = useState(true);
+  const [error,        setError]       = useState(null);
+  const [search,       setSearch]      = useState("");
+  const [currentPage,  setCurrentPage] = useState(1);
+  const [pageSize,     setPageSize]    = useState(5);
+  const [returnOrder,  setReturnOrder] = useState(null); // order being returned
+
+  // ── Fetch orders ──────────────────────────────────────────────────────────
+  const fetchOrders = useCallback(async () => {
+    try {
+      const res = await api.get("/api/orders");
+      const fetched = res.data.success && Array.isArray(res.data.orders)
+        ? res.data.orders
+        : [];
+      setOrders(fetched);
+    } catch {
+      setError("Failed to load orders. Please try again later.");
+      setOrders([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
+
+  // ── Derived data ──────────────────────────────────────────────────────────
   const filteredOrders = useMemo(() => {
     if (!search) return orders;
     const q = search.toLowerCase().trim();
@@ -77,30 +502,22 @@ export default function Orders() {
     return items;
   }, [current, totalPages]);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const res = await api.get("/api/orders");
-        setOrders(res.data.success && Array.isArray(res.data.orders) ? res.data.orders : []);
-      } catch {
-        setError("Failed to load orders. Please try again later.");
-        setOrders([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchOrders();
-  }, []);
+  const handleReturnSuccess = () => {
+    setReturnOrder(null);
+    addToast("Return request submitted successfully! Our team will review it shortly.", {
+      type: "success", title: "🔄 Return Requested", duration: 6000,
+    });
+    fetchOrders(); // refresh to update hasReturnRequest flag
+  };
 
+  // ── Render ────────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <>
         <Header />
         <div className="orders-page">
           <div className="orders-container orders-loading">
-            <div className="orders-loading-spinner">
-              <OrbitLoader size="lg" />
-            </div>
+            <div className="orders-loading-spinner"><OrbitLoader size="lg" /></div>
             <h4>Loading your orders…</h4>
             <p>Please wait while we fetch your order history</p>
           </div>
@@ -118,6 +535,15 @@ export default function Orders() {
         canonical={`${SEO_CONFIG.SITE_URL}/orders`}
       />
       <Header />
+
+      {returnOrder && (
+        <ReturnModal
+          order={returnOrder}
+          onClose={() => setReturnOrder(null)}
+          onSuccess={handleReturnSuccess}
+        />
+      )}
+
       <div className="orders-page">
         <div className="orders-container">
           {/* Hero */}
@@ -173,6 +599,7 @@ export default function Orders() {
                       <th>Summary</th>
                       <th>Shipping Address</th>
                       <th>Status</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -215,6 +642,16 @@ export default function Orders() {
                             ) : "—"}
                           </td>
                           <td><StatusBadge status={status} /></td>
+                          <td style={{ minWidth: "130px" }}>
+                            <TrackButton
+                              status={status}
+                              onClick={() => navigate(`/track/${oid}`)}
+                            />
+                            <ReturnButton
+                              order={order}
+                              onClick={() => setReturnOrder(order)}
+                            />
+                          </td>
                         </tr>
                       );
                     })}
@@ -247,6 +684,16 @@ export default function Orders() {
                               {order.shippingAddress.street}{order.shippingAddress.city ? `, ${order.shippingAddress.city}` : ""}
                             </div>
                           )}
+                          <div style={{ marginTop: "0.75rem" }}>
+                            <TrackButton
+                              status={status}
+                              onClick={() => navigate(`/track/${oid}`)}
+                            />
+                            <ReturnButton
+                              order={order}
+                              onClick={() => setReturnOrder(order)}
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>

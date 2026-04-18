@@ -51,6 +51,21 @@ export const updateProduct = createAsyncThunk(
   },
 );
 
+// Restock product (admin)
+export const restockProduct = createAsyncThunk(
+  "products/restockProduct",
+  async ({ id, quantity, note }, { rejectWithValue }) => {
+    try {
+      const res = await api.patch(`/api/products/${id}/restock`, { quantity, note });
+      return res.data.product;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.error || "Failed to restock product",
+      );
+    }
+  },
+);
+
 // Delete product
 export const deleteProduct = createAsyncThunk(
   "products/deleteProduct",
@@ -140,6 +155,11 @@ const productsSlice = createSlice({
       .addCase(updateProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      // Restock product
+      .addCase(restockProduct.fulfilled, (state, action) => {
+        const index = state.items.findIndex((item) => item._id === action.payload._id);
+        if (index !== -1) state.items[index] = action.payload;
       })
       // Delete product
       .addCase(deleteProduct.pending, (state) => {

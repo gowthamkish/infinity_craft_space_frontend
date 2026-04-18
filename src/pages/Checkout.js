@@ -44,6 +44,7 @@ export default function Checkout() {
     state: "",
     zipCode: "",
     country: "India",
+    // Note: always store plain "India" — not "India (भारत)" which breaks Shiprocket
     phone: "",
     label: "",
     isDefault: false,
@@ -68,17 +69,18 @@ export default function Checkout() {
   const [saveAddressToBook, setSaveAddressToBook] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
 
+  // Shiprocket selected shipping rate (set by ShippingStep)
+  const [shippingRate, setShippingRate] = useState(null);
+  // Backend order returned from verify-payment (contains shiprocket data)
+  const [backendOrder, setBackendOrder] = useState(null);
+
   // Calculate totals
   const subtotal = cartItems.reduce(
     (total, item) => total + item.totalPrice,
     0,
   );
-  // TODO: Uncomment when ready to enable shipping charges
-  // const shipping = subtotal > 500 ? 0 : 50; // Free shipping over ₹500
-  const shipping = 0; // Temporarily disabled - free shipping for now
-  // TODO: Uncomment when ready to enable GST
-  // const tax = subtotal * 0.18; // 18% GST
-  const tax = 0; // Temporarily disabled - no GST for now
+  const shipping = shippingRate?.rate || 0;
+  const tax = 0;
   const total = subtotal + shipping + tax;
 
   // Step configuration
@@ -285,6 +287,8 @@ export default function Checkout() {
         currency: "INR",
         shippingAddress: shippingAddress,
         items: cartItems,
+        shippingCost: shipping,
+        shippingCourierId: shippingRate?.courierId || null,
       });
       const { razorpayOrderId, currency } = orderResponse.data.order;
       const orderId = orderResponse.data.order.id;
@@ -308,8 +312,9 @@ export default function Checkout() {
             });
 
             if (verifyResponse.data.success) {
-              // Payment successful, create the actual order
-              await completeOrder(response);
+              // Payment successful — pass backend order (with shiprocket data) to completion
+              await completeOrder(response, verifyResponse.data.order);
+            } else {
               console.error("Verification failed:", verifyResponse.data);
               setError(
                 "Payment verification failed. " +
@@ -355,7 +360,7 @@ export default function Checkout() {
     }
   };
 
-  const completeOrder = async (paymentResponse) => {
+  const completeOrder = async (paymentResponse, verifiedOrder = null) => {
     try {
       setLoading(true);
 
@@ -396,6 +401,9 @@ export default function Checkout() {
 
       // Clear the cart after capturing items
       dispatch(clearCart());
+
+      // Store the backend order (has shiprocket data) for ConfirmationStep
+      if (verifiedOrder) setBackendOrder(verifiedOrder);
 
       setOrderData(finalOrderData);
       setPaymentData(paymentResponse);
@@ -480,6 +488,8 @@ export default function Checkout() {
                 loading={loading}
                 proceedToPayment={proceedToPayment}
                 handleSaveAddress={handleSaveAddress}
+                shippingRate={shippingRate}
+                onShippingRateSelected={setShippingRate}
               />
             )}
             {currentStep === 3 && (
@@ -503,6 +513,7 @@ export default function Checkout() {
                 shippingAddress={shippingAddress}
                 total={total}
                 navigate={navigate}
+                backendOrder={backendOrder}
               />
             )}
           </Container>

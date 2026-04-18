@@ -385,3 +385,78 @@
     }
   }
 }
+/* ── India-only Phone Input Styling ── */
+.iti {
+  width: 100%;
+}
+
+.iti--allow-dropdown input {
+  padding-left: 50px;
+}
+
+.iti__flag-container {
+  pointer-events: auto;
+  opacity: 1;
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+}
+
+.iti__country-list {
+  display: none !important;
+}
+
+.iti__selected-flag {
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+  width: 40px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #e2e8f0;
+  margin-right: 8px;
+  background: transparent;
+}
+
+.iti__flag {
+  display: inline-block;
+  width: 32px;
+  height: 24px;
+}
+
+.iti__dial-code {
+  color: #64748b;
+  font-weight: 500;
+  margin: 0 4px;
+  user-select: none;
+  font-size: 0.9rem;
+}
+
+/* Phone input field styling - keep fully editable */
+.iti__tel-input {
+  width: 100%;
+  padding: 12px 16px !important;
+  border: 2px solid var(--border-color) !important;
+  border-radius: 12px !important;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 1rem;
+  cursor: text !important;
+}
+
+.iti__tel-input:focus {
+  outline: none;
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.iti__tel-input:disabled {
+  background-color: var(--bg-tertiary);
+  cursor: not-allowed;
+}
+
+/* Prevent dropdown arrow */
+.iti__dropdown-arrow {
+  display: none !important;
+}

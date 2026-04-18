@@ -1,8 +1,7 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useEffect, Suspense, lazy, useContext } from "react";
-import { useDispatch } from "react-redux";
-import { fetchCurrentUser } from "./features/authSlice";
+import { useEffect, useRef, Suspense, lazy, useContext } from "react";
+import { useSelector } from "react-redux";
 import { PageLoader } from "./components/Loader";
 import { HelmetProvider } from "react-helmet-async";
 import OfflineIndicator from "./components/OfflineIndicator";
@@ -11,6 +10,7 @@ import ErrorBoundary, { RouteErrorBoundary } from "./components/ErrorBoundary";
 import ToastContainer from "./components/ToastContainer";
 import { ToastContext } from "./context/ToastContext";
 import RecentlyViewed from "./components/RecentlyViewed";
+import api from "./api/axios";
 
 // Lazy load components for better performance
 const ProductListing = lazy(() => import("./pages/ProductListing"));
@@ -45,19 +45,125 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const ReturnPolicy = lazy(() => import("./pages/ReturnPolicy"));
 const ContactUs = lazy(() => import("./pages/ContactUs"));
 const TermsAndConditions = lazy(() => import("./pages/TermsAndConditions"));
+const TrackOrder = lazy(() => import("./pages/TrackOrder"));
 
 const LoadingFallback = ({ message }) => (
   <PageLoader label={message || "Loading…"} variant="section" />
 );
 
+const STATUS_TOAST_CONFIG = {
+  confirmed:       { emoji: "✅", label: "Order Confirmed",   type: "success" },
+  processing:      { emoji: "⏳", label: "Being Processed",   type: "info"    },
+  shipped:         { emoji: "🚚", label: "Shipped",           type: "success" },
+  out_for_delivery:{ emoji: "🛵", label: "Out for Delivery!", type: "success" },
+  delivered:       { emoji: "🎉", label: "Delivered!",        type: "success" },
+  cancelled:       { emoji: "❌", label: "Order Cancelled",   type: "error"   },
+  returned:        { emoji: "🔄", label: "Return Initiated",  type: "warning" },
+};
+
 function App() {
-  const dispatch = useDispatch();
-  const { toasts, removeToast } = useContext(ToastContext);
+  const { toasts, removeToast, addToast } = useContext(ToastContext);
+  // Use _id as a stable scalar so the effect only re-runs on actual user change
+  const userId = useSelector((state) => state.auth.user?._id ?? null);
+
+  // Keep a stable ref to addToast so polling interval doesn't restart on every toast
+  const addToastRef = useRef(addToast);
+  useEffect(() => { addToastRef.current = addToast; }, [addToast]);
+
+  // In-memory snapshot for live diffing during this session
+  const liveMapRef = useRef(null);
+
+  // index.jsx dispatches fetchCurrentUser before React mounts — no need to repeat it here.
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  const lsKey = (uid) => `order_status_snapshot_${uid}`;
+
+  const loadSnapshot = (uid) => {
+    try {
+      const raw = localStorage.getItem(lsKey(uid));
+      return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+  };
+
+  const saveSnapshot = (uid, map) => {
+    try { localStorage.setItem(lsKey(uid), JSON.stringify(map)); } catch {}
+  };
+
+  const fireToasts = (prevMap, orders) => {
+    orders.forEach((order) => {
+      const key  = String(order._id);
+      const prev = prevMap[key];
+      const curr = order.status;
+      if (prev && prev !== curr) {
+        const cfg = STATUS_TOAST_CONFIG[curr];
+        if (cfg) {
+          const shortId   = key.slice(-6).toUpperCase();
+          const prevLabel = prev.charAt(0).toUpperCase() + prev.slice(1);
+          const currLabel = curr.charAt(0).toUpperCase() + curr.slice(1);
+          addToastRef.current(
+            `Your order #${shortId} status changed: ${prevLabel} → ${currLabel}`,
+            { type: cfg.type, title: `${cfg.emoji} ${cfg.label}`, duration: 7000 },
+          );
+        }
+      }
+    });
+  };
 
   useEffect(() => {
-    // Restore session from httpOnly cookie (no localStorage needed)
-    dispatch(fetchCurrentUser());
-  }, [dispatch]);
+    if (!userId) {
+      liveMapRef.current = null;
+      return;
+    }
+
+    let cancelled = false;
+
+    const poll = async (isFirstRun) => {
+      try {
+        const res = await api.get("/api/orders");
+        if (cancelled) return;
+
+        const orders =
+          res.data.success && Array.isArray(res.data.orders)
+            ? res.data.orders
+            : [];
+
+        // Build current map
+        const currentMap = {};
+        orders.forEach((o) => { currentMap[String(o._id)] = o.status; });
+
+        if (isFirstRun) {
+          // On first run: compare against localStorage snapshot (catches offline changes)
+          const persisted = loadSnapshot(userId);
+          if (persisted) {
+            fireToasts(persisted, orders);
+          }
+          // Seed in-memory map with current data
+          liveMapRef.current = currentMap;
+        } else {
+          // On subsequent polls: compare against in-memory map (catches live changes)
+          if (liveMapRef.current) {
+            fireToasts(liveMapRef.current, orders);
+          }
+          liveMapRef.current = currentMap;
+        }
+
+        // Always persist the latest snapshot to localStorage
+        saveSnapshot(userId, currentMap);
+      } catch (err) {
+        console.warn("[Order polling] fetch failed:", err.message);
+      }
+    };
+
+    // Run immediately on login, then every 15 s
+    poll(true);
+    const id = setInterval(() => poll(false), 15_000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
   return (
     <div className="App">
@@ -178,6 +284,24 @@ function App() {
                         }
                       >
                         <TermsAndConditions />
+                      </Suspense>
+                    </RouteErrorBoundary>
+                  }
+                />
+
+                {/* Track Order (protected) */}
+                <Route
+                  path="/track/:orderId"
+                  element={
+                    <RouteErrorBoundary>
+                      <Suspense
+                        fallback={
+                          <LoadingFallback message="Loading tracking..." />
+                        }
+                      >
+                        <ProtectedRoute>
+                          <TrackOrder />
+                        </ProtectedRoute>
                       </Suspense>
                     </RouteErrorBoundary>
                   }
