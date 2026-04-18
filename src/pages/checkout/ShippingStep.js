@@ -258,6 +258,68 @@ const styles = {
   },
 };
 
+// ── AddressLabelChips ─────────────────────────────────────────────────────
+
+const LABEL_PRESETS = ["Home", "Office", "Other"];
+
+function AddressLabelChips({ value, onChange }) {
+  const [custom, setCustom] = useState(
+    LABEL_PRESETS.includes(value) || !value ? "" : value
+  );
+  const isPreset = LABEL_PRESETS.includes(value);
+  const isOther = !isPreset && value;
+
+  const select = (label) => {
+    if (label === "Other") {
+      onChange("Other");
+    } else {
+      setCustom("");
+      onChange(label);
+    }
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.5rem" }}>
+        {LABEL_PRESETS.map((lbl) => {
+          const active = lbl === "Other" ? (value === "Other" || isOther) : value === lbl;
+          return (
+            <button
+              key={lbl}
+              type="button"
+              onClick={() => select(lbl)}
+              style={{
+                padding: "0.3rem 0.9rem",
+                borderRadius: "99px",
+                border: `1.5px solid ${active ? "var(--primary-color, #2563eb)" : "#cbd5e1"}`,
+                background: active ? "var(--primary-color, #2563eb)" : "white",
+                color: active ? "white" : "#475569",
+                fontSize: "0.82rem",
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all 0.15s ease",
+              }}
+            >
+              {lbl === "Home" ? "🏠 Home" : lbl === "Office" ? "🏢 Office" : "✏️ Other"}
+            </button>
+          );
+        })}
+      </div>
+      {(value === "Other" || (isOther && !isPreset)) && (
+        <input
+          type="text"
+          className="form-control"
+          placeholder="e.g. Parents' house, Gym, etc."
+          value={isOther && value !== "Other" ? value : custom}
+          onChange={(e) => { setCustom(e.target.value); onChange(e.target.value || "Other"); }}
+          style={{ fontSize: "0.875rem", borderRadius: "10px" }}
+          autoFocus
+        />
+      )}
+    </div>
+  );
+}
+
 // ── Main Component ─────────────────────────────────────────────────────────
 
 export const ShippingStep = ({
@@ -287,6 +349,35 @@ export const ShippingStep = ({
   const phoneInputRef = useRef(null);
   const itiRef = useRef(null);
   const [localError, setLocalError] = useState(null);
+  const [pincodeLoading, setPincodeLoading] = useState(false);
+  const [pincodeAutoFilled, setPincodeAutoFilled] = useState(false);
+  const [pincodeError, setPincodeError] = useState(null);
+
+  // Auto-fill city/state from India Post pincode API
+  const fetchPincodeDetails = useCallback(async (pin) => {
+    setPincodeLoading(true);
+    setPincodeError(null);
+    try {
+      const res = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
+      const data = await res.json();
+      if (data?.[0]?.Status === "Success" && data[0].PostOffice?.length) {
+        const po = data[0].PostOffice[0];
+        setShippingAddress((prev) => ({
+          ...prev,
+          city: po.District || po.Division || prev.city,
+          state: po.State || prev.state,
+        }));
+        setPincodeAutoFilled(true);
+      } else {
+        setPincodeError("Pincode not found — please enter city/state manually");
+        setPincodeAutoFilled(false);
+      }
+    } catch {
+      setPincodeAutoFilled(false);
+    } finally {
+      setPincodeLoading(false);
+    }
+  }, [setShippingAddress]);
 
   // ── Shipping rates state ─────────────────────────────────────
   const [rates, setRates] = useState([]);
@@ -334,14 +425,19 @@ export const ShippingStep = ({
     [cartWeight, subtotal, onShippingRateSelected],
   );
 
-  // Auto-fetch rates when pincode reaches 6 digits
+  // Auto-fetch rates + city/state when pincode reaches 6 digits
   useEffect(() => {
     const pin = shippingAddress.zipCode?.trim();
-    if (pin?.length === 6) {
+    if (pin?.length === 6 && /^\d{6}$/.test(pin)) {
       fetchRates(pin);
+      fetchPincodeDetails(pin);
     } else {
       setRates([]);
       onShippingRateSelected?.(null);
+      if ((pin?.length ?? 0) < 6) {
+        setPincodeAutoFilled(false);
+        setPincodeError(null);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shippingAddress.zipCode]);
@@ -645,129 +741,146 @@ export const ShippingStep = ({
                 })();
               }}
             >
+              {/* ── Address Label Chips ── */}
+              <div className="mb-3">
+                <Form.Label style={labelStyle}>Address Label <span style={{ fontWeight: 400, color: "#94a3b8" }}>(optional)</span></Form.Label>
+                <AddressLabelChips
+                  value={shippingAddress.label}
+                  onChange={(val) => setShippingAddress((prev) => ({ ...prev, label: val }))}
+                />
+              </div>
+
+              {/* ── Street Address ── */}
+              <div className="mb-3">
+                <Form.Label style={labelStyle}>
+                  Street Address <span style={{ color: "#ef4444" }}>*</span>
+                </Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={2}
+                  name="street"
+                  value={shippingAddress.street}
+                  onChange={handleInputChange}
+                  placeholder="House/Flat no., Building name, Street, Area…"
+                  required
+                  style={{ ...inputStyle, resize: "none", lineHeight: 1.5 }}
+                  autoComplete="street-address"
+                />
+              </div>
+
+              {/* ── Pincode + auto-fill row ── */}
               <Row>
-                <Col md={12} className="mb-3">
+                <Col md={4} className="mb-3">
                   <Form.Group>
                     <Form.Label style={labelStyle}>
-                      Address Label (optional)
+                      PIN Code <span style={{ color: "#ef4444" }}>*</span>
                     </Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="label"
-                      value={shippingAddress.label}
-                      onChange={handleInputChange}
-                      placeholder="Home / Office / Friend"
-                      style={inputStyle}
-                      autoComplete="off"
-                      spellCheck="false"
-                    />
+                    <div style={{ position: "relative" }}>
+                      <Form.Control
+                        type="text"
+                        name="zipCode"
+                        value={shippingAddress.zipCode}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, "").slice(0, 6);
+                          handleInputChange({ target: { name: "zipCode", value: val } });
+                          if (val.length < 6) { setPincodeAutoFilled(false); setPincodeError(null); }
+                        }}
+                        placeholder="6-digit PIN"
+                        required
+                        maxLength={6}
+                        inputMode="numeric"
+                        style={{ ...inputStyle, paddingRight: pincodeLoading ? "2.5rem" : undefined }}
+                        autoComplete="postal-code"
+                      />
+                      {pincodeLoading && (
+                        <div style={{ position: "absolute", right: "0.75rem", top: "50%", transform: "translateY(-50%)", fontSize: "0.8rem", color: "#94a3b8" }}>
+                          ⟳
+                        </div>
+                      )}
+                    </div>
+                    {pincodeAutoFilled && !pincodeLoading && (
+                      <div style={{ fontSize: "0.72rem", color: "#059669", marginTop: "0.25rem", fontWeight: 600 }}>
+                        ✓ City & state auto-filled
+                      </div>
+                    )}
+                    {pincodeError && (
+                      <div style={{ fontSize: "0.72rem", color: "#b45309", marginTop: "0.25rem" }}>
+                        ⚠ {pincodeError}
+                      </div>
+                    )}
                   </Form.Group>
                 </Col>
-                <Col md={12} className="mb-3">
+
+                <Col md={4} className="mb-3">
                   <Form.Group>
-                    <Form.Label style={labelStyle}>Street Address *</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="street"
-                      value={shippingAddress.street}
-                      onChange={handleInputChange}
-                      placeholder="Enter your complete street address"
-                      required
-                      style={inputStyle}
-                      autoComplete="off"
-                      spellCheck="false"
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={6} className="mb-3">
-                  <Form.Group>
-                    <Form.Label style={labelStyle}>City *</Form.Label>
+                    <Form.Label style={labelStyle}>
+                      City <span style={{ color: "#ef4444" }}>*</span>
+                      {pincodeAutoFilled && (
+                        <span style={{ marginLeft: "0.4rem", fontSize: "0.68rem", color: "#059669", fontWeight: 600 }}>Auto</span>
+                      )}
+                    </Form.Label>
                     <Form.Control
                       type="text"
                       name="city"
                       value={shippingAddress.city}
-                      onChange={handleInputChange}
-                      placeholder="Enter your city"
+                      onChange={(e) => { setPincodeAutoFilled(false); handleInputChange(e); }}
+                      placeholder="City / District"
                       required
-                      style={inputStyle}
-                      autoComplete="off"
-                      spellCheck="false"
+                      style={{
+                        ...inputStyle,
+                        background: pincodeAutoFilled ? "#f0fdf4" : undefined,
+                        borderColor: pincodeAutoFilled ? "#86efac" : undefined,
+                      }}
+                      autoComplete="address-level2"
                     />
                   </Form.Group>
                 </Col>
-                <Col md={6} className="mb-3">
+
+                <Col md={4} className="mb-3">
                   <Form.Group>
-                    <Form.Label style={labelStyle}>State *</Form.Label>
+                    <Form.Label style={labelStyle}>
+                      State <span style={{ color: "#ef4444" }}>*</span>
+                      {pincodeAutoFilled && (
+                        <span style={{ marginLeft: "0.4rem", fontSize: "0.68rem", color: "#059669", fontWeight: 600 }}>Auto</span>
+                      )}
+                    </Form.Label>
                     <Form.Control
                       type="text"
                       name="state"
                       value={shippingAddress.state}
-                      onChange={handleInputChange}
-                      placeholder="Enter your state"
-                      required
-                      style={inputStyle}
-                      autoComplete="off"
-                      spellCheck="false"
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={6} className="mb-3">
-                  <Form.Group>
-                    <Form.Label style={labelStyle}>ZIP Code *</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="zipCode"
-                      value={shippingAddress.zipCode}
-                      onChange={handleInputChange}
-                      placeholder="Enter ZIP/Postal code"
-                      required
-                      style={inputStyle}
-                      autoComplete="off"
-                      spellCheck="false"
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={6} className="mb-3">
-                  <Form.Group>
-                    <Form.Label style={labelStyle}>
-                      Phone Number (India) *
-                    </Form.Label>
-                    <input
-                      ref={phoneInputRef}
-                      type="tel"
-                      name="phone"
-                      defaultValue={shippingAddress.phone}
-                      placeholder="10-digit Indian mobile (e.g., 9876543210)"
+                      onChange={(e) => { setPincodeAutoFilled(false); handleInputChange(e); }}
+                      placeholder="State"
                       required
                       style={{
                         ...inputStyle,
-                        width: "100%",
-                        cursor: "text",
+                        background: pincodeAutoFilled ? "#f0fdf4" : undefined,
+                        borderColor: pincodeAutoFilled ? "#86efac" : undefined,
                       }}
-                      autoComplete="off"
-                      spellCheck="false"
-                      className="form-control"
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={6} className="mb-3">
-                  <Form.Group>
-                    <Form.Label style={labelStyle}>Country</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="country"
-                      value={shippingAddress.country}
-                      onChange={handleInputChange}
-                      placeholder="India"
-                      disabled
-                      style={{
-                        ...inputStyle,
-                        backgroundColor: "var(--bg-tertiary)",
-                      }}
+                      autoComplete="address-level1"
                     />
                   </Form.Group>
                 </Col>
               </Row>
+
+              {/* ── Phone ── */}
+              <div className="mb-3">
+                <Form.Label style={labelStyle}>
+                  Phone Number <span style={{ color: "#ef4444" }}>*</span>
+                  <span style={{ fontWeight: 400, color: "#94a3b8", marginLeft: "0.4rem", fontSize: "0.78rem" }}>(India, 10 digits)</span>
+                </Form.Label>
+                <input
+                  ref={phoneInputRef}
+                  type="tel"
+                  name="phone"
+                  defaultValue={shippingAddress.phone}
+                  placeholder="9876543210"
+                  required
+                  style={{ ...inputStyle, width: "100%", cursor: "text" }}
+                  autoComplete="tel-national"
+                  inputMode="numeric"
+                  className="form-control"
+                />
+              </div>
 
               {/* ── Delivery Options Widget ── */}
               {(ratesLoading || rates.length > 0 || ratesError) && (
