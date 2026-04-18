@@ -12,71 +12,53 @@ import api from "../../api/axios";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-function fmtDeliveryDate(etd, estimatedDays) {
+/* COMMENTED OUT — tier-based delivery options (Standard / Fast / Express)
+function fmtDeliveryDate(etd, estimatedDays) { ... }
+function buildTiers(rates) { ... }
+function DeliveryOptions({ rates, loading, error, zipCode, selectedTier, onSelect }) { ... }
+const styles = { ... };
+*/
+
+// Pick Xpressbees Air from the Shiprocket rates array.
+// Falls back to any Xpressbees courier, then to the first available rate.
+function findXpressbees(rates) {
+  if (!rates || rates.length === 0) return null;
+  const byName = (name) => rates.find(
+    (r) => r.courierName?.toLowerCase().includes(name)
+  );
+  return (
+    byName("xpressbees air") ||
+    byName("xpressbees") ||
+    rates[0]
+  );
+}
+
+function fmtDate(etd, estimatedDays) {
   if (etd) {
-    // etd may be "2026-04-21" or "21 Apr" etc.
     try {
       const d = new Date(etd);
-      if (!isNaN(d)) {
-        return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", weekday: "short" });
-      }
-      return etd; // already human-readable
+      if (!isNaN(d)) return d.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
+      return etd;
     } catch { return etd; }
   }
   if (estimatedDays) {
     const d = new Date();
     d.setDate(d.getDate() + estimatedDays);
-    return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", weekday: "short" });
+    return d.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
   }
   return null;
 }
 
-/**
- * Maps raw Shiprocket rates array → { standard, fast, express } tiers.
- * Standard = cheapest, Express = fastest (fewest days), Fast = middle.
- */
-function buildTiers(rates) {
-  if (!rates || rates.length === 0) return {};
+// ── XpressbeesWidget ──────────────────────────────────────────────────────
 
-  const sorted = [...rates].filter((r) => r.rate != null);
-
-  // cheapest → standard
-  const byPrice = [...sorted].sort((a, b) => a.rate - b.rate);
-  const standard = byPrice[0];
-
-  // fastest → express
-  const bySpeed = [...sorted].sort((a, b) => {
-    const da = a.estimatedDays ?? 99;
-    const db = b.estimatedDays ?? 99;
-    return da - db;
-  });
-  const express = bySpeed[0];
-
-  // middle ground → fast (best rated, mid-price, not same as cheapest/fastest)
-  const middle = sorted.find(
-    (r) => r.courierId !== standard.courierId && r.courierId !== express.courierId
-  ) || (express.courierId !== standard.courierId ? express : standard);
-
-  return {
-    standard: { tier: "standard", courier: standard, label: "Standard Delivery", icon: "📦", tag: "Cheapest", tagColor: "#059669", tagBg: "#dcfce7", desc: "Best value for money", deliveryDate: fmtDeliveryDate(standard.etd, standard.estimatedDays) },
-    fast:     { tier: "fast",     courier: middle,   label: "Fast Delivery",     icon: "🚚", tag: "Recommended", tagColor: "#2563eb", tagBg: "#dbeafe", desc: "Reliable & popular choice", deliveryDate: fmtDeliveryDate(middle.etd, middle.estimatedDays) },
-    express:  { tier: "express",  courier: express,  label: "Express Delivery",  icon: "⚡", tag: "Fastest",     tagColor: "#d97706", tagBg: "#fef3c7", desc: "Fastest possible delivery", deliveryDate: fmtDeliveryDate(express.etd, express.estimatedDays) },
-  };
-}
-
-// ── DeliveryOptions Component ──────────────────────────────────────────────
-
-function DeliveryOptions({ rates, loading, error, zipCode, selectedTier, onSelect }) {
-  const tiers = React.useMemo(() => buildTiers(rates), [rates]);
-  const tierKeys = ["standard", "fast", "express"];
-
+function XpressbeesWidget({ loading, error, zipCode, courier }) {
   if (loading) {
     return (
-      <div style={styles.widget}>
-        <div style={styles.widgetHeader}>🚚 Delivery Options</div>
-        <div style={{ padding: "1.25rem", textAlign: "center", color: "#64748b", fontSize: "0.875rem" }}>
+      <div style={xStyles.card}>
+        <div style={xStyles.header}>✈️ Delivery Partner</div>
+        <div style={{ padding: "1rem", textAlign: "center", color: "#64748b", fontSize: "0.875rem" }}>
           <DotsLoader size="sm" />
-          <div style={{ marginTop: "0.5rem" }}>Finding best rates for {zipCode}…</div>
+          <div style={{ marginTop: "0.4rem" }}>Checking rates for {zipCode}…</div>
         </div>
       </div>
     );
@@ -84,119 +66,83 @@ function DeliveryOptions({ rates, loading, error, zipCode, selectedTier, onSelec
 
   if (error) {
     return (
-      <div style={styles.widget}>
-        <div style={styles.widgetHeader}>🚚 Delivery Options</div>
-        <div style={{ padding: "0.875rem 1rem", color: "#b45309", fontSize: "0.82rem", background: "#fffbeb", borderTop: "1px solid #fde68a" }}>
+      <div style={xStyles.card}>
+        <div style={xStyles.header}>✈️ Delivery Partner</div>
+        <div style={{ padding: "0.875rem 1rem", color: "#b45309", fontSize: "0.82rem", background: "#fffbeb" }}>
           ⚠️ {error}
         </div>
       </div>
     );
   }
 
-  if (!rates.length || Object.keys(tiers).length === 0) return null;
+  if (!courier) return null;
+
+  const deliveryDate = fmtDate(courier.etd, courier.estimatedDays);
 
   return (
     <div style={{ marginBottom: "1.25rem" }}>
-      {/* Header */}
-      <div style={styles.widgetHeader}>
-        🚚 Choose Delivery Option
-        <span style={{ marginLeft: "auto", fontSize: "0.72rem", color: "#64748b", fontWeight: 400 }}>
-          Delivered by trusted courier partners
-        </span>
-      </div>
+      <div style={xStyles.card}>
+        <div style={xStyles.header}>
+          ✈️ Delivery Partner
+        </div>
+        <div style={xStyles.body}>
+          {/* Selected — always Xpressbees Air */}
+          <div style={xStyles.row}>
+            {/* Checkmark indicator */}
+            <div style={xStyles.check}>✓</div>
 
-      {/* Tier cards */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", padding: "0.75rem" }}>
-        {tierKeys.map((key) => {
-          const tier = tiers[key];
-          if (!tier) return null;
-          const isSelected = selectedTier === key;
-          const isRecommended = key === "fast";
+            {/* Logo placeholder + name */}
+            <div style={xStyles.logoBox}>XB</div>
 
-          return (
-            <div
-              key={key}
-              onClick={() => onSelect(key, tier.courier)}
-              role="radio"
-              aria-checked={isSelected}
-              tabIndex={0}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onSelect(key, tier.courier); } }}
-              style={{
-                ...styles.tierCard,
-                border: isSelected ? "2px solid #2563eb" : "1.5px solid #e2e8f0",
-                background: isSelected ? "#eff6ff" : "white",
-                boxShadow: isSelected ? "0 0 0 3px rgba(37,99,235,0.1)" : "none",
-                position: "relative",
-                outline: "none",
-              }}
-            >
-              {/* Recommended ribbon */}
-              {isRecommended && (
-                <div style={styles.recommendedRibbon}>★ RECOMMENDED</div>
-              )}
-
-              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                {/* Radio dot */}
-                <div style={{
-                  ...styles.radioDot,
-                  border: `2px solid ${isSelected ? "#2563eb" : "#cbd5e1"}`,
-                  background: isSelected ? "#2563eb" : "white",
-                }}>
-                  {isSelected && <div style={{ width: 7, height: 7, borderRadius: "50%", background: "white" }} />}
-                </div>
-
-                {/* Icon */}
-                <div style={{ fontSize: "1.5rem", lineHeight: 1 }}>{tier.icon}</div>
-
-                {/* Text */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", flexWrap: "wrap" }}>
-                    <span style={{ fontWeight: 700, fontSize: "0.9rem", color: "#1e293b" }}>{tier.label}</span>
-                    <span style={{ ...styles.tag, color: tier.tagColor, background: tier.tagBg }}>{tier.tag}</span>
-                  </div>
-                  <div style={{ fontSize: "0.75rem", color: "#64748b", marginTop: "0.15rem" }}>{tier.desc}</div>
-                  {tier.deliveryDate && (
-                    <div style={{ fontSize: "0.78rem", color: "#059669", fontWeight: 600, marginTop: "0.2rem" }}>
-                      📅 Delivery by {tier.deliveryDate}
-                    </div>
-                  )}
-                </div>
-
-                {/* Price */}
-                <div style={{ textAlign: "right", flexShrink: 0 }}>
-                  <div style={{ fontWeight: 800, fontSize: "1rem", color: tier.courier.rate === 0 ? "#059669" : "#1e293b" }}>
-                    {tier.courier.rate === 0 ? "FREE" : `₹${tier.courier.rate}`}
-                  </div>
-                  <div style={{ fontSize: "0.68rem", color: "#94a3b8" }}>
-                    {tier.courier.estimatedDays ? `~${tier.courier.estimatedDays}d` : ""}
-                  </div>
-                </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", flexWrap: "wrap" }}>
+                <span style={{ fontWeight: 700, fontSize: "0.92rem", color: "#1e293b" }}>
+                  {courier.courierName || "Xpressbees Air"}
+                </span>
+                <span style={xStyles.tag}>Air Express</span>
               </div>
+              <div style={{ fontSize: "0.75rem", color: "#64748b", marginTop: "0.1rem" }}>
+                Fast & reliable air delivery across India
+              </div>
+              {deliveryDate && (
+                <div style={{ fontSize: "0.78rem", color: "#059669", fontWeight: 600, marginTop: "0.2rem" }}>
+                  📅 Expected by {deliveryDate}
+                </div>
+              )}
             </div>
-          );
-        })}
-      </div>
 
-      {/* Trust bar */}
-      <div style={styles.trustBar}>
-        <span>🔒 100% Secure</span>
-        <span>📦 Fully Insured</span>
-        <span>🔄 Easy Returns</span>
-        <span>⭐ 4.8/5 Delivery Rating</span>
+            {/* Price */}
+            <div style={{ textAlign: "right", flexShrink: 0 }}>
+              <div style={{ fontWeight: 800, fontSize: "1.05rem", color: courier.rate === 0 ? "#059669" : "#1e293b" }}>
+                {courier.rate === 0 ? "FREE" : `₹${courier.rate}`}
+              </div>
+              {courier.estimatedDays && (
+                <div style={{ fontSize: "0.68rem", color: "#94a3b8" }}>~{courier.estimatedDays} days</div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Trust bar */}
+        <div style={xStyles.trustBar}>
+          <span>🔒 Secure</span>
+          <span>📦 Insured</span>
+          <span>🔄 Easy Returns</span>
+          <span>⭐ 4.8/5 Rating</span>
+        </div>
       </div>
     </div>
   );
 }
 
-const styles = {
-  widget: {
-    marginBottom: "1.25rem",
+const xStyles = {
+  card: {
     border: "1.5px solid #e2e8f0",
     borderRadius: "14px",
     overflow: "hidden",
   },
-  widgetHeader: {
-    padding: "0.75rem 1rem",
+  header: {
+    padding: "0.65rem 1rem",
     background: "linear-gradient(135deg, #f8fafc, #f1f5f9)",
     borderBottom: "1px solid #e2e8f0",
     fontWeight: 700,
@@ -205,24 +151,46 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "0.4rem",
-    borderRadius: "14px 14px 0 0",
   },
-  tierCard: {
-    padding: "0.9rem 1rem",
+  body: {
+    padding: "0.875rem 1rem",
+  },
+  row: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.75rem",
+    background: "#eff6ff",
+    border: "2px solid #2563eb",
     borderRadius: "12px",
-    cursor: "pointer",
-    transition: "all 0.18s ease",
-    userSelect: "none",
+    padding: "0.85rem 1rem",
+    boxShadow: "0 0 0 3px rgba(37,99,235,0.08)",
   },
-  radioDot: {
-    width: 20,
-    height: 20,
+  check: {
+    width: 22,
+    height: 22,
     borderRadius: "50%",
+    background: "#2563eb",
+    color: "white",
+    fontSize: "0.75rem",
+    fontWeight: 800,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
-    transition: "all 0.15s ease",
+  },
+  logoBox: {
+    width: 38,
+    height: 38,
+    borderRadius: "8px",
+    background: "linear-gradient(135deg, #1d4ed8, #3b82f6)",
+    color: "white",
+    fontSize: "0.72rem",
+    fontWeight: 800,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+    letterSpacing: "0.03em",
   },
   tag: {
     fontSize: "0.65rem",
@@ -231,29 +199,18 @@ const styles = {
     borderRadius: "99px",
     letterSpacing: "0.03em",
     textTransform: "uppercase",
-  },
-  recommendedRibbon: {
-    position: "absolute",
-    top: -1,
-    right: 12,
-    background: "#2563eb",
-    color: "white",
-    fontSize: "0.6rem",
-    fontWeight: 800,
-    padding: "0.15rem 0.5rem",
-    borderRadius: "0 0 6px 6px",
-    letterSpacing: "0.05em",
+    background: "#dbeafe",
+    color: "#1d4ed8",
   },
   trustBar: {
     display: "flex",
     flexWrap: "wrap",
     gap: "0.5rem 1.5rem",
-    padding: "0.6rem 0.75rem",
+    padding: "0.5rem 0.75rem",
     fontSize: "0.72rem",
     color: "#64748b",
     background: "#f8fafc",
     borderTop: "1px solid #e2e8f0",
-    borderRadius: "0 0 14px 14px",
     justifyContent: "center",
   },
 };
@@ -383,7 +340,8 @@ export const ShippingStep = ({
   const [rates, setRates] = useState([]);
   const [ratesLoading, setRatesLoading] = useState(false);
   const [ratesError, setRatesError] = useState(null);
-  const [selectedTier, setSelectedTier] = useState("fast"); // "standard" | "fast" | "express"
+  // COMMENTED OUT — tier selection (Standard / Fast / Express)
+  // const [selectedTier, setSelectedTier] = useState("fast");
 
   // Calculate total weight from cart items (0.5 kg default per item unit)
   const cartWeight = cartItems.reduce(
@@ -406,17 +364,11 @@ export const ShippingStep = ({
         });
         const fetchedRates = res.data.rates || [];
         setRates(fetchedRates);
-        if (fetchedRates.length > 0) {
-          const tiers = buildTiers(fetchedRates);
-          setSelectedTier("fast");
-          onShippingRateSelected?.(tiers.fast?.courier ?? tiers.standard?.courier ?? fetchedRates[0]);
-        } else {
-          onShippingRateSelected?.(null);
-        }
+        // Always pick Xpressbees Air (or best fallback)
+        const xb = findXpressbees(fetchedRates);
+        onShippingRateSelected?.(xb ?? null);
       } catch {
-        setRatesError(
-          "Could not fetch shipping rates. Free shipping will apply.",
-        );
+        setRatesError("Could not fetch shipping rates. Free shipping will apply.");
         onShippingRateSelected?.(null);
       } finally {
         setRatesLoading(false);
@@ -882,18 +834,13 @@ export const ShippingStep = ({
                 />
               </div>
 
-              {/* ── Delivery Options Widget ── */}
+              {/* ── Delivery Partner Widget (Xpressbees Air) ── */}
               {(ratesLoading || rates.length > 0 || ratesError) && (
-                <DeliveryOptions
-                  rates={rates}
+                <XpressbeesWidget
                   loading={ratesLoading}
                   error={ratesError}
                   zipCode={shippingAddress.zipCode}
-                  selectedTier={selectedTier}
-                  onSelect={(tier, courier) => {
-                    setSelectedTier(tier);
-                    onShippingRateSelected?.(courier);
-                  }}
+                  courier={findXpressbees(rates)}
                 />
               )}
 
@@ -1103,7 +1050,7 @@ export const ShippingStep = ({
                       fontSize: "0.875rem",
                     }}
                   >
-                    Shipping ({selectedTier === "standard" ? "Standard" : selectedTier === "express" ? "Express" : "Fast"}):
+                    Shipping (Xpressbees Air):
                   </span>
                   <span
                     style={{
