@@ -3,7 +3,7 @@ import Container from 'react-bootstrap/Container';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import Badge from 'react-bootstrap/Badge';
-import Header from '../../components/Header';
+import AdminLayout from './AdminLayout';
 import api from '../../api/axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -38,10 +38,7 @@ export default function Notifications() {
   };
 
   return (
-    <>
-      <Header />
-      <div className="main-container" style={{ paddingTop: '110px' }}>
-        <Container className="px-3 px-md-4">
+    <AdminLayout>
           <h2 className="mb-4">Admin Notifications</h2>
           <Card style={{ borderRadius: 12 }}>
             <Card.Body>
@@ -70,8 +67,6 @@ export default function Notifications() {
               )}
             </Card.Body>
           </Card>
-        </Container>
-      </div>
-    </>
+    </AdminLayout>
   );
 }

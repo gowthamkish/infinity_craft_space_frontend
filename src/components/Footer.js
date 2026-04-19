@@ -121,12 +121,12 @@ export default function Footer() {
               <h4 className="footer-section-subtitle">Get In Touch</h4>
               <div className="footer-contact-list">
                 <a
-                  href="mailto:jsaginfinitycraftspace@gmail.com"
+                  href="mailto:infinitycraftspacejsag@gmail.com"
                   className="footer-contact-item footer-contact-link"
                   aria-label="Email us"
                 >
                   <FiMail size={16} />
-                  <span>jsaginfinitycraftspace@gmail.com</span>
+                  <span>infinitycraftspacejsag@gmail.com</span>
                 </a>
                 <a
                   href="tel:+918925083167"

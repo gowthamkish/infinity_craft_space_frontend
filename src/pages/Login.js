@@ -49,6 +49,8 @@ export default function Login() {
     try {
       const preLoginCart = [...guestCartItems];
       const data = await dispatch(loginUser({ email, password })).unwrap();
+      // Record login time so axios interceptor skips redirect during cookie settle window
+      sessionStorage.setItem("authLoginTime", String(Date.now()));
       await dispatch(fetchUserCart());
       if (preLoginCart.length > 0) {
         dispatch(mergeGuestCart(preLoginCart));

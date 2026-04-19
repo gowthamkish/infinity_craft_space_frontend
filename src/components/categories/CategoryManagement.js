@@ -25,7 +25,7 @@ import {
   FiEye,
   FiEyeOff,
 } from "react-icons/fi";
-import Header from "../Header";
+import AdminLayout from "../admin/AdminLayout";
 import {
   fetchCategories,
   createCategory,
@@ -278,18 +278,7 @@ const CategoryManagement = () => {
   };
 
   return (
-    <>
-      <Header />
-
-      <Container
-        fluid
-        className=""
-        style={{
-          background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
-          minHeight: "100vh",
-          paddingTop: "20px",
-        }}
-      >
+    <AdminLayout>
         {/* Header Section */}
         <div className="mb-4">
           <Breadcrumb className="mb-3">
@@ -930,8 +919,7 @@ const CategoryManagement = () => {
             </Button>
           </Modal.Footer>
         </Modal>
-      </Container>
-    </>
+    </AdminLayout>
   );
 };
 

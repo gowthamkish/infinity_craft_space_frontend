@@ -106,7 +106,13 @@ api.interceptors.response.use(
           window.location.pathname === "/login" ||
           window.location.pathname === "/register";
 
-        if (!isNoRedirect && !alreadyOnAuth) {
+        // Grace period: on mobile (iOS Safari ITP), cookies can take a few seconds
+        // to be sent after login. If we're within 25 seconds of login, skip the
+        // redirect and let the page recover naturally on the next request.
+        const loginTime = Number(sessionStorage.getItem("authLoginTime") || 0);
+        const withinGracePeriod = loginTime && Date.now() - loginTime < 25_000;
+
+        if (!isNoRedirect && !alreadyOnAuth && !withinGracePeriod) {
           window.location.href = "/login";
         }
         return Promise.reject(refreshError);

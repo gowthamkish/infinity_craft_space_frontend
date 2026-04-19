@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
@@ -8,134 +8,300 @@ import Alert from "react-bootstrap/Alert";
 import Badge from "react-bootstrap/Badge";
 import { Trash2, CreditCard, Package } from "react-feather";
 import { DotsLoader } from "../../components/Loader";
+// import api from "../../api/axios"; // COMMENTED OUT — Shiprocket API no longer used
+
+// ── COMMENTED OUT — Shiprocket rate fetching (will be re-enabled when product scales)
+/*
 import api from "../../api/axios";
 
-// ── Helpers ────────────────────────────────────────────────────────────────
+function findXpressbees(rates) { ... }
+function fmtDate(etd, estimatedDays) { ... }
+function XpressbeesWidget({ loading, error, zipCode, courier }) { ... }
+const xStyles = { ... };
+// Also commented: fetchRates(), ratesLoading, ratesError, rates state
+*/
 
-/* COMMENTED OUT — tier-based delivery options (Standard / Fast / Express)
+// ── COMMENTED OUT — tier-based delivery options (Standard / Fast / Express)
+/*
 function fmtDeliveryDate(etd, estimatedDays) { ... }
 function buildTiers(rates) { ... }
 function DeliveryOptions({ rates, loading, error, zipCode, selectedTier, onSelect }) { ... }
 const styles = { ... };
 */
 
-// Pick Xpressbees Air from the Shiprocket rates array.
-// Falls back to any Xpressbees courier, then to the first available rate.
-function findXpressbees(rates) {
-  if (!rates || rates.length === 0) return null;
-  const byName = (name) => rates.find(
-    (r) => r.courierName?.toLowerCase().includes(name)
-  );
-  return (
-    byName("xpressbees air") ||
-    byName("xpressbees") ||
-    rates[0]
-  );
+// ══════════════════════════════════════════════════════════════════════════════
+// ROADWAYS SHIPPING — Domestic Slab Rate Card (Surface/Road only)
+// All zones use roadways (no air transit) — cheapest & reliable for India
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Weight slabs in grams → price (₹)
+const ROAD_ZONES = {
+  LOCAL: {
+    label: "Local Delivery",
+    sublabel: "Bangalore / Bengaluru",
+    deliveryDays: "1–2",
+    color: "#16a34a",
+    rates: [
+      { maxG: 250,   price: 50 },
+      { maxG: 500,   price: 70 },
+      { maxG: 750,   price: 90 },
+      { maxG: 1000,  price: 110 },
+      { maxG: 2000,  price: 175 },
+      { maxG: 3000,  price: 240 },
+      { maxG: 4000,  price: 305 },
+      { maxG: 5000,  price: 370 },
+      { maxG: 6000,  price: 425 },
+      { maxG: 7000,  price: 480 },
+      { maxG: 8000,  price: 535 },
+      { maxG: 9000,  price: 590 },
+      { maxG: 10000, price: 645 },
+    ],
+    perKgAbove10: 55,
+    perKgAbove50: 45,
+  },
+  STATE: {
+    label: "Within Karnataka",
+    sublabel: "Rest of Karnataka",
+    deliveryDays: "2–3",
+    color: "#0891b2",
+    rates: [
+      { maxG: 250,   price: 65 },
+      { maxG: 500,   price: 88 },
+      { maxG: 750,   price: 110 },
+      { maxG: 1000,  price: 133 },
+      { maxG: 2000,  price: 210 },
+      { maxG: 3000,  price: 290 },
+      { maxG: 4000,  price: 370 },
+      { maxG: 5000,  price: 450 },
+      { maxG: 6000,  price: 520 },
+      { maxG: 7000,  price: 595 },
+      { maxG: 8000,  price: 670 },
+      { maxG: 9000,  price: 745 },
+      { maxG: 10000, price: 820 },
+    ],
+    perKgAbove10: 70,
+    perKgAbove50: 58,
+  },
+  SOUTH: {
+    label: "South India",
+    sublabel: "AP, Telangana, Kerala, Tamil Nadu",
+    deliveryDays: "3–5",
+    color: "#7c3aed",
+    rates: [
+      { maxG: 250,   price: 85 },
+      { maxG: 500,   price: 110 },
+      { maxG: 750,   price: 135 },
+      { maxG: 1000,  price: 160 },
+      { maxG: 2000,  price: 255 },
+      { maxG: 3000,  price: 355 },
+      { maxG: 4000,  price: 455 },
+      { maxG: 5000,  price: 555 },
+      { maxG: 6000,  price: 640 },
+      { maxG: 7000,  price: 730 },
+      { maxG: 8000,  price: 820 },
+      { maxG: 9000,  price: 910 },
+      { maxG: 10000, price: 1000 },
+    ],
+    perKgAbove10: 88,
+    perKgAbove50: 72,
+  },
+  PAN_INDIA: {
+    label: "Pan-India",
+    sublabel: "MH, GJ, Goa, Delhi, UP, MP, RJ, HR, WB & more",
+    deliveryDays: "5–8",
+    color: "#2563eb",
+    rates: [
+      { maxG: 250,   price: 120 },
+      { maxG: 500,   price: 155 },
+      { maxG: 750,   price: 190 },
+      { maxG: 1000,  price: 225 },
+      { maxG: 2000,  price: 360 },
+      { maxG: 3000,  price: 500 },
+      { maxG: 4000,  price: 640 },
+      { maxG: 5000,  price: 780 },
+      { maxG: 6000,  price: 895 },
+      { maxG: 7000,  price: 1020 },
+      { maxG: 8000,  price: 1145 },
+      { maxG: 9000,  price: 1270 },
+      { maxG: 10000, price: 1395 },
+    ],
+    perKgAbove10: 130,
+    perKgAbove50: 108,
+  },
+  REMOTE: {
+    label: "Remote / Hilly Areas",
+    sublabel: "NE States, Andaman, J&K, Ladakh, HP",
+    deliveryDays: "7–12",
+    color: "#b45309",
+    rates: [
+      { maxG: 250,   price: 145 },
+      { maxG: 500,   price: 188 },
+      { maxG: 750,   price: 232 },
+      { maxG: 1000,  price: 275 },
+      { maxG: 2000,  price: 440 },
+      { maxG: 3000,  price: 610 },
+      { maxG: 4000,  price: 785 },
+      { maxG: 5000,  price: 960 },
+      { maxG: 6000,  price: 1105 },
+      { maxG: 7000,  price: 1265 },
+      { maxG: 8000,  price: 1425 },
+      { maxG: 9000,  price: 1590 },
+      { maxG: 10000, price: 1750 },
+    ],
+    perKgAbove10: 165,
+    perKgAbove50: 138,
+  },
+};
+
+// State → Zone key mapping (roadways grouping)
+function getZoneKey(state, city) {
+  const s = (state || "").toLowerCase().trim();
+  const c = (city || "").toLowerCase().trim();
+
+  if (c.includes("bangalore") || c.includes("bengaluru")) return "LOCAL";
+
+  if (s.includes("karnataka")) return "STATE";
+
+  if (
+    s.includes("andhra") || s.includes("telangana") ||
+    s.includes("kerala") || s.includes("tamil")
+  ) return "SOUTH";
+
+  if (
+    s.includes("manipur") || s.includes("meghalaya") ||
+    s.includes("mizoram") || s.includes("nagaland") ||
+    s.includes("sikkim") || s.includes("tripura") ||
+    s.includes("assam") || s.includes("arunachal") ||
+    s.includes("andaman") || s.includes("jammu") ||
+    s.includes("kashmir") || s.includes("ladakh") ||
+    s.includes("himachal")
+  ) return "REMOTE";
+
+  // Maharashtra, Gujarat, Goa, Delhi, UP, MP, RJ, HR, WB, Punjab, Bihar, etc.
+  return "PAN_INDIA";
 }
 
-function fmtDate(etd, estimatedDays) {
-  if (etd) {
-    try {
-      const d = new Date(etd);
-      if (!isNaN(d)) return d.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
-      return etd;
-    } catch { return etd; }
+// Shipping charge calculation
+function calcShippingRate(weightKg, zoneKey) {
+  const zone = ROAD_ZONES[zoneKey];
+  if (!zone) return 0;
+
+  const weightG = weightKg * 1000;
+
+  for (const slab of zone.rates) {
+    if (weightG <= slab.maxG) return slab.price;
   }
-  if (estimatedDays) {
-    const d = new Date();
-    d.setDate(d.getDate() + estimatedDays);
-    return d.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
+
+  if (weightKg <= 50) {
+    const extraKg = Math.ceil(weightKg - 10);
+    return zone.rates[zone.rates.length - 1].price + extraKg * zone.perKgAbove10;
   }
-  return null;
+
+  const base50 = zone.rates[zone.rates.length - 1].price + 40 * zone.perKgAbove10;
+  return base50 + Math.ceil(weightKg - 50) * zone.perKgAbove50;
 }
 
-// ── XpressbeesWidget ──────────────────────────────────────────────────────
+// Expected delivery date range string
+function expectedDeliveryRange(deliveryDays) {
+  const parts = deliveryDays.split("–").map(Number);
+  const minDays = parts[0] || 3;
+  const maxDays = parts[1] || minDays + 3;
 
-function XpressbeesWidget({ loading, error, zipCode, courier }) {
-  if (loading) {
-    return (
-      <div style={xStyles.card}>
-        <div style={xStyles.header}>✈️ Delivery Partner</div>
-        <div style={{ padding: "1rem", textAlign: "center", color: "#64748b", fontSize: "0.875rem" }}>
-          <DotsLoader size="sm" />
-          <div style={{ marginTop: "0.4rem" }}>Checking rates for {zipCode}…</div>
-        </div>
-      </div>
-    );
-  }
+  const fmt = (d) =>
+    d.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
 
-  if (error) {
-    return (
-      <div style={xStyles.card}>
-        <div style={xStyles.header}>✈️ Delivery Partner</div>
-        <div style={{ padding: "0.875rem 1rem", color: "#b45309", fontSize: "0.82rem", background: "#fffbeb" }}>
-          ⚠️ {error}
-        </div>
-      </div>
-    );
-  }
+  const from = new Date();
+  from.setDate(from.getDate() + minDays);
+  const to = new Date();
+  to.setDate(to.getDate() + maxDays);
 
-  if (!courier) return null;
+  return `${fmt(from)} – ${fmt(to)}`;
+}
 
-  const deliveryDate = fmtDate(courier.etd, courier.estimatedDays);
+// ── ShippingWidget ──────────────────────────────────────────────────────────
+
+function ShippingWidget({ zoneKey, weightKg, rate }) {
+  if (!zoneKey) return null;
+
+  const zone = ROAD_ZONES[zoneKey];
+  if (!zone) return null;
+
+  const deliveryRange = expectedDeliveryRange(zone.deliveryDays);
+  const accent = zone.color;
 
   return (
     <div style={{ marginBottom: "1.25rem" }}>
-      <div style={xStyles.card}>
-        <div style={xStyles.header}>
-          ✈️ Delivery Partner
+      <div style={shipStyles.card}>
+        {/* Header */}
+        <div style={shipStyles.header}>
+          <span>🚚 Shipping Details</span>
+          <span style={{
+            fontSize: "0.68rem",
+            fontWeight: 700,
+            color: "#16a34a",
+            background: "#dcfce7",
+            padding: "0.15rem 0.55rem",
+            borderRadius: "99px",
+          }}>
+            🛣️ Road Delivery
+          </span>
         </div>
-        <div style={xStyles.body}>
-          {/* Selected — always Xpressbees Air */}
-          <div style={xStyles.row}>
-            {/* Checkmark indicator */}
-            <div style={xStyles.check}>✓</div>
 
-            {/* Logo placeholder + name */}
-            <div style={xStyles.logoBox}>XB</div>
+        {/* Rate row */}
+        <div style={shipStyles.body}>
+          <div style={{ ...shipStyles.row, borderColor: accent, boxShadow: `0 0 0 3px ${accent}18` }}>
+            <div style={{ ...shipStyles.check, background: accent }}>✓</div>
+
+            <div style={{ ...shipStyles.iconBox, background: `linear-gradient(135deg, ${accent}, ${accent}bb)` }}>
+              🚛
+            </div>
 
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", flexWrap: "wrap" }}>
                 <span style={{ fontWeight: 700, fontSize: "0.92rem", color: "#1e293b" }}>
-                  {courier.courierName || "Xpressbees Air"}
+                  Standard Road Delivery
                 </span>
-                <span style={xStyles.tag}>Air Express</span>
+                <span style={{ ...shipStyles.tag, background: `${accent}1a`, color: accent }}>
+                  {zone.label}
+                </span>
               </div>
               <div style={{ fontSize: "0.75rem", color: "#64748b", marginTop: "0.1rem" }}>
-                Fast & reliable air delivery across India
+                {zone.sublabel}
               </div>
-              {deliveryDate && (
-                <div style={{ fontSize: "0.78rem", color: "#059669", fontWeight: 600, marginTop: "0.2rem" }}>
-                  📅 Expected by {deliveryDate}
-                </div>
-              )}
+              <div style={{ fontSize: "0.78rem", color: "#059669", fontWeight: 600, marginTop: "0.25rem" }}>
+                📅 Expected: {deliveryRange}
+              </div>
+              <div style={{ fontSize: "0.7rem", color: "#94a3b8", marginTop: "0.1rem" }}>
+                Shipment weight:{" "}
+                {weightKg < 1
+                  ? `${Math.round(weightKg * 1000)} g`
+                  : `${weightKg.toFixed(2)} kg`}
+              </div>
             </div>
 
-            {/* Price */}
             <div style={{ textAlign: "right", flexShrink: 0 }}>
-              <div style={{ fontWeight: 800, fontSize: "1.05rem", color: courier.rate === 0 ? "#059669" : "#1e293b" }}>
-                {courier.rate === 0 ? "FREE" : `₹${courier.rate}`}
+              <div style={{ fontWeight: 800, fontSize: "1.1rem", color: rate === 0 ? "#059669" : "#1e293b" }}>
+                {rate === 0 ? "FREE" : `₹${rate}`}
               </div>
-              {courier.estimatedDays && (
-                <div style={{ fontSize: "0.68rem", color: "#94a3b8" }}>~{courier.estimatedDays} days</div>
-              )}
+              <div style={{ fontSize: "0.68rem", color: "#94a3b8" }}>
+                {zone.deliveryDays} days
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Trust bar */}
-        <div style={xStyles.trustBar}>
-          <span>🔒 Secure</span>
-          <span>📦 Insured</span>
+        <div style={shipStyles.trustBar}>
+          <span>🔒 Safe Packaging</span>
+          <span>📦 Door Delivery</span>
           <span>🔄 Easy Returns</span>
-          <span>⭐ 4.8/5 Rating</span>
+          <span>📍 Pan-India</span>
         </div>
       </div>
     </div>
   );
 }
 
-const xStyles = {
+const shipStyles = {
   card: {
     border: "1.5px solid #e2e8f0",
     borderRadius: "14px",
@@ -150,26 +316,21 @@ const xStyles = {
     color: "#1e293b",
     display: "flex",
     alignItems: "center",
-    gap: "0.4rem",
+    justifyContent: "space-between",
   },
-  body: {
-    padding: "0.875rem 1rem",
-  },
+  body: { padding: "0.875rem 1rem" },
   row: {
     display: "flex",
     alignItems: "center",
     gap: "0.75rem",
-    background: "#eff6ff",
-    border: "2px solid #2563eb",
+    background: "#f8fafc",
+    border: "2px solid #e2e8f0",
     borderRadius: "12px",
     padding: "0.85rem 1rem",
-    boxShadow: "0 0 0 3px rgba(37,99,235,0.08)",
   },
   check: {
-    width: 22,
-    height: 22,
+    width: 22, height: 22,
     borderRadius: "50%",
-    background: "#2563eb",
     color: "white",
     fontSize: "0.75rem",
     fontWeight: 800,
@@ -178,29 +339,20 @@ const xStyles = {
     justifyContent: "center",
     flexShrink: 0,
   },
-  logoBox: {
-    width: 38,
-    height: 38,
+  iconBox: {
+    width: 38, height: 38,
     borderRadius: "8px",
-    background: "linear-gradient(135deg, #1d4ed8, #3b82f6)",
-    color: "white",
-    fontSize: "0.72rem",
-    fontWeight: 800,
+    fontSize: "1.2rem",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
-    letterSpacing: "0.03em",
   },
   tag: {
-    fontSize: "0.65rem",
+    fontSize: "0.62rem",
     fontWeight: 700,
     padding: "0.1rem 0.45rem",
     borderRadius: "99px",
-    letterSpacing: "0.03em",
-    textTransform: "uppercase",
-    background: "#dbeafe",
-    color: "#1d4ed8",
   },
   trustBar: {
     display: "flex",
@@ -215,7 +367,7 @@ const xStyles = {
   },
 };
 
-// ── AddressLabelChips ─────────────────────────────────────────────────────
+// ── AddressLabelChips ─────────────────────────────────────────────────────────
 
 const LABEL_PRESETS = ["Home", "Office", "Other"];
 
@@ -277,7 +429,7 @@ function AddressLabelChips({ value, onChange }) {
   );
 }
 
-// ── Main Component ─────────────────────────────────────────────────────────
+// ── Main Component ─────────────────────────────────────────────────────────────
 
 export const ShippingStep = ({
   cartItems,
@@ -336,18 +488,48 @@ export const ShippingStep = ({
     }
   }, [setShippingAddress]);
 
-  // ── Shipping rates state ─────────────────────────────────────
+  // ── Shipping calculation (The Professional Couriers) ────────────────────────
+
+  // Total cart weight — uses weightInGrams from product if set, else 500g default per unit
+  const cartWeight = cartItems.reduce(
+    (sum, item) => sum + ((item.product?.weightInGrams ?? 500) / 1000) * item.quantity,
+    0,
+  );
+
+  // Derive zone + rate from state/city whenever they change
+  const zoneKey = useMemo(() => {
+    const state = shippingAddress.state?.trim();
+    const city = shippingAddress.city?.trim();
+    if (!state && !city) return null;
+    return getZoneKey(state, city);
+  }, [shippingAddress.state, shippingAddress.city]);
+
+  const shippingCharge = useMemo(() => {
+    if (!zoneKey) return null;
+    const weight = Math.max(cartWeight, 0.25); // min 250g slab
+    return calcShippingRate(weight, zoneKey);
+  }, [zoneKey, cartWeight]);
+
+  // Propagate rate to parent whenever zone/charge changes
+  useEffect(() => {
+    if (zoneKey && shippingCharge !== null) {
+      onShippingRateSelected?.({
+        courierName: "Road Delivery",
+        rate: shippingCharge,
+        estimatedDays: ROAD_ZONES[zoneKey]?.deliveryDays,
+        zoneKey,
+      });
+    } else {
+      onShippingRateSelected?.(null);
+    }
+  }, [zoneKey, shippingCharge, onShippingRateSelected]);
+
+  // COMMENTED OUT — Shiprocket rate fetching (re-enable when scaling)
+  /*
   const [rates, setRates] = useState([]);
   const [ratesLoading, setRatesLoading] = useState(false);
   const [ratesError, setRatesError] = useState(null);
-  // COMMENTED OUT — tier selection (Standard / Fast / Express)
   // const [selectedTier, setSelectedTier] = useState("fast");
-
-  // Calculate total weight from cart items (0.5 kg default per item unit)
-  const cartWeight = cartItems.reduce(
-    (sum, item) => sum + (item.product?.weight || 0.5) * item.quantity,
-    0,
-  );
 
   const fetchRates = useCallback(
     async (pincode) => {
@@ -364,7 +546,6 @@ export const ShippingStep = ({
         });
         const fetchedRates = res.data.rates || [];
         setRates(fetchedRates);
-        // Always pick Xpressbees Air (or best fallback)
         const xb = findXpressbees(fetchedRates);
         onShippingRateSelected?.(xb ?? null);
       } catch {
@@ -376,15 +557,15 @@ export const ShippingStep = ({
     },
     [cartWeight, subtotal, onShippingRateSelected],
   );
+  */
 
-  // Auto-fetch rates + city/state when pincode reaches 6 digits
+  // Trigger pincode auto-fill when 6-digit pin is entered
   useEffect(() => {
     const pin = shippingAddress.zipCode?.trim();
     if (pin?.length === 6 && /^\d{6}$/.test(pin)) {
-      fetchRates(pin);
       fetchPincodeDetails(pin);
+      // COMMENTED OUT — Shiprocket: fetchRates(pin);
     } else {
-      setRates([]);
       onShippingRateSelected?.(null);
       if ((pin?.length ?? 0) < 6) {
         setPincodeAutoFilled(false);
@@ -393,6 +574,8 @@ export const ShippingStep = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shippingAddress.zipCode]);
+
+  // ── intl-tel-input phone widget ──────────────────────────────────────────────
 
   useEffect(() => {
     const input = phoneInputRef.current;
@@ -405,7 +588,6 @@ export const ShippingStep = ({
     const UTILS_SRC =
       "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js";
 
-    // inject CSS if not already present
     if (!document.querySelector(`link[href='${CSS_HREF}']`)) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
@@ -436,22 +618,19 @@ export const ShippingStep = ({
     ensureScript()
       .then(() => {
         if (!mounted) return;
-        // Initialize with India only — no country switching allowed
         const iti = window.intlTelInput(input, {
-          initialCountry: "in", // Fixed to India
+          initialCountry: "in",
           separateDialCode: true,
           utilsScript: UTILS_SRC,
-          onlyCountries: ["in"], // Restrict to India only
+          onlyCountries: ["in"],
           preferredCountries: ["in"],
         });
         itiRef.current = iti;
 
-        // Disable country selection but keep flag visible
         const flagContainer = input.parentElement?.querySelector(
           ".iti__flag-container",
         );
         if (flagContainer) {
-          // Prevent clicking on the flag to open country list
           flagContainer.style.cursor = "not-allowed";
           flagContainer.style.pointerEvents = "auto";
           flagContainer.onclick = (e) => {
@@ -461,7 +640,6 @@ export const ShippingStep = ({
           };
         }
 
-        // Disable the country list button
         const countryListBtn = input.parentElement?.querySelector(
           ".iti__selected-flag",
         );
@@ -470,9 +648,7 @@ export const ShippingStep = ({
           countryListBtn.style.cursor = "not-allowed";
         }
 
-        // set initial input value from shippingAddress
         if (shippingAddress && shippingAddress.phone) {
-          // Strip country code if present (e.g., +91 prefix)
           let phoneValue = shippingAddress.phone.toString().trim();
           if (phoneValue.startsWith("+91")) {
             phoneValue = phoneValue.substring(3);
@@ -481,12 +657,10 @@ export const ShippingStep = ({
         }
 
         const handleChange = () => {
-          const fullNumber = iti.getNumber(); // Full number with country code
-          const nationalNumber = input.value; // Just the number part
-
+          const nationalNumber = input.value;
           setShippingAddress((prev) => ({
             ...prev,
-            phone: nationalNumber, // Store without country code
+            phone: nationalNumber,
             country: "India",
             countryCode: "+91",
           }));
@@ -495,13 +669,9 @@ export const ShippingStep = ({
         input.addEventListener("change", handleChange);
         input.addEventListener("blur", handleChange);
         input.addEventListener("keyup", handleChange);
-
-        // store handler so we can remove it later
         input.__iti_handle_change = handleChange;
       })
-      .catch(() => {
-        // script failed to load — leave non-enhanced input
-      });
+      .catch(() => {});
 
     return () => {
       mounted = false;
@@ -513,9 +683,7 @@ export const ShippingStep = ({
         delete input.__iti_handle_change;
       }
       if (itiRef.current) {
-        try {
-          itiRef.current.destroy();
-        } catch (e) {}
+        try { itiRef.current.destroy(); } catch (e) {}
       }
       itiRef.current = null;
     };
@@ -524,21 +692,12 @@ export const ShippingStep = ({
   const validatePhone = () => {
     const input = phoneInputRef.current;
     if (!input || !input.value) return false;
-
-    // Indian phone validation: 10 digits, starting with 6-9
     const phoneNumber = input.value.toString().trim();
     const isFallbackValid = /^[6-9]\d{9}$/.test(phoneNumber);
-
-    // Try intl-tel-input validation if available
     const iti = itiRef.current;
     if (iti) {
-      try {
-        return iti.isValidNumber() || isFallbackValid;
-      } catch (e) {
-        return isFallbackValid;
-      }
+      try { return iti.isValidNumber() || isFallbackValid; } catch (e) { return isFallbackValid; }
     }
-
     return isFallbackValid;
   };
 
@@ -720,7 +879,7 @@ export const ShippingStep = ({
                 />
               </div>
 
-              {/* ── Pincode + auto-fill row ── */}
+              {/* ── Pincode + City + State ── */}
               <Row>
                 <Col md={4} className="mb-3">
                   <Form.Group>
@@ -834,13 +993,12 @@ export const ShippingStep = ({
                 />
               </div>
 
-              {/* ── Delivery Partner Widget (Xpressbees Air) ── */}
-              {(ratesLoading || rates.length > 0 || ratesError) && (
-                <XpressbeesWidget
-                  loading={ratesLoading}
-                  error={ratesError}
-                  zipCode={shippingAddress.zipCode}
-                  courier={findXpressbees(rates)}
+              {/* ── Shipping Widget (Road Delivery) ── */}
+              {zoneKey && shippingCharge !== null && (
+                <ShippingWidget
+                  zoneKey={zoneKey}
+                  weightKg={Math.max(cartWeight, 0.25)}
+                  rate={shippingCharge}
                 />
               )}
 
@@ -924,6 +1082,8 @@ export const ShippingStep = ({
           </Card.Body>
         </Card>
       </Col>
+
+      {/* ── Order Summary Sidebar ── */}
       <Col lg={4}>
         <Card
           style={{
@@ -1042,26 +1202,41 @@ export const ShippingStep = ({
                   ₹{subtotal.toFixed(2)}
                 </span>
               </div>
+
               {shippingRate && (
                 <div className="d-flex justify-content-between mb-2">
-                  <span
-                    style={{
-                      color: "var(--text-secondary)",
-                      fontSize: "0.875rem",
-                    }}
-                  >
-                    Shipping (Xpressbees Air):
-                  </span>
+                  <div style={{ color: "var(--text-secondary)", fontSize: "0.875rem" }}>
+                    <div>Shipping:</div>
+                    <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginTop: "0.1rem" }}>
+                      Road Delivery
+                      {zoneKey && (
+                        <span> · {ROAD_ZONES[zoneKey]?.label}</span>
+                      )}
+                    </div>
+                  </div>
                   <span
                     style={{
                       fontWeight: "600",
                       color: shippingRate.rate === 0 ? "#059669" : "inherit",
+                      alignSelf: "flex-start",
                     }}
                   >
                     {shippingRate.rate === 0 ? "FREE" : `₹${shippingRate.rate}`}
                   </span>
                 </div>
               )}
+
+              {!shippingRate && (
+                <div className="d-flex justify-content-between mb-2">
+                  <span style={{ color: "var(--text-secondary)", fontSize: "0.875rem" }}>
+                    Shipping:
+                  </span>
+                  <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>
+                    Enter state to calculate
+                  </span>
+                </div>
+              )}
+
               <hr style={{ border: "1px solid var(--border-color)" }} />
               <div className="d-flex justify-content-between">
                 <span

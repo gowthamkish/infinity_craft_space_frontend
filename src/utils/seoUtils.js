@@ -90,7 +90,7 @@ export const generateOrganizationJsonLD = () => {
       "@type": "ContactPoint",
       telephone: "+91 8925083167",
       contactType: "Customer Service",
-      email: "jsaginfinitycraftspace@gmail.com",
+      email: "infinitycraftspacejsag@gmail.com",
     },
     address: {
       "@type": "PostalAddress",

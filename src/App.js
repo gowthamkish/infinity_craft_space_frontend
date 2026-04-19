@@ -154,12 +154,18 @@ function App() {
       }
     };
 
-    // Run immediately on login, then every 15 s
-    poll(true);
+    // Delay first poll by 4 s after login to let iOS Safari ITP settle cookies.
+    // Subsequent polls run every 15 s as before.
+    const loginTime = Number(sessionStorage.getItem("authLoginTime") || 0);
+    const msSinceLogin = loginTime ? Date.now() - loginTime : Infinity;
+    const initialDelay = msSinceLogin < 10_000 ? 4_000 : 0;
+
+    const firstPoll = setTimeout(() => poll(true), initialDelay);
     const id = setInterval(() => poll(false), 15_000);
 
     return () => {
       cancelled = true;
+      clearTimeout(firstPoll);
       clearInterval(id);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps

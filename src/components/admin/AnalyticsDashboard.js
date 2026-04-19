@@ -10,7 +10,7 @@ import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ProgressBar from "react-bootstrap/ProgressBar";
-import Header from "../Header";
+import AdminLayout from "./AdminLayout";
 import api from "../../api/axios";
 import SEOHead, { SEO_CONFIG } from "../SEOHead";
 import c3 from "c3";
@@ -711,17 +711,8 @@ export default function AnalyticsDashboard() {
         noindex={true}
         nofollow={true}
       />
-      <div className="App">
-        <Header />
-        <div
-          className="main-container"
-          style={{
-            backgroundColor: "#f8fafc",
-            minHeight: "100vh",
-            paddingTop: "20px",
-          }}
-        >
-          <Container fluid className="px-3 px-md-4 pb-5">
+      <AdminLayout>
+
             {/* Header */}
             <Row className="mb-4">
               <Col>
@@ -1516,10 +1507,6 @@ export default function AnalyticsDashboard() {
                 </Row>
               </>
             ) : null}
-          </Container>
-        </div>
-      </div>
-
       <style>{`
         .spin {
           animation: spin 1s linear infinite;
@@ -1581,6 +1568,7 @@ export default function AnalyticsDashboard() {
           stroke: #e2e8f0;
         }
       `}</style>
+      </AdminLayout>
     </>
   );
 }

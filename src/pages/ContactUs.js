@@ -19,7 +19,8 @@ export default function ContactUs() {
               <div className="cp-eyebrow">Support</div>
               <h1 className="cp-title">Contact Us</h1>
               <p className="cp-lead">
-                Have a question about your order or products? Reach out to us and we'll respond as soon as possible.
+                Have a question about your order or products? Reach out to us
+                and we'll respond as soon as possible.
               </p>
             </div>
             <div className="cp-card-body cp-body">
@@ -27,7 +28,9 @@ export default function ContactUs() {
                 <div className="cp-contact-card">
                   <p className="cp-contact-label">Support</p>
                   <div className="cp-contact-item">
-                    <a href="mailto:jsaginfinitycraftspace@gmail.com">jsaginfinitycraftspace@gmail.com</a>
+                    <a href="mailto:infinitycraftspacejsag@gmail.com">
+                      infinitycraftspacejsag@gmail.com
+                    </a>
                     <a href="tel:+918925083167">+91 89250 83167</a>
                     <span>Hours: 10:00 AM – 6:00 PM IST</span>
                   </div>

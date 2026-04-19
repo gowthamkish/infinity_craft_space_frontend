@@ -62,7 +62,9 @@ export default function TermsAndConditions() {
               <div className="cp-eyebrow">Legal</div>
               <h1 className="cp-title">Terms &amp; Conditions</h1>
               <p className="cp-lead">
-                These terms govern your use of Infinity Craft Space and any purchases made through our store. By using the site, you agree to the conditions below.
+                These terms govern your use of Infinity Craft Space and any
+                purchases made through our store. By using the site, you agree
+                to the conditions below.
               </p>
             </div>
             <div className="cp-card-body cp-body">
@@ -76,7 +78,10 @@ export default function TermsAndConditions() {
               <h2 className="cp-section-heading">11. Contact</h2>
               <p>
                 For questions about these terms, contact us at{" "}
-                <a href="mailto:jsaginfinitycraftspace@gmail.com">jsaginfinitycraftspace@gmail.com</a>.
+                <a href="mailto:infinitycraftspacejsag@gmail.com">
+                  infinitycraftspacejsag@gmail.com
+                </a>
+                .
               </p>
             </div>
           </div>

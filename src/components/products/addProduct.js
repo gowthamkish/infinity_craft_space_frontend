@@ -51,7 +51,11 @@ const AddProduct = () => {
     lowStockThreshold: "5",
     trackInventory: true,
     estimatedDelivery: "5",
+    weightInGrams: "500",
   });
+
+  // UI-only: which unit the admin is viewing in the weight field
+  const [weightUnit, setWeightUnit] = useState("g");
 
   const [editingId] = useState(params?.id ?? null);
   const [loading, setLoading] = useState(false);
@@ -282,6 +286,7 @@ const AddProduct = () => {
           lowStockThreshold: "5",
           trackInventory: true,
           estimatedDelivery: "5",
+          weightInGrams: "500",
         });
         handleRemoveAllImages();
         setValidated(false);
@@ -349,6 +354,12 @@ const AddProduct = () => {
             : "5",
         trackInventory:
           product.trackInventory !== undefined ? product.trackInventory : true,
+        estimatedDelivery:
+          product.estimatedDelivery !== undefined
+            ? String(product.estimatedDelivery)
+            : "5",
+        weightInGrams:
+          product.weightInGrams !== undefined ? String(product.weightInGrams) : "500",
       });
 
       // Set existing images if available
@@ -785,6 +796,103 @@ const AddProduct = () => {
                         />
                         <Form.Text className="text-muted">
                           Number of days for estimated delivery (1-90 days)
+                        </Form.Text>
+                      </Form.Group>
+                    </Col>
+
+                    {/* ── Product Weight ── */}
+                    <Col md={6}>
+                      <Form.Group className="mb-4" controlId="formWeight">
+                        <Form.Label
+                          className="fw-semibold text-dark mb-2"
+                          style={{ fontSize: "1rem" }}
+                        >
+                          ⚖️ Product Weight
+                          <span
+                            style={{
+                              fontSize: "0.75rem",
+                              fontWeight: 400,
+                              color: "#6b7280",
+                              marginLeft: "0.4rem",
+                            }}
+                          >
+                            (used for shipping)
+                          </span>
+                        </Form.Label>
+
+                        {/* Unit toggle */}
+                        <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                          {["g", "kg"].map((u) => (
+                            <button
+                              key={u}
+                              type="button"
+                              onClick={() => setWeightUnit(u)}
+                              style={{
+                                padding: "0.25rem 0.85rem",
+                                borderRadius: "99px",
+                                border: `1.5px solid ${weightUnit === u ? "#667eea" : "#cbd5e1"}`,
+                                background: weightUnit === u ? "#667eea" : "white",
+                                color: weightUnit === u ? "white" : "#475569",
+                                fontSize: "0.8rem",
+                                fontWeight: 600,
+                                cursor: "pointer",
+                              }}
+                            >
+                              {u}
+                            </button>
+                          ))}
+                        </div>
+
+                        <Form.Control
+                          type="number"
+                          placeholder={weightUnit === "g" ? "e.g. 500" : "e.g. 0.5"}
+                          value={
+                            weightUnit === "g"
+                              ? form.weightInGrams
+                              : form.weightInGrams
+                                ? (Number(form.weightInGrams) / 1000).toFixed(3).replace(/\.?0+$/, "")
+                                : ""
+                          }
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val === "" || val === "-") {
+                              setForm({ ...form, weightInGrams: "" });
+                              return;
+                            }
+                            const grams =
+                              weightUnit === "g"
+                                ? Math.round(Number(val))
+                                : Math.round(Number(val) * 1000);
+                            setForm({ ...form, weightInGrams: String(grams) });
+                          }}
+                          min={weightUnit === "g" ? "1" : "0.001"}
+                          step={weightUnit === "g" ? "1" : "0.001"}
+                          style={{
+                            borderRadius: "14px",
+                            border: "2px solid #e2e8f0",
+                            fontSize: "1rem",
+                            padding: "14px 18px",
+                            transition: "all 0.3s ease",
+                            backgroundColor: "#f8fafc",
+                          }}
+                          className="form-control-lg"
+                          onFocus={(e) => {
+                            e.target.style.border = "2px solid #667eea";
+                            e.target.style.backgroundColor = "white";
+                            e.target.style.boxShadow = "0 0 0 4px rgba(102,126,234,0.1)";
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.border = "2px solid #e2e8f0";
+                            e.target.style.backgroundColor = "#f8fafc";
+                            e.target.style.boxShadow = "none";
+                          }}
+                        />
+                        <Form.Text className="text-muted">
+                          {form.weightInGrams
+                            ? weightUnit === "g"
+                              ? `= ${(Number(form.weightInGrams) / 1000).toFixed(3).replace(/\.?0+$/, "")} kg`
+                              : `= ${form.weightInGrams} g`
+                            : "Enter weight to auto-calculate shipping charges"}
                         </Form.Text>
                       </Form.Group>
                     </Col>
