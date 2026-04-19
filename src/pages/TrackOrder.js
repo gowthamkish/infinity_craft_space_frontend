@@ -15,14 +15,14 @@ import api from "../api/axios";
 import "./TrackOrder.css";
 
 const STATUS_ICON = {
-  confirmed:       "✅",
-  processing:      "⏳",
-  shipped:         "🚚",
-  out_for_delivery:"🛵",
-  delivered:       "🏠",
-  cancelled:       "❌",
-  returned:        "🔄",
-  pending:         "🕐",
+  confirmed: "✅",
+  processing: "⏳",
+  shipped: "🚚",
+  out_for_delivery: "🛵",
+  delivered: "🏠",
+  cancelled: "❌",
+  returned: "🔄",
+  pending: "🕐",
 };
 
 function fmtCurrency(n) {
@@ -43,11 +43,11 @@ export default function TrackOrder() {
   const navigate = useNavigate();
   const user = useSelector((s) => s.auth.user);
 
-  const [order, setOrder]       = useState(null);
+  const [order, setOrder] = useState(null);
   const [tracking, setTracking] = useState(null);
-  const [loading, setLoading]   = useState(true);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [error, setError]       = useState(null);
+  const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
 
   const fetchTracking = useCallback(
@@ -65,14 +65,14 @@ export default function TrackOrder() {
       } catch (err) {
         setError(
           err.response?.data?.error ||
-            "Failed to fetch tracking information. Please try again."
+            "Failed to fetch tracking information. Please try again.",
         );
       } finally {
         setLoading(false);
         setRefreshing(false);
       }
     },
-    [orderId]
+    [orderId],
   );
 
   useEffect(() => {
@@ -97,7 +97,10 @@ export default function TrackOrder() {
         <Container className="mt-4">
           <div className="to-card">
             <div className="to-card-body">
-              <div className="to-skeleton" style={{ height: 100, marginBottom: 16 }} />
+              <div
+                className="to-skeleton"
+                style={{ height: 100, marginBottom: 16 }}
+              />
               <div className="to-skeleton" style={{ height: 200 }} />
             </div>
           </div>
@@ -257,7 +260,13 @@ export default function TrackOrder() {
                     </span>
                   </p>
                 ) : (
-                  <p style={{ margin: 0, color: "#94a3b8", fontSize: "0.875rem" }}>
+                  <p
+                    style={{
+                      margin: 0,
+                      color: "#94a3b8",
+                      fontSize: "0.875rem",
+                    }}
+                  >
                     Address details not available.
                   </p>
                 )}
@@ -285,7 +294,10 @@ export default function TrackOrder() {
                   </div>
                   <div className="to-meta-item">
                     <span className="to-meta-label">Total amount</span>
-                    <span className="to-meta-value" style={{ color: "#059669" }}>
+                    <span
+                      className="to-meta-value"
+                      style={{ color: "#059669" }}
+                    >
                       {fmtCurrency(order?.totalAmount)}
                     </span>
                   </div>
@@ -322,8 +334,7 @@ export default function TrackOrder() {
                       display: "block",
                       marginTop: "1rem",
                       padding: "0.6rem 1rem",
-                      background:
-                        "linear-gradient(135deg, #10b981, #059669)",
+                      background: "linear-gradient(135deg, #10b981, #059669)",
                       color: "white",
                       borderRadius: 10,
                       textAlign: "center",
