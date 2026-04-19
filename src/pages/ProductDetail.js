@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from "react";
+import React, { useState, useEffect, lazy, Suspense, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Card, Alert } from "react-bootstrap";
@@ -21,8 +21,10 @@ import api from "../api/axios";
 import SEOHead, { generateProductStructuredData } from "../components/SEOHead";
 import { useRecentlyViewed } from "../hooks/useRecentlyViewed";
 import Breadcrumbs from "../components/Breadcrumbs";
-import ProductRecommendations from "../components/ProductRecommendations";
-import ProductQnA from "../components/ProductQnA";
+import { useLazySection } from "../hooks/useLazySection";
+
+const ProductRecommendations = lazy(() => import("../components/ProductRecommendations"));
+const ProductQnA = lazy(() => import("../components/ProductQnA"));
 import "./ProductDetail.css";
 
 const Header = lazy(() => import("../components/Header"));
@@ -41,6 +43,8 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { addProduct } = useRecentlyViewed();
+  const { ref: qnaRef, inView: qnaInView } = useLazySection();
+  const { ref: recoRef, inView: recoInView } = useLazySection();
 
   const isAuthenticated = useSelector((state) => !!state.auth.user);
   const cartItems = useSelector((state) => state.cart.items);
@@ -387,25 +391,29 @@ const ProductDetail = () => {
             </Col>
           </Row>
 
-          {/* Q&A */}
-          <Row className="mt-4">
+          {/* Q&A — lazy mount on scroll */}
+          <Row className="mt-4" ref={qnaRef}>
             <Col>
               <Card className="pd-section-card">
                 <Card.Body>
-                  <Suspense fallback={<PageLoader variant="card" label="Loading…" />}>
-                    <ProductQnA productId={id} isAuthenticated={isAuthenticated} userName={userName} />
-                  </Suspense>
+                  {qnaInView && (
+                    <Suspense fallback={<PageLoader variant="card" label="Loading Q&A…" />}>
+                      <ProductQnA productId={id} isAuthenticated={isAuthenticated} userName={userName} />
+                    </Suspense>
+                  )}
                 </Card.Body>
               </Card>
             </Col>
           </Row>
 
-          {/* Recommendations */}
-          <Row className="mt-4">
+          {/* Recommendations — lazy mount on scroll */}
+          <Row className="mt-4" ref={recoRef}>
             <Col>
-              <Suspense fallback={<PageLoader variant="card" label="Loading…" />}>
-                <ProductRecommendations productId={id} currentProductCategory={product.category} />
-              </Suspense>
+              {recoInView && (
+                <Suspense fallback={<PageLoader variant="card" label="Loading recommendations…" />}>
+                  <ProductRecommendations productId={id} currentProductCategory={product.category} />
+                </Suspense>
+              )}
             </Col>
           </Row>
         </Container>

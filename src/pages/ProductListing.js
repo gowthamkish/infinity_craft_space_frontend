@@ -5,6 +5,7 @@ import React, {
   lazy,
   Suspense,
   useEffect,
+  useRef,
 } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -34,6 +35,36 @@ const ProductFilters = lazy(() => import("../components/ProductFilters"));
 const ImageCarouselModal = lazy(
   () => import("../components/ImageCarouselModal"),
 );
+
+const PAGE_SIZE = 16;
+
+// ─── Lazy Image with fade-in ──────────────────────────────────────────────────
+function useLazyImage(src) {
+  const imgRef = useRef(null);
+  const [loaded, setLoaded] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = imgRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return { imgRef, src: visible ? src : undefined, loaded, setLoaded };
+}
 
 // ─── Skeleton Card ────────────────────────────────────────────────────────────
 const SkeletonCard = () => (
@@ -71,9 +102,11 @@ const ProductCard = React.memo(
       product.trackInventory !== false &&
       product.stock > 0 &&
       product.stock <= (product.lowStockThreshold || 5);
-    const imageUrl =
+    const rawImageUrl =
       product.images?.[0]?.url || product.image?.url || product.image || null;
     const imgCount = product.images?.length || 0;
+    const { imgRef, src: imageUrl, loaded: imgLoaded, setLoaded: setImgLoaded } =
+      useLazyImage(rawImageUrl);
 
     const handleToggleWishlist = async () => {
       if (!isAuthenticated) {
@@ -113,14 +146,19 @@ const ProductCard = React.memo(
       <div className="pc">
         {/* Image */}
         <div className="pc-img-wrap" onClick={() => onImageClick?.(product)}>
-          {imageUrl ? (
+          {rawImageUrl ? (
             <img
+              ref={imgRef}
               src={imageUrl}
               alt={product.name}
               loading="lazy"
+              decoding="async"
+              className={`pc-img-lazy${imgLoaded ? " pc-img-lazy--loaded" : ""}`}
+              onLoad={() => setImgLoaded(true)}
               onError={(e) => {
                 e.target.src =
                   "https://via.placeholder.com/300x300?text=No+Image";
+                setImgLoaded(true);
               }}
             />
           ) : (
@@ -253,6 +291,10 @@ const ProductListing = () => {
   const navigate = useNavigate();
   const { data: products, loading, error } = useProducts();
 
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const sentinelRef = useRef(null);
+
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     categories: [],
@@ -303,6 +345,33 @@ const ProductListing = () => {
       mounted = false;
     };
   }, [isAuthenticated]);
+
+  // Reset visible count whenever filters change
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [filters]);
+
+  // Infinite scroll sentinel
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !loadingMore) {
+          setLoadingMore(true);
+          // Small delay to show the skeleton before adding items
+          setTimeout(() => {
+            setVisibleCount((prev) => prev + PAGE_SIZE);
+            setLoadingMore(false);
+          }, 300);
+        }
+      },
+      { rootMargin: "300px" },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [loadingMore]);
 
   const filteredProducts = useMemo(() => {
     if (!Array.isArray(products) || !products.length) return [];
@@ -604,21 +673,36 @@ const ProductListing = () => {
               )}
 
               {filteredProducts.length > 0 && (
-                <div className="pl-grid">
-                  {filteredProducts.map((product) => (
-                    <ProductCard
-                      key={product._id}
-                      product={product}
-                      quantityInCart={getQty(product._id)}
-                      onAddToCart={handleAddToCart}
-                      onRemoveFromCart={handleRemoveFromCart}
-                      onImageClick={handleImageClick}
-                      onShowToast={handleShowToast}
-                      isWishlisted={wishlistIds.has(product._id)}
-                      onWishlistToggle={handleWishlistToggle}
-                    />
-                  ))}
-                </div>
+                <>
+                  <div className="pl-grid">
+                    {filteredProducts.slice(0, visibleCount).map((product) => (
+                      <ProductCard
+                        key={product._id}
+                        product={product}
+                        quantityInCart={getQty(product._id)}
+                        onAddToCart={handleAddToCart}
+                        onRemoveFromCart={handleRemoveFromCart}
+                        onImageClick={handleImageClick}
+                        onShowToast={handleShowToast}
+                        isWishlisted={wishlistIds.has(product._id)}
+                        onWishlistToggle={handleWishlistToggle}
+                      />
+                    ))}
+                    {loadingMore &&
+                      Array.from({ length: 4 }).map((_, i) => (
+                        <SkeletonCard key={`more-${i}`} />
+                      ))}
+                  </div>
+
+                  {/* Sentinel — triggers next page */}
+                  {visibleCount < filteredProducts.length && (
+                    <div ref={sentinelRef} className="pl-sentinel" aria-hidden="true" />
+                  )}
+
+                  {visibleCount >= filteredProducts.length && filteredProducts.length > PAGE_SIZE && (
+                    <p className="pl-all-loaded">All {filteredProducts.length} products shown</p>
+                  )}
+                </>
               )}
             </>
           )}

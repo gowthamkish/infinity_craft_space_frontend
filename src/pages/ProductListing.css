@@ -1080,3 +1080,26 @@
     transition: none !important;
   }
 }
+
+/* ── Lazy Image Fade-in ──────────────────────────────────────── */
+.pc-img-lazy {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.pc-img-lazy--loaded {
+  opacity: 1;
+}
+
+/* ── Infinite Scroll ─────────────────────────────────────────── */
+.pl-sentinel {
+  height: 1px;
+  width: 100%;
+}
+
+.pl-all-loaded {
+  text-align: center;
+  color: var(--text-secondary, #6b7280);
+  font-size: 0.85rem;
+  padding: 1.5rem 0 0.5rem;
+  letter-spacing: 0.02em;
+}
