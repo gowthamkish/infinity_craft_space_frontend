@@ -130,8 +130,13 @@ const authSlice = createSlice({
       })
       .addCase(fetchCurrentUser.rejected, (state) => {
         state.loading = false;
-        state.user = null;
-        // Cookie expiry/invalidity handled by backend
+        // Do NOT clear state.user here — if the user just logged in and this fires
+        // due to a cookie timing/mobile ITP issue, wiping user causes instant logout.
+        // The axios interceptor + refresh-token flow handles true auth failures.
+        // Only clear on initial hydration (user was already null).
+        if (!state.user) {
+          state.user = null; // already null — no-op, just for clarity
+        }
       });
   },
 });

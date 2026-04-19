@@ -53,15 +53,25 @@ api.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
+    const url = originalRequest?.url || "";
 
-    // Handle token expiry with refresh token
+    // Paths where we should never attempt a token refresh or redirect
+    const noRefreshPaths = [
+      "/api/auth/login",
+      "/api/auth/register",
+      "/api/auth/refresh-token",
+    ];
+    const isNoRefresh = noRefreshPaths.some((p) => url.includes(p));
+
+    // Handle all 401s on protected endpoints by attempting a token refresh first.
+    // On mobile (iOS Safari ITP), cookies may not be sent even right after login,
+    // so we must try to refresh before giving up — not just when code === TOKEN_EXPIRED.
     if (
       error.response?.status === 401 &&
-      error.response?.data?.code === "TOKEN_EXPIRED" &&
-      !originalRequest._retry
+      !originalRequest._retry &&
+      !isNoRefresh
     ) {
       if (isRefreshing) {
-        // If already refreshing, queue this request
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
@@ -73,19 +83,32 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // Refresh token is in httpOnly cookie — backend reads it automatically
         await axios.post(
           `${import.meta.env.VITE_API_URL}/api/auth/refresh-token`,
           {},
           { withCredentials: true },
         );
-
         processQueue(null, null);
-
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        window.location.href = "/login";
+
+        // Refresh failed — only redirect to /login for protected data calls,
+        // not for profile checks (those are just hydration probes).
+        const noRedirectPaths = [
+          "/api/auth/profile",
+          "/api/auth/login",
+          "/api/auth/register",
+          "/api/auth/refresh-token",
+        ];
+        const isNoRedirect = noRedirectPaths.some((p) => url.includes(p));
+        const alreadyOnAuth =
+          window.location.pathname === "/login" ||
+          window.location.pathname === "/register";
+
+        if (!isNoRedirect && !alreadyOnAuth) {
+          window.location.href = "/login";
+        }
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
@@ -93,16 +116,7 @@ api.interceptors.response.use(
     }
 
     if (error.response?.status === 401) {
-      // Don't redirect for profile/auth checks — these legitimately return 401
-      // for unauthenticated users and should be handled by the caller
-      const url = originalRequest?.url || "";
-      const noRedirectPaths = ["/api/auth/profile", "/api/auth/login", "/api/auth/register", "/api/auth/refresh-token"];
-      const isNoRedirect = noRedirectPaths.some((p) => url.includes(p));
-      const alreadyOnAuth = window.location.pathname === "/login" || window.location.pathname === "/register";
-
-      if (!isNoRedirect && !alreadyOnAuth) {
-        window.location.href = "/login";
-      }
+      // Reached here only for login/register/refresh-token endpoints — let callers handle it.
     } else if (error.response?.status === 413) {
       // Payload too large
       console.error(
