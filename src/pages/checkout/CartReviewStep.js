@@ -6,6 +6,7 @@ import Alert from "react-bootstrap/Alert";
 import Badge from "react-bootstrap/Badge";
 import { Trash2, Plus, Minus, Package } from "react-feather";
 import CouponInput from "../../components/CouponInput";
+import { isCustomItem } from "../../components/CheckoutDeliveryPanel";
 
 export const CartReviewStep = ({
   cartItems,
@@ -74,6 +75,34 @@ export const CartReviewStep = ({
           </div>
         </Card.Header>
         <Card.Body style={{ padding: "0", background: "#fafafa" }}>
+          {cartItems.some(isCustomItem) && (
+            <div
+              style={{
+                margin: "clamp(0.75rem, 2vw, 1rem)",
+                padding: "0.75rem 1rem",
+                background: "linear-gradient(135deg, #fef3c7, #fde68a)",
+                border: "1px solid #fcd34d",
+                borderRadius: "12px",
+                display: "flex",
+                gap: "0.6rem",
+                alignItems: "flex-start",
+                color: "#92400e",
+              }}
+              role="note"
+            >
+              <span style={{ fontSize: "1.1rem" }}>⏳</span>
+              <div>
+                <strong style={{ fontSize: "0.88rem", color: "#78350f", display: "block" }}>
+                  Handcrafted Items Notice
+                </strong>
+                <span style={{ fontSize: "0.82rem", lineHeight: 1.5 }}>
+                  Your order contains made-to-order items that require{" "}
+                  <strong>10–12 business days</strong> of preparation before
+                  dispatch. You will be notified when your order ships.
+                </span>
+              </div>
+            </div>
+          )}
           {cartItems.map((item, index) => (
             <div
               key={item.product._id}
@@ -133,6 +162,25 @@ export const CartReviewStep = ({
                   >
                     {item.product.name}
                   </h6>
+                  {isCustomItem(item) && (
+                    <div
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.3rem",
+                        background: "#fef3c7",
+                        border: "1px solid #fcd34d",
+                        color: "#92400e",
+                        padding: "0.2rem 0.6rem",
+                        borderRadius: "20px",
+                        fontSize: "0.75rem",
+                        fontWeight: "600",
+                        marginBottom: "0.5rem",
+                      }}
+                    >
+                      ⏳ Handcrafted · 10–12 days to dispatch
+                    </div>
+                  )}
                   <p
                     className="mb-2"
                     style={{

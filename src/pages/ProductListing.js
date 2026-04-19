@@ -210,9 +210,14 @@ const ProductCard = React.memo(
                 Only {product.stock} left
               </span>
             )}
-            {product.estimatedDelivery && !isOutOfStock && (
-              <span className="pc-badge pc-badge--delivery">
-                🚚 {product.estimatedDelivery}d delivery
+            {!isOutOfStock && !product.isCustomizable && (
+              <span className="pc-badge pc-badge--delivery" title="Enter pincode on product page for exact delivery date">
+                📍 Check delivery
+              </span>
+            )}
+            {!isOutOfStock && product.isCustomizable && (
+              <span className="pc-badge pc-badge--custom" title="Handcrafted — enter pincode on product page for full EDD">
+                ✦ Custom · {product.processingDaysMin ?? 10}–{product.processingDaysMax ?? 12}d dispatch
               </span>
             )}
           </div>

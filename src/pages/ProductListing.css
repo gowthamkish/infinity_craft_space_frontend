@@ -586,6 +586,12 @@
   color: #1e40af;
 }
 
+.pc-badge--custom {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
 /* Action buttons */
 .pc-actions {
   display: flex;
@@ -1102,4 +1108,54 @@
   font-size: 0.85rem;
   padding: 1.5rem 0 0.5rem;
   letter-spacing: 0.02em;
+}
+
+/* ── Location Delivery Banner ────────────────────────────────── */
+.pl-location-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 0.65rem 1rem;
+  font-size: 0.87rem;
+  color: #1e40af;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.pl-location-banner--muted {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #64748b;
+}
+
+.pl-location-banner--success {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-color: #86efac;
+  color: #166534;
+}
+
+.pl-location-sub {
+  color: inherit;
+  opacity: 0.75;
+}
+
+.pl-location-btn {
+  margin-left: auto;
+  padding: 0.35rem 0.85rem;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.pl-location-btn:hover {
+  background: #1d4ed8;
 }

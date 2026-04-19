@@ -352,6 +352,14 @@
   background: var(--primary-subtle);
 }
 
+/* ── DELIVERY ESTIMATOR WRAPPER ─────────────────────────────── */
+.pd-delivery-section {
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--radius-lg, 12px);
+  padding: 1rem 1.1rem;
+  background: var(--bg-primary, #fff);
+}
+
 /* ── TRUST STRIP (Shipping, Security, Returns) ──────────────── */
 .pd-trust-strip {
   background: linear-gradient(135deg, #f0f9ff 0%, #f0fdf4 100%);

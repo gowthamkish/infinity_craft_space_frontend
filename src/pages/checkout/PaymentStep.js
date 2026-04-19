@@ -6,6 +6,7 @@ import Alert from "react-bootstrap/Alert";
 import Badge from "react-bootstrap/Badge";
 import { Lock, CreditCard, Check } from "react-feather";
 import { DotsLoader } from "../../components/Loader";
+import CheckoutDeliveryPanel from "../../components/CheckoutDeliveryPanel";
 
 export const PaymentStep = ({
   cartItems,
@@ -392,6 +393,12 @@ export const PaymentStep = ({
               {shippingAddress.zipCode}
             </p>
           </div>
+
+          {/* Per-item delivery estimates */}
+          <CheckoutDeliveryPanel
+            cartItems={cartItems}
+            pincode={shippingAddress.zipCode}
+          />
 
           <hr style={{ border: "1px solid var(--border-color)" }} />
 

@@ -24,7 +24,14 @@ import { ShippingStep } from "./checkout/ShippingStep";
 import { PaymentStep } from "./checkout/PaymentStep";
 import { ConfirmationStep } from "./checkout/ConfirmationStep";
 import { EmptyCart } from "./checkout/EmptyCart";
+import CustomOrderModal from "../components/CustomOrderModal";
 import "./checkout/checkout.css";
+
+const CUSTOM_KEYWORDS = ["embroidery", "kundan", "thread bangle", "thread bangles"];
+const isCustomProduct = (item) => {
+  const text = `${item.product?.name ?? ""} ${item.product?.category ?? ""} ${item.product?.subCategory ?? ""}`.toLowerCase();
+  return CUSTOM_KEYWORDS.some((kw) => text.includes(kw));
+};
 
 export default function Checkout() {
   const dispatch = useDispatch();
@@ -73,6 +80,9 @@ export default function Checkout() {
   const [shippingRate, setShippingRate] = useState(null);
   // Backend order returned from verify-payment (contains shiprocket data)
   const [backendOrder, setBackendOrder] = useState(null);
+  // Custom order notice modal
+  const [showCustomModal, setShowCustomModal] = useState(false);
+  const [customItems, setCustomItems] = useState([]);
 
   // Calculate totals
   const subtotal = cartItems.reduce(
@@ -220,7 +230,16 @@ export default function Checkout() {
       setError("Your cart is empty!");
       return;
     }
-    // Track begin checkout event
+    const matched = cartItems.filter(isCustomProduct);
+    if (matched.length > 0) {
+      setCustomItems(matched);
+      setShowCustomModal(true);
+      return;
+    }
+    doMoveToShipping();
+  };
+
+  const doMoveToShipping = () => {
     trackBeginCheckout(cartItems, total);
     setCurrentStep(2);
     setError(null);
@@ -434,6 +453,13 @@ export default function Checkout() {
 
   return (
     <>
+      {showCustomModal && (
+        <CustomOrderModal
+          customItems={customItems}
+          onConfirm={() => { setShowCustomModal(false); doMoveToShipping(); }}
+          onCancel={() => setShowCustomModal(false)}
+        />
+      )}
       <SEOHead
         title={`Checkout - ${currentStep === 1 ? "Review Cart" : currentStep === 2 ? "Shipping Details" : currentStep === 3 ? "Payment" : "Confirmation"}`}
         description="Complete your craft supplies purchase with our secure checkout process. Review your order, add shipping details, and complete payment safely."

@@ -22,6 +22,7 @@ import SEOHead, { generateProductStructuredData } from "../components/SEOHead";
 import { useRecentlyViewed } from "../hooks/useRecentlyViewed";
 import Breadcrumbs from "../components/Breadcrumbs";
 import { useLazySection } from "../hooks/useLazySection";
+import DeliveryEstimator from "../components/DeliveryEstimator";
 
 const ProductRecommendations = lazy(() => import("../components/ProductRecommendations"));
 const ProductQnA = lazy(() => import("../components/ProductQnA"));
@@ -358,6 +359,16 @@ const ProductDetail = () => {
                   <button className="pd-btn pd-btn--share" onClick={handleShare} aria-label="Share product">
                     <FiShare2 />
                   </button>
+                </div>
+
+                {/* Delivery Estimator */}
+                <div className="pd-delivery-section">
+                  <DeliveryEstimator
+                    productId={product._id}
+                    isCustomizable={product.isCustomizable}
+                    processingDaysMin={product.processingDaysMin}
+                    processingDaysMax={product.processingDaysMax}
+                  />
                 </div>
 
                 {/* Trust strip */}
