@@ -1060,7 +1060,8 @@
   }
 
   .pc-details-link {
-    display: none;
+    display: block;
+    font-size: 0.7rem;
   }
 
   .pl-empty {

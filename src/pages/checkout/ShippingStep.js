@@ -202,10 +202,11 @@ function calcShippingRate(weightKg, zoneKey) {
 }
 
 // Expected delivery date range string
-function expectedDeliveryRange(deliveryDays) {
+// dispatchBuffer: extra days for custom/handcrafted orders before dispatch
+function expectedDeliveryRange(deliveryDays, dispatchBuffer = 0) {
   const parts = deliveryDays.split("–").map(Number);
-  const minDays = parts[0] || 3;
-  const maxDays = parts[1] || minDays + 3;
+  const minDays = (parts[0] || 3) + dispatchBuffer;
+  const maxDays = (parts[1] || minDays + 3) + dispatchBuffer;
 
   const fmt = (d) =>
     d.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
@@ -220,13 +221,13 @@ function expectedDeliveryRange(deliveryDays) {
 
 // ── ShippingWidget ──────────────────────────────────────────────────────────
 
-function ShippingWidget({ zoneKey, weightKg, rate }) {
+function ShippingWidget({ zoneKey, weightKg, rate, dispatchBuffer = 0 }) {
   if (!zoneKey) return null;
 
   const zone = ROAD_ZONES[zoneKey];
   if (!zone) return null;
 
-  const deliveryRange = expectedDeliveryRange(zone.deliveryDays);
+  const deliveryRange = expectedDeliveryRange(zone.deliveryDays, dispatchBuffer);
   const accent = zone.color;
 
   return (
@@ -271,6 +272,11 @@ function ShippingWidget({ zoneKey, weightKg, rate }) {
               <div style={{ fontSize: "0.78rem", color: "#059669", fontWeight: 600, marginTop: "0.25rem" }}>
                 📅 Expected: {deliveryRange}
               </div>
+              {dispatchBuffer > 0 && (
+                <div style={{ fontSize: "0.7rem", color: "#f59e0b", fontWeight: 600, marginTop: "0.1rem" }}>
+                  ⏳ Includes ~10–12 day handcraft dispatch
+                </div>
+              )}
               <div style={{ fontSize: "0.7rem", color: "#94a3b8", marginTop: "0.1rem" }}>
                 Shipment weight:{" "}
                 {weightKg < 1
@@ -487,6 +493,15 @@ export const ShippingStep = ({
       setPincodeLoading(false);
     }
   }, [setShippingAddress]);
+
+  // ── Custom order dispatch buffer ─────────────────────────────────────────────
+  const CUSTOM_KEYWORDS = ["embroidery", "kundan", "thread bangle", "thread bangles"];
+  const hasCustomItems = cartItems.some((item) => {
+    const text = `${item.product?.name ?? ""} ${item.product?.category ?? ""} ${item.product?.subCategory ?? ""}`.toLowerCase();
+    return CUSTOM_KEYWORDS.some((kw) => text.includes(kw));
+  });
+  // 10 business days minimum dispatch buffer for custom orders (~14 calendar days)
+  const dispatchBuffer = hasCustomItems ? 14 : 0;
 
   // ── Shipping calculation (The Professional Couriers) ────────────────────────
 
@@ -999,6 +1014,7 @@ export const ShippingStep = ({
                   zoneKey={zoneKey}
                   weightKg={Math.max(cartWeight, 0.25)}
                   rate={shippingCharge}
+                  dispatchBuffer={dispatchBuffer}
                 />
               )}
 

@@ -103,7 +103,7 @@ const StatusUpdateModal = ({
                           fontWeight: 600,
                         }}
                       >
-                        {selectedOrder.user?.name || "Unknown"}
+                        {selectedOrder.userId?.username || selectedOrder.customerName || "Unknown"}
                       </div>
                     </div>
                   </Col>

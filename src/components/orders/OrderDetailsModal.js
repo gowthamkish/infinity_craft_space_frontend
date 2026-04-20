@@ -800,8 +800,9 @@ const OrderDetailsModal = ({
                         }}
                       >
                         {formatCurrency(
+                          selectedOrder.subtotal ||
                           (selectedOrder.totalAmount || selectedOrder.total) -
-                            (selectedOrder.shippingCost || 0),
+                            (selectedOrder.shipping || selectedOrder.shippingCost || 0),
                         )}
                       </span>
                     </div>
@@ -816,7 +817,7 @@ const OrderDetailsModal = ({
                           fontSize: "0.9rem",
                         }}
                       >
-                        {formatCurrency(selectedOrder.shippingCost || 0)}
+                        {formatCurrency(selectedOrder.shipping || selectedOrder.shippingCost || 0)}
                       </span>
                     </div>
                     {selectedOrder.tax && (

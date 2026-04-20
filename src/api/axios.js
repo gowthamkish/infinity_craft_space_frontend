@@ -110,7 +110,7 @@ api.interceptors.response.use(
         // to be sent after login. If we're within 25 seconds of login, skip the
         // redirect and let the page recover naturally on the next request.
         const loginTime = Number(sessionStorage.getItem("authLoginTime") || 0);
-        const withinGracePeriod = loginTime && Date.now() - loginTime < 25_000;
+        const withinGracePeriod = loginTime && Date.now() - loginTime < 60_000;
 
         if (!isNoRedirect && !alreadyOnAuth && !withinGracePeriod) {
           window.location.href = "/login";

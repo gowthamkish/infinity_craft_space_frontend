@@ -9,11 +9,23 @@ import { fetchCurrentUser } from "./features/authSlice";
 import { fetchUserCart } from "./features/cartSlice";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-// Restore session from httpOnly cookie — no localStorage needed
+// Restore session from httpOnly cookie — no localStorage needed.
+// On mobile (iOS Safari ITP), cookies may not be immediately available after login.
+// Retry once after a short delay if the first attempt fails.
 store.dispatch(fetchCurrentUser()).then((result) => {
-  // result.payload is the user object from /api/auth/profile
   if (result.payload?._id) {
     store.dispatch(fetchUserCart());
+  } else {
+    // Retry after 3 s to handle mobile cookie propagation delay
+    const loginTime = Number(sessionStorage.getItem("authLoginTime") || 0);
+    const recentlyLoggedIn = loginTime && Date.now() - loginTime < 60_000;
+    if (recentlyLoggedIn) {
+      setTimeout(() => {
+        store.dispatch(fetchCurrentUser()).then((r) => {
+          if (r.payload?._id) store.dispatch(fetchUserCart());
+        });
+      }, 3000);
+    }
   }
 });
 
