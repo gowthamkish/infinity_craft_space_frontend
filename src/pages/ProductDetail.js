@@ -62,6 +62,8 @@ const ProductDetail = () => {
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
   const [ratingStats, setRatingStats] = useState(null);
+  const [notifyEmail, setNotifyEmail] = useState("");
+  const [notifyStatus, setNotifyStatus] = useState(null); // null | "loading" | "success" | "error"
 
   // Fetch product
   useEffect(() => {
@@ -139,6 +141,18 @@ const ProductDetail = () => {
       // silently ignore
     } finally {
       setWishlistLoading(false);
+    }
+  };
+
+  const handleNotifyMe = async (e) => {
+    e.preventDefault();
+    if (!notifyEmail) return;
+    setNotifyStatus("loading");
+    try {
+      await api.post(`/api/products/${id}/notify`, { email: notifyEmail });
+      setNotifyStatus("success");
+    } catch {
+      setNotifyStatus("error");
     }
   };
 
@@ -325,9 +339,32 @@ const ProductDetail = () => {
                 {/* Actions */}
                 <div className="pd-actions">
                   {isOutOfStock ? (
-                    <button className="pd-btn pd-btn--disabled" disabled>
-                      <FiPackage /> Out of Stock
-                    </button>
+                    <div className="pd-notify-me">
+                      {notifyStatus === "success" ? (
+                        <p className="pd-notify-success"><FiCheck size={14} /> We'll email you when it's back!</p>
+                      ) : (
+                        <form onSubmit={handleNotifyMe} className="pd-notify-form">
+                          <input
+                            type="email"
+                            placeholder="Your email"
+                            value={notifyEmail}
+                            onChange={(e) => setNotifyEmail(e.target.value)}
+                            className="pd-notify-input"
+                            required
+                          />
+                          <button
+                            type="submit"
+                            className="pd-btn pd-btn--notify"
+                            disabled={notifyStatus === "loading"}
+                          >
+                            {notifyStatus === "loading" ? <DotsLoader size="sm" /> : "Notify Me"}
+                          </button>
+                        </form>
+                      )}
+                      {notifyStatus === "error" && (
+                        <p className="pd-notify-error">Something went wrong. Try again.</p>
+                      )}
+                    </div>
                   ) : (
                     <button
                       className="pd-btn pd-btn--primary"

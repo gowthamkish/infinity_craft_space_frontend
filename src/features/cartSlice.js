@@ -46,6 +46,21 @@ export const syncCartToBackend = createAsyncThunk(
   },
 );
 
+// Optimistic add to cart: updates UI immediately, syncs to backend, reverts on failure
+export const optimisticAddToCart = createAsyncThunk(
+  "cart/optimisticAdd",
+  async ({ product, quantity = 1 }, { dispatch, rejectWithValue }) => {
+    dispatch(addToCart({ product, quantity }));
+    try {
+      await api.post("/api/cart/add", { productId: product._id, quantity });
+      return { success: true };
+    } catch (error) {
+      dispatch(revertCartItem({ product, quantity }));
+      return rejectWithValue(error.response?.data?.error || "Failed to add to cart");
+    }
+  },
+);
+
 // Async thunk to clear cart on backend
 export const clearCartOnBackend = createAsyncThunk(
   "cart/clearOnBackend",
@@ -127,6 +142,19 @@ const cartSlice = createSlice({
       }
     },
 
+    revertCartItem: (state, action) => {
+      const { product, quantity } = action.payload;
+      const existing = state.items.find((item) => item.product._id === product._id);
+      if (existing) {
+        existing.quantity -= quantity;
+        if (existing.quantity <= 0) {
+          state.items = state.items.filter((item) => item.product._id !== product._id);
+        } else {
+          existing.totalPrice = existing.quantity * existing.product.price;
+        }
+      }
+    },
+
     removeItemCompletely: (state, action) => {
       const productId = action.payload;
       state.items = state.items.filter(
@@ -190,6 +218,7 @@ export const {
   removeFromCart,
   updateCartItemQuantity,
   removeItemCompletely,
+  revertCartItem,
   clearCart,
   mergeGuestCart,
 } = cartSlice.actions;

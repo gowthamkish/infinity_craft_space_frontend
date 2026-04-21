@@ -109,6 +109,44 @@ function App() {
     });
   };
 
+  // SSE connection for real-time order status updates
+  useEffect(() => {
+    if (!userId) return;
+
+    const baseURL = import.meta.env.VITE_API_URL || "";
+    let es;
+    try {
+      es = new EventSource(`${baseURL}/api/sse/stream`, { withCredentials: true });
+      es.addEventListener("ORDER_UPDATE", (e) => {
+        try {
+          const { order } = JSON.parse(e.data);
+          if (!order || !liveMapRef.current) return;
+          const key = String(order._id);
+          const prev = liveMapRef.current[key];
+          const curr = order.status;
+          if (prev && prev !== curr) {
+            const cfg = STATUS_TOAST_CONFIG[curr];
+            if (cfg) {
+              const shortId = key.slice(-6).toUpperCase();
+              addToastRef.current(
+                `Your order #${shortId} status changed: ${prev} → ${curr}`,
+                { type: cfg.type, title: `${cfg.emoji} ${cfg.label}`, duration: 7000 },
+              );
+            }
+            liveMapRef.current[key] = curr;
+          }
+        } catch {}
+      });
+      es.onerror = () => {
+        // SSE will auto-reconnect; silent failure is fine
+      };
+    } catch {}
+
+    return () => {
+      if (es) es.close();
+    };
+  }, [userId]);
+
   useEffect(() => {
     if (!userId) {
       liveMapRef.current = null;
