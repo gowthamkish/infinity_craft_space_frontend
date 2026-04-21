@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import { Alert, Pagination } from "react-bootstrap";
 import { OrbitLoader } from "../components/Loader";
-import { FiPackage, FiSearch, FiShoppingBag, FiTruck, FiRotateCcw, FiX, FiUploadCloud, FiImage } from "react-icons/fi";
+import { FiPackage, FiSearch, FiShoppingBag, FiTruck, FiRotateCcw, FiX, FiUploadCloud, FiImage, FiXCircle } from "react-icons/fi";
 import api from "../api/axios";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 import { ToastContext } from "../context/ToastContext";
@@ -13,6 +13,9 @@ import "./Orders.css";
 
 // Statuses where Track Order button is shown
 const TRACKABLE_STATUSES = ["confirmed", "processing", "shipped", "delivered"];
+
+// Statuses where the customer can cancel
+const CANCELLABLE_STATUSES = ["confirmed", "processing"];
 
 // Return window: 3 days after delivery
 const RETURN_WINDOW_DAYS = 3;
@@ -157,6 +160,34 @@ function ReturnButton({ order, onClick }) {
       title={`${daysLeft} day${daysLeft !== 1 ? "s" : ""} left to return`}
     >
       <FiRotateCcw size={13} /> Return ({daysLeft}d left)
+    </button>
+  );
+}
+
+function CancelButton({ order, onCancel, cancelling }) {
+  const isCancellable = CANCELLABLE_STATUSES.includes(order.status);
+  if (!isCancellable) return null;
+
+  return (
+    <button
+      onClick={() => onCancel(order)}
+      disabled={cancelling}
+      style={{
+        display: "flex", alignItems: "center", justifyContent: "center",
+        gap: "0.35rem", padding: "0.4rem 0.85rem",
+        background: cancelling
+          ? "linear-gradient(135deg, #94a3b8, #64748b)"
+          : "linear-gradient(135deg, #ef4444, #dc2626)",
+        color: "white", border: "none", borderRadius: "8px",
+        fontSize: "0.8rem", fontWeight: 600,
+        cursor: cancelling ? "not-allowed" : "pointer",
+        opacity: cancelling ? 0.7 : 1,
+        whiteSpace: "nowrap", width: "100%", marginTop: "0.4rem",
+      }}
+      title="Cancel this order"
+    >
+      <FiXCircle size={13} />
+      {cancelling ? "Cancelling…" : "Cancel Order"}
     </button>
   );
 }
@@ -502,6 +533,22 @@ export default function Orders() {
     return items;
   }, [current, totalPages]);
 
+  const [cancellingId, setCancellingId] = useState(null);
+
+  const handleCancelOrder = useCallback(async (order) => {
+    if (!window.confirm(`Cancel order ${formatOrderId(String(order._id))}? This cannot be undone.`)) return;
+    setCancellingId(order._id);
+    try {
+      await api.post(`/api/shipping/cancel/${order._id}`);
+      addToast("Order cancelled successfully.", { type: "success", title: "❌ Order Cancelled", duration: 5000 });
+      fetchOrders();
+    } catch (err) {
+      addToast(err.response?.data?.error || "Failed to cancel order.", { type: "error", title: "Error", duration: 5000 });
+    } finally {
+      setCancellingId(null);
+    }
+  }, [addToast, fetchOrders]);
+
   const handleReturnSuccess = () => {
     setReturnOrder(null);
     addToast("Return request submitted successfully! Our team will review it shortly.", {
@@ -651,6 +698,11 @@ export default function Orders() {
                               order={order}
                               onClick={() => setReturnOrder(order)}
                             />
+                            <CancelButton
+                              order={order}
+                              onCancel={handleCancelOrder}
+                              cancelling={cancellingId === order._id}
+                            />
                           </td>
                         </tr>
                       );
@@ -692,6 +744,11 @@ export default function Orders() {
                             <ReturnButton
                               order={order}
                               onClick={() => setReturnOrder(order)}
+                            />
+                            <CancelButton
+                              order={order}
+                              onCancel={handleCancelOrder}
+                              cancelling={cancellingId === order._id}
                             />
                           </div>
                         </div>

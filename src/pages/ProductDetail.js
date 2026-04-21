@@ -247,7 +247,13 @@ const ProductDetail = () => {
                   onClick={() => images.length > 0 && setShowImageModal(true)}
                 >
                   {images.length > 0 ? (
-                    <img src={images[selectedImageIndex]?.url} alt={product.name} />
+                    <img
+                    src={images[selectedImageIndex]?.url}
+                    alt={product.name}
+                    fetchPriority={selectedImageIndex === 0 ? "high" : "auto"}
+                    loading={selectedImageIndex === 0 ? "eager" : "lazy"}
+                    style={{ aspectRatio: "1 / 1", objectFit: "cover", width: "100%" }}
+                  />
                   ) : (
                     <div className="pd-image-no-img">
                       <FiPackage size={64} />

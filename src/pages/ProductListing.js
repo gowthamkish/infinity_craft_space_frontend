@@ -160,6 +160,7 @@ const ProductCard = React.memo(
                   "https://via.placeholder.com/300x300?text=No+Image";
                 setImgLoaded(true);
               }}
+              style={{ aspectRatio: "1 / 1", objectFit: "cover" }}
             />
           ) : (
             <div className="pc-img-placeholder">
