@@ -1,7 +1,8 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useEffect, useRef, Suspense, lazy, useContext } from "react";
+import { useEffect, useRef, Suspense, lazy, useContext, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
+import OrderStatusModal from "./components/OrderStatusModal";
 import { PageLoader } from "./components/Loader";
 import { HelmetProvider } from "react-helmet-async";
 import OfflineIndicator from "./components/OfflineIndicator";
@@ -73,6 +74,10 @@ function App() {
   // In-memory snapshot for live diffing during this session
   const liveMapRef = useRef(null);
 
+  // Order status modal — shown when admin pushes a status change via SSE
+  const [orderStatusEvent, setOrderStatusEvent] = useState(null);
+  const closeOrderModal = useCallback(() => setOrderStatusEvent(null), []);
+
   // index.jsx dispatches fetchCurrentUser before React mounts — no need to repeat it here.
 
   // ── Helpers ────────────────────────────────────────────────────────────────
@@ -89,24 +94,47 @@ function App() {
     try { localStorage.setItem(lsKey(uid), JSON.stringify(map)); } catch {}
   };
 
+  // Stable ref so the polling closure always calls the latest setter
+  const setOrderStatusEventRef = useRef(setOrderStatusEvent);
+
+  // Guard: track which (orderId + status) combos we've already notified this session
+  const shownRef = useRef(new Set());
+
   const fireToasts = (prevMap, orders) => {
+    // Collect all changes, pick the most recent one to show as modal
+    let latestChange = null;
+
     orders.forEach((order) => {
       const key  = String(order._id);
       const prev = prevMap[key];
       const curr = order.status;
-      if (prev && prev !== curr) {
-        const cfg = STATUS_TOAST_CONFIG[curr];
-        if (cfg) {
-          const shortId   = key.slice(-6).toUpperCase();
-          const prevLabel = prev.charAt(0).toUpperCase() + prev.slice(1);
-          const currLabel = curr.charAt(0).toUpperCase() + curr.slice(1);
-          addToastRef.current(
-            `Your order #${shortId} status changed: ${prevLabel} → ${currLabel}`,
-            { type: cfg.type, title: `${cfg.emoji} ${cfg.label}`, duration: 7000 },
-          );
+      const notifKey = `${key}:${curr}`;
+
+      if (shownRef.current.has(notifKey)) return; // already shown this session
+
+      if (prev && prev !== curr && STATUS_TOAST_CONFIG[curr]) {
+        // Existing order whose status changed
+        shownRef.current.add(notifKey);
+        const changeTime = new Date(order.updatedAt || order.createdAt).getTime();
+        if (!latestChange || changeTime > latestChange.time) {
+          latestChange = { order, previousStatus: prev, time: changeTime };
+        }
+      } else if (!prev && curr !== "pending" && STATUS_TOAST_CONFIG[curr]) {
+        // Brand-new order just placed — only show if created within the last 10 minutes
+        const orderAge = Date.now() - new Date(order.createdAt).getTime();
+        if (orderAge < 10 * 60 * 1000) {
+          shownRef.current.add(notifKey);
+          const changeTime = new Date(order.createdAt).getTime();
+          if (!latestChange || changeTime > latestChange.time) {
+            latestChange = { order, previousStatus: null, time: changeTime };
+          }
         }
       }
     });
+
+    if (latestChange) {
+      setOrderStatusEventRef.current({ order: latestChange.order, previousStatus: latestChange.previousStatus });
+    }
   };
 
   // SSE connection for real-time order status updates
@@ -117,26 +145,29 @@ function App() {
     let es;
     try {
       es = new EventSource(`${baseURL}/api/sse/stream`, { withCredentials: true });
+
       es.addEventListener("ORDER_UPDATE", (e) => {
         try {
-          const { order } = JSON.parse(e.data);
-          if (!order || !liveMapRef.current) return;
+          const payload = JSON.parse(e.data);
+          const { order, previousStatus } = payload;
+          if (!order || !order.status) return;
+
           const key = String(order._id);
-          const prev = liveMapRef.current[key];
-          const curr = order.status;
-          if (prev && prev !== curr) {
-            const cfg = STATUS_TOAST_CONFIG[curr];
-            if (cfg) {
-              const shortId = key.slice(-6).toUpperCase();
-              addToastRef.current(
-                `Your order #${shortId} status changed: ${prev} → ${curr}`,
-                { type: cfg.type, title: `${cfg.emoji} ${cfg.label}`, duration: 7000 },
-              );
-            }
-            liveMapRef.current[key] = curr;
+          const notifKey = `${key}:${order.status}`;
+
+          // Update in-memory status map
+          if (liveMapRef.current) {
+            liveMapRef.current[key] = order.status;
+          }
+
+          // Show modal — SSE is the real-time path; deduplicate with shownRef
+          if (order.status !== previousStatus && !shownRef.current.has(notifKey)) {
+            shownRef.current.add(notifKey);
+            setOrderStatusEventRef.current({ order, previousStatus: previousStatus || null });
           }
         } catch {}
       });
+
       es.onerror = () => {
         // SSE will auto-reconnect; silent failure is fine
       };
@@ -150,6 +181,7 @@ function App() {
   useEffect(() => {
     if (!userId) {
       liveMapRef.current = null;
+      shownRef.current = new Set();
       return;
     }
 
@@ -170,11 +202,11 @@ function App() {
         orders.forEach((o) => { currentMap[String(o._id)] = o.status; });
 
         if (isFirstRun) {
-          // On first run: compare against localStorage snapshot (catches offline changes)
-          const persisted = loadSnapshot(userId);
-          if (persisted) {
-            fireToasts(persisted, orders);
-          }
+          // On first run: compare against localStorage snapshot (catches offline + new-order cases).
+          // Use {} when no snapshot exists so new recent orders (< 10 min) are still detected
+          // without waiting for a hard reload to clear the snapshot.
+          const persisted = loadSnapshot(userId) || {};
+          fireToasts(persisted, orders);
           // Seed in-memory map with current data
           liveMapRef.current = currentMap;
         } else {
@@ -226,6 +258,14 @@ function App() {
                 onClose={removeToast}
                 position="top-right"
               />
+
+              {/* Order status modal — shown when admin updates order status in real-time */}
+              {orderStatusEvent && (
+                <OrderStatusModal
+                  event={orderStatusEvent}
+                  onClose={closeOrderModal}
+                />
+              )}
 
               {/* Idle Timeout Manager - Active globally for all authenticated users */}
               {/* <IdleTimeoutManager /> */}

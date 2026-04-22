@@ -8,6 +8,9 @@ import {
   fetchOrders,
 } from "../features/adminSlice";
 
+// Selector for auth state — used to gate admin fetches until auth is confirmed
+const selectAuth = (state) => state.auth;
+
 // Request deduplication cache
 const requestCache = new Map();
 
@@ -18,9 +21,11 @@ export const useSmartFetch = (
   dependencies = [],
   cacheTimeout = 5 * 60 * 1000, // 5 minutes default
   requestDeduplication = true,
+  requiresAuth = false,
 ) => {
   const dispatch = useDispatch();
   const { data, loading, error, lastFetched, isStale } = useSelector(selector);
+  const { user, loading: authLoading } = useSelector(selectAuth);
   const fetchTimeoutRef = useRef(null);
   const thunkKey = asyncThunk.typePrefix;
 
@@ -61,11 +66,13 @@ export const useSmartFetch = (
   );
 
   useEffect(() => {
+    // On mobile (iOS Safari ITP), auth cookie may arrive late — wait for auth to settle
+    // before dispatching admin fetches to avoid a premature 401 that blocks the error guard.
+    if (requiresAuth && (authLoading || !user)) return;
+
     // Don't fetch if there's an error (prevent infinite retry)
     // User can manually refresh or navigate away and back
-    if (error) {
-      return;
-    }
+    if (error) return;
 
     const shouldFetch =
       isStale ||
@@ -84,7 +91,7 @@ export const useSmartFetch = (
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedFetch, isStale, lastFetched, loading, cacheTimeout, error]);
+  }, [debouncedFetch, isStale, lastFetched, loading, cacheTimeout, error, requiresAuth, authLoading, user]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -138,11 +145,7 @@ const selectDashboardCounts = createSelector(
 
 // Hook for dashboard counts
 export const useDashboardCounts = (dependencies = []) => {
-  return useSmartFetch(
-    fetchDashboardCounts,
-    selectDashboardCounts,
-    dependencies,
-  );
+  return useSmartFetch(fetchDashboardCounts, selectDashboardCounts, dependencies, 5 * 60 * 1000, true, true);
 };
 
 // Hook specifically for users
@@ -157,7 +160,7 @@ const selectUsersData = createSelector([(state) => state.admin], (admin) => ({
 
 // Hook for users data
 export const useUsers = (dependencies = []) => {
-  return useSmartFetch(fetchUsers, selectUsersData, dependencies);
+  return useSmartFetch(fetchUsers, selectUsersData, dependencies, 5 * 60 * 1000, true, true);
 };
 
 // Hook specifically for orders
@@ -172,5 +175,5 @@ const selectOrdersData = createSelector([(state) => state.admin], (admin) => ({
 
 // Hook for orders data
 export const useOrders = (dependencies = []) => {
-  return useSmartFetch(fetchOrders, selectOrdersData, dependencies);
+  return useSmartFetch(fetchOrders, selectOrdersData, dependencies, 5 * 60 * 1000, true, true);
 };

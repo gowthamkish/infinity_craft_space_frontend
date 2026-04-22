@@ -118,12 +118,16 @@ export default function TrackingTimeline({ order, tracking }) {
     return [];
   }, [tracking, order]);
 
-  const sr = order?.shiprocket || {};
-  const awb = sr.awbCode || tracking?.awbCode;
-  const courier = sr.courierName || tracking?.courierName;
-  const etd = sr.etd || tracking?.etd || order?.estimatedDelivery;
-  const trackUrl = sr.trackingUrl;
-  const status = tracking?.currentStatus || order?.status || "—";
+  // Shiprocket fields — re-enable when integrated
+  // const sr = order?.shiprocket || {};
+  // const awb = sr.awbCode || tracking?.awbCode;
+  // const courier = sr.courierName || tracking?.courierName;
+  // const trackUrl = sr.trackingUrl;
+  const awb = null;
+  const courier = null;
+  const etd = order?.estimatedDelivery;
+  const trackUrl = null;
+  const status = order?.status || "—";
   const etdCountdown = daysUntil(etd);
 
   const infoBarClass = useMemo(() => {
@@ -231,16 +235,7 @@ export default function TrackingTimeline({ order, tracking }) {
               <span className="tt-info-value">{status}</span>
             </div>
           )}
-          {trackUrl && (
-            <div className="tt-info-item">
-              <span className="tt-info-label">Track on Shiprocket</span>
-              <span className="tt-info-value">
-                <a href={trackUrl} target="_blank" rel="noopener noreferrer">
-                  Open tracking ↗
-                </a>
-              </span>
-            </div>
-          )}
+          {/* Shiprocket tracking URL — re-enable when integrated */}
         </div>
       )}
 
@@ -275,9 +270,7 @@ export default function TrackingTimeline({ order, tracking }) {
         <div className="tt-empty">
           <div className="tt-empty-icon">📦</div>
           <p style={{ margin: 0, fontSize: "0.9rem" }}>
-            {order?.shiprocket?.shipmentId
-              ? "Tracking updates will appear here once the shipment is in transit."
-              : "Shipment details will be available once your order is dispatched."}
+            Shipment details will be available once your order is dispatched.
           </p>
         </div>
       )}

@@ -1,0 +1,218 @@
+/* ── Order Status Modal ─────────────────────────────────────────────────────── */
+
+.osm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 1rem 1.5rem;
+  animation: osm-fade-in 0.25s ease;
+  pointer-events: all;
+}
+
+@keyframes osm-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.osm-panel {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.18),
+    0 8px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  animation: osm-slide-up 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-top: 4px solid var(--osm-color);
+}
+
+@keyframes osm-slide-up {
+  from { transform: translateY(60px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* Auto-dismiss progress bar */
+.osm-progress-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 4px 4px 0 0;
+  overflow: hidden;
+}
+
+.osm-progress-bar {
+  height: 100%;
+  background: var(--osm-color);
+  border-radius: inherit;
+  width: 100%;
+}
+
+/* Close button */
+.osm-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: rgba(0, 0, 0, 0.07);
+  color: #64748b;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  z-index: 2;
+}
+.osm-close:hover { background: rgba(0, 0, 0, 0.15); }
+
+/* Emoji */
+.osm-emoji-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 1.5rem 0;
+}
+
+.osm-emoji {
+  font-size: 3rem;
+  display: block;
+  animation: osm-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+}
+
+@keyframes osm-pop {
+  from { transform: scale(0.5); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+/* Body */
+.osm-body {
+  padding: 0.75rem 1.5rem 1.5rem;
+  text-align: center;
+}
+
+.osm-tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--osm-color);
+  margin: 0 0 0.35rem;
+}
+
+.osm-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+}
+
+.osm-desc {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0 0 1rem;
+  line-height: 1.5;
+}
+
+/* Status transition pills */
+.osm-transition {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.6rem;
+}
+
+.osm-status {
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1.5px solid;
+  text-transform: capitalize;
+}
+
+.osm-status--prev {
+  background: #f1f5f9;
+  color: #64748b;
+  border-color: #cbd5e1;
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.osm-status--curr {
+  font-weight: 700;
+}
+
+.osm-arrow {
+  font-size: 1rem;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+/* Order ID */
+.osm-order-id {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin: 0 0 1.25rem;
+  font-family: monospace;
+  letter-spacing: 0.06em;
+}
+
+/* Buttons */
+.osm-actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+}
+
+.osm-btn {
+  padding: 0.6rem 1.25rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.osm-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.osm-btn:active { transform: translateY(0); }
+
+.osm-btn--primary {
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+.osm-btn--ghost {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* Responsive — center on desktop */
+@media (min-width: 640px) {
+  .osm-backdrop {
+    align-items: center;
+    padding: 1rem;
+  }
+  .osm-panel {
+    animation: osm-zoom-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+}
+
+@keyframes osm-zoom-in {
+  from { transform: scale(0.88); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}

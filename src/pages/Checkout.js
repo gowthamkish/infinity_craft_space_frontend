@@ -76,9 +76,9 @@ export default function Checkout() {
   const [saveAddressToBook, setSaveAddressToBook] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
 
-  // Shiprocket selected shipping rate (set by ShippingStep)
+  // Selected shipping rate (Shiprocket — re-enable when integrated)
   const [shippingRate, setShippingRate] = useState(null);
-  // Backend order returned from verify-payment (contains shiprocket data)
+  // Backend order returned from verify-payment
   const [backendOrder, setBackendOrder] = useState(null);
   // Custom order notice modal
   const [showCustomModal, setShowCustomModal] = useState(false);

@@ -301,51 +301,8 @@ export default function TrackOrder() {
                       {fmtCurrency(order?.totalAmount)}
                     </span>
                   </div>
-                  {order?.shiprocket?.courierName && (
-                    <div className="to-meta-item">
-                      <span className="to-meta-label">Courier</span>
-                      <span className="to-meta-value">
-                        {order.shiprocket.courierName}
-                      </span>
-                    </div>
-                  )}
-                  {order?.shiprocket?.awbCode && (
-                    <div className="to-meta-item">
-                      <span className="to-meta-label">AWB / Tracking #</span>
-                      <span
-                        className="to-meta-value"
-                        style={{
-                          fontFamily: "monospace",
-                          letterSpacing: "0.05em",
-                        }}
-                      >
-                        {order.shiprocket.awbCode}
-                      </span>
-                    </div>
-                  )}
+                  {/* Shiprocket courier/AWB display — re-enable when integrated */}
                 </div>
-
-                {order?.shiprocket?.trackingUrl && (
-                  <a
-                    href={order.shiprocket.trackingUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: "block",
-                      marginTop: "1rem",
-                      padding: "0.6rem 1rem",
-                      background: "linear-gradient(135deg, #10b981, #059669)",
-                      color: "white",
-                      borderRadius: 10,
-                      textAlign: "center",
-                      textDecoration: "none",
-                      fontWeight: 600,
-                      fontSize: "0.875rem",
-                    }}
-                  >
-                    Track on Shiprocket ↗
-                  </a>
-                )}
 
                 <button
                   onClick={() => navigate("/orders")}

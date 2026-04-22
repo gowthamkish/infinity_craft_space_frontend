@@ -254,23 +254,20 @@ const OrderDetailsModal = ({
   const [tracking, setTracking] = useState(null);
   const [trackingLoading, setTrackingLoading] = useState(false);
 
-  // Fetch live tracking when a shipped/processing order modal opens
-  useEffect(() => {
-    if (!show || !selectedOrder?._id) { setTracking(null); return; }
-    const hasShipment = selectedOrder?.shiprocket?.shipmentId || selectedOrder?.shiprocket?.awbCode;
-    if (!hasShipment) return;
-
-    setTrackingLoading(true);
-    api.get(`/api/shipping/track/${selectedOrder._id}`)
-      .then((res) => setTracking(res.data.tracking))
-      .catch(() => setTracking(null))
-      .finally(() => setTrackingLoading(false));
-  }, [show, selectedOrder?._id]);
+  // Shiprocket live tracking — re-enable when integrated
+  // useEffect(() => {
+  //   if (!show || !selectedOrder?._id) { setTracking(null); return; }
+  //   const hasShipment = selectedOrder?.shiprocket?.shipmentId || selectedOrder?.shiprocket?.awbCode;
+  //   if (!hasShipment) return;
+  //   setTrackingLoading(true);
+  //   api.get(`/api/shipping/track/${selectedOrder._id}`)
+  //     .then((res) => setTracking(res.data.tracking))
+  //     .catch(() => setTracking(null))
+  //     .finally(() => setTrackingLoading(false));
+  // }, [show, selectedOrder?._id]);
 
   const orderId = selectedOrder?._id;
-  const hasShipment =
-    selectedOrder?.shiprocket?.awbCode ||
-    selectedOrder?.shiprocket?.shipmentId;
+  const hasShipment = false; // Shiprocket — re-enable when integrated
 
   return (
     <Modal

@@ -5,18 +5,6 @@ import Button from "react-bootstrap/Button";
 import Badge from "react-bootstrap/Badge";
 import { Check } from "react-feather";
 
-function fmtDate(raw) {
-  if (!raw) return null;
-  try {
-    return new Date(raw).toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    });
-  } catch {
-    return raw;
-  }
-}
 
 export const ConfirmationStep = ({
   orderData,
@@ -24,9 +12,9 @@ export const ConfirmationStep = ({
   shippingAddress,
   total,
   navigate,
-  backendOrder, // full order from verify-payment response (has .shiprocket)
+  backendOrder,
 }) => {
-  const sr = backendOrder?.shiprocket || orderData?.shiprocket;
+  // const sr = backendOrder?.shiprocket || orderData?.shiprocket; // Shiprocket — re-enable when integrated
   const orderId =
     backendOrder?._id || orderData?.orderId || orderData?.id || orderData?._id;
 
@@ -84,118 +72,7 @@ export const ConfirmationStep = ({
               start processing your order right away.
             </p>
 
-            {/* ── Shiprocket tracking card ── */}
-            {sr?.awbCode && (
-              <Card
-                className="mb-4"
-                style={{
-                  border: "none",
-                  borderRadius: "16px",
-                  background: "rgba(255,255,255,0.85)",
-                  backdropFilter: "blur(10px)",
-                }}
-              >
-                <Card.Body style={{ padding: "1.25rem" }}>
-                  <h6
-                    style={{
-                      fontWeight: 700,
-                      color: "#1e293b",
-                      marginBottom: "1rem",
-                      textAlign: "left",
-                    }}
-                  >
-                    🚚 Shipment Details
-                  </h6>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: "1.25rem",
-                      textAlign: "left",
-                    }}
-                  >
-                    {sr.awbCode && (
-                      <div>
-                        <div
-                          style={{
-                            fontSize: "0.7rem",
-                            fontWeight: 600,
-                            textTransform: "uppercase",
-                            color: "#94a3b8",
-                          }}
-                        >
-                          Tracking ID (AWB)
-                        </div>
-                        <div
-                          style={{
-                            fontWeight: 700,
-                            fontFamily: "monospace",
-                            fontSize: "1rem",
-                            color: "#1e293b",
-                          }}
-                        >
-                          {sr.awbCode}
-                        </div>
-                      </div>
-                    )}
-                    {sr.courierName && (
-                      <div>
-                        <div
-                          style={{
-                            fontSize: "0.7rem",
-                            fontWeight: 600,
-                            textTransform: "uppercase",
-                            color: "#94a3b8",
-                          }}
-                        >
-                          Courier Partner
-                        </div>
-                        <div style={{ fontWeight: 600, color: "#1e293b" }}>
-                          {sr.courierName}
-                        </div>
-                      </div>
-                    )}
-                    {sr.etd && (
-                      <div>
-                        <div
-                          style={{
-                            fontSize: "0.7rem",
-                            fontWeight: 600,
-                            textTransform: "uppercase",
-                            color: "#94a3b8",
-                          }}
-                        >
-                          Expected Delivery
-                        </div>
-                        <div style={{ fontWeight: 600, color: "#059669" }}>
-                          {fmtDate(sr.etd)}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  {sr.trackingUrl && (
-                    <a
-                      href={sr.trackingUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        display: "inline-block",
-                        marginTop: "1rem",
-                        padding: "0.5rem 1.25rem",
-                        background: "linear-gradient(135deg, #3b82f6, #2563eb)",
-                        color: "white",
-                        borderRadius: 8,
-                        textDecoration: "none",
-                        fontWeight: 600,
-                        fontSize: "0.875rem",
-                      }}
-                    >
-                      Track on Shiprocket ↗
-                    </a>
-                  )}
-                </Card.Body>
-              </Card>
-            )}
+            {/* Shiprocket tracking card — re-enable when Shiprocket is integrated */}
 
             {/* ── Order details card ── */}
             {orderData && (
