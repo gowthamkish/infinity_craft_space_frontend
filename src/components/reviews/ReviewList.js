@@ -19,7 +19,7 @@ const ReviewList = ({ productId, productName }) => {
   );
   const isAuthenticated = useSelector((state) => !!state.auth.user);
 
-  const [sortBy, setSortBy] = useState("newest");
+  const [sortBy, setSortBy] = useState("verified");
   const [showAddReview, setShowAddReview] = useState(false);
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [selectedImages, setSelectedImages] = useState([]);
@@ -70,7 +70,18 @@ const ReviewList = ({ productId, productName }) => {
     setImageModalOpen(true);
   };
 
-  const reviews = productReviews?.reviews || [];
+  const rawReviews = productReviews?.reviews || [];
+
+  // "verified" sort: verified purchases + photo reviews first, then by rating desc
+  const reviews = sortBy === "verified"
+    ? [...rawReviews].sort((a, b) => {
+        const scoreA = (a.verifiedPurchase ? 2 : 0) + (a.images?.length > 0 ? 1 : 0);
+        const scoreB = (b.verifiedPurchase ? 2 : 0) + (b.images?.length > 0 ? 1 : 0);
+        if (scoreB !== scoreA) return scoreB - scoreA;
+        return b.rating - a.rating;
+      })
+    : rawReviews;
+
   const ratingStats = productReviews?.ratingStats || {};
   const pagination = productReviews?.pagination;
 
@@ -171,6 +182,7 @@ const ReviewList = ({ productId, productName }) => {
               className="sort-select"
               style={{ width: "auto" }}
             >
+              <option value="verified">Verified Purchases First</option>
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
               <option value="highest">Highest Rated</option>

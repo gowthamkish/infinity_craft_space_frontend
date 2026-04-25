@@ -5,7 +5,6 @@ import Button from "react-bootstrap/Button";
 import Badge from "react-bootstrap/Badge";
 import { Check } from "react-feather";
 
-
 export const ConfirmationStep = ({
   orderData,
   paymentData,
@@ -246,7 +245,7 @@ export const ConfirmationStep = ({
               <Button
                 variant="outline-primary"
                 size="lg"
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/products")}
                 style={{
                   borderRadius: "12px",
                   fontWeight: "500",

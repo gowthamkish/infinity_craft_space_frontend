@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
@@ -7,6 +8,94 @@ import Badge from "react-bootstrap/Badge";
 import { Trash2, Plus, Minus, Package } from "react-feather";
 import CouponInput from "../../components/CouponInput";
 import { isCustomItem } from "../../components/CheckoutDeliveryPanel";
+import api from "../../api/axios";
+
+// Cross-sell strip — shows 3 recommendations based on the first cart item
+function CrossSellSection({ cartItems, navigate }) {
+  const [recs, setRecs] = useState([]);
+
+  useEffect(() => {
+    if (!cartItems?.length) return;
+    const firstProductId = cartItems[0]?.product?._id;
+    if (!firstProductId) return;
+    api
+      .get(`/api/products/${firstProductId}/recommendations`)
+      .then((res) => {
+        const products = res.data?.recommendations || res.data?.products || [];
+        setRecs(products.slice(0, 3));
+      })
+      .catch(() => {});
+  }, [cartItems]);
+
+  if (!recs.length) return null;
+
+  return (
+    <div style={{ marginTop: "2rem" }}>
+      <h6 style={{ fontWeight: 700, color: "#374151", marginBottom: "1rem" }}>
+        🎁 Complete the set
+      </h6>
+      <Row className="g-3">
+        {recs.map((product) => {
+          const img = product.images?.[0]?.url || product.image?.url;
+          return (
+            <Col xs={12} sm={4} key={product._id}>
+              <Card
+                style={{
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 12,
+                  cursor: "pointer",
+                }}
+                onClick={() =>
+                  navigate(`/product/${product.slug || product._id}`)
+                }
+              >
+                {img && (
+                  <Card.Img
+                    variant="top"
+                    src={img}
+                    alt={product.name}
+                    style={{
+                      height: 120,
+                      objectFit: "cover",
+                      borderRadius: "12px 12px 0 0",
+                    }}
+                  />
+                )}
+                <Card.Body style={{ padding: "0.6rem 0.75rem" }}>
+                  <p
+                    style={{
+                      fontSize: "0.8rem",
+                      fontWeight: 600,
+                      margin: 0,
+                      color: "#111827",
+                      lineClamp: 2,
+                      overflow: "hidden",
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                    }}
+                  >
+                    {product.name}
+                  </p>
+                  <p
+                    style={{
+                      fontSize: "0.85rem",
+                      fontWeight: 700,
+                      color: "#7c3aed",
+                      margin: "0.25rem 0 0",
+                    }}
+                  >
+                    ₹{product.price}
+                  </p>
+                </Card.Body>
+              </Card>
+            </Col>
+          );
+        })}
+      </Row>
+    </div>
+  );
+}
 
 const FREE_SHIPPING_THRESHOLD = 999;
 
@@ -16,26 +105,44 @@ function FreeShippingBar({ subtotal }) {
   const achieved = remaining === 0;
 
   return (
-    <div style={{
-      background: achieved ? "#ecfdf5" : "#f0fdf4",
-      border: `1px solid ${achieved ? "#6ee7b7" : "#d1fae5"}`,
-      borderRadius: "12px",
-      padding: "0.85rem 1rem",
-      marginBottom: "1.25rem",
-    }}>
-      <p style={{ margin: "0 0 0.5rem", fontSize: "0.82rem", fontWeight: "600", color: achieved ? "#065f46" : "#374151" }}>
+    <div
+      style={{
+        background: achieved ? "#ecfdf5" : "#f0fdf4",
+        border: `1px solid ${achieved ? "#6ee7b7" : "#d1fae5"}`,
+        borderRadius: "12px",
+        padding: "0.85rem 1rem",
+        marginBottom: "1.25rem",
+      }}
+    >
+      <p
+        style={{
+          margin: "0 0 0.5rem",
+          fontSize: "0.82rem",
+          fontWeight: "600",
+          color: achieved ? "#065f46" : "#374151",
+        }}
+      >
         {achieved
           ? "🎉 You've unlocked free shipping!"
           : `Add ₹${remaining.toFixed(0)} more for free shipping`}
       </p>
-      <div style={{ background: "#d1fae5", borderRadius: "9999px", height: "6px", overflow: "hidden" }}>
-        <div style={{
-          height: "100%",
-          width: `${pct}%`,
-          background: "linear-gradient(90deg, #10b981, #059669)",
+      <div
+        style={{
+          background: "#d1fae5",
           borderRadius: "9999px",
-          transition: "width 0.4s ease",
-        }} />
+          height: "6px",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            width: `${pct}%`,
+            background: "linear-gradient(90deg, #10b981, #059669)",
+            borderRadius: "9999px",
+            transition: "width 0.4s ease",
+          }}
+        />
       </div>
     </div>
   );
@@ -125,7 +232,13 @@ export const CartReviewStep = ({
             >
               <span style={{ fontSize: "1.1rem" }}>⏳</span>
               <div>
-                <strong style={{ fontSize: "0.88rem", color: "#78350f", display: "block" }}>
+                <strong
+                  style={{
+                    fontSize: "0.88rem",
+                    color: "#78350f",
+                    display: "block",
+                  }}
+                >
                   Handcrafted Items Notice
                 </strong>
                 <span style={{ fontSize: "0.82rem", lineHeight: 1.5 }}>
@@ -681,7 +794,7 @@ export const CartReviewStep = ({
             </Button>
             <Button
               variant="outline-secondary"
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/products")}
               style={{
                 borderRadius: "16px",
                 fontWeight: "600",
@@ -705,6 +818,7 @@ export const CartReviewStep = ({
           </div>
         </Card.Body>
       </Card>
+      <CrossSellSection cartItems={cartItems} navigate={navigate} />
     </Col>
   </Row>
 );

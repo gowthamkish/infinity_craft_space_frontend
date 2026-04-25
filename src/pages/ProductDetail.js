@@ -18,7 +18,7 @@ import {
 import { addToCart } from "../features/cartSlice";
 import { StarRating } from "../components/reviews/StarRating";
 import api from "../api/axios";
-import SEOHead, { generateProductStructuredData } from "../components/SEOHead";
+import SEOHead, { generateProductStructuredData, generateBreadcrumbStructuredData, getBaseUrl } from "../components/SEOHead";
 import { useRecentlyViewed } from "../hooks/useRecentlyViewed";
 import Breadcrumbs from "../components/Breadcrumbs";
 import { useLazySection } from "../hooks/useLazySection";
@@ -221,9 +221,27 @@ const ProductDetail = () => {
     <>
       <SEOHead
         title={`${product.name} - Infinity Craft Space`}
-        description={product.description}
+        description={product.seoDescription || product.description}
         type="product"
-        structuredData={generateProductStructuredData(product, [])}
+        price={product.price}
+        availability={isOutOfStock ? "https://schema.org/OutOfStock" : "https://schema.org/InStock"}
+        rating={ratingStats?.averageRating}
+        reviewCount={ratingStats?.reviewCount}
+        image={images[0]?.url}
+        url={`${getBaseUrl()}/product/${product.slug || product._id}`}
+        canonical={`${getBaseUrl()}/product/${product.slug || product._id}`}
+        structuredData={{
+          "@context": "https://schema.org",
+          "@graph": [
+            generateProductStructuredData(product, []),
+            generateBreadcrumbStructuredData([
+              { name: "Home", url: getBaseUrl() },
+              { name: "Products", url: `${getBaseUrl()}/` },
+              ...(product.category ? [{ name: product.category, url: `${getBaseUrl()}/?category=${encodeURIComponent(product.category)}` }] : []),
+              { name: product.name, url: `${getBaseUrl()}/product/${product.slug || product._id}` },
+            ]),
+          ],
+        }}
       />
 
       <Suspense fallback={null}>
@@ -341,6 +359,19 @@ const ProductDetail = () => {
                   <p className="pd-desc-heading">Description</p>
                   <p className="pd-desc-body">{product.description}</p>
                 </div>
+
+                {/* Bulk discounts */}
+                {product.bulkDiscounts?.length > 0 && (
+                  <div className="pd-bulk-table">
+                    <h6>🎁 Buy more, save more</h6>
+                    {product.bulkDiscounts.map((bd) => (
+                      <div key={bd.minQuantity} className="pd-bulk-row">
+                        <span>Buy {bd.minQuantity}{bd.maxQuantity ? `–${bd.maxQuantity}` : "+"} units</span>
+                        <span className="pd-bulk-discount">Save {bd.discount}%</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {/* Actions */}
                 <div className="pd-actions">
@@ -472,6 +503,21 @@ const ProductDetail = () => {
           </Row>
         </Container>
       </div>
+
+      {/* Sticky mobile CTA — visible only on small screens when product is loaded */}
+      {!isOutOfStock && (
+        <div className="pd-sticky-cta d-lg-none">
+          <div className="pd-sticky-price">₹{product.price}</div>
+          <button
+            className="pd-btn pd-btn--primary pd-sticky-btn"
+            onClick={handleAddToCart}
+            disabled={addingToCart}
+          >
+            <FiShoppingCart size={18} />
+            {quantityInCart > 0 ? `Add More (${quantityInCart})` : "Add to Cart"}
+          </button>
+        </div>
+      )}
 
       {showImageModal && images.length > 0 && (
         <Suspense fallback={null}>

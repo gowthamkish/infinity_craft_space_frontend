@@ -59,9 +59,9 @@ export const EmptyCart = ({ onShop }) => (
   <EmptyState
     type="cart"
     title="Your cart is empty"
-    description="Add some products to get started"
+    description="Discover 100+ unique handcrafted items — from resin art to personalised gifts."
     actions={[
-      { label: "Continue Shopping", onClick: onShop, className: "btn-primary" },
+      { label: "Discover handmade gifts →", onClick: onShop, className: "btn-primary" },
     ]}
   />
 );

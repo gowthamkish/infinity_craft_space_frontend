@@ -1,6 +1,14 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useEffect, useRef, Suspense, lazy, useContext, useState, useCallback } from "react";
+import {
+  useEffect,
+  useRef,
+  Suspense,
+  lazy,
+  useContext,
+  useState,
+  useCallback,
+} from "react";
 import { useSelector } from "react-redux";
 import OrderStatusModal from "./components/OrderStatusModal";
 import { PageLoader } from "./components/Loader";
@@ -53,13 +61,17 @@ const LoadingFallback = ({ message }) => (
 );
 
 const STATUS_TOAST_CONFIG = {
-  confirmed:       { emoji: "✅", label: "Order Confirmed",   type: "success" },
-  processing:      { emoji: "⏳", label: "Being Processed",   type: "info"    },
-  shipped:         { emoji: "🚚", label: "Shipped",           type: "success" },
-  out_for_delivery:{ emoji: "🛵", label: "Out for Delivery!", type: "success" },
-  delivered:       { emoji: "🎉", label: "Delivered!",        type: "success" },
-  cancelled:       { emoji: "❌", label: "Order Cancelled",   type: "error"   },
-  returned:        { emoji: "🔄", label: "Return Initiated",  type: "warning" },
+  confirmed: { emoji: "✅", label: "Order Confirmed", type: "success" },
+  processing: { emoji: "⏳", label: "Being Processed", type: "info" },
+  shipped: { emoji: "🚚", label: "Shipped", type: "success" },
+  out_for_delivery: {
+    emoji: "🛵",
+    label: "Out for Delivery!",
+    type: "success",
+  },
+  delivered: { emoji: "🎉", label: "Delivered!", type: "success" },
+  cancelled: { emoji: "❌", label: "Order Cancelled", type: "error" },
+  returned: { emoji: "🔄", label: "Return Initiated", type: "warning" },
 };
 
 function App() {
@@ -69,7 +81,9 @@ function App() {
 
   // Keep a stable ref to addToast so polling interval doesn't restart on every toast
   const addToastRef = useRef(addToast);
-  useEffect(() => { addToastRef.current = addToast; }, [addToast]);
+  useEffect(() => {
+    addToastRef.current = addToast;
+  }, [addToast]);
 
   // In-memory snapshot for live diffing during this session
   const liveMapRef = useRef(null);
@@ -87,11 +101,15 @@ function App() {
     try {
       const raw = localStorage.getItem(lsKey(uid));
       return raw ? JSON.parse(raw) : null;
-    } catch { return null; }
+    } catch {
+      return null;
+    }
   };
 
   const saveSnapshot = (uid, map) => {
-    try { localStorage.setItem(lsKey(uid), JSON.stringify(map)); } catch {}
+    try {
+      localStorage.setItem(lsKey(uid), JSON.stringify(map));
+    } catch {}
   };
 
   // Stable ref so the polling closure always calls the latest setter
@@ -105,7 +123,7 @@ function App() {
     let latestChange = null;
 
     orders.forEach((order) => {
-      const key  = String(order._id);
+      const key = String(order._id);
       const prev = prevMap[key];
       const curr = order.status;
       const notifKey = `${key}:${curr}`;
@@ -115,7 +133,9 @@ function App() {
       if (prev && prev !== curr && STATUS_TOAST_CONFIG[curr]) {
         // Existing order whose status changed
         shownRef.current.add(notifKey);
-        const changeTime = new Date(order.updatedAt || order.createdAt).getTime();
+        const changeTime = new Date(
+          order.updatedAt || order.createdAt,
+        ).getTime();
         if (!latestChange || changeTime > latestChange.time) {
           latestChange = { order, previousStatus: prev, time: changeTime };
         }
@@ -133,7 +153,10 @@ function App() {
     });
 
     if (latestChange) {
-      setOrderStatusEventRef.current({ order: latestChange.order, previousStatus: latestChange.previousStatus });
+      setOrderStatusEventRef.current({
+        order: latestChange.order,
+        previousStatus: latestChange.previousStatus,
+      });
     }
   };
 
@@ -144,7 +167,9 @@ function App() {
     const baseURL = import.meta.env.VITE_API_URL || "";
     let es;
     try {
-      es = new EventSource(`${baseURL}/api/sse/stream`, { withCredentials: true });
+      es = new EventSource(`${baseURL}/api/sse/stream`, {
+        withCredentials: true,
+      });
 
       es.addEventListener("ORDER_UPDATE", (e) => {
         try {
@@ -161,9 +186,15 @@ function App() {
           }
 
           // Show modal — SSE is the real-time path; deduplicate with shownRef
-          if (order.status !== previousStatus && !shownRef.current.has(notifKey)) {
+          if (
+            order.status !== previousStatus &&
+            !shownRef.current.has(notifKey)
+          ) {
             shownRef.current.add(notifKey);
-            setOrderStatusEventRef.current({ order, previousStatus: previousStatus || null });
+            setOrderStatusEventRef.current({
+              order,
+              previousStatus: previousStatus || null,
+            });
           }
         } catch {}
       });
@@ -199,7 +230,9 @@ function App() {
 
         // Build current map
         const currentMap = {};
-        orders.forEach((o) => { currentMap[String(o._id)] = o.status; });
+        orders.forEach((o) => {
+          currentMap[String(o._id)] = o.status;
+        });
 
         if (isFirstRun) {
           // On first run: compare against localStorage snapshot (catches offline + new-order cases).
@@ -238,7 +271,7 @@ function App() {
       clearTimeout(firstPoll);
       clearInterval(id);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   return (
@@ -283,11 +316,29 @@ function App() {
                       >
                         {/* PWA Install Prompt - Shows on mobile devices */}
                         {/* <PWAInstallPrompt /> */}
+                        <Home />
+                      </Suspense>
+                    </RouteErrorBoundary>
+                  }
+                />
+
+                <Route
+                  path="/products"
+                  element={
+                    <RouteErrorBoundary>
+                      <Suspense
+                        fallback={
+                          <LoadingFallback message="Loading products..." />
+                        }
+                      >
+                        {/* PWA Install Prompt - Shows on mobile devices */}
+                        {/* <PWAInstallPrompt /> */}
                         <ProductListing />
                       </Suspense>
                     </RouteErrorBoundary>
                   }
                 />
+
                 <Route
                   path="/product/:id"
                   element={

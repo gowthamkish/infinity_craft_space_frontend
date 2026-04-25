@@ -358,7 +358,11 @@
 }
 
 .acct-btn--save {
-  background: linear-gradient(135deg, var(--primary), var(--primary-light)) !important;
+  background: linear-gradient(
+    135deg,
+    var(--primary),
+    var(--primary-light)
+  ) !important;
   border: none !important;
   color: white !important;
   border-radius: 10px !important;
@@ -409,13 +413,23 @@
 }
 
 @keyframes acct-shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position:  200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
-.account-skel-line--sm { width: 40%; }
-.account-skel-line--md { width: 65%; }
-.account-skel-line--lg { width: 90%; }
+.account-skel-line--sm {
+  width: 40%;
+}
+.account-skel-line--md {
+  width: 65%;
+}
+.account-skel-line--lg {
+  width: 90%;
+}
 
 /* ── Loading State ────────────────────────────────────────────── */
 .account-loading {
@@ -432,11 +446,11 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.2);
+  /* box-shadow: 0 8px 24px rgba(37, 99, 235, 0.2); */
   margin-bottom: 0.5rem;
 }
 
@@ -574,7 +588,9 @@
   transition: background 0.15s;
 }
 
-.account-copy-btn:hover { background: #ede9fe; }
+.account-copy-btn:hover {
+  background: #ede9fe;
+}
 
 .account-referral-credits {
   font-size: 0.78rem;

@@ -51,7 +51,7 @@ export const EmptyCart = ({ navigate }) => (
               <Button
                 variant="primary"
                 size="lg"
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/products")}
                 style={{
                   borderRadius: "12px",
                   fontWeight: "600",

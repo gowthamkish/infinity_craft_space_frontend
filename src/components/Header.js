@@ -25,7 +25,13 @@ import api from "../api/axios";
 import "./Header.css";
 
 const NAV_LINKS = [
-  { path: "/", label: "Products", icon: FiHome, showWhen: "always" },
+  { path: "/", label: "Home", icon: FiHome, showWhen: "always" },
+  {
+    path: "/products",
+    label: "Products",
+    icon: FiShoppingCart,
+    showWhen: "always",
+  },
   { path: "/orders", label: "My Orders", icon: FiPackage, showWhen: "auth" },
   { path: "/account", label: "My Account", icon: FiUser, showWhen: "auth" },
 ];
@@ -57,7 +63,7 @@ function Header() {
     dispatch(clearProducts());
     dispatch(clearAdminData());
     localStorage.removeItem("redirectAfterLogin");
-    navigate("/");
+    navigate("/products");
   };
 
   const handleCartClick = () => {
