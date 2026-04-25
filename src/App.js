@@ -399,9 +399,7 @@ function App() {
                       <Suspense
                         fallback={<LoadingFallback message="Loading home..." />}
                       >
-                        <ProtectedRoute>
-                          <Home />
-                        </ProtectedRoute>
+                        <Home />
                       </Suspense>
                     </RouteErrorBoundary>
                   }

@@ -26,7 +26,7 @@ export default defineConfig({
     dedupe: ["react", "react-dom"],
   },
   optimizeDeps: {
-    include: ["c3", "d3", "react", "react-dom", "react-redux"],
+    include: ["recharts", "react", "react-dom", "react-redux"],
     esbuildOptions: {
       loader: {
         ".js": "jsx",
@@ -82,7 +82,7 @@ export default defineConfig({
           vendor: ["react", "react-dom", "react-router-dom"],
           redux: ["@reduxjs/toolkit", "react-redux"],
           bootstrap: ["react-bootstrap", "bootstrap"],
-          charts: ["d3", "c3"],
+          charts: ["recharts"],
         },
       },
     },

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -13,8 +13,10 @@ import ProgressBar from "react-bootstrap/ProgressBar";
 import AdminLayout from "./AdminLayout";
 import api from "../../api/axios";
 import SEOHead, { SEO_CONFIG } from "../SEOHead";
-import c3 from "c3";
-import "c3/c3.css";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  PieChart, Pie, Cell, ResponsiveContainer,
+} from "recharts";
 import {
   FiTrendingUp,
   FiTrendingDown,
@@ -153,7 +155,13 @@ const StatCard = ({
   </Card>
 );
 
-// C3 Bar Chart Component
+const formatRupee = (d) => {
+  if (d >= 100000) return `₹${(d / 100000).toFixed(0)}L`;
+  if (d >= 1000) return `₹${(d / 1000).toFixed(0)}K`;
+  return `₹${d}`;
+};
+
+// Recharts Bar Chart (replaces C3BarChart)
 const C3BarChart = ({
   data,
   dataKey,
@@ -161,118 +169,33 @@ const C3BarChart = ({
   color = "#10b981",
   height = 250,
 }) => {
-  const chartRef = useRef(null);
-  const chartInstance = useRef(null);
-
-  useEffect(() => {
-    if (!data || data.length === 0 || !chartRef.current) return;
-
-    // Prepare data for C3
-    const categories = data.map((item) => {
-      const name = item[nameKey] || "";
-      // Format date if it looks like a date
-      if (name.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        const date = new Date(name);
-        return date.toLocaleDateString("en-IN", {
-          day: "2-digit",
-          month: "short",
-        });
-      }
-      return name.length > 8 ? name.substring(0, 8) + "..." : name;
-    });
-    const values = ["Revenue", ...data.map((item) => item[dataKey] || 0)];
-
-    // Destroy existing chart safely
-    if (chartInstance.current) {
-      try {
-        chartInstance.current.destroy();
-      } catch (e) {
-        // Ignore destroy errors
-      }
-      chartInstance.current = null;
-    }
-
-    // Create new chart
-    const chart = c3.generate({
-      bindto: chartRef.current,
-      data: {
-        columns: [values],
-        type: "bar",
-        colors: {
-          Revenue: color,
-        },
-      },
-      bar: {
-        width: {
-          ratio: 0.6,
-        },
-      },
-      axis: {
-        x: {
-          type: "category",
-          categories: categories,
-          tick: {
-            rotate: -45,
-            multiline: false,
-          },
-          height: 60,
-        },
-        y: {
-          tick: {
-            format: (d) => {
-              if (d >= 100000) return `₹${(d / 100000).toFixed(0)}L`;
-              if (d >= 1000) return `₹${(d / 1000).toFixed(0)}K`;
-              return `₹${d}`;
-            },
-          },
-        },
-      },
-      legend: {
-        show: false,
-      },
-      tooltip: {
-        format: {
-          value: (value) => `₹${value?.toLocaleString("en-IN") || 0}`,
-        },
-      },
-      size: {
-        height: height,
-      },
-      padding: {
-        bottom: 10,
-        right: 20,
-      },
-      grid: {
-        y: {
-          show: true,
-        },
-      },
-    });
-    chartInstance.current = chart;
-
-    return () => {
-      if (chart) {
-        try {
-          chart.destroy();
-        } catch (e) {
-          // Ignore destroy errors
-        }
-      }
-    };
-  }, [data, dataKey, nameKey, color, height]);
-
   if (!data || data.length === 0) {
     return <p className="text-muted text-center py-4">No data available</p>;
   }
 
-  return <div ref={chartRef} />;
+  const chartData = data.map((item) => {
+    const name = item[nameKey] || "";
+    const label = name.match(/^\d{4}-\d{2}-\d{2}$/)
+      ? new Date(name).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })
+      : name.length > 8 ? name.slice(0, 8) + "…" : name;
+    return { name: label, value: item[dataKey] || 0 };
+  });
+
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <BarChart data={chartData} margin={{ top: 5, right: 20, bottom: 40, left: 10 }}>
+        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+        <XAxis dataKey="name" tick={{ fontSize: 11 }} angle={-45} textAnchor="end" interval={0} />
+        <YAxis tickFormatter={formatRupee} tick={{ fontSize: 11 }} />
+        <Tooltip formatter={(v) => [`₹${v?.toLocaleString("en-IN")}`, "Revenue"]} />
+        <Bar dataKey="value" fill={color} radius={[4, 4, 0, 0]} />
+      </BarChart>
+    </ResponsiveContainer>
+  );
 };
 
-// C3 Donut Chart Component
+// Recharts Donut Chart (replaces C3DonutChart)
 const C3DonutChart = ({ data, nameKey, valueKey, colors, height = 280 }) => {
-  const chartRef = useRef(null);
-  const chartInstance = useRef(null);
-
   const defaultColors = {
     confirmed: "#10b981",
     processing: "#3b82f6",
@@ -282,81 +205,43 @@ const C3DonutChart = ({ data, nameKey, valueKey, colors, height = 280 }) => {
     delivered: "#059669",
   };
 
-  useEffect(() => {
-    if (!data || data.length === 0 || !chartRef.current) return;
-
-    // Prepare data for C3
-    const columns = data.map((item) => [
-      item[nameKey] || "Unknown",
-      item[valueKey] || 0,
-    ]);
-
-    // Prepare color pattern
-    const colorPattern = {};
-    data.forEach((item, i) => {
-      const name = item[nameKey] || "Unknown";
-      colorPattern[name] =
-        colors?.[i] || defaultColors[name] || `hsl(${i * 60}, 70%, 50%)`;
-    });
-
-    // Destroy existing chart safely
-    if (chartInstance.current) {
-      try {
-        chartInstance.current.destroy();
-      } catch (e) {
-        // Ignore destroy errors
-      }
-      chartInstance.current = null;
-    }
-
-    // Create new chart
-    const chart = c3.generate({
-      bindto: chartRef.current,
-      data: {
-        columns: columns,
-        type: "donut",
-        colors: colorPattern,
-      },
-      donut: {
-        title: "Orders",
-        width: 40,
-        label: {
-          format: (value) => value,
-        },
-      },
-      legend: {
-        position: "right",
-      },
-      tooltip: {
-        format: {
-          value: (value, ratio) => `${value} (${(ratio * 100).toFixed(1)}%)`,
-        },
-      },
-      size: {
-        height: height,
-      },
-    });
-    chartInstance.current = chart;
-
-    return () => {
-      if (chart) {
-        try {
-          chart.destroy();
-        } catch (e) {
-          // Ignore destroy errors
-        }
-      }
-    };
-  }, [data, nameKey, valueKey, colors, height]);
-
   if (!data || data.length === 0) {
     return <p className="text-muted text-center py-4">No data available</p>;
   }
 
-  return <div ref={chartRef} />;
+  const chartData = data.map((item) => ({
+    name: item[nameKey] || "Unknown",
+    value: item[valueKey] || 0,
+  }));
+
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <PieChart>
+        <Pie
+          data={chartData}
+          cx="50%"
+          cy="50%"
+          innerRadius="55%"
+          outerRadius="75%"
+          dataKey="value"
+          label={({ name, value }) => `${name}: ${value}`}
+          labelLine={false}
+        >
+          {chartData.map((entry, i) => (
+            <Cell
+              key={entry.name}
+              fill={colors?.[i] || defaultColors[entry.name] || `hsl(${i * 60}, 70%, 50%)`}
+            />
+          ))}
+        </Pie>
+        <Tooltip formatter={(v, name) => [`${v} (${((v / chartData.reduce((s, d) => s + d.value, 0)) * 100).toFixed(1)}%)`, name]} />
+        <Legend />
+      </PieChart>
+    </ResponsiveContainer>
+  );
 };
 
-// C3 Horizontal Bar Chart for Categories
+// Recharts Horizontal Bar Chart (replaces C3CategoryChart)
 const C3CategoryChart = ({
   data,
   dataKey,
@@ -364,220 +249,62 @@ const C3CategoryChart = ({
   color = "#3b82f6",
   height = 200,
 }) => {
-  const chartRef = useRef(null);
-  const chartInstance = useRef(null);
-
-  useEffect(() => {
-    if (!data || data.length === 0 || !chartRef.current) return;
-
-    // Prepare data for C3 - horizontal bar chart
-    const categories = data.map((item) => {
-      const name = item[nameKey] || "Unknown";
-      return name.length > 12 ? name.substring(0, 12) + "..." : name;
-    });
-    const values = ["Revenue", ...data.map((item) => item[dataKey] || 0)];
-
-    // Destroy existing chart safely
-    if (chartInstance.current) {
-      try {
-        chartInstance.current.destroy();
-      } catch (e) {
-        // Ignore destroy errors
-      }
-      chartInstance.current = null;
-    }
-
-    // Create new chart
-    const chart = c3.generate({
-      bindto: chartRef.current,
-      data: {
-        columns: [values],
-        type: "bar",
-        colors: {
-          Revenue: color,
-        },
-      },
-      bar: {
-        width: {
-          ratio: 0.7,
-        },
-      },
-      axis: {
-        rotated: true,
-        x: {
-          type: "category",
-          categories: categories,
-        },
-        y: {
-          tick: {
-            format: (d) => {
-              if (d >= 100000) return `₹${(d / 100000).toFixed(0)}L`;
-              if (d >= 1000) return `₹${(d / 1000).toFixed(0)}K`;
-              return `₹${d}`;
-            },
-          },
-        },
-      },
-      legend: {
-        show: false,
-      },
-      tooltip: {
-        format: {
-          value: (value) => `₹${value?.toLocaleString("en-IN") || 0}`,
-        },
-      },
-      size: {
-        height: height,
-      },
-      padding: {
-        left: 100,
-      },
-    });
-    chartInstance.current = chart;
-
-    return () => {
-      if (chart) {
-        try {
-          chart.destroy();
-        } catch (e) {
-          // Ignore destroy errors
-        }
-      }
-    };
-  }, [data, dataKey, nameKey, color, height]);
-
   if (!data || data.length === 0) {
     return <p className="text-muted text-center py-4">No data available</p>;
   }
 
-  return <div ref={chartRef} />;
+  const chartData = data.map((item) => {
+    const name = item[nameKey] || "Unknown";
+    return { name: name.length > 12 ? name.slice(0, 12) + "…" : name, value: item[dataKey] || 0 };
+  });
+
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 20, bottom: 5, left: 90 }}>
+        <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+        <XAxis type="number" tickFormatter={formatRupee} tick={{ fontSize: 11 }} />
+        <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={90} />
+        <Tooltip formatter={(v) => [`₹${v?.toLocaleString("en-IN")}`, "Revenue"]} />
+        <Bar dataKey="value" fill={color} radius={[0, 4, 4, 0]} />
+      </BarChart>
+    </ResponsiveContainer>
+  );
 };
 
-// C3 Prediction Chart Component - Grouped bar chart comparing last month vs predicted
+// Recharts Grouped Bar Chart (replaces C3PredictionChart)
 const C3PredictionChart = ({ data, height = 350 }) => {
-  const chartRef = useRef(null);
-  const chartInstance = useRef(null);
-
-  useEffect(() => {
-    if (!data || data.length === 0 || !chartRef.current) return;
-
-    // Prepare data for C3 - grouped bar chart
-    const categories = data.map((item) => {
-      const name = item.productName || "Unknown";
-      return name.length > 15 ? name.substring(0, 15) + "..." : name;
-    });
-
-    const lastMonthData = [
-      "Last Month",
-      ...data.map((item) => item.lastMonthQuantity || 0),
-    ];
-    const predictedData = [
-      "Predicted",
-      ...data.map((item) => item.predictedQuantity || 0),
-    ];
-    const currentMonthData = [
-      "Current (So Far)",
-      ...data.map((item) => item.currentMonthQuantity || 0),
-    ];
-
-    // Destroy existing chart safely
-    if (chartInstance.current) {
-      try {
-        chartInstance.current.destroy();
-      } catch (e) {
-        // Ignore destroy errors
-      }
-      chartInstance.current = null;
-    }
-
-    // Create new chart
-    const chart = c3.generate({
-      bindto: chartRef.current,
-      data: {
-        columns: [lastMonthData, predictedData, currentMonthData],
-        type: "bar",
-        colors: {
-          "Last Month": "#94a3b8",
-          Predicted: "#3b82f6",
-          "Current (So Far)": "#10b981",
-        },
-        groups: [],
-      },
-      bar: {
-        width: {
-          ratio: 0.7,
-        },
-      },
-      axis: {
-        x: {
-          type: "category",
-          categories: categories,
-          tick: {
-            rotate: -45,
-            multiline: false,
-          },
-          height: 80,
-        },
-        y: {
-          label: {
-            text: "Quantity",
-            position: "outer-middle",
-          },
-          tick: {
-            format: (d) => Math.round(d),
-          },
-        },
-      },
-      legend: {
-        position: "top",
-      },
-      tooltip: {
-        format: {
-          value: (value) => `${value} units`,
-        },
-      },
-      size: {
-        height: height,
-      },
-      padding: {
-        bottom: 20,
-        right: 20,
-      },
-      grid: {
-        y: {
-          show: true,
-        },
-      },
-    });
-    chartInstance.current = chart;
-
-    return () => {
-      if (chart) {
-        try {
-          chart.destroy();
-        } catch (e) {
-          // Ignore destroy errors
-        }
-      }
-    };
-  }, [data, height]);
-
   if (!data || data.length === 0) {
-    return (
-      <p className="text-muted text-center py-4">
-        No prediction data available
-      </p>
-    );
+    return <p className="text-muted text-center py-4">No prediction data available</p>;
   }
 
-  return <div ref={chartRef} />;
+  const chartData = data.map((item) => {
+    const name = item.productName || "Unknown";
+    return {
+      name: name.length > 15 ? name.slice(0, 15) + "…" : name,
+      "Last Month": item.lastMonthQuantity || 0,
+      Predicted: item.predictedQuantity || 0,
+      "Current (So Far)": item.currentMonthQuantity || 0,
+    };
+  });
+
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <BarChart data={chartData} margin={{ top: 5, right: 20, bottom: 60, left: 10 }}>
+        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+        <XAxis dataKey="name" tick={{ fontSize: 10 }} angle={-45} textAnchor="end" interval={0} />
+        <YAxis tick={{ fontSize: 11 }} tickFormatter={(d) => Math.round(d)} />
+        <Tooltip formatter={(v, name) => [`${v} units`, name]} />
+        <Legend verticalAlign="top" />
+        <Bar dataKey="Last Month" fill="#94a3b8" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="Predicted" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="Current (So Far)" fill="#10b981" radius={[4, 4, 0, 0]} />
+      </BarChart>
+    </ResponsiveContainer>
+  );
 };
 
-// C3 Category Prediction Donut Chart
+// Recharts Donut Chart for category predictions (replaces C3CategoryPredictionChart)
 const C3CategoryPredictionChart = ({ data, height = 280 }) => {
-  const chartRef = useRef(null);
-  const chartInstance = useRef(null);
-
   const categoryColors = {
     Paintings: "#3b82f6",
     Sculptures: "#10b981",
@@ -589,79 +316,38 @@ const C3CategoryPredictionChart = ({ data, height = 280 }) => {
     Woodwork: "#84cc16",
   };
 
-  useEffect(() => {
-    if (!data || data.length === 0 || !chartRef.current) return;
-
-    // Prepare data for C3
-    const columns = data
-      .slice(0, 6)
-      .map((item) => [item.category || "Other", item.predictedQuantity || 0]);
-
-    // Prepare color pattern
-    const colorPattern = {};
-    data.slice(0, 6).forEach((item, i) => {
-      const name = item.category || "Other";
-      colorPattern[name] = categoryColors[name] || `hsl(${i * 60}, 70%, 50%)`;
-    });
-
-    // Destroy existing chart safely
-    if (chartInstance.current) {
-      try {
-        chartInstance.current.destroy();
-      } catch (e) {
-        // Ignore destroy errors
-      }
-      chartInstance.current = null;
-    }
-
-    // Create new chart
-    const chart = c3.generate({
-      bindto: chartRef.current,
-      data: {
-        columns: columns,
-        type: "donut",
-        colors: colorPattern,
-      },
-      donut: {
-        title: "Predicted",
-        width: 40,
-        label: {
-          format: (value) => value,
-        },
-      },
-      legend: {
-        position: "right",
-      },
-      tooltip: {
-        format: {
-          value: (value, ratio) =>
-            `${value} units (${(ratio * 100).toFixed(1)}%)`,
-        },
-      },
-      size: {
-        height: height,
-      },
-    });
-    chartInstance.current = chart;
-
-    return () => {
-      if (chart) {
-        try {
-          chart.destroy();
-        } catch (e) {
-          // Ignore destroy errors
-        }
-      }
-    };
-  }, [data, height]);
-
   if (!data || data.length === 0) {
-    return (
-      <p className="text-muted text-center py-4">No category data available</p>
-    );
+    return <p className="text-muted text-center py-4">No category data available</p>;
   }
 
-  return <div ref={chartRef} />;
+  const chartData = data.slice(0, 6).map((item) => ({
+    name: item.category || "Other",
+    value: item.predictedQuantity || 0,
+  }));
+
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <PieChart>
+        <Pie
+          data={chartData}
+          cx="50%"
+          cy="50%"
+          innerRadius="50%"
+          outerRadius="70%"
+          dataKey="value"
+        >
+          {chartData.map((entry, i) => (
+            <Cell
+              key={entry.name}
+              fill={categoryColors[entry.name] || `hsl(${i * 60}, 70%, 50%)`}
+            />
+          ))}
+        </Pie>
+        <Tooltip formatter={(v, name) => [`${v} units`, name]} />
+        <Legend />
+      </PieChart>
+    </ResponsiveContainer>
+  );
 };
 
 export default function AnalyticsDashboard() {

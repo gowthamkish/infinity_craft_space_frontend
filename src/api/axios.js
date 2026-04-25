@@ -15,6 +15,23 @@ const api = axios.create({
 let isRefreshing = false;
 let failedQueue = [];
 
+// ── CSRF token management ──────────────────────────────────────────────────────
+let csrfToken = null;
+
+async function ensureCsrfToken() {
+  if (csrfToken) return csrfToken;
+  try {
+    const res = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/auth/csrf-token`,
+      { withCredentials: true },
+    );
+    csrfToken = res.data.csrfToken;
+  } catch {
+    // Non-fatal: if CSRF fetch fails, proceed without it (will 403 on state-changing calls)
+  }
+  return csrfToken;
+}
+
 const processQueue = (error, token = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
@@ -28,7 +45,12 @@ const processQueue = (error, token = null) => {
 
 // Request interceptor — cookies are sent automatically via withCredentials
 api.interceptors.request.use(
-  (config) => {
+  async (config) => {
+    // Attach CSRF token to all state-changing requests
+    if (!["get", "head", "options"].includes(config.method?.toLowerCase())) {
+      const token = await ensureCsrfToken();
+      if (token) config.headers["X-CSRF-Token"] = token;
+    }
     // Log large requests in development
     if (import.meta.env.DEV && config.data) {
       const dataSize = JSON.stringify(config.data).length;

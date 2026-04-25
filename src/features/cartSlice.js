@@ -22,26 +22,28 @@ export const fetchUserCart = createAsyncThunk(
   },
 );
 
-// Async thunk to sync cart to backend
+// Async thunk to sync cart to backend (last-write-wins via clientUpdatedAt)
 export const syncCartToBackend = createAsyncThunk(
   "cart/syncToBackend",
-  async (_, { getState, rejectWithValue }) => {
+  async (_, { getState, dispatch, rejectWithValue }) => {
     try {
       const { auth, cart } = getState();
-      if (!auth.user?._id) {
-        return; // Don't sync if not logged in
-      }
+      if (!auth.user?._id) return;
 
-      await api.post("/api/cart/sync", {
+      const res = await api.post("/api/cart/sync", {
         userId: auth.user._id,
         items: cart.items,
+        clientUpdatedAt: cart.lastSyncedAt || null,
       });
 
-      return { success: true };
+      return { success: true, updatedAt: res.data.updatedAt };
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.error || "Failed to sync cart",
-      );
+      // 409 = server cart is newer — fetch server cart and replace local state
+      if (error.response?.status === 409) {
+        dispatch(fetchUserCart());
+        return rejectWithValue("conflict");
+      }
+      return rejectWithValue(error.response?.data?.error || "Failed to sync cart");
     }
   },
 );
@@ -89,6 +91,7 @@ const cartSlice = createSlice({
     loading: false,
     syncing: false,
     error: null,
+    lastSyncedAt: null, // ISO string — used for last-write-wins cart conflict detection
   },
   reducers: {
     addToCart: (state, action) => {
@@ -200,8 +203,11 @@ const cartSlice = createSlice({
       .addCase(syncCartToBackend.pending, (state) => {
         state.syncing = true;
       })
-      .addCase(syncCartToBackend.fulfilled, (state) => {
+      .addCase(syncCartToBackend.fulfilled, (state, action) => {
         state.syncing = false;
+        if (action.payload?.updatedAt) {
+          state.lastSyncedAt = action.payload.updatedAt;
+        }
       })
       .addCase(syncCartToBackend.rejected, (state) => {
         state.syncing = false;
