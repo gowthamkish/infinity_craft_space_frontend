@@ -8,6 +8,39 @@ import { Trash2, Plus, Minus, Package } from "react-feather";
 import CouponInput from "../../components/CouponInput";
 import { isCustomItem } from "../../components/CheckoutDeliveryPanel";
 
+const FREE_SHIPPING_THRESHOLD = 999;
+
+function FreeShippingBar({ subtotal }) {
+  const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+  const pct = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
+  const achieved = remaining === 0;
+
+  return (
+    <div style={{
+      background: achieved ? "#ecfdf5" : "#f0fdf4",
+      border: `1px solid ${achieved ? "#6ee7b7" : "#d1fae5"}`,
+      borderRadius: "12px",
+      padding: "0.85rem 1rem",
+      marginBottom: "1.25rem",
+    }}>
+      <p style={{ margin: "0 0 0.5rem", fontSize: "0.82rem", fontWeight: "600", color: achieved ? "#065f46" : "#374151" }}>
+        {achieved
+          ? "🎉 You've unlocked free shipping!"
+          : `Add ₹${remaining.toFixed(0)} more for free shipping`}
+      </p>
+      <div style={{ background: "#d1fae5", borderRadius: "9999px", height: "6px", overflow: "hidden" }}>
+        <div style={{
+          height: "100%",
+          width: `${pct}%`,
+          background: "linear-gradient(90deg, #10b981, #059669)",
+          borderRadius: "9999px",
+          transition: "width 0.4s ease",
+        }} />
+      </div>
+    </div>
+  );
+}
+
 export const CartReviewStep = ({
   cartItems,
   subtotal,
@@ -538,6 +571,9 @@ export const CartReviewStep = ({
           </p>
         </Card.Header>
         <Card.Body style={{ padding: "clamp(1rem, 3vw, 1.75rem)" }}>
+          {/* Free shipping progress bar */}
+          <FreeShippingBar subtotal={subtotal} />
+
           <div className="mb-4">
             <div
               className="d-flex justify-content-between mb-3 pb-3"

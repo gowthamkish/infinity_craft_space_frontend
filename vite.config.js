@@ -69,19 +69,15 @@ export default defineConfig({
     port: 3000,
   },
   build: {
+    outDir: "build",
+    sourcemap: false,
     rollupOptions: {
       output: {
-        // Add hash to all assets for cache-busting in production
+        // Cache-busting hashes on all output files
         entryFileNames: "assets/[name]-[hash].js",
         chunkFileNames: "assets/[name]-[hash].js",
         assetFileNames: "assets/[name]-[hash][extname]",
-      },
-    },
-    outDir: "build",
-    sourcemap: false,
-    // Optimize chunk splitting
-    rollupOptions: {
-      output: {
+        // Manual chunk splitting for better long-term caching
         manualChunks: {
           vendor: ["react", "react-dom", "react-router-dom"],
           redux: ["@reduxjs/toolkit", "react-redux"],

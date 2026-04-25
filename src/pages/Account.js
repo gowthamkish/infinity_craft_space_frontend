@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Modal } from "react-bootstrap";
 import { OrbitLoader, DotsLoader } from "../components/Loader";
 import {
   FiMapPin, FiHeart, FiEdit2, FiTrash2, FiShoppingCart,
-  FiCheckCircle, FiPhone, FiMap, FiUser,
+  FiCheckCircle, FiPhone, FiMap, FiUser, FiGift, FiShare2,
+  FiCopy, FiAward,
 } from "react-icons/fi";
 import api from "../api/axios";
 import Header from "../components/Header";
@@ -25,9 +26,12 @@ export default function Account() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const [addresses, setAddresses] = useState([]);
-  const [wishlist,  setWishlist]  = useState([]);
-  const [loading,   setLoading]   = useState(true);
+  const [addresses,    setAddresses]    = useState([]);
+  const [wishlist,     setWishlist]     = useState([]);
+  const [profile,      setProfile]      = useState(null);
+  const [loading,      setLoading]      = useState(true);
+  const [copiedCode,   setCopiedCode]   = useState(false);
+  const authUser = useSelector((s) => s.auth.user);
 
   const [editingAddress, setEditingAddress] = useState(null);
   const [showEditModal,  setShowEditModal]  = useState(false);
@@ -46,14 +50,30 @@ export default function Account() {
     } catch { /* ignore */ }
   };
 
+  const fetchProfile = async () => {
+    try {
+      const res = await api.get("/api/auth/profile");
+      setProfile(res.data.user || res.data);
+    } catch { /* ignore */ }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      await Promise.all([fetchAddresses(), fetchWishlist()]);
+      await Promise.all([fetchAddresses(), fetchWishlist(), fetchProfile()]);
       setLoading(false);
     };
     fetchData();
   }, []);
+
+  const handleCopyReferral = useCallback(() => {
+    const code = profile?.referralCode || authUser?.referralCode;
+    if (!code) return;
+    navigator.clipboard.writeText(code).then(() => {
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
+    });
+  }, [profile, authUser]);
 
   const handleDeleteAddress = async (id) => {
     try { await api.delete(`/api/auth/addresses/${id}`); fetchAddresses(); } catch { /* ignore */ }
@@ -105,6 +125,67 @@ export default function Account() {
               <h1 className="account-hero-title">My Account</h1>
               <p className="account-hero-sub">Manage your addresses and wishlist</p>
             </div>
+
+            {/* ── Loyalty + Referral strip ── */}
+            {(profile || authUser) && (() => {
+              const pts  = profile?.loyaltyPoints  ?? authUser?.loyaltyPoints  ?? 0;
+              const tier = profile?.loyaltyTier    ?? authUser?.loyaltyTier    ?? "bronze";
+              const code = profile?.referralCode   ?? authUser?.referralCode;
+              const credits = profile?.referralCredits ?? authUser?.referralCredits ?? 0;
+              const tierColors = { bronze: "#92400e", silver: "#475569", gold: "#b45309" };
+              const tierBg    = { bronze: "#fef3c7", silver: "#f1f5f9", gold: "#fffbeb" };
+
+              return (
+                <div className="account-loyalty-strip">
+                  {/* Loyalty points card */}
+                  <div className="account-loyalty-card">
+                    <div className="account-loyalty-icon" style={{ background: tierBg[tier] }}>
+                      <FiAward size={22} color={tierColors[tier]} />
+                    </div>
+                    <div className="account-loyalty-body">
+                      <p className="account-loyalty-label">Loyalty Points</p>
+                      <p className="account-loyalty-pts">{pts.toLocaleString()} pts</p>
+                      <span className="account-loyalty-tier" style={{ background: tierBg[tier], color: tierColors[tier] }}>
+                        {tier.charAt(0).toUpperCase() + tier.slice(1)} member
+                      </span>
+                    </div>
+                    <div className="account-loyalty-note">
+                      Earn points on every purchase. Redeem at checkout.
+                    </div>
+                  </div>
+
+                  {/* Referral card */}
+                  {code && (
+                    <div className="account-loyalty-card">
+                      <div className="account-loyalty-icon" style={{ background: "#ede9fe" }}>
+                        <FiGift size={22} color="#7c3aed" />
+                      </div>
+                      <div className="account-loyalty-body">
+                        <p className="account-loyalty-label">Referral Code</p>
+                        <div className="account-referral-code-row">
+                          <span className="account-referral-code">{code}</span>
+                          <button
+                            className="account-copy-btn"
+                            onClick={handleCopyReferral}
+                            title="Copy code"
+                          >
+                            {copiedCode ? <FiCheckCircle size={15} color="#10b981" /> : <FiCopy size={15} />}
+                          </button>
+                        </div>
+                        {credits > 0 && (
+                          <p className="account-referral-credits">
+                            ₹{credits} referral credits available
+                          </p>
+                        )}
+                      </div>
+                      <div className="account-loyalty-note">
+                        Share your code — you both get ₹100 store credit when they order!
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             <div className="account-grid">
               {/* ── Address Book ── */}

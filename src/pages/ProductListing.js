@@ -194,6 +194,24 @@ const ProductCard = React.memo(
             {product.name}
           </p>
 
+          {/* Star rating + review count */}
+          {product.averageRating > 0 && (
+            <div className="pc-rating-row" aria-label={`Rated ${product.averageRating} out of 5`}>
+              <span className="pc-stars" aria-hidden="true">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <span
+                    key={i}
+                    className={`pc-star ${i < Math.round(product.averageRating) ? "pc-star--filled" : "pc-star--empty"}`}
+                  >★</span>
+                ))}
+              </span>
+              <span className="pc-rating-count">
+                {product.averageRating.toFixed(1)}
+                {product.ratingCount > 0 && ` (${product.ratingCount})`}
+              </span>
+            </div>
+          )}
+
           <div className="pc-price-row">
             <p className="pc-price">₹{product.price?.toLocaleString()}</p>
             {quantityInCart > 0 && (
