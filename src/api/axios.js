@@ -88,6 +88,20 @@ api.interceptors.response.use(
     // Handle all 401s on protected endpoints by attempting a token refresh first.
     // On mobile (iOS Safari ITP), cookies may not be sent even right after login,
     // so we must try to refresh before giving up — not just when code === TOKEN_EXPIRED.
+    // On 403 "Invalid CSRF token", refresh the CSRF token and retry once.
+    // This handles iOS Safari ITP resetting cookies between sessions.
+    if (
+      error.response?.status === 403 &&
+      error.response?.data?.error === "Invalid CSRF token" &&
+      !originalRequest._csrfRetry
+    ) {
+      originalRequest._csrfRetry = true;
+      csrfToken = null; // force re-fetch
+      const token = await ensureCsrfToken();
+      if (token) originalRequest.headers["X-CSRF-Token"] = token;
+      return api(originalRequest);
+    }
+
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&

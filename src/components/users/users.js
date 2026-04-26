@@ -5,10 +5,11 @@ import { Modal } from "react-bootstrap";
 import { OrbitLoader, DotsLoader } from "../Loader";
 import AdminLayout from "../admin/AdminLayout";
 import {
-  FiUsers, FiMail, FiShield, FiUser, FiSearch, FiUserX,
+  FiUsers, FiMail, FiShield, FiUser, FiSearch, FiUserX, FiEdit2, FiEye, FiEyeOff,
 } from "react-icons/fi";
 import { useUsers } from "../../hooks/useSmartFetch";
 import { updateUserRole } from "../../features/adminSlice";
+import api from "../../api/axios";
 import "../admin/admin.css";
 
 const UsersList = () => {
@@ -19,6 +20,16 @@ const UsersList = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [roleActionLoading, setRoleActionLoading] = useState(false);
+
+  // Edit user state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editUser, setEditUser] = useState(null);
+  const [editEmail, setEditEmail] = useState("");
+  const [editPassword, setEditPassword] = useState("");
+  const [showEditPw, setShowEditPw] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState("");
+  const [editSuccess, setEditSuccess] = useState("");
 
   const filteredUsers = users.filter(
     (u) =>
@@ -36,6 +47,34 @@ const UsersList = () => {
       setShowConfirmModal(false); setSelectedUser(null);
     } catch { /* handled by redux */ } finally {
       setRoleActionLoading(false);
+    }
+  };
+
+  const openEditModal = (user) => {
+    setEditUser(user);
+    setEditEmail(user.email || "");
+    setEditPassword("");
+    setShowEditPw(false);
+    setEditError("");
+    setEditSuccess("");
+    setShowEditModal(true);
+  };
+
+  const handleEditSave = async () => {
+    if (!editEmail.trim()) { setEditError("Email cannot be empty."); return; }
+    setEditLoading(true);
+    setEditError("");
+    setEditSuccess("");
+    try {
+      const payload = { email: editEmail.trim() };
+      if (editPassword) payload.password = editPassword;
+      await api.patch(`/api/admin/users/${editUser._id}`, payload);
+      setEditSuccess("User updated successfully.");
+      setTimeout(() => setShowEditModal(false), 1200);
+    } catch (err) {
+      setEditError(err.response?.data?.error || "Failed to update user.");
+    } finally {
+      setEditLoading(false);
     }
   };
 
@@ -143,17 +182,27 @@ const UsersList = () => {
                     </td>
 
                     <td style={{ textAlign: "center" }}>
-                      <button
-                        className={`adm-btn adm-btn-sm ${user.isAdmin ? "adm-btn-secondary" : "adm-btn-secondary"}`}
-                        onClick={() => handleRoleChange(user)}
-                        disabled={roleActionLoading}
-                        style={{
-                          borderColor: user.isAdmin ? "var(--adm-warning)" : "var(--adm-success)",
-                          color: user.isAdmin ? "var(--adm-warning)" : "var(--adm-success)",
-                        }}
-                      >
-                        {user.isAdmin ? <><FiUser size={12} />Make User</> : <><FiShield size={12} />Make Admin</>}
-                      </button>
+                      <div style={{ display: "flex", gap: "var(--adm-space-2)", justifyContent: "center" }}>
+                        <button
+                          className="adm-btn adm-btn-sm adm-btn-secondary"
+                          onClick={() => openEditModal(user)}
+                          title="Edit email / password"
+                          style={{ borderColor: "var(--adm-primary)", color: "var(--adm-primary)" }}
+                        >
+                          <FiEdit2 size={12} /> Edit
+                        </button>
+                        <button
+                          className="adm-btn adm-btn-sm adm-btn-secondary"
+                          onClick={() => handleRoleChange(user)}
+                          disabled={roleActionLoading}
+                          style={{
+                            borderColor: user.isAdmin ? "var(--adm-warning)" : "var(--adm-success)",
+                            color: user.isAdmin ? "var(--adm-warning)" : "var(--adm-success)",
+                          }}
+                        >
+                          {user.isAdmin ? <><FiUser size={12} />Make User</> : <><FiShield size={12} />Make Admin</>}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -162,6 +211,89 @@ const UsersList = () => {
           </div>
         )}
       </div>
+
+      {/* Edit user modal */}
+      <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered className="adm-modal">
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <FiEdit2 size={16} style={{ color: "var(--adm-primary)", marginRight: 8 }} />
+            Edit User
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {editUser && (
+            <>
+              <div style={{ display: "flex", alignItems: "center", gap: "var(--adm-space-3)", background: "var(--adm-surface-raised)", borderRadius: "var(--adm-radius-md)", padding: "var(--adm-space-3)", marginBottom: "var(--adm-space-4)" }}>
+                <div className="adm-avatar">{initials(editUser)}</div>
+                <div>
+                  <div style={{ fontWeight: 700 }}>{editUser.username}</div>
+                  <div style={{ fontSize: "var(--adm-font-sm)", color: "var(--adm-text-secondary)" }}>#{(editUser._id || "").slice(-6)}</div>
+                </div>
+              </div>
+
+              {editError && (
+                <div className="adm-alert adm-alert--error" style={{ marginBottom: "var(--adm-space-3)" }}>
+                  {editError}
+                </div>
+              )}
+              {editSuccess && (
+                <div className="adm-alert adm-alert--success" style={{ marginBottom: "var(--adm-space-3)" }}>
+                  {editSuccess}
+                </div>
+              )}
+
+              <div style={{ marginBottom: "var(--adm-space-3)" }}>
+                <label style={{ display: "block", fontSize: "var(--adm-font-sm)", fontWeight: 600, marginBottom: "var(--adm-space-1)", color: "var(--adm-text-secondary)" }}>
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  className="adm-input"
+                  value={editEmail}
+                  onChange={(e) => setEditEmail(e.target.value)}
+                  placeholder="Enter new email"
+                  style={{ width: "100%" }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "var(--adm-font-sm)", fontWeight: 600, marginBottom: "var(--adm-space-1)", color: "var(--adm-text-secondary)" }}>
+                  New password <span style={{ fontWeight: 400, color: "var(--adm-text-tertiary)" }}>(leave blank to keep current)</span>
+                </label>
+                <div style={{ position: "relative" }}>
+                  <input
+                    type={showEditPw ? "text" : "password"}
+                    className="adm-input"
+                    value={editPassword}
+                    onChange={(e) => setEditPassword(e.target.value)}
+                    placeholder="Enter new password"
+                    style={{ width: "100%", paddingRight: "2.5rem" }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowEditPw((v) => !v)}
+                    style={{ position: "absolute", right: "0.75rem", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--adm-text-tertiary)", padding: 0 }}
+                    aria-label={showEditPw ? "Hide password" : "Show password"}
+                  >
+                    {showEditPw ? <FiEyeOff size={15} /> : <FiEye size={15} />}
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <button className="adm-btn adm-btn-secondary" onClick={() => setShowEditModal(false)}>Cancel</button>
+          <button
+            className="adm-btn"
+            style={{ background: "var(--adm-primary)", color: "white" }}
+            onClick={handleEditSave}
+            disabled={editLoading}
+          >
+            {editLoading ? <><DotsLoader size="sm" /> Saving…</> : <><FiEdit2 size={14} /> Save Changes</>}
+          </button>
+        </Modal.Footer>
+      </Modal>
 
       {/* Role change confirmation modal */}
       <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)} centered className="adm-modal">
