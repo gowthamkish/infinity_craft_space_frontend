@@ -63,7 +63,7 @@ function Header() {
     dispatch(clearProducts());
     dispatch(clearAdminData());
     localStorage.removeItem("redirectAfterLogin");
-    navigate("/products");
+    navigate("/login");
   };
 
   const handleCartClick = () => {

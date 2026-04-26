@@ -1,0 +1,216 @@
+/* ============================================================
+   PASSWORD RESET FLOW — Supplemental styles
+   Works alongside auth.css (reuses .auth-* classes)
+   ============================================================ */
+
+/* ── Step indicator ────────────────────────────────────────── */
+.reset-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 1.75rem;
+}
+
+.reset-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.reset-step-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  background: #fff;
+  color: #94a3b8;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+}
+
+.reset-step-circle--active {
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+  color: #fff;
+}
+
+.reset-step-circle--done {
+  border-color: #10b981;
+  background: #10b981;
+  color: #fff;
+}
+
+.reset-step-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.reset-step-label--active { color: #1d4ed8; }
+.reset-step-label--done   { color: #10b981; }
+
+.reset-step-connector {
+  width: 40px;
+  height: 2px;
+  background: #e2e8f0;
+  margin: 0 4px;
+  margin-bottom: 18px;
+  transition: background 0.25s;
+}
+
+.reset-step-connector--done { background: #10b981; }
+
+/* ── Password strength meter ───────────────────────────────── */
+.pw-strength {
+  margin-top: 0.5rem;
+}
+
+.pw-strength-bars {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 0.3rem;
+}
+
+.pw-strength-bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: #e2e8f0;
+  transition: background 0.3s ease;
+}
+
+.pw-strength-bar--weak   { background: #ef4444; }
+.pw-strength-bar--fair   { background: #f97316; }
+.pw-strength-bar--good   { background: #eab308; }
+.pw-strength-bar--strong { background: #10b981; }
+
+.pw-strength-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.pw-strength-label--weak   { color: #ef4444; }
+.pw-strength-label--fair   { color: #f97316; }
+.pw-strength-label--good   { color: #eab308; }
+.pw-strength-label--strong { color: #10b981; }
+
+.pw-requirements {
+  list-style: none;
+  padding: 0;
+  margin: 0.6rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.pw-req {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  transition: color 0.2s;
+}
+
+.pw-req--met { color: #10b981; }
+
+.pw-req-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.pw-req--met .pw-req-dot { background: #10b981; }
+
+/* ── Security question block ───────────────────────────────── */
+.reset-question-block {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.reset-question-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.4rem;
+}
+
+.reset-question-text {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+/* ── Token expiry countdown ────────────────────────────────── */
+.reset-expiry-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #f97316;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 6px;
+  padding: 0.2rem 0.55rem;
+  margin-bottom: 1rem;
+}
+
+.reset-expiry-badge--urgent { color: #ef4444; background: #fef2f2; border-color: #fecaca; }
+
+/* ── Success screen ────────────────────────────────────────── */
+.reset-success {
+  text-align: center;
+  padding: 1.5rem 0 0.5rem;
+}
+
+.reset-success-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #059669);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+  animation: reset-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes reset-pop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+/* ── Info note ─────────────────────────────────────────────── */
+.reset-info-note {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 0.75rem 0.9rem;
+  font-size: 0.8rem;
+  color: #1e40af;
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}

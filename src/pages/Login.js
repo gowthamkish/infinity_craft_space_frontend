@@ -257,6 +257,18 @@ export default function Login() {
                 )}
               </div>
 
+              {/* Forgot password link */}
+              <div style={{ textAlign: "right", marginTop: "-0.25rem", marginBottom: "1rem" }}>
+                <button
+                  type="button"
+                  className="auth-footer-link"
+                  style={{ fontSize: "0.82rem", color: "#1d4ed8", background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline" }}
+                  onClick={() => navigate("/forgot-password")}
+                >
+                  Forgot password?
+                </button>
+              </div>
+
               {/* Primary CTA */}
               <button
                 type="submit"

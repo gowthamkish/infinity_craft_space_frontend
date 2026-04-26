@@ -51,6 +51,10 @@ const AnalyticsDashboard = lazy(
 // );
 const PWAInstallPrompt = lazy(() => import("./components/PWAInstallPrompt"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const SecurityVerification = lazy(() => import("./pages/SecurityVerification"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const SetupSecurityQuestions = lazy(() => import("./pages/SetupSecurityQuestions"));
 const ReturnPolicy = lazy(() => import("./pages/ReturnPolicy"));
 const ContactUs = lazy(() => import("./pages/ContactUs"));
 const TermsAndConditions = lazy(() => import("./pages/TermsAndConditions"));
@@ -377,6 +381,46 @@ function App() {
                         }
                       >
                         <Register />
+                      </Suspense>
+                    </RouteErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/forgot-password"
+                  element={
+                    <RouteErrorBoundary>
+                      <Suspense fallback={<LoadingFallback message="Loading..." />}>
+                        <ForgotPassword />
+                      </Suspense>
+                    </RouteErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/verify-security"
+                  element={
+                    <RouteErrorBoundary>
+                      <Suspense fallback={<LoadingFallback message="Loading..." />}>
+                        <SecurityVerification />
+                      </Suspense>
+                    </RouteErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/reset-password"
+                  element={
+                    <RouteErrorBoundary>
+                      <Suspense fallback={<LoadingFallback message="Loading..." />}>
+                        <ResetPassword />
+                      </Suspense>
+                    </RouteErrorBoundary>
+                  }
+                />
+                <Route
+                  path="/setup-security-questions"
+                  element={
+                    <RouteErrorBoundary>
+                      <Suspense fallback={<LoadingFallback message="Loading..." />}>
+                        <SetupSecurityQuestions />
                       </Suspense>
                     </RouteErrorBoundary>
                   }

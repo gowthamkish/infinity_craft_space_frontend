@@ -8,6 +8,7 @@ import Alert from "react-bootstrap/Alert";
 import Badge from "react-bootstrap/Badge";
 import { Trash2, CreditCard, Package } from "react-feather";
 import { DotsLoader } from "../../components/Loader";
+import { ProductThumb } from "./CartReviewStep";
 // import api from "../../api/axios"; // COMMENTED OUT — Shiprocket API no longer used
 
 // ── COMMENTED OUT — Shiprocket rate fetching (will be re-enabled when product scales)
@@ -1141,55 +1142,17 @@ export const ShippingStep = ({
           </Card.Header>
           <Card.Body style={{ padding: "clamp(0.75rem, 3vw, 1.5rem)" }}>
             {cartItems.slice(0, 3).map((item) => (
-              <div
-                key={item.product._id}
-                className="d-flex align-items-center mb-3"
-              >
-                <div
-                  style={{
-                    width: "50px",
-                    height: "50px",
-                    background: `linear-gradient(135deg, ${
-                      item.product.name.charAt(0) === "K"
-                        ? "#3b82f6"
-                        : "#10b981"
-                    }, ${
-                      item.product.name.charAt(0) === "K"
-                        ? "#1d4ed8"
-                        : "#059669"
-                    })`,
-                    borderRadius: "8px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "white",
-                    fontSize: "1rem",
-                    fontWeight: "700",
-                    marginRight: "12px",
-                  }}
-                >
-                  {item.product.name.charAt(0)}
-                </div>
-                <div className="flex-grow-1">
-                  <h6
-                    className="mb-0"
-                    style={{ fontSize: "0.875rem", fontWeight: "600" }}
-                  >
+              <div key={item.product._id} className="d-flex align-items-center mb-3" style={{ gap: "0.75rem" }}>
+                <ProductThumb product={item.product} size="xs" />
+                <div className="flex-grow-1" style={{ minWidth: 0 }}>
+                  <h6 className="mb-0" style={{ fontSize: "0.82rem", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {item.product.name}
                   </h6>
-                  <p
-                    className="mb-0"
-                    style={{
-                      fontSize: "0.75rem",
-                      color: "var(--text-secondary)",
-                    }}
-                  >
+                  <p className="mb-0" style={{ fontSize: "0.72rem", color: "var(--text-secondary)" }}>
                     Qty: {item.quantity}
                   </p>
                 </div>
-                <span
-                  style={{ fontWeight: "600", color: "var(--secondary-color)" }}
-                >
+                <span style={{ fontWeight: 700, color: "var(--secondary-color)", flexShrink: 0 }}>
                   ₹{item.totalPrice}
                 </span>
               </div>
