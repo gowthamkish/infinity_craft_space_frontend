@@ -192,7 +192,7 @@ export default function Register() {
             {step === 1 && (
               <form onSubmit={handleNextStep} noValidate>
                 <div className="auth-field">
-                  <label htmlFor="reg-username" className="auth-label">Full name</label>
+                  <label htmlFor="reg-username" className="auth-label">Username</label>
                   <input
                     id="reg-username"
                     type="text"
@@ -200,8 +200,8 @@ export default function Register() {
                     value={form.username}
                     onChange={(e) => { setForm({ ...form, username: e.target.value }); clearFieldError("username"); }}
                     onBlur={() => setTouched((p) => ({ ...p, username: true }))}
-                    placeholder="Your full name"
-                    autoComplete="name"
+                    placeholder="Choose a username"
+                    autoComplete="username"
                     required
                   />
                   {touched.username && validationErrors.username && (
@@ -328,7 +328,7 @@ export default function Register() {
                   alignItems: "flex-start",
                 }}>
                   <span style={{ fontSize: "1rem", flexShrink: 0 }}>🔒</span>
-                  <span>These answers will be used to verify your identity if you ever need to reset your password. Answers are case-insensitive and stored securely.</span>
+                  <span>These answers will be used to verify your identity if you ever need to reset your password. Answers are stored securely and encrypted.</span>
                 </div>
 
                 {[0, 1].map((i) => (
@@ -363,17 +363,19 @@ export default function Register() {
                       type="text"
                       className={`auth-input ${sqErrors[i] && sq[i].answer.trim().length < 2 ? "auth-input--error" : sq[i].answer.trim().length >= 2 ? "auth-input--valid" : ""}`}
                       style={{ marginTop: "0.5rem" }}
-                      placeholder="Your answer (case-insensitive)"
+                      placeholder="Type your answer"
                       value={sq[i].answer}
                       onChange={(e) => {
                         const next = [...sq];
-                        next[i] = { ...next[i], answer: e.target.value };
+                        next[i] = { ...next[i], answer: e.target.value.toLowerCase() };
                         setSq(next);
                         const errs = [...sqErrors];
                         errs[i] = "";
                         setSqErrors(errs);
                       }}
                       autoComplete="off"
+                      autoCapitalize="none"
+                      autoCorrect="off"
                     />
 
                     {sqErrors[i] && (

@@ -37,11 +37,11 @@ export const validateRegister = ({ username, email, password }) => {
   const errors = {};
 
   if (!username?.trim()) {
-    errors.username = "Full name is required";
+    errors.username = "Username is required";
   } else if (username.trim().length < 3) {
-    errors.username = "Full name must be at least 3 characters long";
+    errors.username = "Username must be at least 3 characters long";
   } else if (!USERNAME_REGEX.test(username)) {
-    errors.username = "Full name can only contain letters, numbers, spaces, and underscores";
+    errors.username = "Username can only contain letters, numbers, spaces, and underscores";
   }
 
   if (!email?.trim()) {

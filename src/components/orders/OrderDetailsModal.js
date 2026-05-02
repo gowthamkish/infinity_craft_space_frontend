@@ -389,7 +389,7 @@ const OrderDetailsModal = ({
                             fontWeight: 500,
                           }}
                         >
-                          Full Name
+                          Username
                         </label>
                         <p
                           style={{

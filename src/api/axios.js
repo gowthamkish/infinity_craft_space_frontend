@@ -20,12 +20,18 @@ let csrfToken = null;
 
 async function ensureCsrfToken() {
   if (csrfToken) return csrfToken;
+  // Restore from sessionStorage across iOS soft-reloads (in-memory state lost)
+  try {
+    const cached = sessionStorage.getItem("_csrf_token");
+    if (cached) { csrfToken = cached; return csrfToken; }
+  } catch { /* sessionStorage unavailable — proceed */ }
   try {
     const res = await axios.get(
       `${import.meta.env.VITE_API_URL}/api/auth/csrf-token`,
       { withCredentials: true },
     );
     csrfToken = res.data.csrfToken;
+    try { sessionStorage.setItem("_csrf_token", csrfToken); } catch { /* ignore */ }
   } catch {
     // Non-fatal: if CSRF fetch fails, proceed without it (will 403 on state-changing calls)
   }
@@ -97,6 +103,7 @@ api.interceptors.response.use(
     ) {
       originalRequest._csrfRetry = true;
       csrfToken = null; // force re-fetch
+      try { sessionStorage.removeItem("_csrf_token"); } catch { /* ignore */ }
       const token = await ensureCsrfToken();
       if (token) originalRequest.headers["X-CSRF-Token"] = token;
       return api(originalRequest);
@@ -146,7 +153,7 @@ api.interceptors.response.use(
         // to be sent after login. If we're within 25 seconds of login, skip the
         // redirect and let the page recover naturally on the next request.
         const loginTime = Number(sessionStorage.getItem("authLoginTime") || 0);
-        const withinGracePeriod = loginTime && Date.now() - loginTime < 60_000;
+        const withinGracePeriod = loginTime && Date.now() - loginTime < 120_000;
 
         if (!isNoRedirect && !alreadyOnAuth && !withinGracePeriod) {
           window.location.href = "/login";
