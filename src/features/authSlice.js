@@ -75,6 +75,7 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.error = null;
+      try { sessionStorage.removeItem("_access_token"); } catch { /* ignore */ }
       // Token cookies are cleared by the backend /api/auth/logout endpoint
     },
     autoLogout: (state, action) => {
@@ -84,6 +85,7 @@ const authSlice = createSlice({
       );
       state.user = null;
       state.error = null;
+      try { sessionStorage.removeItem("_access_token"); } catch { /* ignore */ }
     },
     clearError: (state) => {
       state.error = null;
@@ -99,7 +101,10 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.loading = false;
         state.error = null;
-        // Tokens are set as httpOnly cookies by the backend — nothing to store here
+        // Also store in sessionStorage for iOS Safari ITP fallback (Bearer header)
+        if (action.payload.accessToken) {
+          try { sessionStorage.setItem("_access_token", action.payload.accessToken); } catch { /* ignore */ }
+        }
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -114,7 +119,9 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.loading = false;
         state.error = null;
-        // Tokens are set as httpOnly cookies by the backend — nothing to store here
+        if (action.payload.accessToken) {
+          try { sessionStorage.setItem("_access_token", action.payload.accessToken); } catch { /* ignore */ }
+        }
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;

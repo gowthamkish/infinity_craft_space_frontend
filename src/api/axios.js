@@ -52,6 +52,15 @@ const processQueue = (error, token = null) => {
 // Request interceptor — cookies are sent automatically via withCredentials
 api.interceptors.request.use(
   async (config) => {
+    // iOS Safari ITP fallback: send access token as Bearer if available in sessionStorage
+    // (cross-origin httpOnly cookies are blocked by ITP, so Bearer is more reliable)
+    try {
+      const storedToken = sessionStorage.getItem("_access_token");
+      if (storedToken && !config.headers["Authorization"]) {
+        config.headers["Authorization"] = `Bearer ${storedToken}`;
+      }
+    } catch { /* sessionStorage unavailable */ }
+
     // Attach CSRF token to all state-changing requests
     if (!["get", "head", "options"].includes(config.method?.toLowerCase())) {
       const token = await ensureCsrfToken();
@@ -126,11 +135,15 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        await axios.post(
+        const refreshRes = await axios.post(
           `${import.meta.env.VITE_API_URL}/api/auth/refresh-token`,
           {},
           { withCredentials: true },
         );
+        // Update sessionStorage with the new access token for iOS Safari ITP fallback
+        if (refreshRes.data?.accessToken) {
+          try { sessionStorage.setItem("_access_token", refreshRes.data.accessToken); } catch { /* ignore */ }
+        }
         processQueue(null, null);
         return api(originalRequest);
       } catch (refreshError) {
