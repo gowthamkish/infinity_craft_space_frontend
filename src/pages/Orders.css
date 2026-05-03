@@ -357,3 +357,31 @@
     padding-right: 0.875rem;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   ORDERS BRAND ALIGNMENT — Purple × Amber
+   ══════════════════════════════════════════════════════════════ */
+
+/* Hero icon → brand purple */
+.orders-hero-icon { color: #7c3aed !important; }
+
+/* Search focus ring → brand purple */
+.orders-search:focus-within {
+  border-color: #c084fc !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12) !important;
+}
+.orders-search-clear:hover { color: #7c3aed !important; }
+
+/* Empty state CTA → brand purple */
+.orders-empty-btn {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+  box-shadow: 0 2px 8px rgba(109, 40, 217, 0.22) !important;
+}
+
+/* Status badge — confirmed uses blue, remap to brand */
+.status-badge--confirmed {
+  background: #f3e8ff !important;
+  color: #6d28d9 !important;
+}
+
+/* Pagination active → brand purple handled by pagination.css override below */

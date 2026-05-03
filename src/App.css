@@ -1151,3 +1151,106 @@ pre {
     animation: none !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   BRAND ALIGNMENT LAYER — Purple × Amber · Overrides blue system
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  /* Reroute --primary to brand purple (replaces #2563eb) */
+  --primary:        #7c3aed;
+  --primary-dark:   #6d28d9;
+  --primary-light:  #9333ea;
+  --primary-subtle: rgba(124, 58, 237, 0.08);
+
+  /* Focus & border alignment */
+  --border-focus: var(--primary);
+
+  /* Text: warm neutrals (replaces cold slate) */
+  --text-primary:   #1c1917;
+  --text-secondary: #57534e;
+  --text-muted:     #a8a29e;
+  --text-disabled:  #d6d3d1;
+
+  /* Backgrounds: warm off-white */
+  --bg-secondary: #fafaf9;
+  --bg-tertiary:  #f5f5f4;
+  --border-color: #e7e5e4;
+  --border-light: #f5f5f4;
+}
+
+/* Link color → brand purple */
+a { color: var(--primary); }
+a:hover { color: var(--primary-dark); }
+a:focus-visible { outline-color: var(--primary); }
+
+/* Global focus ring → brand purple */
+:focus-visible { outline-color: var(--primary) !important; }
+
+/* Form focus → brand purple */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15) !important;
+}
+
+/* Bootstrap .btn-primary → brand purple */
+.btn-primary {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+}
+
+/* Modal header → brand purple (replaces dark slate) */
+.modal-header {
+  background: linear-gradient(135deg, var(--brand-900, #4c1d95), var(--brand-800, #6d28d9)) !important;
+}
+
+/* Account avatar → brand purple (replaces blue/green) */
+.account-avatar {
+  background: linear-gradient(135deg, var(--brand-700, #7c3aed), var(--brand-800, #6d28d9)) !important;
+  box-shadow: 0 8px 24px rgba(109, 40, 217, 0.25) !important;
+}
+
+/* Account header strip → brand purple */
+.account-header {
+  background: linear-gradient(90deg, rgba(124, 58, 237, 0.06), rgba(245, 158, 11, 0.03)) !important;
+}
+
+/* Gradient card variants → brand purple */
+.account-grid .compact-card.address-gradient {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.06) 0%, rgba(245, 158, 11, 0.03) 100%) !important;
+  border: 1px solid rgba(124, 58, 237, 0.1) !important;
+}
+.account-grid .compact-card.wishlist-gradient {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, rgba(245, 158, 11, 0.04) 100%) !important;
+  border: 1px solid rgba(124, 58, 237, 0.08) !important;
+}
+
+/* Account avatar in App.css compact sidebar widget */
+.account-avatar.account-avatar--sm {
+  background: linear-gradient(135deg, var(--brand-700, #7c3aed), var(--brand-800, #6d28d9)) !important;
+}
+
+/* cartPulse → brand purple */
+@keyframes cartPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4); }
+  70%  { box-shadow: 0 0 0 8px rgba(124, 58, 237, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0); }
+}
+
+/* Info alert → brand purple */
+.alert-info {
+  background: linear-gradient(135deg, var(--brand-50, #faf5ff) 0%, var(--brand-100, #f3e8ff) 100%) !important;
+  color: var(--brand-900, #4c1d95) !important;
+  border-left-color: var(--brand-600, #9333ea) !important;
+}
+
+/* Badge primary → brand purple */
+.badge.bg-primary { background-color: var(--brand-700, #7c3aed) !important; }
+
+/* Scrollbar thumb → brand purple */
+::-webkit-scrollbar-thumb { background: var(--neutral-300, #d6d3d1); }
+::-webkit-scrollbar-thumb:hover { background: var(--brand-400, #c084fc); }

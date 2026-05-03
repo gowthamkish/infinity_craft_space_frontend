@@ -231,3 +231,31 @@
     animation: none !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   TOAST BRAND ALIGNMENT — info toast uses brand purple
+   ══════════════════════════════════════════════════════════════ */
+.toast {
+  border-left-color: #7c3aed !important;
+}
+.toast.info {
+  border-left-color: #7c3aed !important;
+  background: linear-gradient(135deg, #faf5ff, #fff) !important;
+}
+.toast.info .toast-icon {
+  background: rgba(124, 58, 237, 0.1) !important;
+  color: #7c3aed !important;
+}
+.toast.info .toast-progress { background: #7c3aed !important; }
+
+/* App.css toast variants — info/primary */
+.toast--info,
+.toast--primary {
+  background: linear-gradient(135deg, #faf5ff, #f3e8ff) !important;
+  border-left-color: #7c3aed !important;
+  color: #4c1d95 !important;
+}
+.toast--info .toast-header,
+.toast--primary .toast-header {
+  color: #6d28d9 !important;
+}

@@ -321,3 +321,17 @@
     font-size: 0.8rem;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   TRACKING TIMELINE BRAND ALIGNMENT
+   ══════════════════════════════════════════════════════════════ */
+.tt-step--active,
+.tt-step--active .tt-step-dot,
+[class*="tt-step"].active [class*="dot"] {
+  border-color: #7c3aed !important;
+  color: #7c3aed !important;
+  background-color: #7c3aed !important;
+}
+.tt-step-label--active { color: #7c3aed !important; }
+[class*="tt-track-link"],
+[class*="tt-courier-link"] { color: #7c3aed !important; }

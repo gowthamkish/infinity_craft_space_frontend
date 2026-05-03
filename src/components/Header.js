@@ -45,6 +45,7 @@ function Header() {
   const cartItems = useSelector((state) => state.cart.items);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
 
   const totalCartItems = cartItems.reduce(
     (sum, item) => sum + item.quantity,
@@ -79,6 +80,12 @@ function Header() {
     navigate(user?.isAdmin ? "/admin/dashboard" : "/");
 
   useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
     if (!user?.isAdmin) return;
     let mounted = true;
     const fetchUnread = async () => {
@@ -107,12 +114,12 @@ function Header() {
 
   return (
     <>
-      <Navbar fixed="top" className="navbar-main" variant="dark">
+      <Navbar fixed="top" className={`navbar-main${scrolled ? " scrolled" : ""}`} variant="dark">
         <Container fluid>
           {/* ── Desktop ── */}
           <div className="d-none d-lg-flex w-100 align-items-center">
             <Navbar.Brand className="nav-brand" onClick={handleBrandClick}>
-              Infinity Craft Space
+              <img src="/ICS_Logo.jpeg" alt="Infinity Craft Space" className="nav-logo-img" />
             </Navbar.Brand>
 
             <Nav className="me-auto">
@@ -208,10 +215,9 @@ function Header() {
 
             <Navbar.Brand
               className="nav-brand m-0"
-              style={{ fontSize: "1.1rem" }}
               onClick={handleBrandClick}
             >
-              Infinity Craft Space
+              <img src="/ICS_Logo.jpeg" alt="Infinity Craft Space" className="nav-logo-img" />
             </Navbar.Brand>
 
             {!user?.isAdmin && (

@@ -260,3 +260,34 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   PAGINATION BRAND ALIGNMENT — Purple replaces blue
+   ══════════════════════════════════════════════════════════════ */
+.adm-pagination-wrapper {
+  background: linear-gradient(135deg, #faf5ff 0%, #fafaf9 100%) !important;
+  border-top-color: #e9d5ff !important;
+}
+.adm-pagination-text strong { color: #1c1917 !important; }
+.adm-pagination-select:focus {
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12) !important;
+}
+.adm-pagination-btn {
+  color: #7c3aed !important;
+}
+.adm-pagination-btn:hover:not(:disabled) {
+  background: #faf5ff !important;
+  border-color: #7c3aed !important;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.15) !important;
+}
+.adm-pagination-page-btn:hover {
+  color: #7c3aed !important;
+  border-color: #c084fc !important;
+  background: #faf5ff !important;
+}
+.adm-pagination-page-btn.active {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+  border-color: #7c3aed !important;
+  box-shadow: 0 2px 8px rgba(109, 40, 217, 0.25) !important;
+}

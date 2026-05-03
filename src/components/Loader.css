@@ -201,3 +201,21 @@
     transform: none !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   LOADER BRAND ALIGNMENT — Brand purple for ring 1
+   ══════════════════════════════════════════════════════════════ */
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0   rgba(124, 58, 237, 0.5); }
+  70%  { box-shadow: 0 0 0 18px rgba(124, 58, 237, 0);  }
+  100% { box-shadow: 0 0 0 0   rgba(124, 58, 237, 0);   }
+}
+.loader-orbit__ring--1 {
+  border-top-color: #7c3aed !important;
+  border-right-color: rgba(124, 58, 237, 0.15) !important;
+}
+.loader-bars__bar { background: #7c3aed !important; }
+.loader-bars__bar:nth-child(2) { background: #f59e0b !important; }
+.loader-bars__bar:nth-child(3) { background: #9333ea !important; }
+.loader-bars__bar:nth-child(4) { background: #f59e0b !important; }
+.loader-page { background: #fafaf9 !important; }

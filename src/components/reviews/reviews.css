@@ -480,3 +480,14 @@
     font-size: 1.75rem;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   REVIEWS BRAND ALIGNMENT — Review CTA button → brand purple
+   ══════════════════════════════════════════════════════════════ */
+[class*="review-submit"],
+[class*="review-btn"],
+[class*="rev-cta"],
+[class*="write-review"] button {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+  box-shadow: 0 2px 8px rgba(109, 40, 217, 0.2) !important;
+}

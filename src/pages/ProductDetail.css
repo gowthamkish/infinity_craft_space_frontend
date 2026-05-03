@@ -757,3 +757,61 @@
   color: #94a3b8;
   margin-top: 0.3rem;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   PRODUCT DETAIL BRAND ALIGNMENT — Purple × Amber
+   ══════════════════════════════════════════════════════════════ */
+
+/* Add to Cart CTA → brand purple */
+.pd-add-btn,
+.pd-add-to-cart-btn {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
+  box-shadow: 0 8px 20px rgba(109, 40, 217, 0.35) !important;
+  border-color: #7c3aed !important;
+}
+.pd-add-btn:hover:not(:disabled),
+.pd-add-to-cart-btn:hover:not(:disabled) {
+  box-shadow: 0 14px 28px rgba(109, 40, 217, 0.45) !important;
+}
+
+/* Price → brand purple */
+.pd-price {
+  color: #7c3aed !important;
+}
+
+/* In Stock badge → brand purple tint */
+.pd-stock-badge,
+.pd-stock-badge--instock {
+  background: rgba(124, 58, 237, 0.1) !important;
+  color: #6d28d9 !important;
+  border-color: rgba(124, 58, 237, 0.25) !important;
+}
+
+/* Delivery section: pincode check button → brand purple */
+.pd-pin-check-btn {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+  border-color: #7c3aed !important;
+}
+
+/* Delivery result card border → brand purple */
+.pd-delivery-result {
+  border-color: rgba(124, 58, 237, 0.25) !important;
+}
+
+/* Notify success → brand purple */
+.pd-notify-success {
+  color: #6d28d9 !important;
+}
+
+/* Tab active underline → brand purple */
+.pd-tab.active,
+.pd-tab:focus {
+  border-bottom-color: #7c3aed !important;
+  color: #7c3aed !important;
+}
+
+/* Input focus ring → brand purple */
+.pd-pin-input:focus {
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12) !important;
+}

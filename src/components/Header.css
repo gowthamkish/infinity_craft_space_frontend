@@ -440,3 +440,18 @@
     display: none !important;
   }
 }
+
+/* ── Logo Image ──────────────────────────────────────────────── */
+.nav-logo-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  display: block;
+}
+
+@media (max-width: 991px) {
+  .nav-logo-img {
+    height: 34px;
+  }
+}

@@ -589,3 +589,124 @@
     animation: none !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   CHECKOUT BRAND ALIGNMENT — Purple × Amber
+   ══════════════════════════════════════════════════════════════ */
+
+/* Primary CTA → brand purple */
+.co-cta-btn {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
+  box-shadow: 0 8px 20px rgba(109, 40, 217, 0.35) !important;
+}
+.co-cta-btn:hover:not(:disabled) {
+  box-shadow: 0 14px 28px rgba(109, 40, 217, 0.45) !important;
+}
+
+/* Total price gradient → brand purple */
+.co-summary-total-val {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* Free shipping progress bar → brand purple */
+.co-free-ship-fill {
+  background: linear-gradient(90deg, #7c3aed, #6d28d9) !important;
+}
+
+/* Order summary header → brand purple */
+.co-summary-header {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+}
+
+/* Cart review header → brand purple */
+.co-card-header {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+}
+
+/* Item price badge → brand amber */
+.co-item-price {
+  background: rgba(124, 58, 237, 0.1) !important;
+  color: #6d28d9 !important;
+}
+
+/* Address label chips active → brand purple */
+.addr-chip.active,
+.addr-chip:focus {
+  background: rgba(124, 58, 237, 0.1) !important;
+  border-color: #7c3aed !important;
+  color: #7c3aed !important;
+}
+
+/* Input focus → brand purple */
+.iti__tel-input:focus {
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12) !important;
+}
+
+/* Security banner → brand purple */
+.co-security-banner {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+}
+
+/* Saved address card selected → brand purple */
+.saved-address-card.selected {
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15) !important;
+}
+
+/* Item price color when hardcoded green */
+.co-item-subtotal,
+.co-summary-item-val {
+  color: #7c3aed !important;
+}
+
+/* "Continue Shopping" secondary link color */
+.co-continue-link {
+  color: #7c3aed !important;
+}
+
+/* Additional green → purple overrides */
+.co-qty-btn:hover:not(:disabled) {
+  border-color: #7c3aed !important;
+  background: rgba(124, 58, 237, 0.06) !important;
+  color: #6d28d9 !important;
+}
+
+.co-free-ship--achieved {
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe) !important;
+  border-color: #a78bfa !important;
+}
+
+.co-free-ship-track {
+  background: #ede9fe !important;
+}
+
+.co-check-circle {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+  box-shadow: 0 12px 32px rgba(109, 40, 217, 0.4) !important;
+}
+
+.co-security-check {
+  background: #7c3aed !important;
+}
+
+/* Coupon apply button */
+.co-coupon-btn {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+  border-color: #7c3aed !important;
+}
+
+/* saved address selected → brand purple */
+.saved-address-card.selected {
+  border-color: #7c3aed !important;
+  background: rgba(124, 58, 237, 0.05) !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12) !important;
+}
+
+.saved-address-card.selected .address-radio {
+  border-color: #7c3aed !important;
+  background: #7c3aed !important;
+}

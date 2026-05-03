@@ -211,3 +211,13 @@
   .com-card { padding: 1.5rem 1.25rem 1.25rem; }
   .com-actions { flex-direction: column-reverse; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   CUSTOM ORDER MODAL BRAND ALIGNMENT
+   ══════════════════════════════════════════════════════════════ */
+.com-modal .modal-header,
+.custom-order-modal .modal-header,
+[class*="com-header"] {
+  background: linear-gradient(135deg, #4c1d95, #6d28d9) !important;
+}
+/* Dark item list in modal stays dark — just soften the dark navy */

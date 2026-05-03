@@ -317,7 +317,7 @@ const ProductDetail = () => {
             </Col>
 
             {/* ── Info Panel ── */}
-            <Col lg={6}>
+            <Col lg={6} className="pd-info-col">
               <div className="pd-info">
                 {/* Category badges */}
                 <div className="pd-badges">

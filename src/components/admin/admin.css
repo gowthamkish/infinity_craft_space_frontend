@@ -834,3 +834,85 @@
 .admin-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
 .admin-header-title { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; color: var(--text-primary, #0f172a); letter-spacing: -0.02em; margin: 0 0 0.25rem; display: flex; align-items: center; gap: 0.625rem; }
 .admin-header-sub { color: var(--text-secondary, #475569); font-size: 0.9375rem; margin: 0; }
+
+/* ══════════════════════════════════════════════════════════════
+   ADMIN BRAND ALIGNMENT — align --adm-primary to brand purple
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  --adm-primary:          #7c3aed;
+  --adm-primary-dark:     #6d28d9;
+  --adm-secondary:        #9333ea;
+  --adm-primary-gradient: linear-gradient(135deg, #7c3aed, #6d28d9);
+  --adm-primary-glow:     rgba(124, 58, 237, 0.12);
+
+  /* Warm neutral backgrounds (replaces cool slate) */
+  --adm-bg:             #fafaf9;
+  --adm-surface:        #ffffff;
+  --adm-surface-raised: #f5f5f4;
+  --adm-border:         #e7e5e4;
+  --adm-text-primary:   #1c1917;
+  --adm-text-secondary: #57534e;
+  --adm-text-tertiary:  #a8a29e;
+}
+
+/* Stat card — brand purple replaces blue */
+.adm-stat--blue,
+.admin-stat-card--blue {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+}
+
+/* Sidebar link active/hover highlight → brand purple */
+.adm-sidebar-link:hover,
+.adm-sidebar-link.active {
+  background: rgba(124, 58, 237, 0.1) !important;
+  color: #7c3aed !important;
+}
+
+/* Admin search / select focus → brand purple */
+.adm-search-input:focus,
+.adm-select:focus,
+.adm-input:focus,
+.adm-textarea:focus,
+.adm-form-select:focus {
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12) !important;
+}
+
+/* Admin primary button → brand purple */
+.adm-btn-primary {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2) !important;
+}
+.adm-btn-primary:hover {
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.25) !important;
+}
+
+/* Admin secondary & icon buttons hover → brand purple */
+.adm-btn-secondary:hover {
+  border-color: #7c3aed !important;
+  color: #7c3aed !important;
+  background: rgba(124, 58, 237, 0.08) !important;
+}
+.adm-btn-icon:hover {
+  border-color: #7c3aed !important;
+  color: #7c3aed !important;
+  background: rgba(124, 58, 237, 0.08) !important;
+}
+
+/* Admin action button hover → brand purple */
+.adm-action-btn:hover,
+.admin-action-btn:hover {
+  border-color: #7c3aed !important;
+  color: #7c3aed !important;
+  background: rgba(124, 58, 237, 0.08) !important;
+}
+
+/* Breadcrumb hover → brand purple */
+.adm-breadcrumb a:hover,
+.adm-breadcrumb button:hover { color: #7c3aed !important; }
+
+/* Avatar gradient → brand purple */
+.adm-avatar { background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; }
+
+/* Legacy admin action button */
+.admin-action-btn:hover { border-color: #7c3aed !important; color: #7c3aed !important; }

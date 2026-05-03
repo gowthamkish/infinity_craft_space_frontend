@@ -214,3 +214,15 @@
   margin-bottom: 1.25rem;
   line-height: 1.5;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   RESET PASSWORD BRAND ALIGNMENT
+   ══════════════════════════════════════════════════════════════ */
+.reset-step--active,
+[class*="reset-step"].active,
+[class*="reset"] [class*="active"] {
+  border-color: #7c3aed !important;
+  background: #7c3aed !important;
+  color: white !important;
+}
+.reset-step-label--active { color: #7c3aed !important; }

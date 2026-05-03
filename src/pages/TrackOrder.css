@@ -150,3 +150,28 @@
     padding: 1rem;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   TRACK ORDER BRAND ALIGNMENT
+   ══════════════════════════════════════════════════════════════ */
+/* Hero header → brand purple gradient */
+.track-order-hero,
+.to-hero,
+[class*="track-hero"],
+[class*="to-page"] > *:first-child {
+  background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 60%, #7c3aed 100%) !important;
+}
+
+/* Confirmed badge → brand purple */
+.to-status-badge--confirmed {
+  background: #f3e8ff !important;
+  color: #6d28d9 !important;
+}
+
+/* Text color adjustments */
+.to-section-title,
+.to-label,
+[class*="to-info"] h4,
+[class*="to-info"] h5 {
+  color: #1c1917 !important;
+}

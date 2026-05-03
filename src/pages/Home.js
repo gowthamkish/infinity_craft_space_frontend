@@ -371,7 +371,7 @@ export default function Home() {
                   Handmade with Love in India
                 </span>
 
-                <h1 className="hp-hero-heading">
+                <h1 className="hp-hero-heading display-heading">
                   Gifts that carry<br />
                   <span className="hp-hero-accent">a lifetime</span> of<br />
                   memories
@@ -385,7 +385,7 @@ export default function Home() {
 
                 <div className="hp-hero-actions">
                   <button
-                    className="hp-btn hp-btn--primary hp-btn--lg"
+                    className="hp-btn hp-btn--primary hp-btn--lg btn-ics btn-ics--primary btn-ics--lg"
                     onClick={() => navigate("/products")}
                   >
                     <FiGift /> Explore Collection
@@ -677,7 +677,7 @@ export default function Home() {
                   ))}
                 </div>
                 <button
-                  className="hp-btn hp-btn--primary"
+                  className="hp-btn hp-btn--primary btn-ics btn-ics--primary"
                   onClick={() => navigate("/products")}
                 >
                   Discover Our Craft <FiArrowRight />
@@ -799,7 +799,7 @@ export default function Home() {
                   placeholder="Enter your email address"
                   aria-label="Email address"
                 />
-                <button type="submit" className="hp-btn hp-btn--primary">
+                <button type="submit" className="hp-btn hp-btn--primary btn-ics btn-ics--primary">
                   <FiZap /> Claim ₹100 Off
                 </button>
               </form>
@@ -831,7 +831,7 @@ export default function Home() {
                 </div>
                 <div className="hp-cta-actions">
                   <button
-                    className="hp-btn hp-btn--primary hp-btn--lg"
+                    className="hp-btn hp-btn--primary hp-btn--lg btn-ics btn-ics--primary btn-ics--lg"
                     onClick={() => navigate("/register")}
                   >
                     Create Free Account

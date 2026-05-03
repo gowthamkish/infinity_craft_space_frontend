@@ -308,3 +308,11 @@
     box-shadow: var(--shadow-md);
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   PERFORMANCE CSS BRAND ALIGNMENT
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  --primary-color: #7c3aed;
+  --text-primary:  #1c1917;
+}

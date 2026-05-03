@@ -222,3 +222,29 @@
     transition: none !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   CHECKOUT PROGRESS BRAND ALIGNMENT — Purple
+   ══════════════════════════════════════════════════════════════ */
+
+/* Active step circles → brand purple */
+.cpb-circle.active,
+.cpb-circle.completed,
+.cpb-circle-sm.active,
+.cpb-circle-sm.completed {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2) !important;
+}
+
+/* Active connector line → brand purple */
+.cpb-connector.active,
+.cpb-connector-mobile.active {
+  background: linear-gradient(90deg, #7c3aed, #6d28d9) !important;
+}
+
+/* Active step label → brand purple */
+.cpb-step-label.active,
+.cpb-step-label-sm.active {
+  color: #7c3aed !important;
+}

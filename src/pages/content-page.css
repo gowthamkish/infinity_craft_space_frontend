@@ -136,3 +136,14 @@
   .cp-card-header { padding: 1.25rem; }
   .cp-card-body   { padding: 1.25rem; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   CONTENT PAGE BRAND ALIGNMENT
+   ══════════════════════════════════════════════════════════════ */
+/* Highlight callout → brand purple */
+[class*="highlight"],
+[class*="callout"],
+[class*="tip"] {
+  background: rgba(124, 58, 237, 0.06) !important;
+  border-left-color: #7c3aed !important;
+}

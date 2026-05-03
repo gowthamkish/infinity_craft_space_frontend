@@ -395,3 +395,22 @@
     background: linear-gradient(145deg, #374151 0%, #4b5563 100%);
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   NOT FOUND BRAND ALIGNMENT — brand purple gradient
+   ══════════════════════════════════════════════════════════════ */
+.not-found-page,
+.error-page,
+[class*="not-found"] {
+  background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #9333ea 100%) !important;
+}
+
+/* Primary action button text → brand purple */
+.action-btn.primary-action {
+  color: #6d28d9 !important;
+}
+
+/* Floating diamond → brand amber */
+.float-element.diamond {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+}
