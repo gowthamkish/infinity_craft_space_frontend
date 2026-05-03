@@ -114,12 +114,20 @@ function Header() {
 
   return (
     <>
-      <Navbar fixed="top" className={`navbar-main${scrolled ? " scrolled" : ""}`} variant="dark">
+      <Navbar
+        fixed="top"
+        className={`navbar-main${scrolled ? " scrolled" : ""}`}
+        variant="dark"
+      >
         <Container fluid>
           {/* ── Desktop ── */}
           <div className="d-none d-lg-flex w-100 align-items-center">
             <Navbar.Brand className="nav-brand" onClick={handleBrandClick}>
-              <img src="/ICS_Logo.jpeg" alt="Infinity Craft Space" className="nav-logo-img" />
+              <img
+                src="/ICS_Logo.jpeg"
+                alt="Infinity Craft Space"
+                className="nav-logo-img"
+              />
             </Navbar.Brand>
 
             <Nav className="me-auto">
@@ -213,11 +221,12 @@ function Header() {
               <FiMenu size={24} />
             </Button>
 
-            <Navbar.Brand
-              className="nav-brand m-0"
-              onClick={handleBrandClick}
-            >
-              <img src="/ICS_Logo.jpeg" alt="Infinity Craft Space" className="nav-logo-img" />
+            <Navbar.Brand className="nav-brand m-0" onClick={handleBrandClick}>
+              <img
+                src="/ICS_Logo.jpeg"
+                alt="Infinity Craft Space"
+                className="nav-logo-img"
+              />
             </Navbar.Brand>
 
             {!user?.isAdmin && (

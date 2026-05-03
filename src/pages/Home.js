@@ -9,32 +9,87 @@ import { buildCloudinaryUrl } from "../components/OptimizedImage";
 import { optimisticAddToCart } from "../features/cartSlice";
 import api from "../api/axios";
 import {
-  FiShoppingCart, FiHeart, FiStar, FiTruck, FiRefreshCw,
-  FiLock, FiAward, FiArrowRight, FiCheck, FiPackage,
-  FiSmartphone, FiGift, FiZap,
+  FiShoppingCart,
+  FiHeart,
+  FiStar,
+  FiTruck,
+  FiRefreshCw,
+  FiLock,
+  FiAward,
+  FiArrowRight,
+  FiCheck,
+  FiPackage,
+  FiSmartphone,
+  FiGift,
+  FiZap,
 } from "react-icons/fi";
 import "./Home.css";
 
 /* ─── Festival data ────────────────────────────────────────────────────── */
 
 const FESTIVALS = [
-  { name: "Mother's Day",     emoji: "💐", query: "Mother",         date: new Date(2026, 4, 10) },
-  { name: "Buddha Purnima",   emoji: "🙏", query: "Buddha Purnima", date: new Date(2026, 4, 23) },
-  { name: "Eid al-Adha",      emoji: "🌙", query: "Eid",            date: new Date(2026, 5, 6) },
-  { name: "Father's Day",     emoji: "👔", query: "Father",         date: new Date(2026, 5, 21) },
-  { name: "Raksha Bandhan",   emoji: "🪢", query: "Rakhi",          date: new Date(2026, 7, 9) },
-  { name: "Independence Day", emoji: "🇮🇳", query: "Independence",   date: new Date(2026, 7, 15) },
-  { name: "Ganesh Chaturthi", emoji: "🐘", query: "Ganesh",         date: new Date(2026, 8, 14) },
-  { name: "Dussehra",         emoji: "🏹", query: "Dussehra",       date: new Date(2026, 9, 2) },
-  { name: "Diwali",           emoji: "🪔", query: "Diwali",         date: new Date(2026, 9, 20) },
-  { name: "Christmas",        emoji: "🎄", query: "Christmas",      date: new Date(2026, 11, 25) },
+  {
+    name: "Mother's Day",
+    emoji: "💐",
+    query: "Mother",
+    date: new Date(2026, 4, 10),
+  },
+  {
+    name: "Buddha Purnima",
+    emoji: "🙏",
+    query: "Buddha Purnima",
+    date: new Date(2026, 4, 23),
+  },
+  {
+    name: "Eid al-Adha",
+    emoji: "🌙",
+    query: "Eid",
+    date: new Date(2026, 5, 6),
+  },
+  {
+    name: "Father's Day",
+    emoji: "👔",
+    query: "Father",
+    date: new Date(2026, 5, 21),
+  },
+  {
+    name: "Raksha Bandhan",
+    emoji: "🪢",
+    query: "Rakhi",
+    date: new Date(2026, 7, 9),
+  },
+  {
+    name: "Independence Day",
+    emoji: "🇮🇳",
+    query: "Independence",
+    date: new Date(2026, 7, 15),
+  },
+  {
+    name: "Ganesh Chaturthi",
+    emoji: "🐘",
+    query: "Ganesh",
+    date: new Date(2026, 8, 14),
+  },
+  {
+    name: "Dussehra",
+    emoji: "🏹",
+    query: "Dussehra",
+    date: new Date(2026, 9, 2),
+  },
+  { name: "Diwali", emoji: "🪔", query: "Diwali", date: new Date(2026, 9, 20) },
+  {
+    name: "Christmas",
+    emoji: "🎄",
+    query: "Christmas",
+    date: new Date(2026, 11, 25),
+  },
 ];
 
 function getUpcomingFestival() {
   const now = new Date();
-  const upcoming = FESTIVALS
-    .filter((f) => f.date > now)
-    .sort((a, b) => a.date - b.date)[0];
+  const upcoming = FESTIVALS.filter((f) => f.date > now).sort(
+    (a, b) => a.date - b.date,
+  )[0];
   if (!upcoming) return null;
   const days = Math.ceil((upcoming.date - now) / (1000 * 60 * 60 * 24));
   return days <= 45 ? { ...upcoming, days } : null;
@@ -44,37 +99,96 @@ function getUpcomingFestival() {
 
 const STATS = [
   { value: 1200, suffix: "+", label: "Happy Customers" },
-  { value: 500,  suffix: "+", label: "Handmade Products" },
+  { value: 500, suffix: "+", label: "Handmade Products" },
   { value: 28000, suffix: "+", label: "Pincodes Served" },
 ];
 
 const OCCASIONS = [
-  { emoji: "🎂", label: "Birthday",    query: "Birthday" },
+  { emoji: "🎂", label: "Birthday", query: "Birthday" },
   { emoji: "💕", label: "Anniversary", query: "Anniversary" },
-  { emoji: "💍", label: "Wedding",     query: "Wedding" },
-  { emoji: "🪔", label: "Diwali",      query: "Diwali" },
-  { emoji: "💼", label: "Corporate",   query: "Corporate" },
+  { emoji: "💍", label: "Wedding", query: "Wedding" },
+  { emoji: "🪔", label: "Diwali", query: "Diwali" },
+  { emoji: "💼", label: "Corporate", query: "Corporate" },
   { emoji: "🍼", label: "Baby Shower", query: "Baby" },
 ];
 
 const TRUST_ITEMS = [
-  { Icon: FiTruck,      title: "Free Shipping",     desc: "On orders above ₹999", color: "#7c3aed" },
-  { Icon: FiRefreshCw,  title: "Easy Returns",      desc: "7-day hassle-free returns", color: "#059669" },
-  { Icon: FiLock,       title: "Secure Payment",    desc: "100% encrypted checkout", color: "#0284c7" },
-  { Icon: FiAward,      title: "Handcrafted",       desc: "Made with love & care", color: "#f59e0b" },
+  {
+    Icon: FiTruck,
+    title: "Free Shipping",
+    desc: "On orders above ₹999",
+    color: "#7c3aed",
+  },
+  {
+    Icon: FiRefreshCw,
+    title: "Easy Returns",
+    desc: "7-day hassle-free returns",
+    color: "#059669",
+  },
+  {
+    Icon: FiLock,
+    title: "Secure Payment",
+    desc: "100% encrypted checkout",
+    color: "#0284c7",
+  },
+  {
+    Icon: FiAward,
+    title: "Handcrafted",
+    desc: "Made with love & care",
+    color: "#f59e0b",
+  },
 ];
 
 const PROCESS_STEPS = [
-  { Icon: FiPackage,     step: "01", title: "Browse & Discover",   desc: "Explore 500+ unique handcrafted products across every category — from resin art to custom jewelry." },
-  { Icon: FiGift,        step: "02", title: "Personalize It",       desc: "Add names, dates, or a heartfelt message. Make every gift uniquely yours." },
-  { Icon: FiSmartphone,  step: "03", title: "Delivered with Love",  desc: "Crafted just for you and shipped in premium packaging to your doorstep." },
+  {
+    Icon: FiPackage,
+    step: "01",
+    title: "Browse & Discover",
+    desc: "Explore 500+ unique handcrafted products across every category — from resin art to custom jewelry.",
+  },
+  {
+    Icon: FiGift,
+    step: "02",
+    title: "Personalize It",
+    desc: "Add names, dates, or a heartfelt message. Make every gift uniquely yours.",
+  },
+  {
+    Icon: FiSmartphone,
+    step: "03",
+    title: "Delivered with Love",
+    desc: "Crafted just for you and shipped in premium packaging to your doorstep.",
+  },
 ];
 
 const TESTIMONIALS = [
-  { name: "Priya S.",   location: "Mumbai",    rating: 5, verified: true, text: "The resin coasters I ordered were absolutely stunning. Quality far exceeded my expectations — everyone who sees them wants one!" },
-  { name: "Rahul M.",   location: "Bangalore", rating: 5, verified: true, text: "Ordered a personalized gift hamper for Diwali — my entire team was in awe. The packaging alone made it feel luxurious." },
-  { name: "Ananya K.",  location: "Chennai",   rating: 5, verified: true, text: "Fast delivery, beautiful packaging, and the customization was exactly what I envisioned. Will be a repeat customer for sure!" },
-  { name: "Meera T.",   location: "Delhi",     rating: 5, verified: true, text: "Gifted an embroidery hoop to my mom for her birthday — she cried happy tears. The artistry and detail is unmatched." },
+  {
+    name: "Priya S.",
+    location: "Mumbai",
+    rating: 5,
+    verified: true,
+    text: "The resin coasters I ordered were absolutely stunning. Quality far exceeded my expectations — everyone who sees them wants one!",
+  },
+  {
+    name: "Rahul M.",
+    location: "Bangalore",
+    rating: 5,
+    verified: true,
+    text: "Ordered a personalized gift hamper for Diwali — my entire team was in awe. The packaging alone made it feel luxurious.",
+  },
+  {
+    name: "Ananya K.",
+    location: "Chennai",
+    rating: 5,
+    verified: true,
+    text: "Fast delivery, beautiful packaging, and the customization was exactly what I envisioned. Will be a repeat customer for sure!",
+  },
+  {
+    name: "Meera T.",
+    location: "Delhi",
+    rating: 5,
+    verified: true,
+    text: "Gifted an embroidery hoop to my mom for her birthday — she cried happy tears. The artistry and detail is unmatched.",
+  },
 ];
 
 const FLOATING_ELEMENTS = ["🌸", "✨", "🎨", "💎", "🌿", "🎁"];
@@ -104,9 +218,15 @@ function useInView(threshold = 0.15) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { setInView(true); obs.disconnect(); }
-    }, { threshold });
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          obs.disconnect();
+        }
+      },
+      { threshold },
+    );
     obs.observe(el);
     return () => obs.disconnect();
   }, [threshold]);
@@ -119,7 +239,10 @@ function StarRow({ count }) {
   return (
     <span className="hp-stars" aria-label={`${count} stars`}>
       {Array.from({ length: 5 }).map((_, i) => (
-        <FiStar key={i} className={i < count ? "hp-star--on" : "hp-star--off"} />
+        <FiStar
+          key={i}
+          className={i < count ? "hp-star--on" : "hp-star--off"}
+        />
       ))}
     </span>
   );
@@ -130,7 +253,8 @@ function StatCounter({ value, suffix, label, animate }) {
   return (
     <div className="hp-stat">
       <span className="hp-stat-value">
-        {count.toLocaleString()}{suffix}
+        {count.toLocaleString()}
+        {suffix}
       </span>
       <span className="hp-stat-label">{label}</span>
     </div>
@@ -142,21 +266,30 @@ function WishlistButton({ productId }) {
   const [loading, setLoading] = useState(false);
   const isAuthenticated = useSelector((s) => !!s.auth.user);
 
-  const toggle = useCallback(async (e) => {
-    e.stopPropagation();
-    if (!isAuthenticated) { window.location.href = "/login"; return; }
-    setLoading(true);
-    try {
-      if (wishlisted) {
-        await api.delete(`/api/auth/wishlist/${productId}`);
-        setWishlisted(false);
-      } else {
-        await api.post("/api/auth/wishlist", { productId });
-        setWishlisted(true);
+  const toggle = useCallback(
+    async (e) => {
+      e.stopPropagation();
+      if (!isAuthenticated) {
+        window.location.href = "/login";
+        return;
       }
-    } catch { /* silent */ }
-    finally { setLoading(false); }
-  }, [wishlisted, productId, isAuthenticated]);
+      setLoading(true);
+      try {
+        if (wishlisted) {
+          await api.delete(`/api/auth/wishlist/${productId}`);
+          setWishlisted(false);
+        } else {
+          await api.post("/api/auth/wishlist", { productId });
+          setWishlisted(true);
+        }
+      } catch {
+        /* silent */
+      } finally {
+        setLoading(false);
+      }
+    },
+    [wishlisted, productId, isAuthenticated],
+  );
 
   return (
     <button
@@ -177,24 +310,33 @@ function ProductCard({ product, index }) {
   const [added, setAdded] = useState(false);
 
   const imgSrc =
-    buildCloudinaryUrl(product.images?.[0]?.url || product.image?.url || product.image, 480) ||
-    "https://placehold.co/480x480?text=No+Image";
+    buildCloudinaryUrl(
+      product.images?.[0]?.url || product.image?.url || product.image,
+      480,
+    ) || "https://placehold.co/480x480?text=No+Image";
 
-  const isLowStock = product.trackInventory && product.stock > 0 && product.stock <= (product.lowStockThreshold || 5);
+  const isLowStock =
+    product.trackInventory &&
+    product.stock > 0 &&
+    product.stock <= (product.lowStockThreshold || 5);
   const isOutOfStock = product.trackInventory && product.stock === 0;
-  const discountPct = product.originalPrice && product.originalPrice > product.price
-    ? Math.round((1 - product.price / product.originalPrice) * 100)
-    : 0;
+  const discountPct =
+    product.originalPrice && product.originalPrice > product.price
+      ? Math.round((1 - product.price / product.originalPrice) * 100)
+      : 0;
 
-  const handleAddToCart = useCallback(async (e) => {
-    e.stopPropagation();
-    if (isOutOfStock || adding) return;
-    setAdding(true);
-    await dispatch(optimisticAddToCart({ product, quantity: 1 }));
-    setAdding(false);
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
-  }, [dispatch, product, isOutOfStock, adding]);
+  const handleAddToCart = useCallback(
+    async (e) => {
+      e.stopPropagation();
+      if (isOutOfStock || adding) return;
+      setAdding(true);
+      await dispatch(optimisticAddToCart({ product, quantity: 1 }));
+      setAdding(false);
+      setAdded(true);
+      setTimeout(() => setAdded(false), 2000);
+    },
+    [dispatch, product, isOutOfStock, adding],
+  );
 
   return (
     <div
@@ -211,7 +353,9 @@ function ProductCard({ product, index }) {
         {/* Badges */}
         <div className="hp-product-badges">
           {discountPct > 0 && (
-            <span className="hp-badge hp-badge--discount">{discountPct}% OFF</span>
+            <span className="hp-badge hp-badge--discount">
+              {discountPct}% OFF
+            </span>
           )}
           {product.isCustomizable && (
             <span className="hp-badge hp-badge--custom">✦ Custom</span>
@@ -219,7 +363,9 @@ function ProductCard({ product, index }) {
         </div>
 
         {isLowStock && (
-          <span className="hp-badge hp-badge--low-stock">Only {product.stock} left!</span>
+          <span className="hp-badge hp-badge--low-stock">
+            Only {product.stock} left!
+          </span>
         )}
         {isOutOfStock && (
           <div className="hp-out-of-stock-overlay">Sold Out</div>
@@ -234,11 +380,15 @@ function ProductCard({ product, index }) {
             aria-label="Add to cart"
           >
             {added ? (
-              <><FiCheck /> Added!</>
+              <>
+                <FiCheck /> Added!
+              </>
             ) : adding ? (
               <span className="hp-spinner" />
             ) : (
-              <><FiShoppingCart /> Add to Cart</>
+              <>
+                <FiShoppingCart /> Add to Cart
+              </>
             )}
           </button>
         </div>
@@ -250,14 +400,20 @@ function ProductCard({ product, index }) {
         {product.averageRating > 0 && (
           <div className="hp-product-rating">
             <StarRow count={Math.round(product.averageRating)} />
-            <span className="hp-product-rating-count">({product.ratingCount || 0})</span>
+            <span className="hp-product-rating-count">
+              ({product.ratingCount || 0})
+            </span>
           </div>
         )}
         <p className="hp-product-name">{product.name}</p>
         <div className="hp-product-pricing">
-          <span className="hp-product-price">₹{product.price?.toLocaleString()}</span>
+          <span className="hp-product-price">
+            ₹{product.price?.toLocaleString()}
+          </span>
           {product.originalPrice > product.price && (
-            <span className="hp-product-original-price">₹{product.originalPrice?.toLocaleString()}</span>
+            <span className="hp-product-original-price">
+              ₹{product.originalPrice?.toLocaleString()}
+            </span>
           )}
         </div>
         {product.isCustomizable && (
@@ -271,7 +427,8 @@ function ProductCard({ product, index }) {
 function PopularSection({ navigate }) {
   const [popularProducts, setPopularProducts] = useState([]);
   useEffect(() => {
-    api.get("/api/products/popular/list")
+    api
+      .get("/api/products/popular/list")
       .then((res) => {
         const products = res.data.products || res.data || [];
         setPopularProducts(products.slice(0, 4));
@@ -288,7 +445,10 @@ function PopularSection({ navigate }) {
           <p className="hp-section-eyebrow">Flying off the shelves</p>
           <h2 className="hp-section-title">🔥 Currently Popular</h2>
         </div>
-        <button className="hp-section-link" onClick={() => navigate("/products")}>
+        <button
+          className="hp-section-link"
+          onClick={() => navigate("/products")}
+        >
           View all <FiArrowRight />
         </button>
       </div>
@@ -336,7 +496,10 @@ export default function Home() {
     () =>
       [...products]
         .filter((p) => p.averageRating > 0 && p.stock !== 0)
-        .sort((a, b) => b.averageRating - a.averageRating || b.ratingCount - a.ratingCount)
+        .sort(
+          (a, b) =>
+            b.averageRating - a.averageRating || b.ratingCount - a.ratingCount,
+        )
         .slice(0, 8),
     [products],
   );
@@ -353,14 +516,46 @@ export default function Home() {
       />
       <div className="App">
         <Header />
-        <main className="hp-main">
 
+        {/* ══ FESTIVAL BANNER ══════════════════════════════════════════ */}
+        {(() => {
+          const festival = getUpcomingFestival();
+          if (!festival) return null;
+          return (
+            <div className="hp-festival-banner" role="banner">
+              <span className="hp-festival-emoji">{festival.emoji}</span>
+              <span className="hp-festival-text">
+                <strong>
+                  {festival.days === 1
+                    ? "Tomorrow is"
+                    : festival.days <= 7
+                      ? `${festival.days} days to`
+                      : "Coming up —"}{" "}
+                  {festival.name}
+                </strong>
+                {" · "}Find the perfect handcrafted gift
+              </span>
+              <button
+                className="hp-festival-cta"
+                onClick={() =>
+                  navigate(`/products?q=${encodeURIComponent(festival.query)}`)
+                }
+              >
+                Shop Gifts <FiArrowRight size={13} />
+              </button>
+            </div>
+          );
+        })()}
+
+        <main className="hp-main">
           {/* ══ HERO ══════════════════════════════════════════════════════ */}
           <section className="hp-hero" aria-label="Hero">
             {/* Floating decorative elements */}
             <div className="hp-floats" aria-hidden="true">
               {FLOATING_ELEMENTS.map((el, i) => (
-                <span key={i} className={`hp-float hp-float--${i + 1}`}>{el}</span>
+                <span key={i} className={`hp-float hp-float--${i + 1}`}>
+                  {el}
+                </span>
               ))}
             </div>
 
@@ -372,8 +567,10 @@ export default function Home() {
                 </span>
 
                 <h1 className="hp-hero-heading display-heading">
-                  Gifts that carry<br />
-                  <span className="hp-hero-accent">a lifetime</span> of<br />
+                  Gifts that carry
+                  <br />
+                  <span className="hp-hero-accent">a lifetime</span> of
+                  <br />
                   memories
                 </h1>
 
@@ -402,13 +599,19 @@ export default function Home() {
                 <div className="hp-hero-social-proof">
                   <div className="hp-hero-avatars" aria-hidden="true">
                     {["P", "R", "A", "K", "M"].map((l, i) => (
-                      <span key={i} className="hp-avatar">{l}</span>
+                      <span key={i} className="hp-avatar">
+                        {l}
+                      </span>
                     ))}
                   </div>
                   <div>
                     <div className="hp-hero-proof-stars">
                       {Array.from({ length: 5 }).map((_, i) => (
-                        <FiStar key={i} className="hp-star--on" style={{ width: 13, height: 13 }} />
+                        <FiStar
+                          key={i}
+                          className="hp-star--on"
+                          style={{ width: 13, height: 13 }}
+                        />
                       ))}
                     </div>
                     <span className="hp-hero-proof-text">
@@ -426,7 +629,9 @@ export default function Home() {
                     {featured[0] ? (
                       <img
                         src={buildCloudinaryUrl(
-                          featured[0].images?.[0]?.url || featured[0].image?.url || featured[0].image,
+                          featured[0].images?.[0]?.url ||
+                            featured[0].image?.url ||
+                            featured[0].image,
                           480,
                         )}
                         alt={featured[0].name}
@@ -445,7 +650,9 @@ export default function Home() {
                     <div className="hp-hero-mini-card hp-hero-mini-card--tl">
                       <img
                         src={buildCloudinaryUrl(
-                          featured[1].images?.[0]?.url || featured[1].image?.url || featured[1].image,
+                          featured[1].images?.[0]?.url ||
+                            featured[1].image?.url ||
+                            featured[1].image,
                           160,
                         )}
                         alt={featured[1].name}
@@ -458,7 +665,9 @@ export default function Home() {
                     <div className="hp-hero-mini-card hp-hero-mini-card--br">
                       <img
                         src={buildCloudinaryUrl(
-                          featured[2].images?.[0]?.url || featured[2].image?.url || featured[2].image,
+                          featured[2].images?.[0]?.url ||
+                            featured[2].image?.url ||
+                            featured[2].image,
                           160,
                         )}
                         alt={featured[2].name}
@@ -470,14 +679,20 @@ export default function Home() {
                 </div>
 
                 {/* Floating stat cards */}
-                <div className="hp-hero-stat-card hp-hero-stat-card--top" aria-hidden="true">
+                <div
+                  className="hp-hero-stat-card hp-hero-stat-card--top"
+                  aria-hidden="true"
+                >
                   <span className="hp-hero-stat-emoji">⭐</span>
                   <div>
                     <div className="hp-hero-stat-val">4.9/5</div>
                     <div className="hp-hero-stat-lbl">Average Rating</div>
                   </div>
                 </div>
-                <div className="hp-hero-stat-card hp-hero-stat-card--bottom" aria-hidden="true">
+                <div
+                  className="hp-hero-stat-card hp-hero-stat-card--bottom"
+                  aria-hidden="true"
+                >
                   <span className="hp-hero-stat-emoji">🚀</span>
                   <div>
                     <div className="hp-hero-stat-val">2–5 Days</div>
@@ -495,35 +710,14 @@ export default function Home() {
             </div>
           </section>
 
-          {/* ══ FESTIVAL BANNER ══════════════════════════════════════════ */}
-          {(() => {
-            const festival = getUpcomingFestival();
-            if (!festival) return null;
-            return (
-              <div className="hp-festival-banner" role="banner">
-                <span className="hp-festival-emoji">{festival.emoji}</span>
-                <span className="hp-festival-text">
-                  <strong>
-                    {festival.days === 1 ? "Tomorrow is" : festival.days <= 7 ? `${festival.days} days to` : "Coming up —"}{" "}
-                    {festival.name}
-                  </strong>
-                  {" · "}Find the perfect handcrafted gift
-                </span>
-                <button
-                  className="hp-festival-cta"
-                  onClick={() => navigate(`/products?q=${encodeURIComponent(festival.query)}`)}
-                >
-                  Shop Gifts <FiArrowRight size={13} />
-                </button>
-              </div>
-            );
-          })()}
-
           {/* ══ TRUST STRIP ═══════════════════════════════════════════════ */}
           <section className="hp-trust-strip" aria-label="Why shop with us">
             {TRUST_ITEMS.map(({ Icon, title, desc, color }) => (
               <div key={title} className="hp-trust-item">
-                <div className="hp-trust-icon-wrap" style={{ "--trust-color": color }}>
+                <div
+                  className="hp-trust-icon-wrap"
+                  style={{ "--trust-color": color }}
+                >
                   <Icon />
                 </div>
                 <div>
@@ -541,7 +735,10 @@ export default function Home() {
                 <p className="hp-section-eyebrow">Find the perfect gift</p>
                 <h2 className="hp-section-title">Shop by Occasion</h2>
               </div>
-              <button className="hp-section-link" onClick={() => navigate("/products")}>
+              <button
+                className="hp-section-link"
+                onClick={() => navigate("/products")}
+              >
                 View all <FiArrowRight />
               </button>
             </div>
@@ -551,7 +748,9 @@ export default function Home() {
                   key={occ.label}
                   className="hp-occasion-card"
                   style={{ animationDelay: `${i * 0.08}s` }}
-                  onClick={() => navigate(`/products?q=${encodeURIComponent(occ.query)}`)}
+                  onClick={() =>
+                    navigate(`/products?q=${encodeURIComponent(occ.query)}`)
+                  }
                   aria-label={`Shop ${occ.label} gifts`}
                 >
                   <span className="hp-occasion-emoji">{occ.emoji}</span>
@@ -569,7 +768,10 @@ export default function Home() {
                   <p className="hp-section-eyebrow">Explore our collections</p>
                   <h2 className="hp-section-title">Shop by Category</h2>
                 </div>
-                <button className="hp-section-link" onClick={() => navigate("/products")}>
+                <button
+                  className="hp-section-link"
+                  onClick={() => navigate("/products")}
+                >
                   See all <FiArrowRight />
                 </button>
               </div>
@@ -578,7 +780,11 @@ export default function Home() {
                   <button
                     key={cat.name}
                     className={`hp-category-tile ${i === 0 ? "hp-category-tile--featured" : ""}`}
-                    onClick={() => navigate(`/products?category=${encodeURIComponent(cat.name)}`)}
+                    onClick={() =>
+                      navigate(
+                        `/products?category=${encodeURIComponent(cat.name)}`,
+                      )
+                    }
                     aria-label={`Browse ${cat.name}`}
                   >
                     <div className="hp-category-img-wrap">
@@ -590,14 +796,23 @@ export default function Home() {
                           decoding="async"
                         />
                       ) : (
-                        <div className="hp-category-placeholder" aria-hidden="true">🎁</div>
+                        <div
+                          className="hp-category-placeholder"
+                          aria-hidden="true"
+                        >
+                          🎁
+                        </div>
                       )}
                       <div className="hp-category-overlay" />
                     </div>
                     <div className="hp-category-content">
                       <span className="hp-category-name">{cat.name}</span>
-                      <span className="hp-category-count">{cat.count} products</span>
-                      <span className="hp-category-cta">Explore <FiArrowRight /></span>
+                      <span className="hp-category-count">
+                        {cat.count} products
+                      </span>
+                      <span className="hp-category-cta">
+                        Explore <FiArrowRight />
+                      </span>
                     </div>
                   </button>
                 ))}
@@ -614,13 +829,20 @@ export default function Home() {
               <div className="hp-section-header">
                 <div>
                   <p className="hp-section-eyebrow">
-                    {bestsellers.length ? "Customer favourites" : "Handpicked for you"}
+                    {bestsellers.length
+                      ? "Customer favourites"
+                      : "Handpicked for you"}
                   </p>
                   <h2 className="hp-section-title">
-                    {bestsellers.length ? "⭐ Bestsellers" : "Featured Products"}
+                    {bestsellers.length
+                      ? "⭐ Bestsellers"
+                      : "Featured Products"}
                   </h2>
                 </div>
-                <button className="hp-section-link" onClick={() => navigate("/products")}>
+                <button
+                  className="hp-section-link"
+                  onClick={() => navigate("/products")}
+                >
                   View all <FiArrowRight />
                 </button>
               </div>
@@ -642,7 +864,9 @@ export default function Home() {
 
           {/* ══ STORYTELLING ══════════════════════════════════════════════ */}
           <section className="hp-story-section" ref={storyRef}>
-            <div className={`hp-story-inner ${storyInView ? "hp-in-view" : ""}`}>
+            <div
+              className={`hp-story-inner ${storyInView ? "hp-in-view" : ""}`}
+            >
               <div className="hp-story-visual">
                 <div className="hp-story-blob">
                   <span className="hp-story-emoji">🖌️</span>
@@ -653,21 +877,31 @@ export default function Home() {
               </div>
               <div className="hp-story-content">
                 <p className="hp-section-eyebrow">Our Story</p>
-                <h2 className="hp-section-title">Crafted with Love,<br />Made to Last Forever</h2>
+                <h2 className="hp-section-title">
+                  Crafted with Love,
+                  <br />
+                  Made to Last Forever
+                </h2>
                 <p className="hp-story-text">
-                  Every product at InfinityCraftSpace begins as an idea — then becomes something you
-                  can hold, feel, and treasure. Our artisans pour hours of skill and heart into each
-                  piece, ensuring it carries emotions that mass-produced items never can.
+                  Every product at InfinityCraftSpace begins as an idea — then
+                  becomes something you can hold, feel, and treasure. Our
+                  artisans pour hours of skill and heart into each piece,
+                  ensuring it carries emotions that mass-produced items never
+                  can.
                 </p>
                 <p className="hp-story-text">
-                  From a personalized resin coaster for your best friend's kitchen, to a hand-embroidered
-                  hoop commemorating your wedding date — we believe gifts should tell stories, not just
-                  fill boxes.
+                  From a personalized resin coaster for your best friend's
+                  kitchen, to a hand-embroidered hoop commemorating your wedding
+                  date — we believe gifts should tell stories, not just fill
+                  boxes.
                 </p>
                 <div className="hp-story-pillars">
                   {[
                     { icon: "🌿", text: "Sustainably sourced materials" },
-                    { icon: "✋", text: "Every piece individually handcrafted" },
+                    {
+                      icon: "✋",
+                      text: "Every piece individually handcrafted",
+                    },
                     { icon: "📦", text: "Premium gifting-ready packaging" },
                   ].map((p) => (
                     <div key={p.text} className="hp-story-pillar">
@@ -717,21 +951,36 @@ export default function Home() {
           <section className="hp-custom-banner">
             <div className="hp-custom-banner-deco" aria-hidden="true">
               {["💍", "🎨", "🌹", "✨", "🎁", "💕"].map((e, i) => (
-                <span key={i} className={`hp-custom-deco-el hp-custom-deco-el--${i + 1}`}>{e}</span>
+                <span
+                  key={i}
+                  className={`hp-custom-deco-el hp-custom-deco-el--${i + 1}`}
+                >
+                  {e}
+                </span>
               ))}
             </div>
             <div className="hp-custom-banner-inner">
               <span className="hp-custom-banner-tag">✦ Made Just for You</span>
               <h2 className="hp-custom-banner-title">
-                Want something truly<br />one-of-a-kind?
+                Want something truly
+                <br />
+                one-of-a-kind?
               </h2>
               <p className="hp-custom-banner-desc">
                 Add names, dates, photos, or a heartfelt message. Perfect for
                 birthdays, anniversaries, weddings & corporate gifting.
               </p>
               <div className="hp-custom-banner-occasions">
-                {["Wedding", "Birthday", "Anniversary", "Corporate", "Baby Shower"].map((occ) => (
-                  <span key={occ} className="hp-custom-occ-tag">{occ}</span>
+                {[
+                  "Wedding",
+                  "Birthday",
+                  "Anniversary",
+                  "Corporate",
+                  "Baby Shower",
+                ].map((occ) => (
+                  <span key={occ} className="hp-custom-occ-tag">
+                    {occ}
+                  </span>
                 ))}
               </div>
               <button
@@ -749,7 +998,10 @@ export default function Home() {
               <p className="hp-section-eyebrow">Real stories, real love</p>
               <h2 className="hp-section-title">What Our Customers Say</h2>
             </div>
-            <div className="hp-testimonials-scroll-wrap" aria-label="Customer reviews">
+            <div
+              className="hp-testimonials-scroll-wrap"
+              aria-label="Customer reviews"
+            >
               <div className="hp-testimonials-track">
                 {[...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
                   <div key={`${t.name}-${i}`} className="hp-testimonial-card">
@@ -766,7 +1018,9 @@ export default function Home() {
                       <span className="hp-testimonial-avatar">{t.name[0]}</span>
                       <div>
                         <p className="hp-testimonial-name">{t.name}</p>
-                        <p className="hp-testimonial-location">📍 {t.location}</p>
+                        <p className="hp-testimonial-location">
+                          📍 {t.location}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -781,17 +1035,23 @@ export default function Home() {
           {/* ══ NEWSLETTER ════════════════════════════════════════════════ */}
           <section className="hp-newsletter-section">
             <div className="hp-newsletter-inner">
-              <div className="hp-newsletter-icon" aria-hidden="true">🎁</div>
+              <div className="hp-newsletter-icon" aria-hidden="true">
+                🎁
+              </div>
               <h2 className="hp-newsletter-title">
                 Get ₹100 off your first order
               </h2>
               <p className="hp-newsletter-desc">
                 Join 1,200+ craft lovers. Early access to new collections,
-                exclusive deals & handcrafted inspiration — straight to your inbox.
+                exclusive deals & handcrafted inspiration — straight to your
+                inbox.
               </p>
               <form
                 className="hp-newsletter-form"
-                onSubmit={(e) => { e.preventDefault(); navigate("/products"); }}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  navigate("/products");
+                }}
               >
                 <input
                   type="email"
@@ -799,7 +1059,10 @@ export default function Home() {
                   placeholder="Enter your email address"
                   aria-label="Email address"
                 />
-                <button type="submit" className="hp-btn hp-btn--primary btn-ics btn-ics--primary">
+                <button
+                  type="submit"
+                  className="hp-btn hp-btn--primary btn-ics btn-ics--primary"
+                >
                   <FiZap /> Claim ₹100 Off
                 </button>
               </form>
@@ -813,20 +1076,32 @@ export default function Home() {
           {!user && (
             <section className="hp-cta-section">
               <div className="hp-cta-inner">
-                <span className="hp-eyebrow" style={{ justifyContent: "center" }}>
+                <span
+                  className="hp-eyebrow"
+                  style={{ justifyContent: "center" }}
+                >
                   <span className="hp-eyebrow-dot" />
                   Join the community
                 </span>
                 <h2 className="hp-cta-title">
-                  Be part of India's most loved<br />handcrafted gifting brand
+                  Be part of India's most loved
+                  <br />
+                  handcrafted gifting brand
                 </h2>
                 <p className="hp-cta-desc">
-                  Save your wishlist, track orders, get personalised recommendations
-                  & early access to limited editions.
+                  Save your wishlist, track orders, get personalised
+                  recommendations & early access to limited editions.
                 </p>
                 <div className="hp-cta-perks">
-                  {["Save wishlists", "Track orders", "Exclusive deals", "Early access"].map((p) => (
-                    <span key={p} className="hp-cta-perk"><FiCheck /> {p}</span>
+                  {[
+                    "Save wishlists",
+                    "Track orders",
+                    "Exclusive deals",
+                    "Early access",
+                  ].map((p) => (
+                    <span key={p} className="hp-cta-perk">
+                      <FiCheck /> {p}
+                    </span>
                   ))}
                 </div>
                 <div className="hp-cta-actions">
@@ -846,7 +1121,6 @@ export default function Home() {
               </div>
             </section>
           )}
-
         </main>
       </div>
     </>
