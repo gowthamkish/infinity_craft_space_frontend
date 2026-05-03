@@ -21,16 +21,48 @@ export const fetchDashboardCounts = createAsyncThunk(
   },
 );
 
-// Fetch users list
+// Fetch paginated users list
 export const fetchUsers = createAsyncThunk(
   "admin/fetchUsers",
-  async (_, { rejectWithValue }) => {
+  async ({ page = 1, limit = 50, search = "" } = {}, { rejectWithValue }) => {
     try {
-      const res = await api.get("/api/admin/users");
-      return res.data;
+      const params = new URLSearchParams({ page, limit });
+      if (search) params.set("search", search);
+      const res = await api.get(`/api/admin/users?${params}`);
+      return res.data; // { success, users, pagination }
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch users",
+      );
+    }
+  },
+);
+
+// Fetch fast analytics summary (KPI cards + recent orders, ~100ms)
+export const fetchAnalyticsSummary = createAsyncThunk(
+  "admin/fetchAnalyticsSummary",
+  async (period = "30", { rejectWithValue }) => {
+    try {
+      const res = await api.get(`/api/admin/analytics/summary?period=${period}`);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.error || "Failed to fetch analytics summary",
+      );
+    }
+  },
+);
+
+// Fetch heavy analytics charts (aggregation pipelines, cached 5 min)
+export const fetchAnalyticsCharts = createAsyncThunk(
+  "admin/fetchAnalyticsCharts",
+  async (period = "30", { rejectWithValue }) => {
+    try {
+      const res = await api.get(`/api/admin/analytics/charts?period=${period}`);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.error || "Failed to fetch analytics charts",
       );
     }
   },
@@ -95,8 +127,9 @@ const adminSlice = createSlice({
     dashboardLastFetched: null,
     dashboardIsStale: true,
 
-    // Users data
+    // Users data (paginated)
     users: [],
+    usersPagination: { total: 0, page: 1, limit: 50, totalPages: 1 },
     usersLoading: false,
     usersError: null,
     usersLastFetched: null,
@@ -108,6 +141,14 @@ const adminSlice = createSlice({
     ordersError: null,
     ordersLastFetched: null,
     ordersIsStale: true,
+
+    // Analytics — split into fast summary and heavy charts
+    analyticsSummary: null,
+    analyticsSummaryLoading: false,
+    analyticsSummaryError: null,
+    analyticsCharts: null,
+    analyticsChartsLoading: false,
+    analyticsChartsError: null,
   },
   reducers: {
     clearDashboardError: (state) => {
@@ -158,23 +199,53 @@ const adminSlice = createSlice({
         state.dashboardLoading = false;
         state.dashboardError = action.payload;
       })
-      // Users
+      // Users (paginated)
       .addCase(fetchUsers.pending, (state) => {
         state.usersLoading = true;
         state.usersError = null;
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
-        state.users = action.payload;
+        // Server returns { success, users, pagination }
+        state.users = action.payload.users || action.payload;
+        state.usersPagination = action.payload.pagination || state.usersPagination;
         state.usersLoading = false;
         state.usersError = null;
         state.usersLastFetched = Date.now();
         state.usersIsStale = false;
-        // Update user count in dashboard
-        state.dashboardCounts.userCount = action.payload.length;
+        // Sync total user count to dashboard
+        if (action.payload.pagination?.total != null) {
+          state.dashboardCounts.userCount = action.payload.pagination.total;
+        }
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.usersLoading = false;
         state.usersError = action.payload;
+      })
+      // Analytics summary (fast)
+      .addCase(fetchAnalyticsSummary.pending, (state) => {
+        state.analyticsSummaryLoading = true;
+        state.analyticsSummaryError = null;
+      })
+      .addCase(fetchAnalyticsSummary.fulfilled, (state, action) => {
+        state.analyticsSummary = action.payload;
+        state.analyticsSummaryLoading = false;
+      })
+      .addCase(fetchAnalyticsSummary.rejected, (state, action) => {
+        state.analyticsSummaryLoading = false;
+        state.analyticsSummaryError = action.payload;
+      })
+      // Analytics charts (heavy, lazy-loaded)
+      .addCase(fetchAnalyticsCharts.pending, (state) => {
+        state.analyticsChartsLoading = true;
+        state.analyticsChartsError = null;
+      })
+      .addCase(fetchAnalyticsCharts.fulfilled, (state, action) => {
+        state.analyticsCharts = action.payload;
+        state.analyticsChartsLoading = false;
+      })
+      .addCase(fetchAnalyticsCharts.rejected, (state, action) => {
+        state.analyticsChartsLoading = false;
+        state.analyticsChartsError = action.payload;
       })
       // Orders
       .addCase(fetchOrders.pending, (state) => {

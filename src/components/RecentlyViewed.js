@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { FiX } from "react-icons/fi";
 import { useRecentlyViewed } from "../hooks/useRecentlyViewed";
 import EmptyState from "./EmptyState";
+import OptimizedImage from "./OptimizedImage";
 import "../styles/designPatterns.css";
 
 /**
@@ -119,14 +120,11 @@ const RecentlyViewedCard = ({ product, onRemove }) => {
           }}
         >
           {product.images && product.images[0] ? (
-            <img
+            <OptimizedImage
               src={product.images[0].url}
               alt={product.name}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
+              width={300}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           ) : (
             <div

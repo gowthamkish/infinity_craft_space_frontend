@@ -3,6 +3,7 @@ import { Container, Row, Col, Card, Button, Spinner } from "react-bootstrap";
 import { FiChevronRight } from "react-icons/fi";
 import { recommendationsAPI } from "../api/features";
 import { SkeletonProductGrid, SkeletonProductCard } from "./SkeletonLoaders";
+import OptimizedImage from "./OptimizedImage";
 import "../styles/designPatterns.css";
 
 /**
@@ -138,19 +139,15 @@ const ProductRecommendationCard = ({ product }) => {
           backgroundColor: "#f5f5f5",
         }}
         onClick={handleViewProduct}
+        onMouseEnter={(e) => { const img = e.currentTarget.querySelector("img"); if (img) img.style.transform = "scale(1.05)"; }}
+        onMouseLeave={(e) => { const img = e.currentTarget.querySelector("img"); if (img) img.style.transform = "scale(1)"; }}
       >
         {product.images && product.images[0] ? (
-          <img
+          <OptimizedImage
             src={product.images[0].url}
             alt={product.name}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              transition: "transform 0.3s ease",
-            }}
-            onMouseEnter={(e) => (e.target.style.transform = "scale(1.05)")}
-            onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
+            width={300}
+            style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s ease" }}
           />
         ) : (
           <div

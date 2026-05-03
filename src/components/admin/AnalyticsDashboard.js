@@ -32,30 +32,52 @@ import {
   FiActivity,
 } from "react-icons/fi";
 
-// Custom hook for fetching analytics data
-const useAnalytics = (period = 30) => {
+// Fast KPI cards + recent orders (~100ms)
+const useAnalyticsSummary = (period = 30) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchAnalytics = useCallback(async () => {
+  const fetch = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await api.get(`/api/admin/analytics?period=${period}`);
+      const res = await api.get(`/api/admin/analytics/summary?period=${period}`);
       setData(res.data);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch analytics");
+      setError(err.response?.data?.error || "Failed to fetch analytics summary");
     } finally {
       setLoading(false);
     }
   }, [period]);
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, [fetchAnalytics]);
+  useEffect(() => { fetch(); }, [fetch]);
 
-  return { data, loading, error, refetch: fetchAnalytics };
+  return { data, loading, error, refetch: fetch };
+};
+
+// Heavy aggregation charts (1–5s, loads after summary)
+const useAnalyticsCharts = (period = 30) => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetch = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.get(`/api/admin/analytics/charts?period=${period}`);
+      setData(res.data);
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to fetch analytics charts");
+    } finally {
+      setLoading(false);
+    }
+  }, [period]);
+
+  useEffect(() => { fetch(); }, [fetch]);
+
+  return { data, loading, error, refetch: fetch };
 };
 
 // Custom hook for fetching predictions data
@@ -352,12 +374,15 @@ const C3CategoryPredictionChart = ({ data, height = 280 }) => {
 
 export default function AnalyticsDashboard() {
   const [period, setPeriod] = useState(30);
-  const { data, loading, error, refetch } = useAnalytics(period);
+  const { data: summaryData, loading: summaryLoading, error: summaryError, refetch: refetchSummary } = useAnalyticsSummary(period);
+  const { data: chartsData, loading: chartsLoading, refetch: refetchCharts } = useAnalyticsCharts(period);
   const {
     data: predictionsData,
     loading: predictionsLoading,
     refetch: refetchPredictions,
   } = usePredictions();
+
+  const refetch = useCallback(() => { refetchSummary(); refetchCharts(); }, [refetchSummary, refetchCharts]);
 
   const formatCurrency = (value) => {
     if (value >= 100000) {
@@ -441,11 +466,11 @@ export default function AnalyticsDashboard() {
                       variant="outline-secondary"
                       size="sm"
                       onClick={refetch}
-                      disabled={loading}
+                      disabled={summaryLoading}
                     >
                       <FiRefreshCw
                         size={16}
-                        className={loading ? "spin" : ""}
+                        className={summaryLoading ? "spin" : ""}
                       />
                     </Button>
                   </div>
@@ -453,29 +478,29 @@ export default function AnalyticsDashboard() {
               </Col>
             </Row>
 
-            {loading && !data ? (
+            {summaryLoading && !summaryData ? (
               <div className="text-center py-5 d-flex flex-column align-items-center gap-3">
                 <OrbitLoader size="lg" />
                 <p className="text-muted mb-0">Loading analytics…</p>
               </div>
-            ) : error ? (
+            ) : summaryError ? (
               <Alert variant="danger">
                 <Alert.Heading>Error loading analytics</Alert.Heading>
-                <p>{error}</p>
+                <p>{summaryError}</p>
                 <Button variant="outline-danger" onClick={refetch}>
                   Retry
                 </Button>
               </Alert>
-            ) : data ? (
+            ) : summaryData ? (
               <>
-                {/* Summary Stats */}
+                {/* Summary Stats — renders immediately (~100ms) */}
                 <Row className="g-4 mb-4">
                   <Col xs={12} sm={6} lg={3}>
                     <StatCard
                       icon={FiDollarSign}
                       title="Total Revenue"
-                      value={formatCurrency(data.summary?.totalRevenue || 0)}
-                      subtitle={`${data.summary?.totalOrders || 0} total orders`}
+                      value={formatCurrency(summaryData.summary?.totalRevenue || 0)}
+                      subtitle={`${summaryData.summary?.totalOrders || 0} total orders`}
                       color="#10b981"
                     />
                   </Col>
@@ -483,11 +508,9 @@ export default function AnalyticsDashboard() {
                     <StatCard
                       icon={FiShoppingCart}
                       title={`Orders (${period}D)`}
-                      value={data.summary?.ordersInPeriod || 0}
-                      subtitle={formatCurrency(
-                        data.summary?.revenueInPeriod || 0,
-                      )}
-                      trend={data.summary?.revenueGrowth}
+                      value={summaryData.summary?.ordersInPeriod || 0}
+                      subtitle={formatCurrency(summaryData.summary?.revenueInPeriod || 0)}
+                      trend={summaryData.summary?.revenueGrowth}
                       color="#3b82f6"
                     />
                   </Col>
@@ -495,8 +518,8 @@ export default function AnalyticsDashboard() {
                     <StatCard
                       icon={FiUsers}
                       title="Total Users"
-                      value={data.summary?.totalUsers || 0}
-                      subtitle={`+${data.summary?.newUsersInPeriod || 0} new this period`}
+                      value={summaryData.summary?.totalUsers || 0}
+                      subtitle={`+${summaryData.summary?.newUsersInPeriod || 0} new this period`}
                       color="#8b5cf6"
                     />
                   </Col>
@@ -504,12 +527,21 @@ export default function AnalyticsDashboard() {
                     <StatCard
                       icon={FiPackage}
                       title="Avg Order Value"
-                      value={formatCurrency(data.summary?.avgOrderValue || 0)}
-                      subtitle={`${data.summary?.totalProducts || 0} products`}
+                      value={formatCurrency(summaryData.summary?.avgOrderValue || 0)}
+                      subtitle={`${summaryData.summary?.totalProducts || 0} products`}
                       color="#f59e0b"
                     />
                   </Col>
                 </Row>
+
+                {/* Charts — progressive load (1–5s) */}
+                {chartsLoading ? (
+                  <div className="text-center py-4 d-flex flex-column align-items-center gap-2 mb-4">
+                    <OrbitLoader />
+                    <p className="text-muted mb-0" style={{ fontSize: "0.875rem" }}>Loading charts…</p>
+                  </div>
+                ) : chartsData ? (
+                  <>
 
                 {/* Charts Row */}
                 <Row className="g-4 mb-4">
@@ -535,11 +567,11 @@ export default function AnalyticsDashboard() {
                             </small>
                           </div>
                           <Badge bg="success" className="px-3 py-2">
-                            {formatCurrency(data.summary?.revenueInPeriod || 0)}
+                            {formatCurrency(summaryData.summary?.revenueInPeriod || 0)}
                           </Badge>
                         </div>
                         <C3BarChart
-                          data={data.charts?.dailyData || []}
+                          data={chartsData.charts?.dailyData || []}
                           dataKey="revenue"
                           nameKey="date"
                           color="#10b981"
@@ -565,7 +597,7 @@ export default function AnalyticsDashboard() {
                           Order Status
                         </h5>
                         <C3DonutChart
-                          data={data.charts?.orderStatusDistribution || []}
+                          data={chartsData.charts?.orderStatusDistribution || []}
                           nameKey="status"
                           valueKey="count"
                           height={320}
@@ -592,13 +624,13 @@ export default function AnalyticsDashboard() {
                           />
                           Top Selling Products
                         </h5>
-                        {data.charts?.topProducts?.length > 0 ? (
+                        {chartsData.charts?.topProducts?.length > 0 ? (
                           <div>
-                            {data.charts.topProducts
+                            {chartsData.charts.topProducts
                               .slice(0, 5)
                               .map((product, i) => {
                                 const maxQty =
-                                  data.charts.topProducts[0]?.quantity || 1;
+                                  chartsData.charts.topProducts[0]?.quantity || 1;
                                 const percent =
                                   (product.quantity / maxQty) * 100;
                                 return (
@@ -658,7 +690,7 @@ export default function AnalyticsDashboard() {
                           Revenue by Category
                         </h5>
                         <C3CategoryChart
-                          data={data.charts?.revenueByCategory || []}
+                          data={chartsData.charts?.revenueByCategory || []}
                           dataKey="revenue"
                           nameKey="category"
                           color="#3b82f6"
@@ -686,7 +718,7 @@ export default function AnalyticsDashboard() {
                           Orders by Day of Week
                         </h5>
                         <Row>
-                          {(data.charts?.weeklyData || []).map((day, i) => (
+                          {(chartsData.charts?.weeklyData || []).map((day, i) => (
                             <Col key={i} className="text-center mb-3 mb-md-0">
                               <div
                                 className="p-3 rounded-3"
@@ -717,8 +749,10 @@ export default function AnalyticsDashboard() {
                     </Card>
                   </Col>
                 </Row>
+                  </>
+                ) : null}
 
-                {/* Recent Orders Table */}
+                {/* Recent Orders Table — from summary (fast) */}
                 <Row>
                   <Col>
                     <Card
@@ -747,8 +781,8 @@ export default function AnalyticsDashboard() {
                               </tr>
                             </thead>
                             <tbody>
-                              {data.recentOrders?.length > 0 ? (
-                                data.recentOrders.map((order) => (
+                              {summaryData.recentOrders?.length > 0 ? (
+                                summaryData.recentOrders.map((order) => (
                                   <tr key={order._id}>
                                     <td>
                                       <code style={{ fontSize: "0.75rem" }}>

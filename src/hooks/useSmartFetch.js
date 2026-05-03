@@ -122,12 +122,23 @@ const selectProductsData = createSelector(
     error: products.error,
     lastFetched: products.lastFetched,
     isStale: products.isStale,
+    pagination: products.pagination,
   }),
 );
 
-// Hook for products data
-export const useProducts = (dependencies = []) => {
-  return useSmartFetch(fetchProducts, selectProductsData, dependencies);
+// Hook for products data — pass params to enable server-side pagination/filtering
+export const useProducts = (dependencies = [], params = undefined) => {
+  const dispatch = useDispatch();
+  const result = useSmartFetch(
+    params ? () => fetchProducts(params) : fetchProducts,
+    selectProductsData,
+    dependencies,
+  );
+  const fetchPage = useCallback(
+    (pageParams) => dispatch(fetchProducts(pageParams)),
+    [dispatch],
+  );
+  return { ...result, fetchPage };
 };
 
 // Hook specifically for dashboard counts

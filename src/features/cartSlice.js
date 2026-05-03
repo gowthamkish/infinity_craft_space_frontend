@@ -22,10 +22,12 @@ export const fetchUserCart = createAsyncThunk(
   },
 );
 
-// Async thunk to sync cart to backend (last-write-wins via clientUpdatedAt)
+// Async thunk to sync cart to backend with merge-on-conflict strategy.
+// The server resolves any conflict by merging (max quantity per product) and
+// returns the canonical cart, so we apply it directly — no extra fetch needed.
 export const syncCartToBackend = createAsyncThunk(
   "cart/syncToBackend",
-  async (_, { getState, dispatch, rejectWithValue }) => {
+  async (_, { getState, rejectWithValue }) => {
     try {
       const { auth, cart } = getState();
       if (!auth.user?._id) return;
@@ -36,13 +38,9 @@ export const syncCartToBackend = createAsyncThunk(
         clientUpdatedAt: cart.lastSyncedAt || null,
       });
 
-      return { success: true, updatedAt: res.data.updatedAt };
+      // Server always returns the resolved cart (merged or replaced).
+      return { updatedAt: res.data.updatedAt, items: res.data.items || null };
     } catch (error) {
-      // 409 = server cart is newer — fetch server cart and replace local state
-      if (error.response?.status === 409) {
-        dispatch(fetchUserCart());
-        return rejectWithValue("conflict");
-      }
       return rejectWithValue(error.response?.data?.error || "Failed to sync cart");
     }
   },
@@ -205,8 +203,14 @@ const cartSlice = createSlice({
       })
       .addCase(syncCartToBackend.fulfilled, (state, action) => {
         state.syncing = false;
-        if (action.payload?.updatedAt) {
+        if (!action.payload) return;
+        if (action.payload.updatedAt) {
           state.lastSyncedAt = action.payload.updatedAt;
+        }
+        // If the server merged carts (multi-tab conflict), apply the resolved
+        // items so this tab converges to the same state as the server.
+        if (action.payload.items) {
+          state.items = action.payload.items;
         }
       })
       .addCase(syncCartToBackend.rejected, (state) => {

@@ -1,14 +1,21 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../api/axios";
 
-// Fetch all products
+// Fetch products — supports optional pagination params { page, limit, category, search, sort }
+// When page > 1, items are appended (infinite scroll). Page 1 replaces the list.
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
-  async (_, { rejectWithValue }) => {
+  async (params = {}, { rejectWithValue }) => {
     try {
-      const res = await api.get("/api/products");
-      // Handle both old format (array) and new format (object with products array)
-      return res.data.products || res.data;
+      const res = await api.get("/api/products", { params });
+      const data = res.data;
+      return {
+        products: data.products || data,
+        pagination: data.pages != null
+          ? { page: data.page, totalPages: data.pages, total: data.total }
+          : null,
+        append: (params?.page ?? 1) > 1,
+      };
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch products",
@@ -89,6 +96,7 @@ const productsSlice = createSlice({
     error: null,
     lastFetched: null,
     isStale: true,
+    pagination: null, // { page, totalPages, total } when using server-side pagination
   },
   reducers: {
     clearError: (state) => {
@@ -111,7 +119,9 @@ const productsSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
-        state.items = action.payload;
+        const { products, pagination, append } = action.payload;
+        state.items = append ? [...state.items, ...products] : products;
+        state.pagination = pagination ?? state.pagination;
         state.loading = false;
         state.error = null;
         state.lastFetched = Date.now();

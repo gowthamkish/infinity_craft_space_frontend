@@ -313,9 +313,9 @@ const ProductCard = React.memo(
 const ProductListing = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { data: products, loading, error } = useProducts();
+  const { data: products, loading, error, fetchPage, pagination } = useProducts();
 
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [currentPage, setCurrentPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
   const sentinelRef = useRef(null);
 
@@ -370,32 +370,36 @@ const ProductListing = () => {
     };
   }, [isAuthenticated]);
 
-  // Reset visible count whenever filters change
+  // Reset to page 1 whenever filters change
   useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
+    setCurrentPage(1);
   }, [filters]);
 
-  // Infinite scroll sentinel
+  const hasMore = pagination
+    ? currentPage < pagination.totalPages
+    : false;
+
+  // Infinite scroll sentinel — fetches next server page when reached
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel || typeof IntersectionObserver === "undefined") return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !loadingMore) {
+        if (entry.isIntersecting && !loadingMore && hasMore) {
+          const nextPage = currentPage + 1;
           setLoadingMore(true);
-          // Small delay to show the skeleton before adding items
-          setTimeout(() => {
-            setVisibleCount((prev) => prev + PAGE_SIZE);
-            setLoadingMore(false);
-          }, 300);
+          setCurrentPage(nextPage);
+          fetchPage({ page: nextPage, limit: PAGE_SIZE }).finally(() =>
+            setLoadingMore(false),
+          );
         }
       },
       { rootMargin: "300px" },
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [loadingMore]);
+  }, [loadingMore, hasMore, currentPage, fetchPage]);
 
   const filteredProducts = useMemo(() => {
     if (!Array.isArray(products) || !products.length) return [];
@@ -699,7 +703,7 @@ const ProductListing = () => {
               {filteredProducts.length > 0 && (
                 <>
                   <div className="pl-grid">
-                    {filteredProducts.slice(0, visibleCount).map((product) => (
+                    {filteredProducts.map((product) => (
                       <ProductCard
                         key={product._id}
                         product={product}
@@ -718,13 +722,13 @@ const ProductListing = () => {
                       ))}
                   </div>
 
-                  {/* Sentinel — triggers next page */}
-                  {visibleCount < filteredProducts.length && (
+                  {/* Sentinel — triggers next server page */}
+                  {hasMore && (
                     <div ref={sentinelRef} className="pl-sentinel" aria-hidden="true" />
                   )}
 
-                  {visibleCount >= filteredProducts.length && filteredProducts.length > PAGE_SIZE && (
-                    <p className="pl-all-loaded">All {filteredProducts.length} products shown</p>
+                  {!hasMore && filteredProducts.length > PAGE_SIZE && (
+                    <p className="pl-all-loaded">All {pagination?.total ?? filteredProducts.length} products shown</p>
                   )}
                 </>
               )}
