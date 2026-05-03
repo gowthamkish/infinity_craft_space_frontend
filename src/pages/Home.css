@@ -1477,3 +1477,98 @@
   .hp-product-hover-overlay { display: none; }
   .hp-wishlist-btn        { opacity: 1; }
 }
+
+/* ══ FESTIVAL BANNER ═══════════════════════════════════════════════════════ */
+.hp-festival-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border-top: 3px solid #f59e0b;
+  border-bottom: 1px solid #fde68a;
+  padding: 0.7rem 1.5rem;
+  font-size: 0.875rem;
+  color: #78350f;
+  flex-wrap: wrap;
+}
+
+.hp-festival-emoji { font-size: 1.4rem; flex-shrink: 0; }
+.hp-festival-text  { flex: 1; min-width: 200px; line-height: 1.4; }
+
+.hp-festival-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #f59e0b;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.hp-festival-cta:hover { background: #d97706; transform: translateY(-1px); }
+
+/* ══ POPULAR SECTION ═══════════════════════════════════════════════════════ */
+.hp-popular-section { background: var(--hp-bg); }
+
+.hp-popular-badge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  white-space: nowrap;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
+  letter-spacing: 0.03em;
+}
+
+/* ══ SCROLLING TESTIMONIALS ════════════════════════════════════════════════ */
+.hp-testimonials-section { background: var(--hp-bg); overflow: hidden; }
+
+.hp-testimonials-scroll-wrap {
+  overflow: hidden;
+  position: relative;
+  /* Fade edges */
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
+.hp-testimonials-scroll-wrap:hover .hp-testimonials-track {
+  animation-play-state: paused;
+}
+
+@keyframes hp-scroll-left {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.hp-testimonials-track {
+  display: flex;
+  gap: 1.25rem;
+  width: max-content;
+  animation: hp-scroll-left 30s linear infinite;
+}
+
+.hp-testimonials-track .hp-testimonial-card {
+  width: 300px;
+  flex-shrink: 0;
+  animation: none; /* disable old fade-up since cards scroll */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hp-testimonials-track { animation: none; }
+  .hp-testimonials-scroll-wrap { overflow-x: auto; }
+  .hp-testimonials-track { width: auto; }
+  .hp-testimonials-track .hp-testimonial-card { width: 280px; }
+}

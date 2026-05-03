@@ -93,18 +93,20 @@ const cartSlice = createSlice({
   },
   reducers: {
     addToCart: (state, action) => {
-      const { product, quantity } = action.payload;
+      const { product, quantity, customNote } = action.payload;
       const existing = state.items.find(
         (item) => item.product._id === product._id,
       );
       if (existing) {
         existing.quantity += quantity;
         existing.totalPrice = existing.quantity * existing.product.price;
+        if (customNote) existing.customNote = customNote;
       } else {
         state.items.push({
           product,
           quantity,
           totalPrice: product.price * quantity,
+          ...(customNote ? { customNote } : {}),
         });
       }
     },

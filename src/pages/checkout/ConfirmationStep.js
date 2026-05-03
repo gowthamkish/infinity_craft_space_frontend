@@ -33,6 +33,19 @@ function Confetti({ container }) {
   return null;
 }
 
+function estimatedDelivery(backendOrder, orderData) {
+  const shipping = backendOrder?.shippingDetails || orderData?.shippingDetails;
+  const days = shipping?.estimatedDays;
+  if (!days) return null;
+  const parts = String(days).split("–").map(Number);
+  const minDays = (parts[0] || 5) + 2; // +2 for processing
+  const maxDays = (parts[1] || minDays + 3) + 2;
+  const fmt = (d) => d.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
+  const from = new Date(); from.setDate(from.getDate() + minDays);
+  const to = new Date(); to.setDate(to.getDate() + maxDays);
+  return `${fmt(from)} – ${fmt(to)}`;
+}
+
 export const ConfirmationStep = ({
   orderData,
   paymentData,
@@ -45,6 +58,7 @@ export const ConfirmationStep = ({
   const orderId = backendOrder?._id || orderData?.orderId || orderData?.id || orderData?._id;
   const orderTotal = (backendOrder?.totalAmount ?? orderData?.total ?? total ?? 0).toFixed(2);
   const items = backendOrder?.items || orderData?.items || [];
+  const deliveryRange = estimatedDelivery(backendOrder, orderData);
 
   return (
     <Row className="justify-content-center">
@@ -151,6 +165,18 @@ export const ConfirmationStep = ({
                 </Col>
               </Row>
 
+              {/* Delivery estimate */}
+              {deliveryRange && (
+                <div style={{ background: "#f0fdf4", border: "1.5px solid #bbf7d0", borderRadius: 14, padding: "0.9rem 1.2rem", marginTop: "1rem", display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                  <span style={{ fontSize: "1.5rem" }}>🚚</span>
+                  <div>
+                    <p style={{ margin: 0, fontSize: "0.78rem", color: "#166534", fontWeight: 700 }}>Estimated Delivery</p>
+                    <p style={{ margin: 0, fontSize: "1rem", fontWeight: 800, color: "#15803d" }}>{deliveryRange}</p>
+                    <p style={{ margin: 0, fontSize: "0.72rem", color: "#16a34a" }}>You'll get tracking updates via WhatsApp & email</p>
+                  </div>
+                </div>
+              )}
+
               {/* CTA buttons */}
               <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", flexWrap: "wrap", marginTop: "1.5rem" }}>
                 {orderId && (
@@ -174,6 +200,31 @@ export const ConfirmationStep = ({
                   onClick={() => navigate("/products")}
                 >
                   Continue Shopping
+                </button>
+              </div>
+
+              {/* WhatsApp opt-in + share */}
+              <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", flexWrap: "wrap", marginTop: "1rem", paddingTop: "1rem", borderTop: "1px solid #e5e7eb" }}>
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(`I just ordered from InfinityCraftSpace! 🎁 Order ID: ${orderId ?? ""}\nTrack my order: ${window.location.origin}/track/${orderId ?? ""}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "10px 18px", borderRadius: 12, fontWeight: 600, fontSize: "0.875rem", background: "#25d366", color: "#fff", textDecoration: "none", transition: "all 0.15s ease" }}
+                >
+                  <span>💬</span> Share on WhatsApp
+                </a>
+                <button
+                  style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "10px 18px", borderRadius: 12, fontWeight: 600, fontSize: "0.875rem", background: "#f1f5f9", color: "#374151", border: "1.5px solid #e2e8f0", cursor: "pointer" }}
+                  onClick={() => {
+                    if (navigator.share) {
+                      navigator.share({ title: "My order from InfinityCraftSpace", text: `Just ordered a handcrafted gift! 🎁`, url: window.location.origin });
+                    } else {
+                      navigator.clipboard.writeText(`${window.location.origin}/track/${orderId ?? ""}`);
+                      alert("Order link copied!");
+                    }
+                  }}
+                >
+                  🔗 Share Order
                 </button>
               </div>
             </div>

@@ -15,6 +15,31 @@ import {
 } from "react-icons/fi";
 import "./Home.css";
 
+/* ─── Festival data ────────────────────────────────────────────────────── */
+
+const FESTIVALS = [
+  { name: "Mother's Day",     emoji: "💐", query: "Mother",         date: new Date(2026, 4, 10) },
+  { name: "Buddha Purnima",   emoji: "🙏", query: "Buddha Purnima", date: new Date(2026, 4, 23) },
+  { name: "Eid al-Adha",      emoji: "🌙", query: "Eid",            date: new Date(2026, 5, 6) },
+  { name: "Father's Day",     emoji: "👔", query: "Father",         date: new Date(2026, 5, 21) },
+  { name: "Raksha Bandhan",   emoji: "🪢", query: "Rakhi",          date: new Date(2026, 7, 9) },
+  { name: "Independence Day", emoji: "🇮🇳", query: "Independence",   date: new Date(2026, 7, 15) },
+  { name: "Ganesh Chaturthi", emoji: "🐘", query: "Ganesh",         date: new Date(2026, 8, 14) },
+  { name: "Dussehra",         emoji: "🏹", query: "Dussehra",       date: new Date(2026, 9, 2) },
+  { name: "Diwali",           emoji: "🪔", query: "Diwali",         date: new Date(2026, 9, 20) },
+  { name: "Christmas",        emoji: "🎄", query: "Christmas",      date: new Date(2026, 11, 25) },
+];
+
+function getUpcomingFestival() {
+  const now = new Date();
+  const upcoming = FESTIVALS
+    .filter((f) => f.date > now)
+    .sort((a, b) => a.date - b.date)[0];
+  if (!upcoming) return null;
+  const days = Math.ceil((upcoming.date - now) / (1000 * 60 * 60 * 24));
+  return days <= 45 ? { ...upcoming, days } : null;
+}
+
 /* ─── Static data ──────────────────────────────────────────────────────── */
 
 const STATS = [
@@ -243,6 +268,46 @@ function ProductCard({ product, index }) {
   );
 }
 
+function PopularSection({ navigate }) {
+  const [popularProducts, setPopularProducts] = useState([]);
+  useEffect(() => {
+    api.get("/api/products/popular/list")
+      .then((res) => {
+        const products = res.data.products || res.data || [];
+        setPopularProducts(products.slice(0, 4));
+      })
+      .catch(() => {});
+  }, []);
+
+  if (!popularProducts.length) return null;
+
+  return (
+    <section className="hp-section hp-popular-section">
+      <div className="hp-section-header">
+        <div>
+          <p className="hp-section-eyebrow">Flying off the shelves</p>
+          <h2 className="hp-section-title">🔥 Currently Popular</h2>
+        </div>
+        <button className="hp-section-link" onClick={() => navigate("/products")}>
+          View all <FiArrowRight />
+        </button>
+      </div>
+      <div className="hp-products-grid">
+        {popularProducts.map((product, i) => (
+          <div key={product._id} style={{ position: "relative" }}>
+            {product.ratingCount > 0 && (
+              <span className="hp-popular-badge">
+                🔥 {product.ratingCount}+ bought this
+              </span>
+            )}
+            <ProductCard product={product} index={i} />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 /* ─── Main Component ───────────────────────────────────────────────────── */
 
 export default function Home() {
@@ -430,6 +495,30 @@ export default function Home() {
             </div>
           </section>
 
+          {/* ══ FESTIVAL BANNER ══════════════════════════════════════════ */}
+          {(() => {
+            const festival = getUpcomingFestival();
+            if (!festival) return null;
+            return (
+              <div className="hp-festival-banner" role="banner">
+                <span className="hp-festival-emoji">{festival.emoji}</span>
+                <span className="hp-festival-text">
+                  <strong>
+                    {festival.days === 1 ? "Tomorrow is" : festival.days <= 7 ? `${festival.days} days to` : "Coming up —"}{" "}
+                    {festival.name}
+                  </strong>
+                  {" · "}Find the perfect handcrafted gift
+                </span>
+                <button
+                  className="hp-festival-cta"
+                  onClick={() => navigate(`/products?q=${encodeURIComponent(festival.query)}`)}
+                >
+                  Shop Gifts <FiArrowRight size={13} />
+                </button>
+              </div>
+            );
+          })()}
+
           {/* ══ TRUST STRIP ═══════════════════════════════════════════════ */}
           <section className="hp-trust-strip" aria-label="Why shop with us">
             {TRUST_ITEMS.map(({ Icon, title, desc, color }) => (
@@ -515,6 +604,9 @@ export default function Home() {
               </div>
             </section>
           )}
+
+          {/* ══ CURRENTLY POPULAR ════════════════════════════════════════ */}
+          <PopularSection navigate={navigate} />
 
           {/* ══ BESTSELLERS ═══════════════════════════════════════════════ */}
           {!loading && featured.length > 0 && (
@@ -657,31 +749,29 @@ export default function Home() {
               <p className="hp-section-eyebrow">Real stories, real love</p>
               <h2 className="hp-section-title">What Our Customers Say</h2>
             </div>
-            <div className="hp-testimonials-grid">
-              {TESTIMONIALS.map((t, i) => (
-                <div
-                  key={t.name}
-                  className="hp-testimonial-card"
-                  style={{ animationDelay: `${i * 0.1}s` }}
-                >
-                  <div className="hp-testimonial-top">
-                    <StarRow count={t.rating} />
-                    {t.verified && (
-                      <span className="hp-verified-badge">
-                        <FiCheck /> Verified Purchase
-                      </span>
-                    )}
-                  </div>
-                  <p className="hp-testimonial-text">"{t.text}"</p>
-                  <div className="hp-testimonial-author">
-                    <span className="hp-testimonial-avatar">{t.name[0]}</span>
-                    <div>
-                      <p className="hp-testimonial-name">{t.name}</p>
-                      <p className="hp-testimonial-location">📍 {t.location}</p>
+            <div className="hp-testimonials-scroll-wrap" aria-label="Customer reviews">
+              <div className="hp-testimonials-track">
+                {[...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
+                  <div key={`${t.name}-${i}`} className="hp-testimonial-card">
+                    <div className="hp-testimonial-top">
+                      <StarRow count={t.rating} />
+                      {t.verified && (
+                        <span className="hp-verified-badge">
+                          <FiCheck /> Verified Purchase
+                        </span>
+                      )}
+                    </div>
+                    <p className="hp-testimonial-text">"{t.text}"</p>
+                    <div className="hp-testimonial-author">
+                      <span className="hp-testimonial-avatar">{t.name[0]}</span>
+                      <div>
+                        <p className="hp-testimonial-name">{t.name}</p>
+                        <p className="hp-testimonial-location">📍 {t.location}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </section>
 

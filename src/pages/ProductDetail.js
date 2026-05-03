@@ -64,6 +64,7 @@ const ProductDetail = () => {
   const [ratingStats, setRatingStats] = useState(null);
   const [notifyEmail, setNotifyEmail] = useState("");
   const [notifyStatus, setNotifyStatus] = useState(null); // null | "loading" | "success" | "error"
+  const [customNote, setCustomNote] = useState("");
 
   // Fetch product
   useEffect(() => {
@@ -120,7 +121,7 @@ const ProductDetail = () => {
     if (!product) return;
     setAddingToCart(true);
     try {
-      dispatch(addToCart({ product, quantity: 1 }));
+      dispatch(addToCart({ product, quantity: 1, customNote: customNote.trim() || undefined }));
     } finally {
       setAddingToCart(false);
     }
@@ -434,6 +435,28 @@ const ProductDetail = () => {
                     <FiShare2 />
                   </button>
                 </div>
+
+                {/* Inline customization panel */}
+                {product.isCustomizable && (
+                  <div className="pd-custom-panel">
+                    <div className="pd-custom-panel-header">
+                      <span className="pd-custom-panel-icon">✦</span>
+                      <div>
+                        <p className="pd-custom-panel-title">Personalize This Item</p>
+                        <p className="pd-custom-panel-sub">Add a name, date, or message — we'll craft it just for you.</p>
+                      </div>
+                    </div>
+                    <textarea
+                      className="pd-custom-input"
+                      rows={3}
+                      maxLength={300}
+                      placeholder="e.g. &quot;For Priya, with love ❤️&quot; · Anniversary date · Initials · Any special instructions…"
+                      value={customNote}
+                      onChange={(e) => setCustomNote(e.target.value)}
+                    />
+                    <div className="pd-custom-char-count">{customNote.length}/300</div>
+                  </div>
+                )}
 
                 {/* Delivery Estimator */}
                 <div className="pd-delivery-section">

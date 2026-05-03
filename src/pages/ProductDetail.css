@@ -687,3 +687,73 @@
   font-size: 0.8rem;
   margin: 4px 0 0;
 }
+
+/* ── Inline customization panel ───────────────────────────────────── */
+.pd-custom-panel {
+  background: linear-gradient(135deg, #fdf4ff 0%, #ede9fe 100%);
+  border: 1.5px solid #c4b5fd;
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.pd-custom-panel-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin-bottom: 0.85rem;
+}
+
+.pd-custom-panel-icon {
+  font-size: 1.2rem;
+  color: #7c3aed;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+.pd-custom-panel-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #4c1d95;
+  margin: 0 0 0.2rem;
+}
+
+.pd-custom-panel-sub {
+  font-size: 0.78rem;
+  color: #6d28d9;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.pd-custom-input {
+  width: 100%;
+  border: 1.5px solid #c4b5fd;
+  border-radius: 10px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.875rem;
+  color: #1e293b;
+  background: #fff;
+  resize: vertical;
+  min-height: 72px;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.pd-custom-input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.pd-custom-input::placeholder {
+  color: #a78bfa;
+  font-size: 0.82rem;
+}
+
+.pd-custom-char-count {
+  text-align: right;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin-top: 0.3rem;
+}
