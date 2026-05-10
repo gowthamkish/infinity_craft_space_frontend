@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 import { 
   FiX, 
   FiChevronLeft, 
@@ -388,9 +388,8 @@ const ImageCarouselModal = ({
                 {activeIndex + 1} of {images.length}
               </small>
             </Modal.Title>
-            <Button 
-              variant="outline-secondary"
-              size="sm"
+            <button
+              className="ics-btn ics-btn--outline ics-btn--sm"
               onClick={onHide}
               style={{
                 borderRadius: '50%',
@@ -399,12 +398,10 @@ const ImageCarouselModal = ({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                border: 'none',
-                background: 'rgba(0,0,0,0.05)'
               }}
             >
               <FiX size={16} />
-            </Button>
+            </button>
           </Modal.Header>
         )}
 
@@ -413,85 +410,71 @@ const ImageCarouselModal = ({
             {/* Top Toolbar */}
             <div className="position-absolute top-0 start-50 translate-middle-x image-toolbar d-flex align-items-center gap-2" style={{ zIndex: 10 }}>
               {isFullscreen && (
-                <Button
-                  variant="outline-light"
-                  size="sm"
+                <button
+                  className="ics-btn ics-btn--outline ics-btn--sm d-flex align-items-center justify-content-center"
                   onClick={onHide}
-                  className="d-flex align-items-center justify-content-center"
-                  style={{ width: '32px', height: '32px', borderRadius: '50%' }}
+                  style={{ width: '32px', height: '32px' }}
                   title="Close (ESC)"
                 >
                   <FiX size={16} />
-                </Button>
+                </button>
               )}
-              
-              <Button
-                variant="outline-light"
-                size="sm"
+
+              <button
+                className="ics-btn ics-btn--outline ics-btn--sm d-flex align-items-center justify-content-center"
                 onClick={handleZoomOut}
                 disabled={zoomLevel <= 1}
-                className="d-flex align-items-center justify-content-center"
-                style={{ width: '32px', height: '32px', borderRadius: '50%' }}
+                style={{ width: '32px', height: '32px' }}
                 title="Zoom Out (-)"
               >
                 <FiZoomOut size={14} />
-              </Button>
-              
-              <Button
-                variant="outline-light"
-                size="sm"
+              </button>
+
+              <button
+                className="ics-btn ics-btn--outline ics-btn--sm d-flex align-items-center justify-content-center"
                 onClick={handleZoomIn}
                 disabled={zoomLevel >= 5}
-                className="d-flex align-items-center justify-content-center"
-                style={{ width: '32px', height: '32px', borderRadius: '50%' }}
+                style={{ width: '32px', height: '32px' }}
                 title="Zoom In (+)"
               >
                 <FiZoomIn size={14} />
-              </Button>
-              
-              <Button
-                variant="outline-light"
-                size="sm"
+              </button>
+
+              <button
+                className="ics-btn ics-btn--outline ics-btn--sm d-flex align-items-center justify-content-center"
                 onClick={handleRotate}
-                className="d-flex align-items-center justify-content-center"
-                style={{ width: '32px', height: '32px', borderRadius: '50%' }}
+                style={{ width: '32px', height: '32px' }}
                 title="Rotate (R)"
               >
                 <FiRotateCw size={14} />
-              </Button>
-              
-              <Button
-                variant="outline-light"
-                size="sm"
+              </button>
+
+              <button
+                className="ics-btn ics-btn--outline ics-btn--sm d-flex align-items-center justify-content-center"
                 onClick={toggleFullscreen}
-                className="d-flex align-items-center justify-content-center"
-                style={{ width: '32px', height: '32px', borderRadius: '50%' }}
+                style={{ width: '32px', height: '32px' }}
                 title="Fullscreen (F)"
               >
                 <FiMaximize2 size={14} />
-              </Button>
-              
-              <Button
-                variant="outline-light"
-                size="sm"
+              </button>
+
+              <button
+                className="ics-btn ics-btn--outline ics-btn--sm d-flex align-items-center justify-content-center"
                 onClick={handleDownload}
-                className="d-flex align-items-center justify-content-center"
-                style={{ width: '32px', height: '32px', borderRadius: '50%' }}
+                style={{ width: '32px', height: '32px' }}
                 title="Download Image"
               >
                 <FiDownload size={14} />
-              </Button>
-              
-              <Button
-                variant="outline-light"
-                size="sm"
+              </button>
+
+              <button
+                className="ics-btn ics-btn--outline ics-btn--sm d-flex align-items-center justify-content-center"
                 onClick={handleShare}
-                className="d-flex align-items-center justify-content-center"
-                style={{ width: '32px', height: '32px', borderRadius: '50%' }}
+                style={{ width: '32px', height: '32px' }}
                 title="Share Image"
               >
                 <FiShare2 size={14} />
-              </Button>
+              </button>
             </div>
 
             {/* Main Image Display */}
@@ -532,18 +515,11 @@ const ImageCarouselModal = ({
               {/* Navigation Arrows */}
               {images.length > 1 && (
                 <>
-                  <Button
-                    variant="dark"
-                    className="position-absolute start-0 ms-3"
+                  <button
+                    className="ics-btn ics-btn--primary position-absolute start-0 ms-3 d-flex align-items-center justify-content-center"
                     style={{
-                      borderRadius: '50%',
                       width: '48px',
                       height: '48px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      background: 'rgba(0, 0, 0, 0.7)',
-                      border: 'none',
                       backdropFilter: 'blur(10px)',
                       opacity: 0.8,
                       transition: 'all 0.2s ease'
@@ -554,20 +530,13 @@ const ImageCarouselModal = ({
                     title="Previous Image (←)"
                   >
                     <FiChevronLeft size={24} color="white" />
-                  </Button>
+                  </button>
 
-                  <Button
-                    variant="dark"
-                    className="position-absolute end-0 me-3"
+                  <button
+                    className="ics-btn ics-btn--primary position-absolute end-0 me-3 d-flex align-items-center justify-content-center"
                     style={{
-                      borderRadius: '50%',
                       width: '48px',
                       height: '48px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      background: 'rgba(0, 0, 0, 0.7)',
-                      border: 'none',
                       backdropFilter: 'blur(10px)',
                       opacity: 0.8,
                       transition: 'all 0.2s ease'
@@ -578,7 +547,7 @@ const ImageCarouselModal = ({
                     title="Next Image (→)"
                   >
                     <FiChevronRight size={24} color="white" />
-                  </Button>
+                  </button>
                 </>
               )}
 
@@ -633,14 +602,13 @@ const ImageCarouselModal = ({
             <div className={`image-info-panel ${showImageInfo ? 'show' : ''}`}>
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <h6 className="mb-0 fw-bold">Image Details</h6>
-                <Button
-                  variant="outline-secondary"
-                  size="sm"
+                <button
+                  className="ics-btn ics-btn--outline ics-btn--sm d-flex align-items-center justify-content-center"
                   onClick={() => setShowImageInfo(false)}
-                  style={{ width: '24px', height: '24px', borderRadius: '50%', padding: 0 }}
+                  style={{ width: '24px', height: '24px', padding: 0 }}
                 >
                   <FiX size={12} />
-                </Button>
+                </button>
               </div>
               
               <div className="mb-3">
@@ -686,15 +654,13 @@ const ImageCarouselModal = ({
               <div className="position-absolute bottom-0 start-0 w-100 p-3 text-center" style={{ background: 'rgba(0, 0, 0, 0.5)', color: 'white' }}>
                 <small>
                   Double-click to zoom • Use keyboard shortcuts for quick navigation • 
-                  <Button 
-                    variant="link" 
-                    size="sm" 
-                    className="p-0 ms-1 text-white" 
-                    style={{ textDecoration: 'underline', fontSize: 'inherit' }}
+                  <button
+                    className="ics-btn ics-btn--sm p-0 ms-1 text-white"
+                    style={{ textDecoration: 'underline', fontSize: 'inherit', background: 'none', border: 'none' }}
                     onClick={() => setShowImageInfo(true)}
                   >
                     View shortcuts (I)
-                  </Button>
+                  </button>
                 </small>
               </div>
             )}

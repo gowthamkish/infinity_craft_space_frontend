@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Form, Button, Modal } from "react-bootstrap";
+import { Form, Modal } from "react-bootstrap";
 import { OrbitLoader, DotsLoader } from "../Loader";
 import { FiMessageSquare, FiAlertCircle } from "react-icons/fi";
 import {
@@ -102,19 +102,12 @@ const ReviewList = ({ productId, productName }) => {
         {isAuthenticated &&
           canReviewInfo?.reason !== "already_reviewed" &&
           !showAddReview && (
-            <Button
-              variant="primary"
+            <button
+              className="ics-btn ics-btn--primary ics-btn--sm"
               onClick={() => setShowAddReview(true)}
-              style={{
-                borderRadius: "12px",
-                fontWeight: "600",
-                padding: "0.5rem 1.25rem",
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                border: "none",
-              }}
             >
               Write a Review
-            </Button>
+            </button>
           )}
       </div>
 
@@ -152,14 +145,12 @@ const ReviewList = ({ productId, productName }) => {
             productName={productName}
             onReviewSubmitted={handleReviewSubmitted}
           />
-          <Button
-            variant="outline-secondary"
-            className="mt-3"
+          <button
+            className="ics-btn ics-btn--outline ics-btn--sm mt-3"
             onClick={() => setShowAddReview(false)}
-            style={{ borderRadius: "8px" }}
           >
             Cancel
-          </Button>
+          </button>
         </div>
       )}
 
@@ -241,21 +232,12 @@ const ReviewList = ({ productId, productName }) => {
             {isAuthenticated &&
               canReviewInfo?.reason !== "already_reviewed" &&
               !showAddReview && (
-                <Button
-                  variant="primary"
-                  className="mt-3"
+                <button
+                  className="ics-btn ics-btn--primary mt-3"
                   onClick={() => setShowAddReview(true)}
-                  style={{
-                    borderRadius: "12px",
-                    fontWeight: "600",
-                    padding: "0.5rem 1.5rem",
-                    background:
-                      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                    border: "none",
-                  }}
                 >
                   Write the First Review
-                </Button>
+                </button>
               )}
             {!isAuthenticated && (
               <div className="mt-3 text-muted">

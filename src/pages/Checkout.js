@@ -7,7 +7,6 @@ import {
   removeItemCompletely,
 } from "../features/cartSlice";
 import Header from "../components/Header";
-import Container from "react-bootstrap/Container";
 import api from "../api/axios";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 import {
@@ -57,18 +56,6 @@ export default function Checkout() {
     isDefault: false,
   });
 
-  // Stable input style object to prevent re-renders on mobile
-  const inputStyle = {
-    borderRadius: "12px",
-    border: "2px solid var(--border-color)",
-    padding: "12px 16px",
-    fontSize: "1rem",
-  };
-
-  const labelStyle = {
-    fontWeight: "600",
-    color: "var(--text-primary)",
-  };
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [savedAddresses, setSavedAddresses] = useState([]);
@@ -444,7 +431,7 @@ export default function Checkout() {
 
   if (cartItems.length === 0 && currentStep === 1) {
     return (
-      <div className="App">
+      <div className="App co-page">
         <Header />
         <EmptyCart navigate={navigate} />
       </div>
@@ -468,13 +455,10 @@ export default function Checkout() {
         noindex={true}
         canonical={`${SEO_CONFIG.SITE_URL}/checkout`}
       />
-      <div className="App">
+      <div className="App co-page">
         <Header />
-        <div
-          className="main-container checkout-container"
-          style={{ paddingTop: "110px" }}
-        >
-          <Container className="px-3 px-md-4">
+        <div className="co-wrap">
+          <div className="co-inner">
             <CheckoutProgressBar steps={steps} currentStep={currentStep} />
 
             {currentStep === 1 && (
@@ -498,8 +482,6 @@ export default function Checkout() {
                 subtotal={subtotal}
                 total={total}
                 shippingAddress={shippingAddress}
-                labelStyle={labelStyle}
-                inputStyle={inputStyle}
                 loadingAddresses={loadingAddresses}
                 savedAddresses={savedAddresses}
                 selectedAddressId={selectedAddressId}
@@ -542,7 +524,7 @@ export default function Checkout() {
                 backendOrder={backendOrder}
               />
             )}
-          </Container>
+          </div>
         </div>
       </div>
     </>

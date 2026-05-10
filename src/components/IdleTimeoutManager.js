@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Modal, Button } from "react-bootstrap";
+import { Modal } from "react-bootstrap";
 import { FiClock, FiLogOut, FiRefreshCw } from "react-icons/fi";
 import { autoLogout } from "../features/authSlice";
 import useIdleTimeout from "../hooks/useIdleTimeout";
@@ -362,60 +362,23 @@ const IdleTimeoutManager = () => {
             className="border-0 d-flex justify-content-center gap-3"
             style={{ padding: "25px 35px 35px" }}
           >
-            <Button
-              variant="outline-secondary"
+            <button
               onClick={handleLogoutNow}
-              size="lg"
-              className="px-4 py-3"
-              style={{
-                borderRadius: "15px",
-                border: "2px solid #dee2e6",
-                color: "#6c757d",
-                fontWeight: "600",
-                minWidth: "140px",
-                transition: "all 0.3s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.background = "#6c757d";
-                e.target.style.color = "white";
-                e.target.style.transform = "translateY(-2px)";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.background = "transparent";
-                e.target.style.color = "#6c757d";
-                e.target.style.transform = "translateY(0)";
-              }}
+              className="ics-btn ics-btn--secondary"
+              style={{ minWidth: "140px" }}
             >
               <FiLogOut className="me-2" />
               Logout Now
-            </Button>
+            </button>
 
-            <Button
-              variant="primary"
+            <button
               onClick={handleStayLoggedIn}
-              size="lg"
-              className="px-4 py-3"
-              style={{
-                borderRadius: "15px",
-                background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
-                border: "none",
-                fontWeight: "600",
-                minWidth: "160px",
-                boxShadow: "0 8px 25px rgba(37, 99, 235, 0.3)",
-                transition: "all 0.3s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.transform = "translateY(-3px)";
-                e.target.style.boxShadow = "0 12px 35px rgba(37, 99, 235, 0.4)";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = "translateY(0)";
-                e.target.style.boxShadow = "0 8px 25px rgba(37, 99, 235, 0.3)";
-              }}
+              className="ics-btn ics-btn--primary"
+              style={{ minWidth: "160px" }}
             >
               <FiRefreshCw className="me-2" />
               Stay Logged In
-            </Button>
+            </button>
           </Modal.Footer>
         </div>
       </Modal>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Container, Form, Button, Alert } from "react-bootstrap";
+import { Container, Form, Alert } from "react-bootstrap";
 import { DotsLoader } from "./Loader";
 import { FiThumbsUp, FiMessageSquare, FiCheckCircle } from "react-icons/fi";
 import { qnaAPI } from "../api/features";
@@ -148,17 +148,10 @@ const ProductQnA = ({ productId, isAuthenticated, userName }) => {
                   }}
                 />
               </Form.Group>
-              <Button
-                variant="primary"
+              <button
                 type="submit"
+                className="ics-btn ics-btn--primary"
                 disabled={asking || question.length < 10}
-                style={{
-                  borderRadius: "var(--radius-md)",
-                  backgroundColor: "var(--color-primary)",
-                  border: "none",
-                  fontWeight: 600,
-                  padding: "var(--spacing-sm) var(--spacing-lg)",
-                }}
               >
                 {asking ? (
                   <>
@@ -171,7 +164,7 @@ const ProductQnA = ({ productId, isAuthenticated, userName }) => {
                     Post Question
                   </>
                 )}
-              </Button>
+              </button>
             </Form>
           </div>
         )}
@@ -241,23 +234,23 @@ const ProductQnA = ({ productId, isAuthenticated, userName }) => {
               gap: "var(--spacing-md)",
             }}
           >
-            <Button
-              variant="outline-primary"
+            <button
+              className="ics-btn ics-btn--outline ics-btn--sm"
               disabled={page === 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
             >
               Previous
-            </Button>
+            </button>
             <span style={{ padding: "var(--spacing-md)", fontWeight: 600 }}>
               Page {page} of {totalPages}
             </span>
-            <Button
-              variant="outline-primary"
+            <button
+              className="ics-btn ics-btn--outline ics-btn--sm"
               disabled={page === totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             >
               Next
-            </Button>
+            </button>
           </div>
         )}
       </Container>

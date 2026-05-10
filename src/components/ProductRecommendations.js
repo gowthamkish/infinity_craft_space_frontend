@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Card, Button, Spinner } from "react-bootstrap";
+import { Container, Row, Col, Card, Spinner } from "react-bootstrap";
 import { FiChevronRight } from "react-icons/fi";
 import { recommendationsAPI } from "../api/features";
 import { SkeletonProductGrid, SkeletonProductCard } from "./SkeletonLoaders";
@@ -219,31 +219,12 @@ const ProductRecommendationCard = ({ product }) => {
           ₹{product.price.toLocaleString()}
         </p>
 
-        <Button
+        <button
           onClick={handleViewProduct}
-          className="w-100"
-          style={{
-            backgroundColor: "var(--color-primary)",
-            border: "none",
-            color: "white",
-            padding: "var(--spacing-sm)",
-            borderRadius: "var(--radius-md)",
-            fontSize: "var(--font-size-sm)",
-            fontWeight: 600,
-            cursor: "pointer",
-            transition: "all var(--transition-fast)",
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = "var(--primary-700)";
-            e.target.style.transform = "translateY(-2px)";
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = "var(--color-primary)";
-            e.target.style.transform = "translateY(0)";
-          }}
+          className="ics-btn ics-btn--primary ics-btn--full"
         >
           View Product
-        </Button>
+        </button>
       </Card.Body>
     </Card>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Alert } from "react-bootstrap";
+import { Modal, Alert } from "react-bootstrap";
 import { FiSmartphone, FiDownload } from "react-icons/fi";
 
 const PWAInstallPrompt = () => {
@@ -135,9 +135,9 @@ const PWAInstallPrompt = () => {
         </div>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={() => setShowModal(false)}>
+        <button className="ics-btn ics-btn--secondary" onClick={() => setShowModal(false)}>
           Maybe Later
-        </Button>
+        </button>
       </Modal.Footer>
     </Modal>
   );
@@ -185,15 +185,13 @@ const PWAInstallPrompt = () => {
             </div>
           </div>
           <div className="d-flex align-items-center gap-2">
-            <Button
-              size="sm"
-              variant="light"
+            <button
+              className="ics-btn ics-btn--white ics-btn--sm"
               onClick={handleInstallClick}
-              style={{ fontWeight: "600" }}
             >
               <FiDownload className="me-1" />
               Install
-            </Button>
+            </button>
           </div>
         </div>
       </Alert>

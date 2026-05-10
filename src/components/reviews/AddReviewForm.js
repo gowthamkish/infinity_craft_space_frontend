@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Form, Button, Alert } from "react-bootstrap";
+import { Form, Alert } from "react-bootstrap";
 import { DotsLoader } from "../Loader";
 import { FiCamera, FiX, FiCheck } from "react-icons/fi";
 import {
@@ -312,19 +312,10 @@ const AddReviewForm = ({ productId, productName, onReviewSubmitted }) => {
         </div>
 
         {/* Submit Button */}
-        <Button
+        <button
           type="submit"
-          variant="primary"
-          size="lg"
+          className="ics-btn ics-btn--primary ics-btn--full ics-btn--lg"
           disabled={createLoading}
-          style={{
-            width: "100%",
-            borderRadius: "12px",
-            fontWeight: "600",
-            padding: "0.875rem",
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            border: "none",
-          }}
         >
           {createLoading ? (
             <>
@@ -334,7 +325,7 @@ const AddReviewForm = ({ productId, productName, onReviewSubmitted }) => {
           ) : (
             "Submit Review"
           )}
-        </Button>
+        </button>
       </Form>
     </div>
   );

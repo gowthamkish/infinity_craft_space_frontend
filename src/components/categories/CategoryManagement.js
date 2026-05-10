@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   Container,
   Breadcrumb,
-  Button,
   Card,
   Row,
   Col,
@@ -318,22 +317,13 @@ const CategoryManagement = () => {
                 Manage product categories and subcategories
               </p>
             </div>
-            <Button
-              variant="primary"
-              size="lg"
+            <button
               onClick={handleAddCategory}
-              className="shadow-sm"
-              style={{
-                borderRadius: "12px",
-                fontWeight: "600",
-                padding: "12px 24px",
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                border: "none",
-              }}
+              className="adm-btn adm-btn--primary adm-btn-lg shadow-sm"
             >
               <FiPlus className="me-2" />
               Add Category
-            </Button>
+            </button>
           </div>
         </div>
 
@@ -378,10 +368,10 @@ const CategoryManagement = () => {
                 <p className="text-muted">
                   Start by adding your first category
                 </p>
-                <Button variant="primary" onClick={handleAddCategory}>
+                <button className="adm-btn adm-btn--primary" onClick={handleAddCategory}>
                   <FiPlus className="me-2" />
                   Add Category
-                </Button>
+                </button>
               </div>
             ) : (
               <div className="table-responsive">
@@ -522,18 +512,12 @@ const CategoryManagement = () => {
                                     {subcategory.name}
                                   </Badge>
                                 ))}
-                              <Button
-                                variant="outline-primary"
-                                size="sm"
+                              <button
+                                className="adm-btn adm-btn--secondary adm-btn-sm"
                                 onClick={() => handleAddSubcategory(category)}
-                                style={{
-                                  padding: "0.2rem 0.5rem",
-                                  fontSize: "0.7rem",
-                                  borderRadius: "6px",
-                                }}
                               >
                                 <FiPlus size={12} />
-                              </Button>
+                              </button>
                             </div>
                           </td>
                           <td
@@ -553,43 +537,33 @@ const CategoryManagement = () => {
                             }}
                           >
                             <div className="d-flex justify-content-center gap-2">
-                              <Button
-                                variant="outline-primary"
-                                size="sm"
+                              <button
+                                className="adm-btn adm-btn--secondary adm-btn-sm"
                                 onClick={() => handleEditCategory(category)}
-                                style={{ borderRadius: "6px" }}
                               >
                                 <FiEdit2 size={14} />
-                              </Button>
-                              <Button
-                                variant={
-                                  category.isActive
-                                    ? "outline-warning"
-                                    : "outline-success"
-                                }
-                                size="sm"
+                              </button>
+                              <button
+                                className="adm-btn adm-btn--secondary adm-btn-sm"
                                 onClick={() =>
                                   toggleCategoryStatus(
                                     category._id,
                                     category.isActive,
                                   )
                                 }
-                                style={{ borderRadius: "6px" }}
                               >
                                 {category.isActive ? (
                                   <FiEyeOff size={14} />
                                 ) : (
                                   <FiEye size={14} />
                                 )}
-                              </Button>
-                              <Button
-                                variant="outline-danger"
-                                size="sm"
+                              </button>
+                              <button
+                                className="adm-btn adm-btn--danger adm-btn-sm"
                                 onClick={() => handleDeleteCategory(category)}
-                                style={{ borderRadius: "6px" }}
                               >
                                 <FiTrash2 size={14} />
-                              </Button>
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -662,32 +636,28 @@ const CategoryManagement = () => {
                                 }}
                               >
                                 <div className="d-flex justify-content-center gap-2">
-                                  <Button
-                                    variant="outline-primary"
-                                    size="sm"
+                                  <button
+                                    className="adm-btn adm-btn--secondary adm-btn-sm"
                                     onClick={() =>
                                       handleEditSubcategory(
                                         category,
                                         subcategory,
                                       )
                                     }
-                                    style={{ borderRadius: "6px" }}
                                   >
                                     <FiEdit2 size={12} />
-                                  </Button>
-                                  <Button
-                                    variant="outline-danger"
-                                    size="sm"
+                                  </button>
+                                  <button
+                                    className="adm-btn adm-btn--danger adm-btn-sm"
                                     onClick={() =>
                                       handleDeleteSubcategory(
                                         category,
                                         subcategory,
                                       )
                                     }
-                                    style={{ borderRadius: "6px" }}
                                   >
                                     <FiTrash2 size={12} />
-                                  </Button>
+                                  </button>
                                 </div>
                               </td>
                             </tr>
@@ -758,12 +728,12 @@ const CategoryManagement = () => {
               </Row>
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseCategoryModal}>
+              <button className="adm-btn adm-btn--secondary" onClick={handleCloseCategoryModal}>
                 Cancel
-              </Button>
-              <Button
+              </button>
+              <button
                 type="submit"
-                variant="primary"
+                className="adm-btn adm-btn--primary"
                 disabled={creating || updating || !categoryForm.name.trim()}
               >
                 {creating || updating ? (
@@ -774,7 +744,7 @@ const CategoryManagement = () => {
                 ) : (
                   <>{editingCategory ? "Update Category" : "Create Category"}</>
                 )}
-              </Button>
+              </button>
             </Modal.Footer>
           </Form>
         </Modal>
@@ -845,12 +815,12 @@ const CategoryManagement = () => {
               </Row>
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseSubcategoryModal}>
+              <button className="adm-btn adm-btn--secondary" onClick={handleCloseSubcategoryModal}>
                 Cancel
-              </Button>
-              <Button
+              </button>
+              <button
                 type="submit"
-                variant="primary"
+                className="adm-btn adm-btn--primary"
                 disabled={creating || updating || !subcategoryForm.name.trim()}
               >
                 {creating || updating ? (
@@ -865,7 +835,7 @@ const CategoryManagement = () => {
                       : "Add Subcategory"}
                   </>
                 )}
-              </Button>
+              </button>
             </Modal.Footer>
           </Form>
         </Modal>
@@ -898,13 +868,13 @@ const CategoryManagement = () => {
             )}
           </Modal.Body>
           <Modal.Footer>
-            <Button
-              variant="secondary"
+            <button
+              className="adm-btn adm-btn--secondary"
               onClick={() => setShowDeleteModal(false)}
             >
               Cancel
-            </Button>
-            <Button variant="danger" onClick={handleDelete} disabled={deleting}>
+            </button>
+            <button className="adm-btn adm-btn--danger" onClick={handleDelete} disabled={deleting}>
               {deleting ? (
                 <>
                   <DotsLoader size="sm" />
@@ -916,7 +886,7 @@ const CategoryManagement = () => {
                   Delete {deleteItem.type}
                 </>
               )}
-            </Button>
+            </button>
           </Modal.Footer>
         </Modal>
     </AdminLayout>

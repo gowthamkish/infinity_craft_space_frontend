@@ -154,13 +154,14 @@
 
 .com-btn {
   flex: 1;
-  padding: 0.75rem 1rem;
-  border-radius: 10px;
+  height: var(--btn-h-md, 44px);
+  padding: 0 var(--btn-px-md, 20px);
+  border-radius: var(--btn-radius, 12px);
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: var(--btn-fw, 600);
   border: none;
   cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s;
+  transition: var(--btn-transition, all 150ms cubic-bezier(0.4,0,0.2,1));
 }
 
 .com-btn:active {
@@ -178,18 +179,19 @@
 }
 
 .com-btn--confirm {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--btn-brand-grad, linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%));
   color: #fff;
-  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 14px var(--btn-brand-glow, rgba(124,58,237,0.35));
 }
 
 .com-btn--confirm:hover {
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  background: var(--btn-brand-grad-h, linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%));
+  box-shadow: 0 6px 20px var(--btn-brand-glow, rgba(124,58,237,0.45));
   transform: translateY(-1px);
 }
 
 .com-btn--confirm:focus-visible {
-  outline: 3px solid #667eea;
+  outline: 2px solid var(--btn-brand, #7c3aed);
   outline-offset: 3px;
 }
 

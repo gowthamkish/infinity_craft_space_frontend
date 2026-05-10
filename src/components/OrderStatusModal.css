@@ -179,21 +179,23 @@
 }
 
 .osm-btn {
-  padding: 0.6rem 1.25rem;
-  border-radius: 10px;
+  height: var(--btn-h-md, 44px);
+  padding: 0 var(--btn-px-md, 20px);
+  border-radius: var(--btn-radius, 12px);
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: var(--btn-fw, 600);
   cursor: pointer;
   border: none;
-  transition: opacity 0.15s, transform 0.15s;
+  transition: var(--btn-transition, all 150ms cubic-bezier(0.4,0,0.2,1));
 }
 
 .osm-btn:hover { opacity: 0.88; transform: translateY(-1px); }
 .osm-btn:active { transform: translateY(0); }
 
 .osm-btn--primary {
+  background: var(--btn-brand-grad, linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%));
   color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 4px 12px var(--btn-brand-glow, rgba(124,58,237,0.28));
 }
 
 .osm-btn--ghost {

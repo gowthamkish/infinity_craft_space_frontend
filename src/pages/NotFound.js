@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Container, Button, Row, Col } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import { Helmet } from "react-helmet-async";
 import "./NotFound.css";
 
@@ -130,26 +130,18 @@ const NotFound = () => {
 
                 {/* Action Buttons */}
                 <div className="not-found-actions">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    as={Link}
-                    to="/"
-                    className="action-btn primary-action"
-                  >
+                  <Link to="/" className="action-btn primary-action" style={{ textDecoration: "none" }}>
                     <HomeIcon />
                     <span>Go to Homepage</span>
-                  </Button>
+                  </Link>
 
-                  <Button
-                    variant="outline-secondary"
-                    size="lg"
+                  <button
                     onClick={handleGoBack}
-                    className="action-btn"
+                    className="action-btn btn-outline-secondary"
                   >
                     <ArrowLeftIcon />
                     <span>Go Back</span>
-                  </Button>
+                  </button>
                 </div>
 
                 {/* Helpful Links */}

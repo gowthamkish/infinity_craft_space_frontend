@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, Button } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 import {
   FiShoppingBag,
   FiUser,
@@ -154,23 +154,18 @@ const OrdersTable = ({
                     textAlign: "center",
                   }}
                 >
-                  <Button
-                    variant="outline-primary"
-                    size="sm"
+                  <button
+                    className="adm-btn adm-btn--secondary adm-btn-sm me-2"
                     onClick={() => handleViewDetails(order)}
-                    className="me-2"
-                    style={{ borderRadius: "8px", fontWeight: "500" }}
                   >
                     <FiEye className="me-1" /> View
-                  </Button>
-                  <Button
-                    variant="outline-secondary"
-                    size="sm"
+                  </button>
+                  <button
+                    className="adm-btn adm-btn--secondary adm-btn-sm"
                     onClick={() => handleStatusUpdate(order)}
-                    style={{ borderRadius: "8px", fontWeight: "500" }}
                   >
                     <FiEdit className="me-1" /> Update
-                  </Button>
+                  </button>
                 </td>
               </tr>
             ))}

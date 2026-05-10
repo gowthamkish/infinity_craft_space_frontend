@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, Card, Row, Col, Form, Button } from "react-bootstrap";
+import { Modal, Card, Row, Col, Form } from "react-bootstrap";
 import { DotsLoader } from "../Loader";
 import {
   FiShoppingBag,
@@ -288,39 +288,18 @@ const StatusUpdateModal = ({
           gap: "0.5rem",
         }}
       >
-        <Button
-          variant="outline-secondary"
+        <button
+          className="adm-btn adm-btn--secondary"
           onClick={onHide}
-          style={{
-            borderRadius: 8,
-            padding: "0.6rem 1.2rem",
-            fontWeight: 500,
-            border: "1px solid #e2e8f0",
-            color: "#64748b",
-            flex: 1,
-            fontSize: "0.9rem",
-          }}
+          style={{ flex: 1 }}
         >
           <FiX className="me-1" size={14} /> Cancel
-        </Button>
-        <Button
-          variant="primary"
+        </button>
+        <button
+          className="adm-btn adm-btn--success"
           onClick={confirmStatusUpdate}
-          disabled={
-            updating || !newStatus || newStatus === selectedOrder?.status
-          }
-          style={{
-            borderRadius: 8,
-            padding: "0.6rem 1.2rem",
-            fontWeight: 500,
-            background:
-              updating || !newStatus || newStatus === selectedOrder?.status
-                ? "#9ca3af"
-                : "linear-gradient(135deg, #059669 0%, #047857 100%)",
-            border: "none",
-            flex: 2,
-            fontSize: "0.9rem",
-          }}
+          disabled={updating || !newStatus || newStatus === selectedOrder?.status}
+          style={{ flex: 2 }}
         >
           {updating ? (
             <>
@@ -330,12 +309,10 @@ const StatusUpdateModal = ({
           ) : (
             <>
               <FiCheck className="me-1" size={14} />
-              {newStatus === selectedOrder?.status
-                ? "No Changes"
-                : "Update Status"}
+              {newStatus === selectedOrder?.status ? "No Changes" : "Update Status"}
             </>
           )}
-        </Button>
+        </button>
       </Modal.Footer>
     </Modal>
   );

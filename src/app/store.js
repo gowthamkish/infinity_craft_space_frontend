@@ -6,13 +6,14 @@ import adminReducer from "../features/adminSlice";
 import categoriesReducer from "../features/categoriesSlice";
 import reviewsReducer from "../features/reviewsSlice";
 
-// Cart actions that should trigger a sync to backend
+// Cart actions that should trigger a debounced sync to backend
+// Note: clearCart is intentionally excluded — logout calls syncCartToBackend
+// explicitly before clearing, so we must NOT re-sync an empty cart after clearing.
 const CART_SYNC_ACTIONS = [
   "cart/addToCart",
   "cart/removeFromCart",
   "cart/updateCartItemQuantity",
   "cart/removeItemCompletely",
-  "cart/clearCart",
 ];
 
 // Debounce timer for cart sync
@@ -20,9 +21,19 @@ let cartSyncTimeout = null;
 
 // Cart sync middleware - automatically syncs cart to backend after cart changes
 const cartSyncMiddleware = (store) => (next) => (action) => {
+  // When the cart is being cleared (logout), cancel any pending debounced sync
+  // so the stale timeout can't fire later with an empty auth state.
+  if (action.type === "cart/clearCart") {
+    if (cartSyncTimeout) {
+      clearTimeout(cartSyncTimeout);
+      cartSyncTimeout = null;
+    }
+    return next(action);
+  }
+
   const result = next(action);
 
-  // Check if this is a cart-modifying action
+  // Check if this is a cart-modifying action that requires a backend sync
   if (CART_SYNC_ACTIONS.includes(action.type)) {
     const { auth } = store.getState();
 

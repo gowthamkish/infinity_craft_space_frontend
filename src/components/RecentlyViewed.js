@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Row, Col, Card, Button } from "react-bootstrap";
+import { Container, Row, Col, Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { FiX } from "react-icons/fi";
 import { useRecentlyViewed } from "../hooks/useRecentlyViewed";
@@ -47,14 +47,12 @@ const RecentlyViewed = ({ limit = 8 }) => {
             Recently Viewed
           </h2>
           {recentlyViewed.length > 0 && (
-            <Button
-              variant="outline-secondary"
-              size="sm"
+            <button
+              className="ics-btn ics-btn--outline ics-btn--sm"
               onClick={clearAll}
-              style={{ borderRadius: "var(--radius-md)" }}
             >
               Clear History
-            </Button>
+            </button>
           )}
         </div>
 
@@ -77,12 +75,9 @@ const RecentlyViewed = ({ limit = 8 }) => {
               +{recentlyViewed.length - limit} more
             </p>
             <Link to="/recently-viewed" style={{ textDecoration: "none" }}>
-              <Button
-                variant="outline-primary"
-                style={{ borderRadius: "var(--radius-md)" }}
-              >
+              <button className="ics-btn ics-btn--outline">
                 View All
-              </Button>
+              </button>
             </Link>
           </div>
         )}

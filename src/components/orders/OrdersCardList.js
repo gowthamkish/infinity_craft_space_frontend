@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Button } from "react-bootstrap";
+import { Card } from "react-bootstrap";
 import {
   FiShoppingBag,
   FiUser,
@@ -68,24 +68,18 @@ const OrdersCardList = ({
                 </div>
 
                 <div className="d-grid gap-2 d-md-flex">
-                  <Button
-                    variant="outline-primary"
-                    size="sm"
+                  <button
+                    className="adm-btn adm-btn--secondary adm-btn-sm flex-fill"
                     onClick={() => handleViewDetails(order)}
-                    className="flex-fill"
-                    style={{ borderRadius: "8px", fontWeight: "500" }}
                   >
                     <FiEye className="me-1" /> View Details
-                  </Button>
-                  <Button
-                    variant="outline-secondary"
-                    size="sm"
+                  </button>
+                  <button
+                    className="adm-btn adm-btn--secondary adm-btn-sm flex-fill"
                     onClick={() => handleStatusUpdate(order)}
-                    className="flex-fill"
-                    style={{ borderRadius: "8px", fontWeight: "500" }}
                   >
                     <FiEdit className="me-1" /> Update Status
-                  </Button>
+                  </button>
                 </div>
               </Card.Body>
             </Card>

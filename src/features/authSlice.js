@@ -98,7 +98,9 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        state.user = action.payload.user;
+        const u = action.payload.user || {};
+        // Backend returns { id } not { _id }; normalize so all consumers use _id.
+        state.user = u._id ? u : { ...u, _id: u.id };
         state.loading = false;
         state.error = null;
         // Also store in sessionStorage for iOS Safari ITP fallback (Bearer header)
@@ -116,7 +118,8 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(register.fulfilled, (state, action) => {
-        state.user = action.payload.user;
+        const u = action.payload.user || {};
+        state.user = u._id ? u : { ...u, _id: u.id };
         state.loading = false;
         state.error = null;
         if (action.payload.accessToken) {

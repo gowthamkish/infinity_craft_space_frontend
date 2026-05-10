@@ -142,33 +142,40 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
-  padding: 0.7rem 1.5rem;
-  border-radius: var(--hp-radius-sm);
-  font-size: 0.9rem;
-  font-weight: 700;
+  gap: 8px;
+  height: var(--btn-h-md);
+  padding: 0 var(--btn-px-md);
+  border-radius: var(--btn-radius);
+  font-size: var(--btn-font-md);
+  font-weight: var(--btn-fw-cta);
   cursor: pointer;
-  border: 2px solid transparent;
-  transition: var(--hp-transition);
+  border: 1.5px solid transparent;
+  transition: var(--btn-transition);
   text-decoration: none;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.01em;
   white-space: nowrap;
+  font-family: var(--btn-font);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .hp-btn--lg {
-  padding: 0.85rem 1.85rem;
-  font-size: 0.95rem;
-  border-radius: var(--hp-radius);
+  height: var(--btn-h-lg);
+  padding: 0 var(--btn-px-lg);
+  font-size: var(--btn-font-lg);
+  border-radius: var(--btn-radius-lg);
+  gap: 9px;
 }
 
 .hp-btn--primary {
-  background: linear-gradient(135deg, var(--hp-primary) 0%, #8b5cf6 100%);
+  background: var(--btn-brand-grad);
   color: #fff;
-  box-shadow: 0 4px 16px rgba(109, 40, 217, 0.3);
+  box-shadow: 0 4px 16px var(--btn-brand-glow);
 }
 .hp-btn--primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(109, 40, 217, 0.4);
+  background: var(--btn-brand-grad-h);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px var(--btn-brand-glow);
 }
 
 .hp-btn--ghost {
@@ -178,34 +185,36 @@
   backdrop-filter: blur(8px);
 }
 .hp-btn--ghost:hover {
-  background: var(--hp-primary-light);
+  background: var(--btn-brand-subtle);
+  border-color: var(--btn-brand-dark);
   transform: translateY(-2px);
 }
 
 .hp-btn--outline {
   background: transparent;
-  color: var(--hp-text);
-  border-color: #cbd5e1;
+  color: var(--hp-text, #1c1917);
+  border-color: #d1d5db;
 }
 .hp-btn--outline:hover {
-  border-color: var(--hp-primary);
-  color: var(--hp-primary);
+  border-color: var(--btn-brand);
+  color: var(--btn-brand);
+  background: var(--btn-brand-subtle);
   transform: translateY(-2px);
 }
 
 .hp-btn--white {
   background: #fff;
-  color: var(--hp-primary);
+  color: var(--btn-brand);
+  border-color: transparent;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 .hp-btn--white:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
 }
 
-.hp-btn:active {
-  transform: translateY(0) !important;
-}
+.hp-btn:active { transform: scale(0.97) !important; }
+.hp-btn:focus-visible { outline: 2px solid var(--btn-brand); outline-offset: 2px; }
 
 /* ─── Stars ─────────────────────────────────────────────────────────────── */
 .hp-stars {

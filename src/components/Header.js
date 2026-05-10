@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../features/authSlice";
-import { clearCart } from "../features/cartSlice";
+import { clearCart, syncCartToBackend } from "../features/cartSlice";
 import { clearProducts } from "../features/productsSlice";
 import { clearAdminData } from "../features/adminSlice";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -54,6 +54,11 @@ function Header() {
   const closeMobile = () => setShowMobileMenu(false);
 
   const handleLogout = async () => {
+    // Flush any pending debounced cart sync while auth is still valid
+    try {
+      await dispatch(syncCartToBackend());
+    } catch { /* ignore sync errors during logout */ }
+
     try {
       await api.post("/api/auth/logout");
     } catch {

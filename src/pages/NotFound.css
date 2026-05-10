@@ -200,16 +200,17 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.875rem 1.75rem;
-  font-weight: 600;
-  border-radius: 50px;
-  transition: all 0.3s ease;
+  height: var(--btn-h-lg, 52px);
+  padding: 0 var(--btn-px-lg, 28px);
+  font-weight: var(--btn-fw-cta, 700);
+  border-radius: var(--btn-radius-pill, 9999px);
+  transition: var(--btn-transition, all 150ms cubic-bezier(0.4,0,0.2,1));
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .action-btn.primary-action {
   background: white !important;
-  color: #667eea !important;
+  color: var(--btn-brand, #7c3aed) !important;
   border: none !important;
 }
 
