@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { ToastContext } from "../context/ToastContext";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 import api from "../api/axios";
 import "./auth.css";
@@ -38,6 +39,7 @@ function StepBar({ current }) {
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
+  const { addError } = useContext(ToastContext);
   const [identifier, setIdentifier] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -56,12 +58,11 @@ export default function ForgotPassword() {
       sessionStorage.setItem("reset_vtoken", data.verificationToken || "");
       navigate("/verify-security");
     } catch (err) {
-      // Even on network/rate-limit errors, show a neutral message.
-      setError(
-        err.response?.status === 429
-          ? "Too many attempts. Please try again in 15 minutes."
-          : "Something went wrong. Please try again."
-      );
+      const msg = err.response?.status === 429
+        ? "Too many attempts. Please try again in 15 minutes."
+        : "Something went wrong. Please try again.";
+      setError(msg);
+      addError(msg, "Request Failed");
     } finally {
       setLoading(false);
     }

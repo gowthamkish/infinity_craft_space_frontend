@@ -6,8 +6,9 @@ import {
   syncCartToBackend,
 } from "../features/cartSlice";
 import { validateLogin } from "../utils/validation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { ToastContext } from "../context/ToastContext";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 import "./auth.css";
 
@@ -15,24 +16,22 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
   const [validationErrors, setValidationErrors] = useState({});
   const [touched, setTouched] = useState({});
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { addSuccess } = useContext(ToastContext);
   const { loading, error } = useSelector((state) => state.auth);
   const guestCartItems = useSelector((state) => state.cart.items);
 
   useEffect(() => {
     const msg = localStorage.getItem("registrationSuccess");
     if (msg) {
-      setSuccessMessage(msg);
       localStorage.removeItem("registrationSuccess");
-      const t = setTimeout(() => setSuccessMessage(""), 5000);
-      return () => clearTimeout(t);
+      addSuccess(msg, "Account Created");
     }
-  }, []);
+  }, [addSuccess]);
 
   const clearFieldError = (field) => {
     if (validationErrors[field]) {
@@ -123,31 +122,6 @@ export default function Login() {
               <h1 className="auth-title">Welcome back</h1>
               <p className="auth-subtitle">Sign in to continue shopping</p>
             </div>
-
-            {successMessage && (
-              <div className="auth-alert auth-alert--success" role="alert">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M8 1a7 7 0 100 14A7 7 0 008 1zm3.78 5.78l-4.5 4.5a.75.75 0 01-1.06 0l-2-2a.75.75 0 111.06-1.06L6.75 9.69l3.97-3.97a.75.75 0 111.06 1.06z"
-                    fill="currentColor"
-                  />
-                </svg>
-                {successMessage}
-                <button
-                  className="auth-alert-close"
-                  onClick={() => setSuccessMessage("")}
-                  aria-label="Dismiss"
-                >
-                  ×
-                </button>
-              </div>
-            )}
 
             {error && (
               <div className="auth-alert auth-alert--error" role="alert">

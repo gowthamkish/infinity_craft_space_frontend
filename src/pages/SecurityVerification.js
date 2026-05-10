@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { ToastContext } from "../context/ToastContext";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 import api from "../api/axios";
 import "./auth.css";
@@ -47,6 +48,7 @@ function useCountdown(seconds) {
 
 export default function SecurityVerification() {
   const navigate = useNavigate();
+  const { addError } = useContext(ToastContext);
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState(["", ""]);
   const [showAnswers, setShowAnswers] = useState([false, false]);
@@ -56,10 +58,11 @@ export default function SecurityVerification() {
   const timeLeft = useCountdown(10 * 60); // 10 min verification window
 
   const vtoken = sessionStorage.getItem("reset_vtoken") || "";
+  const verifiedRef = useRef(false);
 
   // Redirect to step 1 if no token
   useEffect(() => {
-    if (!vtoken) { navigate("/forgot-password"); return; }
+    if (!vtoken && !verifiedRef.current) { navigate("/forgot-password"); return; }
 
     api.get(`/api/auth/security-questions/${encodeURIComponent(vtoken)}`)
       .then(({ data }) => {
@@ -87,16 +90,17 @@ export default function SecurityVerification() {
         verificationToken: vtoken,
         answers: answers.map((a) => a.trim()),
       });
-      sessionStorage.removeItem("reset_vtoken");
+      verifiedRef.current = true;
       sessionStorage.setItem("reset_rtoken", data.resetToken || "");
+      sessionStorage.removeItem("reset_vtoken");
       navigate("/reset-password");
     } catch (err) {
-      setError(
-        err.response?.data?.error ||
-          (err.response?.status === 429
-            ? "Too many attempts. Please restart the process."
-            : "Verification failed. Please try again.")
-      );
+      const msg = err.response?.data?.error ||
+        (err.response?.status === 429
+          ? "Too many attempts. Please restart the process."
+          : "Verification failed. Please try again.");
+      setError(msg);
+      addError(msg, "Verification Failed");
     } finally {
       setSubmitting(false);
     }

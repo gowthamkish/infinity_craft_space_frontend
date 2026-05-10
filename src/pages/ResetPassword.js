@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 import api from "../api/axios";
+import { ToastContext } from "../context/ToastContext";
 import "./auth.css";
 import "./reset.css";
 
@@ -84,13 +85,13 @@ function PasswordStrength({ password }) {
 // ── Main component ──────────────────────────────────────────────────────────
 export default function ResetPassword() {
   const navigate = useNavigate();
+  const { addSuccess } = useContext(ToastContext);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [done, setDone] = useState(false);
 
   const rtoken = sessionStorage.getItem("reset_rtoken") || "";
 
@@ -114,7 +115,8 @@ export default function ResetPassword() {
         newPassword,
       });
       sessionStorage.removeItem("reset_rtoken");
-      setDone(true);
+      addSuccess("Your password has been reset. Please sign in with your new password.", "Password Reset Successful", { duration: 6000 });
+      navigate("/login");
     } catch (err) {
       setError(
         err.response?.data?.error ||
@@ -126,45 +128,6 @@ export default function ResetPassword() {
       setLoading(false);
     }
   };
-
-  if (done) {
-    return (
-      <>
-        <SEOHead title={`Password Reset · ${SEO_CONFIG.SITE_NAME}`} noindex={true} />
-        <div className="auth-page">
-          <div className="auth-brand-panel" aria-hidden="true">
-            <div className="auth-brand-content">
-              <img src="/ICS_Logo.jpeg" alt="Infinity Craft Space" className="auth-brand-logo" />
-              <h2 className="auth-brand-title">Infinity Craft Space</h2>
-              <p className="auth-brand-subtitle">Premium craft supplies for creative minds</p>
-            </div>
-          </div>
-          <div className="auth-form-panel">
-            <div className="auth-card">
-              <StepBar current={3} />
-              <div className="reset-success">
-                <div className="reset-success-icon">
-                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                </div>
-                <h1 className="auth-title">Password Reset!</h1>
-                <p className="auth-subtitle" style={{ marginBottom: "1.5rem" }}>
-                  Your password has been updated. All existing sessions have been signed out for security.
-                </p>
-                <button
-                  className="auth-btn auth-btn--primary"
-                  onClick={() => navigate("/login")}
-                >
-                  Sign In with New Password
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  }
 
   return (
     <>
