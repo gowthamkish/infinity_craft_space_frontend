@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Container, Form, Alert } from "react-bootstrap";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MuiAlert from "@mui/material/Alert";
 import { DotsLoader } from "./Loader";
 import { FiThumbsUp, FiMessageSquare, FiCheckCircle } from "react-icons/fi";
 import { qnaAPI } from "../api/features";
@@ -102,7 +108,7 @@ const ProductQnA = ({ productId, isAuthenticated, userName }) => {
         paddingBottom: "var(--spacing-3xl)",
       }}
     >
-      <Container>
+      <Box>
         <div style={{ marginBottom: "var(--spacing-xl)" }}>
           <h2
             style={{
@@ -132,22 +138,20 @@ const ProductQnA = ({ productId, isAuthenticated, userName }) => {
             <h4 style={{ marginBottom: "var(--spacing-md)", fontWeight: 600 }}>
               Ask a Question
             </h4>
-            <Form onSubmit={handlePostQuestion}>
-              <Form.Group className="mb-3">
-                <Form.Control
-                  as="textarea"
+            <form onSubmit={handlePostQuestion}>
+              <div style={{ marginBottom: "1rem" }}>
+                <TextField
+                  fullWidth
+                  multiline
                   rows={3}
                   placeholder="What would you like to know about this product? (minimum 10 characters)"
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
                   disabled={asking}
-                  style={{
-                    borderRadius: "var(--radius-md)",
-                    borderColor: "var(--border-primary)",
-                    padding: "var(--spacing-md)",
-                  }}
+                  size="small"
+                  sx={{ "& .MuiOutlinedInput-root": { borderRadius: "var(--radius-md)" } }}
                 />
-              </Form.Group>
+              </div>
               <button
                 type="submit"
                 className="ics-btn ics-btn--primary"
@@ -160,12 +164,12 @@ const ProductQnA = ({ productId, isAuthenticated, userName }) => {
                   </>
                 ) : (
                   <>
-                    <FiMessageSquare size={16} className="me-2" />
+                    <FiMessageSquare size={16} style={{ marginRight: 8 }} />
                     Post Question
                   </>
                 )}
               </button>
-            </Form>
+            </form>
           </div>
         )}
 
@@ -181,31 +185,26 @@ const ProductQnA = ({ productId, isAuthenticated, userName }) => {
           <p style={{ marginBottom: 0, color: "var(--text-secondary)" }}>
             Showing {qnaList.length} of {totalPages * ITEMS_PER_PAGE} questions
           </p>
-          <Form.Select
+          <select
             value={sortBy}
-            onChange={(e) => {
-              setSortBy(e.target.value);
-              setPage(1);
-            }}
-            style={{
-              maxWidth: "200px",
-              borderRadius: "var(--radius-md)",
-              borderColor: "var(--border-primary)",
-            }}
+            onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
+            style={{ maxWidth: "200px", borderRadius: "var(--radius-md)",
+              border: "1px solid var(--border-primary)", padding: "0.5rem 0.75rem",
+              fontSize: "0.875rem", cursor: "pointer" }}
           >
             <option value="latest">Latest</option>
             <option value="helpful">Most Helpful</option>
             <option value="pinned">Pinned</option>
-          </Form.Select>
+          </select>
         </div>
 
         {/* Q&A List */}
         {loading ? (
           <SkeletonListLoader items={3} />
         ) : qnaList.length === 0 ? (
-          <Alert variant="info" style={{ borderRadius: "var(--radius-lg)" }}>
+          <MuiAlert severity="info" sx={{ borderRadius: "var(--radius-lg)" }}>
             No questions yet. Be the first to ask!
-          </Alert>
+          </MuiAlert>
         ) : (
           <div
             style={{
@@ -253,7 +252,7 @@ const ProductQnA = ({ productId, isAuthenticated, userName }) => {
             </button>
           </div>
         )}
-      </Container>
+      </Box>
     </section>
   );
 };
@@ -287,7 +286,7 @@ const QnAItem = ({ qna, onMarkHelpful }) => {
 
   return (
     <div
-      Style={{
+      style={{
         padding: "var(--spacing-lg)",
         backgroundColor: "var(--bg-primary)",
         border: "1px solid var(--border-primary)",

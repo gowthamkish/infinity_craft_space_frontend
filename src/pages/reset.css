@@ -35,8 +35,8 @@
 }
 
 .reset-step-circle--active {
-  border-color: #1d4ed8;
-  background: #1d4ed8;
+  border-color: #7a1640;
+  background: #7a1640;
   color: #fff;
 }
 
@@ -55,7 +55,7 @@
   white-space: nowrap;
 }
 
-.reset-step-label--active { color: #1d4ed8; }
+.reset-step-label--active { color: #7a1640; }
 .reset-step-label--done   { color: #10b981; }
 
 .reset-step-connector {

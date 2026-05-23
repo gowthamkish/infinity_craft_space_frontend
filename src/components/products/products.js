@@ -1,7 +1,36 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { Modal } from "react-bootstrap";
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Button,
+  IconButton,
+  Chip,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableContainer,
+  Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Select,
+  MenuItem,
+  InputAdornment,
+  CircularProgress,
+  Alert,
+  Stack,
+  Divider,
+  Avatar,
+  Tooltip,
+} from "@mui/material";
 import { OrbitLoader, DotsLoader } from "../Loader";
 import AdminLayout from "../admin/AdminLayout";
 import {
@@ -29,45 +58,46 @@ const formatDateTime = (dateString) => {
 
 function StockBadge({ product }) {
   if (product?.trackInventory === false)
-    return <span className="adm-badge adm-badge--gray">Unlimited</span>;
+    return <Chip label="Unlimited" size="small" sx={{ bgcolor: "#e2e8f0", color: "#475569", fontWeight: 600, fontSize: "0.72rem" }} />;
   if (product?.stock === undefined || product?.stock === null)
-    return <span className="adm-badge adm-badge--blue">Not Set</span>;
+    return <Chip label="Not Set" size="small" color="primary" variant="outlined" sx={{ fontWeight: 600, fontSize: "0.72rem" }} />;
   if (product.stock <= 0)
-    return <span className="adm-badge adm-badge--red">Out of Stock</span>;
+    return <Chip label="Out of Stock" size="small" sx={{ bgcolor: "#fee2e2", color: "#dc2626", fontWeight: 600, fontSize: "0.72rem" }} />;
   if (product.stock <= (product.lowStockThreshold || 5))
-    return <span className="adm-badge adm-badge--amber">Low · {product.stock}</span>;
-  return <span className="adm-badge adm-badge--green">{product.stock} in stock</span>;
+    return <Chip label={`Low · ${product.stock}`} size="small" sx={{ bgcolor: "#fef3c7", color: "#92400e", fontWeight: 600, fontSize: "0.72rem" }} />;
+  return <Chip label={`${product.stock} in stock`} size="small" sx={{ bgcolor: "#d1fae5", color: "#065f46", fontWeight: 600, fontSize: "0.72rem" }} />;
 }
 
 function ProductThumb({ product }) {
   const src = product?.images?.[0]?.url || product?.image?.url;
   if (src)
     return (
-      <div style={{ position: "relative", display: "inline-block" }}>
-        <img
+      <Box sx={{ position: "relative", display: "inline-block" }}>
+        <Avatar
           src={src}
           alt={product.name}
-          className="adm-product-thumb"
-          onError={(e) => { e.target.style.display = "none"; }}
+          variant="rounded"
+          sx={{ width: 44, height: 44 }}
+          imgProps={{ onError: (e) => { e.target.style.display = "none"; } }}
         />
         {(product?.images?.length || 0) > 1 && (
-          <span
-            style={{
+          <Box
+            sx={{
               position: "absolute", bottom: -4, right: -4,
-              background: "var(--adm-primary)", color: "white",
+              bgcolor: "primary.main", color: "white",
               fontSize: "9px", fontWeight: 700, lineHeight: 1,
-              padding: "2px 4px", borderRadius: 4, pointerEvents: "none",
+              px: "4px", py: "2px", borderRadius: "4px", pointerEvents: "none",
             }}
           >
             +{product.images.length - 1}
-          </span>
+          </Box>
         )}
-      </div>
+      </Box>
     );
   return (
-    <div className="adm-product-thumb-placeholder">
+    <Avatar variant="rounded" sx={{ width: 44, height: 44, bgcolor: "#f1f5f9", color: "#94a3b8" }}>
       <FiPackage size={18} />
-    </div>
+    </Avatar>
   );
 }
 
@@ -83,11 +113,11 @@ const ProductList = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const [restockTarget, setRestockTarget] = useState(null);
-  const [restockQty, setRestockQty]       = useState("");
-  const [restockNote, setRestockNote]     = useState("");
+  const [restockQty, setRestockQty] = useState("");
+  const [restockNote, setRestockNote] = useState("");
   const [restockLoading, setRestockLoading] = useState(false);
-  const [restockError, setRestockError]   = useState(null);
-  const [restockDone, setRestockDone]     = useState(null);
+  const [restockError, setRestockError] = useState(null);
+  const [restockDone, setRestockDone] = useState(null);
 
   const handleEdit = (product) =>
     navigate(`/admin/addProduct/${product._id}`, { state: { product } });
@@ -140,225 +170,252 @@ const ProductList = () => {
   return (
     <AdminLayout>
       {/* Page header */}
-      <div className="adm-page-header">
-        <div>
-          <h1 className="adm-page-title">
-            <FiPackage size={22} style={{ color: "var(--adm-primary)" }} />
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}>
+        <Box>
+          <Typography variant="h5" fontWeight={700} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <FiPackage size={22} style={{ color: "#8B1A4A" }} />
             Products
-          </h1>
-          <p className="adm-page-sub">{products.length} total products</p>
-        </div>
+          </Typography>
+          <Typography variant="body2" color="text.secondary">{products.length} total products</Typography>
+        </Box>
         <button className="adm-btn adm-btn-primary adm-btn-lg" onClick={() => navigate("/admin/addProduct")}>
           <FiPlus size={16} />
           Add Product
         </button>
-      </div>
+      </Box>
 
       {/* Filter bar */}
-      <div className="adm-card" style={{ marginBottom: "var(--adm-space-4)" }}>
-        <div className="adm-card-body" style={{ padding: "var(--adm-space-4) var(--adm-space-5) !important" }}>
-          <div className="adm-filter-bar">
-            <div className="adm-search-wrap">
-              <FiSearch className="adm-search-icon" size={15} />
-              <input
-                className="adm-search-input"
-                placeholder="Search products…"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <FiFilter size={14} style={{ color: "var(--adm-text-tertiary)" }} />
-              <select
-                className="adm-select"
+      <Card elevation={0} sx={{ mb: 2, border: "1px solid #e2e8f0", borderRadius: 2 }}>
+        <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
+            <TextField
+              size="small"
+              placeholder="Search products…"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start"><FiSearch size={15} color="#94a3b8" /></InputAdornment>
+                  ),
+                },
+              }}
+              sx={{ minWidth: 220, "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
+            />
+            <Stack direction="row" spacing={1} alignItems="center">
+              <FiFilter size={14} color="#94a3b8" />
+              <Select
+                size="small"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
+                sx={{ minWidth: 160, borderRadius: 2 }}
               >
-                <option value="all">All Categories</option>
-                {categories.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
+                <MenuItem value="all">All Categories</MenuItem>
+                {categories.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)}
+              </Select>
+            </Stack>
             {(searchTerm || selectedCategory !== "all") && (
-              <span style={{ fontSize: "var(--adm-font-xs)", color: "var(--adm-text-tertiary)" }}>
+              <Typography variant="caption" color="text.secondary">
                 {filteredProducts.length} result{filteredProducts.length !== 1 ? "s" : ""}
-              </span>
+              </Typography>
             )}
-          </div>
-        </div>
-      </div>
+          </Stack>
+        </CardContent>
+      </Card>
 
       {/* Table card */}
-      <div className="adm-card">
+      <Card elevation={0} sx={{ border: "1px solid #e2e8f0", borderRadius: 2 }}>
         {loading ? (
-          <div className="adm-loading"><OrbitLoader size="lg" /><span>Loading products…</span></div>
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 8, gap: 2 }}>
+            <OrbitLoader size="lg" />
+            <Typography color="text.secondary">Loading products…</Typography>
+          </Box>
         ) : filteredProducts.length === 0 ? (
-          <div className="adm-empty">
-            <div className="adm-empty-icon"><FiPackage size={28} /></div>
-            <p className="adm-empty-title">No products found</p>
-            <p className="adm-empty-sub">
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 8, gap: 1 }}>
+            <Box sx={{ color: "#cbd5e1", mb: 1 }}><FiPackage size={36} /></Box>
+            <Typography fontWeight={600} color="text.primary">No products found</Typography>
+            <Typography variant="body2" color="text.secondary">
               {searchTerm || selectedCategory !== "all"
                 ? "Try adjusting your search or filters."
                 : "Add your first product to get started."}
-            </p>
+            </Typography>
             {!(searchTerm || selectedCategory !== "all") && (
-              <button className="adm-btn adm-btn-primary" onClick={() => navigate("/admin/addProduct")}>
+              <button className="adm-btn adm-btn-primary" onClick={() => navigate("/admin/addProduct")} style={{ marginTop: 8 }}>
                 <FiPlus size={14} /> Add Product
               </button>
             )}
-          </div>
+          </Box>
         ) : (
-          <div className="adm-table-wrap">
-            <table className="adm-table">
-              <thead>
-                <tr>
-                  <th style={{ width: 60 }}>Img</th>
-                  <th>Product</th>
-                  <th>Price</th>
-                  <th>Category</th>
-                  <th>Stock</th>
-                  <th>Weight</th>
-                  <th>Last Edited</th>
-                  <th style={{ textAlign: "center" }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
+          <TableContainer>
+            <Table size="small">
+              <TableHead>
+                <TableRow sx={{ bgcolor: "#f8fafc" }}>
+                  <TableCell sx={{ fontWeight: 700, color: "#64748b", fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.04em", width: 60 }}>Img</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: "#64748b", fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.04em" }}>Product</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: "#64748b", fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.04em" }}>Price</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: "#64748b", fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.04em" }}>Category</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: "#64748b", fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.04em" }}>Stock</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: "#64748b", fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.04em" }}>Weight</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: "#64748b", fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.04em" }}>Last Edited</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 700, color: "#64748b", fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.04em" }}>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
                 {filteredProducts.map((product) => {
                   const edited = formatDateTime(product.lastEditedAt);
                   return (
-                    <tr key={product._id || product.id}>
-                      <td><ProductThumb product={product} /></td>
+                    <TableRow key={product._id || product.id} sx={{ "&:hover": { bgcolor: "#faf5ff" }, transition: "background 150ms" }}>
+                      <TableCell><ProductThumb product={product} /></TableCell>
 
-                      <td>
-                        <div style={{ fontWeight: 600, color: "var(--adm-text-primary)", marginBottom: 2 }}>
+                      <TableCell>
+                        <Typography variant="body2" fontWeight={600} color="text.primary" sx={{ mb: 0.25 }}>
                           {product.name}
-                        </div>
-                        <div
-                          className="adm-td-muted"
-                          style={{
-                            display: "-webkit-box", WebkitLineClamp: 2,
-                            WebkitBoxOrient: "vertical", overflow: "hidden",
-                            maxWidth: 280,
-                          }}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", maxWidth: 280 }}
                         >
                           {product.description}
-                        </div>
-                      </td>
+                        </Typography>
+                      </TableCell>
 
-                      <td>
-                        <span style={{ fontWeight: 700, color: "var(--adm-success)", fontSize: "0.9375rem" }}>
+                      <TableCell>
+                        <Typography variant="body2" fontWeight={700} sx={{ color: "#059669", fontSize: "0.9375rem" }}>
                           ₹{product.price}
-                        </span>
-                      </td>
+                        </Typography>
+                      </TableCell>
 
-                      <td>
-                        <span className="adm-badge adm-badge--blue" style={{ marginBottom: 3, display: "inline-flex" }}>
-                          {product.category}
-                        </span>
-                        {product.subCategory && (
-                          <span className="adm-badge adm-badge--gray" style={{ display: "block", marginTop: 3 }}>
-                            {product.subCategory}
-                          </span>
-                        )}
-                      </td>
-
-                      <td><StockBadge product={product} /></td>
-
-                      <td className="adm-td-muted">
-                        {product.weightInGrams
-                          ? product.weightInGrams >= 1000
-                            ? `${(product.weightInGrams / 1000).toFixed(2).replace(/\.?0+$/, "")} kg`
-                            : `${product.weightInGrams} g`
-                          : "—"}
-                      </td>
-
-                      <td>
-                        {edited ? (
-                          <>
-                            <div style={{ fontWeight: 500, fontSize: "var(--adm-font-sm)" }}>{edited.date}</div>
-                            <div className="adm-td-muted">{edited.time}</div>
-                            {product.lastEditedBy?.name && (
-                              <div className="adm-td-muted">{product.lastEditedBy.name}</div>
-                            )}
-                          </>
-                        ) : (
-                          <span className="adm-td-muted">—</span>
-                        )}
-                      </td>
-
-                      <td>
-                        <div className="adm-row-actions" style={{ justifyContent: "center" }}>
-                          <button
-                            className="adm-btn-icon"
-                            title="Edit"
-                            onClick={() => handleEdit(product)}
-                            style={{ color: "var(--adm-primary)" }}
-                          >
-                            <FiEdit2 size={14} />
-                          </button>
-                          {product.trackInventory !== false && (
-                            <button
-                              className="adm-btn-icon"
-                              title="Restock"
-                              onClick={() => openRestockModal(product)}
-                              style={{ color: "var(--adm-success)" }}
-                            >
-                              <FiRefreshCw size={14} />
-                            </button>
+                      <TableCell>
+                        <Stack spacing={0.5}>
+                          <Chip label={product.category} size="small" color="primary" variant="outlined" sx={{ fontWeight: 600, fontSize: "0.72rem" }} />
+                          {product.subCategory && (
+                            <Chip label={product.subCategory} size="small" sx={{ bgcolor: "#e2e8f0", color: "#475569", fontWeight: 600, fontSize: "0.72rem" }} />
                           )}
-                          <button
-                            className="adm-btn-icon danger"
-                            title="Delete"
-                            onClick={() => { setSelectedProduct(product); setShowDeleteModal(true); }}
-                          >
-                            <FiTrash2 size={14} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                        </Stack>
+                      </TableCell>
+
+                      <TableCell><StockBadge product={product} /></TableCell>
+
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {product.weightInGrams
+                            ? product.weightInGrams >= 1000
+                              ? `${(product.weightInGrams / 1000).toFixed(2).replace(/\.?0+$/, "")} kg`
+                              : `${product.weightInGrams} g`
+                            : "—"}
+                        </Typography>
+                      </TableCell>
+
+                      <TableCell>
+                        {edited ? (
+                          <Box>
+                            <Typography variant="body2" fontWeight={500}>{edited.date}</Typography>
+                            <Typography variant="caption" color="text.secondary">{edited.time}</Typography>
+                            {product.lastEditedBy?.name && (
+                              <Typography variant="caption" color="text.secondary" display="block">{product.lastEditedBy.name}</Typography>
+                            )}
+                          </Box>
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">—</Typography>
+                        )}
+                      </TableCell>
+
+                      <TableCell align="center">
+                        <Stack direction="row" spacing={0.5} justifyContent="center">
+                          <Tooltip title="Edit">
+                            <button className="adm-btn-icon" onClick={() => handleEdit(product)} style={{ color: "#8B1A4A" }}>
+                              <FiEdit2 size={14} />
+                            </button>
+                          </Tooltip>
+                          {product.trackInventory !== false && (
+                            <Tooltip title="Restock">
+                              <button className="adm-btn-icon" onClick={() => openRestockModal(product)} style={{ color: "#059669" }}>
+                                <FiRefreshCw size={14} />
+                              </button>
+                            </Tooltip>
+                          )}
+                          <Tooltip title="Delete">
+                            <button
+                              className="adm-btn-icon danger"
+                              onClick={() => { setSelectedProduct(product); setShowDeleteModal(true); }}
+                            >
+                              <FiTrash2 size={14} />
+                            </button>
+                          </Tooltip>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
                   );
                 })}
-              </tbody>
-            </table>
-          </div>
+              </TableBody>
+            </Table>
+          </TableContainer>
         )}
-      </div>
+      </Card>
 
       {/* Restock Modal */}
-      <Modal show={!!restockTarget} onHide={closeRestockModal} centered size="sm" className="adm-modal">
-        <Modal.Header closeButton>
-          <Modal.Title><FiRefreshCw size={16} style={{ color: "var(--adm-success)", marginRight: 8 }} />Restock Product</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+      <Dialog open={!!restockTarget} onClose={closeRestockModal} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <FiRefreshCw size={16} style={{ color: "#059669" }} />
+          Restock Product
+        </DialogTitle>
+
+        <DialogContent>
           {restockDone ? (
-            <div style={{ textAlign: "center", padding: "0.5rem 0 1rem" }}>
-              <FiCheckCircle size={44} style={{ color: "var(--adm-success)", marginBottom: 12 }} />
-              <p style={{ fontWeight: 700, marginBottom: 4 }}>Restock Successful!</p>
-              <p style={{ color: "var(--adm-text-secondary)", fontSize: "var(--adm-font-sm)", marginBottom: 16 }}>{restockTarget?.name}</p>
-              <div className="adm-alert adm-alert--success" style={{ flexDirection: "column", gap: 6, textAlign: "left" }}>
-                <div className="adm-kv-row"><span className="adm-kv-label">Previous stock</span><span className="adm-kv-value">{restockDone.prev}</span></div>
-                <div className="adm-kv-row"><span className="adm-kv-label">Added</span><span className="adm-kv-value">+{restockDone.added}</span></div>
-                <div className="adm-kv-row" style={{ borderTop: "1px solid #a7f3d0", paddingTop: 6, marginTop: 2 }}><span className="adm-kv-label" style={{ fontWeight: 700 }}>New stock</span><span className="adm-kv-value" style={{ fontSize: "1rem" }}>{restockDone.newStock}</span></div>
-              </div>
-            </div>
+            <Box sx={{ textAlign: "center", py: 1 }}>
+              <FiCheckCircle size={44} style={{ color: "#059669", marginBottom: 12 }} />
+              <Typography fontWeight={700} sx={{ mb: 0.5 }}>Restock Successful!</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{restockTarget?.name}</Typography>
+              <Alert severity="success" sx={{ textAlign: "left" }}>
+                <Stack spacing={0.5}>
+                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography variant="body2">Previous stock</Typography>
+                    <Typography variant="body2" fontWeight={600}>{restockDone.prev}</Typography>
+                  </Box>
+                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography variant="body2">Added</Typography>
+                    <Typography variant="body2" fontWeight={600}>+{restockDone.added}</Typography>
+                  </Box>
+                  <Divider sx={{ my: 0.5 }} />
+                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography variant="body2" fontWeight={700}>New stock</Typography>
+                    <Typography variant="body1" fontWeight={700}>{restockDone.newStock}</Typography>
+                  </Box>
+                </Stack>
+              </Alert>
+            </Box>
           ) : (
-            <>
-              <p style={{ color: "var(--adm-text-secondary)", fontSize: "var(--adm-font-sm)", marginBottom: 16 }}>
+            <Stack spacing={2} sx={{ pt: 1 }}>
+              <Typography variant="body2" color="text.secondary">
                 Adding stock to <strong>{restockTarget?.name}</strong>.{" "}
                 {restockTarget?.trackInventory && <>Current: <strong>{restockTarget?.stock ?? 0}</strong></>}
-              </p>
-              {restockError && <div className="adm-alert adm-alert--error">{restockError}</div>}
-              <div className="adm-form-group">
-                <label className="adm-label">Quantity to Add <span style={{ color: "var(--adm-danger)" }}>*</span></label>
-                <input className="adm-input" type="number" min="1" value={restockQty} onChange={(e) => setRestockQty(e.target.value)} placeholder="e.g. 50" autoFocus />
-              </div>
-              <div className="adm-form-group" style={{ marginBottom: 0 }}>
-                <label className="adm-label">Note <span style={{ fontWeight: 400, color: "var(--adm-text-tertiary)" }}>(optional)</span></label>
-                <input className="adm-input" type="text" value={restockNote} onChange={(e) => setRestockNote(e.target.value)} placeholder="e.g. Supplier batch #42" />
-              </div>
-            </>
+              </Typography>
+              {restockError && <Alert severity="error">{restockError}</Alert>}
+              <TextField
+                label={<>Quantity to Add <span style={{ color: "#dc2626" }}>*</span></>}
+                type="number"
+                slotProps={{ htmlInput: { min: 1 } }}
+                value={restockQty}
+                onChange={(e) => setRestockQty(e.target.value)}
+                placeholder="e.g. 50"
+                size="small"
+                autoFocus
+                fullWidth
+              />
+              <TextField
+                label="Note (optional)"
+                type="text"
+                value={restockNote}
+                onChange={(e) => setRestockNote(e.target.value)}
+                placeholder="e.g. Supplier batch #42"
+                size="small"
+                fullWidth
+              />
+            </Stack>
           )}
-        </Modal.Body>
-        <Modal.Footer>
+        </DialogContent>
+        <DialogActions>
           {restockDone ? (
             <button className="adm-btn adm-btn-success" style={{ width: "100%" }} onClick={closeRestockModal}>Done</button>
           ) : (
@@ -369,26 +426,27 @@ const ProductList = () => {
               </button>
             </>
           )}
-        </Modal.Footer>
-      </Modal>
+        </DialogActions>
+      </Dialog>
 
       {/* Delete Modal */}
-      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered className="adm-modal">
-        <Modal.Header closeButton>
-          <Modal.Title style={{ color: "var(--adm-danger)" }}><FiTrash2 size={16} style={{ marginRight: 8 }} />Delete Product</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p style={{ margin: 0 }}>
+      <Dialog open={showDeleteModal} onClose={() => setShowDeleteModal(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <FiTrash2 size={16} />
+          Delete Product
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
             Are you sure you want to delete <strong>{selectedProduct?.name}</strong>? This action cannot be undone.
-          </p>
-        </Modal.Body>
-        <Modal.Footer>
+          </Typography>
+        </DialogContent>
+        <DialogActions>
           <button className="adm-btn adm-btn-secondary" onClick={() => setShowDeleteModal(false)}>Cancel</button>
           <button className="adm-btn adm-btn-danger" onClick={handleDeleteConfirm} disabled={deleteLoading}>
             {deleteLoading ? <><DotsLoader size="sm" /> Deleting…</> : <><FiTrash2 size={14} /> Delete</>}
           </button>
-        </Modal.Footer>
-      </Modal>
+        </DialogActions>
+      </Dialog>
     </AdminLayout>
   );
 };

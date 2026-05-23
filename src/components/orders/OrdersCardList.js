@@ -1,12 +1,12 @@
 import React from "react";
-import { Card } from "react-bootstrap";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
 import {
-  FiShoppingBag,
-  FiUser,
-  FiCalendar,
-  FiDollarSign,
-  FiEye,
-  FiEdit,
+  FiShoppingBag, FiUser, FiCalendar, FiDollarSign, FiEye, FiEdit,
 } from "react-icons/fi";
 
 const OrdersCardList = ({
@@ -18,74 +18,56 @@ const OrdersCardList = ({
   getStatusBadge,
 }) => {
   return (
-    <div className="d-lg-none">
-      <div className="p-3">
-        {filteredOrders?.length > 0 &&
-          filteredOrders?.map((order) => (
-            <Card
-              key={order._id || order.id}
-              className="mb-3 border-0 shadow-sm"
-              style={{ borderRadius: "12px" }}
-            >
-              <Card.Body>
-                <div className="d-flex justify-content-between align-items-start mb-3">
-                  <div>
-                    <h6
-                      className="mb-1"
-                      style={{ fontWeight: "600", color: "#212529" }}
-                    >
-                      Order #{order.orderNumber || order._id?.slice(-6)}
-                    </h6>
-                    <small className="text-muted">
-                      {order.items?.length || 0} items
-                    </small>
-                  </div>
-                  {getStatusBadge(order.status)}
-                </div>
+    <Box sx={{ display: { xs: "block", lg: "none" }, p: 2 }}>
+      {filteredOrders?.length > 0 && filteredOrders.map((order) => (
+        <Card key={order._id || order.id}
+          sx={{ mb: 2, borderRadius: "12px", border: "1px solid #f1f5f9" }} elevation={1}>
+          <CardContent>
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
+              <Box>
+                <Typography variant="subtitle2" fontWeight={700}>
+                  Order #{order.orderNumber || order._id?.slice(-6)}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {order.items?.length || 0} items
+                </Typography>
+              </Box>
+              {getStatusBadge(order.status)}
+            </Box>
 
-                <div className="mb-3">
-                  <div className="d-flex align-items-center mb-2">
-                    <FiUser className="me-2" style={{ color: "#10b981" }} />
-                    <span className="fw-medium">
-                      {order.user?.name || order.customerName || "Unknown"}
-                    </span>
-                  </div>
-                  <div className="d-flex align-items-center mb-2">
-                    <FiCalendar className="me-2" style={{ color: "#f59e0b" }} />
-                    <span className="text-muted small">
-                      {formatDate(order.createdAt || order.orderDate)}
-                    </span>
-                  </div>
-                  <div className="d-flex align-items-center">
-                    <FiDollarSign
-                      className="me-2"
-                      style={{ color: "#059669" }}
-                    />
-                    <span style={{ fontWeight: "600", color: "#059669" }}>
-                      {formatCurrency(order.totalAmount || order.total)}
-                    </span>
-                  </div>
-                </div>
+            <Stack spacing={1} sx={{ mb: 2 }}>
+              {[
+                { icon: <FiUser color="#10b981" />, text: order.user?.name || order.customerName || "Unknown", bold: true },
+                { icon: <FiCalendar color="#f59e0b" />, text: formatDate(order.createdAt || order.orderDate) },
+                { icon: <FiDollarSign color="#059669" />, text: formatCurrency(order.totalAmount || order.total), bold: true, color: "#059669" },
+              ].map(({ icon, text, bold, color }, i) => (
+                <Box key={i} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  {icon}
+                  <Typography variant="body2" fontWeight={bold ? 600 : 400} sx={{ color: color || "text.primary" }}>
+                    {text}
+                  </Typography>
+                </Box>
+              ))}
+            </Stack>
 
-                <div className="d-grid gap-2 d-md-flex">
-                  <button
-                    className="adm-btn adm-btn--secondary adm-btn-sm flex-fill"
-                    onClick={() => handleViewDetails(order)}
-                  >
-                    <FiEye className="me-1" /> View Details
-                  </button>
-                  <button
-                    className="adm-btn adm-btn--secondary adm-btn-sm flex-fill"
-                    onClick={() => handleStatusUpdate(order)}
-                  >
-                    <FiEdit className="me-1" /> Update Status
-                  </button>
-                </div>
-              </Card.Body>
-            </Card>
-          ))}
-      </div>
-    </div>
+            <Stack direction="row" spacing={1}>
+              <Button variant="outlined" size="small" fullWidth
+                startIcon={<FiEye size={14} />}
+                onClick={() => handleViewDetails(order)}
+                sx={{ borderRadius: "8px", borderColor: "#e2e8f0", color: "text.secondary" }}>
+                View Details
+              </Button>
+              <Button variant="outlined" size="small" fullWidth
+                startIcon={<FiEdit size={14} />}
+                onClick={() => handleStatusUpdate(order)}
+                sx={{ borderRadius: "8px", borderColor: "#e2e8f0", color: "text.secondary" }}>
+                Update Status
+              </Button>
+            </Stack>
+          </CardContent>
+        </Card>
+      ))}
+    </Box>
   );
 };
 

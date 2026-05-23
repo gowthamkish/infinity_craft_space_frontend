@@ -10,8 +10,106 @@ import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContext } from "../context/ToastContext";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
-import "./auth.css";
+import {
+  Box,
+  Card,
+  CardContent,
+  TextField,
+  Button,
+  IconButton,
+  InputAdornment,
+  Alert,
+  CircularProgress,
+  Typography,
+  Divider,
+  Link,
+} from "@mui/material";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
+// ── Shared brand panel ───────────────────────────────────────────────────────
+function BrandPanel({ title, subtitle, perks }) {
+  return (
+    <Box
+      aria-hidden="true"
+      sx={{
+        display: { xs: "none", lg: "flex" },
+        flex: "0 0 420px",
+        background: "linear-gradient(135deg, #3D1A2A 0%, #5C2038 45%, #6b1238 100%)",
+        alignItems: "center",
+        justifyContent: "center",
+        p: "3rem 2.5rem",
+        position: "relative",
+        overflow: "hidden",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(ellipse at 30% 80%, rgba(201,168,76,0.20) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(244,167,185,0.18) 0%, transparent 50%)",
+        },
+      }}
+    >
+      <Box sx={{ position: "relative", zIndex: 1, color: "white" }}>
+        <Box
+          component="img"
+          src="/ICS_Logo.jpeg"
+          alt="Infinity Craft Space"
+          sx={{
+            width: 80,
+            height: 80,
+            borderRadius: "20px",
+            objectFit: "cover",
+            mb: 2.5,
+            boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
+          }}
+        />
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 800,
+            mb: 0.75,
+            background: "linear-gradient(135deg, #fff 0%, #F4A7B9 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}
+        >
+          {title}
+        </Typography>
+        <Typography sx={{ color: "rgba(255,255,255,0.70)", mb: 3, fontSize: "0.9375rem", lineHeight: 1.5 }}>
+          {subtitle}
+        </Typography>
+        <Box component="ul" sx={{ listStyle: "none", p: 0, m: 0, display: "flex", flexDirection: "column", gap: 1.5 }}>
+          {perks.map(({ icon, text }) => (
+            <Box component="li" key={text} sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <Box
+                sx={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: "10px",
+                  background: "rgba(255,255,255,0.10)",
+                  backdropFilter: "blur(4px)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "1rem",
+                  flexShrink: 0,
+                }}
+              >
+                {icon}
+              </Box>
+              <Typography sx={{ color: "rgba(255,255,255,0.85)", fontSize: "0.9375rem" }}>
+                {text}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+
+// ── Login page ───────────────────────────────────────────────────────────────
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -52,7 +150,6 @@ export default function Login() {
     try {
       const preLoginCart = [...guestCartItems];
       const data = await dispatch(loginUser({ email, password })).unwrap();
-      // Record login time so axios interceptor skips redirect during cookie settle window
       sessionStorage.setItem("authLoginTime", String(Date.now()));
       await dispatch(fetchUserCart());
       if (preLoginCart.length > 0) {
@@ -84,203 +181,166 @@ export default function Login() {
         canonical={`${SEO_CONFIG.SITE_URL}/login`}
       />
 
-      <div className="auth-page">
-        {/* Left panel — brand */}
-        <div className="auth-brand-panel" aria-hidden="true">
-          <div className="auth-brand-content">
-            <img
-              src="/ICS_Logo.jpeg"
-              alt="Infinity Craft Space"
-              className="auth-brand-logo"
-            />
-            <h2 className="auth-brand-title">Infinity Craft Space</h2>
-            <p className="auth-brand-subtitle">
-              Premium craft supplies for creative minds
-            </p>
-            <ul className="auth-brand-perks">
-              <li>
-                <span className="perk-icon">🎨</span> Exclusive craft
-                collections
-              </li>
-              <li>
-                <span className="perk-icon">📦</span> Fast, reliable delivery
-              </li>
-              <li>
-                <span className="perk-icon">⭐</span> Curated quality products
-              </li>
-              <li>
-                <span className="perk-icon">🔒</span> Secure checkout
-              </li>
-            </ul>
-          </div>
-        </div>
+      <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "background.default" }}>
+        <BrandPanel
+          title="Infinity Craft Space"
+          subtitle="Premium craft supplies for creative minds"
+          perks={[
+            { icon: "🎨", text: "Exclusive craft collections" },
+            { icon: "📦", text: "Fast, reliable delivery" },
+            { icon: "⭐", text: "Curated quality products" },
+            { icon: "🔒", text: "Secure checkout" },
+          ]}
+        />
 
-        {/* Right panel — form */}
-        <div className="auth-form-panel">
-          <div className="auth-card">
-            <div className="auth-card-header">
-              <h1 className="auth-title">Welcome back</h1>
-              <p className="auth-subtitle">Sign in to continue shopping</p>
-            </div>
+        {/* Right: form panel */}
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            p: { xs: "2rem 1.25rem", sm: "2rem" },
+            overflowY: "auto",
+          }}
+        >
+          <Box sx={{ width: "100%", maxWidth: 420 }}>
+            <Typography variant="h5" sx={{ fontWeight: 800, mb: 0.5 }}>
+              Welcome back
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
+              Sign in to continue shopping
+            </Typography>
 
             {error && (
-              <div className="auth-alert auth-alert--error" role="alert">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M8 1a7 7 0 100 14A7 7 0 008 1zm-.75 3.75a.75.75 0 011.5 0v3.5a.75.75 0 01-1.5 0v-3.5zm.75 7a1 1 0 110-2 1 1 0 010 2z"
-                    fill="currentColor"
-                  />
-                </svg>
+              <Alert severity="error" sx={{ mb: 2 }}>
                 {error}
-              </div>
+              </Alert>
             )}
 
-            <form onSubmit={handleSubmit} noValidate>
-              {/* Email */}
-              <div className="auth-field">
-                <label htmlFor="login-email" className="auth-label">
-                  Email address
-                </label>
-                <input
-                  id="login-email"
-                  type="email"
-                  className={`auth-input ${touched.email && validationErrors.email ? "auth-input--error" : ""} ${touched.email && !validationErrors.email && email ? "auth-input--valid" : ""}`}
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    clearFieldError("email");
-                  }}
-                  onBlur={() => setTouched((p) => ({ ...p, email: true }))}
-                  placeholder="you@example.com"
-                  autoComplete="email"
-                  required
-                />
-                {touched.email && validationErrors.email && (
-                  <p className="auth-field-error" role="alert">
-                    {validationErrors.email}
-                  </p>
-                )}
-              </div>
+            <Box component="form" onSubmit={handleSubmit} noValidate>
+              <TextField
+                label="Email address"
+                type="email"
+                fullWidth
+                required
+                autoComplete="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  clearFieldError("email");
+                }}
+                onBlur={() => setTouched((p) => ({ ...p, email: true }))}
+                error={!!(touched.email && validationErrors.email)}
+                helperText={touched.email && validationErrors.email ? validationErrors.email : ""}
+                sx={{ mb: 2 }}
+              />
 
-              {/* Password */}
-              <div className="auth-field">
-                <label htmlFor="login-password" className="auth-label">
-                  Password
-                </label>
-                <div className="auth-input-wrapper">
-                  <input
-                    id="login-password"
-                    type={showPassword ? "text" : "password"}
-                    className={`auth-input auth-input--with-icon ${touched.password && validationErrors.password ? "auth-input--error" : ""} ${touched.password && !validationErrors.password && password ? "auth-input--valid" : ""}`}
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      clearFieldError("password");
-                    }}
-                    onBlur={() => setTouched((p) => ({ ...p, password: true }))}
-                    placeholder="Enter your password"
-                    autoComplete="current-password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="auth-eye-btn"
-                    onClick={() => setShowPassword((s) => !s)}
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
-                    tabIndex={-1}
-                  >
-                    {showPassword ? (
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" />
-                        <line x1="1" y1="1" x2="23" y2="23" />
-                      </svg>
-                    ) : (
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                        <circle cx="12" cy="12" r="3" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-                {touched.password && validationErrors.password && (
-                  <p className="auth-field-error" role="alert">
-                    {validationErrors.password}
-                  </p>
-                )}
-              </div>
+              <TextField
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                fullWidth
+                required
+                autoComplete="current-password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  clearFieldError("password");
+                }}
+                onBlur={() => setTouched((p) => ({ ...p, password: true }))}
+                error={!!(touched.password && validationErrors.password)}
+                helperText={touched.password && validationErrors.password ? validationErrors.password : ""}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowPassword((s) => !s)}
+                          aria-label={showPassword ? "Hide password" : "Show password"}
+                          edge="end"
+                          tabIndex={-1}
+                          size="small"
+                        >
+                          {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+                sx={{ mb: 1 }}
+              />
 
-              {/* Forgot password link */}
-              <div style={{ textAlign: "right", marginTop: "-0.25rem", marginBottom: "1rem" }}>
-                <button
+              <Box sx={{ textAlign: "right", mb: 2 }}>
+                <Link
+                  component="button"
                   type="button"
-                  className="auth-footer-link"
-                  style={{ fontSize: "0.82rem", color: "#1d4ed8", background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline" }}
+                  variant="body2"
                   onClick={() => navigate("/forgot-password")}
+                  sx={{ fontWeight: 500, cursor: "pointer" }}
                 >
                   Forgot password?
-                </button>
-              </div>
+                </Link>
+              </Box>
 
-              {/* Primary CTA */}
-              <button
+              <Button
                 type="submit"
-                className="auth-btn auth-btn--primary"
+                variant="contained"
+                color="primary"
+                fullWidth
                 disabled={isDisabled}
+                sx={{
+                  height: 52,
+                  fontWeight: 700,
+                  fontSize: "0.9375rem",
+                  mb: 1.5,
+                  borderRadius: "12px",
+                }}
               >
                 {loading ? (
-                  <>
-                    <span className="auth-spinner" aria-hidden="true" />
-                    Signing in…
-                  </>
-                ) : (
-                  "Sign in"
-                )}
-              </button>
+                  <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />
+                ) : null}
+                {loading ? "Signing in…" : "Sign in"}
+              </Button>
 
-              <div className="auth-divider">
-                <span>or</span>
-              </div>
+              <Divider sx={{ my: 1.5 }}>
+                <Typography variant="caption" color="text.secondary">
+                  or
+                </Typography>
+              </Divider>
 
-              {/* Secondary CTA */}
-              <button
+              <Button
                 type="button"
-                className="auth-btn auth-btn--outline"
+                variant="outlined"
+                color="secondary"
+                fullWidth
                 onClick={() => navigate("/register")}
+                sx={{
+                  height: 52,
+                  fontWeight: 600,
+                  fontSize: "0.9375rem",
+                  borderRadius: "12px",
+                }}
               >
                 Create a new account
-              </button>
-            </form>
+              </Button>
+            </Box>
 
-            <div className="auth-footer-link">
-              <button type="button" onClick={() => navigate("/products")}>
+            <Box sx={{ textAlign: "center", mt: 2.5 }}>
+              <Link
+                component="button"
+                type="button"
+                variant="body2"
+                onClick={() => navigate("/products")}
+                sx={{ cursor: "pointer", fontWeight: 500 }}
+              >
                 Continue browsing without an account →
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+              </Link>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
     </>
   );
 }

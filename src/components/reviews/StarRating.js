@@ -1,141 +1,117 @@
 import React from "react";
 import { FiStar } from "react-icons/fi";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import LinearProgress from "@mui/material/LinearProgress";
 
-// Star Rating Display Component
+const GOLD = "#C9A84C";
+const GOLD_EMPTY = "#EAD9C5";
+
 export const StarRating = ({ rating, size = "1rem", showValue = false }) => {
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 >= 0.5;
   const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
   return (
-    <div className="d-flex align-items-center gap-1">
-      <div className="d-flex" style={{ gap: "2px" }}>
-        {/* Full stars */}
+    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+      <Box sx={{ display: "flex", gap: "2px" }}>
         {[...Array(fullStars)].map((_, i) => (
-          <FiStar
-            key={`full-${i}`}
-            style={{ fontSize: size, color: "#fbbf24", fill: "#fbbf24" }}
-          />
+          <FiStar key={`full-${i}`} style={{ fontSize: size, color: GOLD, fill: GOLD }} />
         ))}
-        {/* Half star */}
         {hasHalfStar && (
-          <FiStar
-            style={{
-              fontSize: size,
-              color: "#fbbf24",
-              fill: "#fbbf24",
-              opacity: 0.5,
-            }}
-          />
+          <FiStar style={{ fontSize: size, color: GOLD, fill: GOLD, opacity: 0.5 }} />
         )}
-        {/* Empty stars */}
         {[...Array(emptyStars)].map((_, i) => (
-          <FiStar
-            key={`empty-${i}`}
-            style={{ fontSize: size, color: "#e9ecef" }}
-          />
+          <FiStar key={`empty-${i}`} style={{ fontSize: size, color: GOLD_EMPTY }} />
         ))}
-      </div>
+      </Box>
       {showValue && (
-        <span
-          style={{
-            fontSize: "0.9rem",
-            fontWeight: "600",
-            color: "var(--text-primary)",
-            marginLeft: "0.25rem",
-          }}
-        >
+        <Typography variant="body2" sx={{ fontWeight: 600, color: "text.primary", ml: 0.5 }}>
           {rating.toFixed(1)}
-        </span>
+        </Typography>
       )}
-    </div>
+    </Box>
   );
 };
 
-// Star Rating Input Component
 export const StarRatingInput = ({ rating, onRatingChange, size = "2rem" }) => {
   const [hoverRating, setHoverRating] = React.useState(0);
 
   return (
-    <div className="star-rating-input" onMouseLeave={() => setHoverRating(0)}>
-      {[1, 2, 3, 4, 5].map((star) => (
-        <FiStar
-          key={star}
-          className={`star ${(hoverRating || rating) >= star ? "filled" : ""}`}
-          style={{
-            fontSize: size,
-            color: (hoverRating || rating) >= star ? "#fbbf24" : "#e9ecef",
-            fill: (hoverRating || rating) >= star ? "#fbbf24" : "none",
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-          }}
-          onMouseEnter={() => setHoverRating(star)}
-          onClick={() => onRatingChange(star)}
-        />
-      ))}
-    </div>
+    <Box
+      sx={{ display: "flex", gap: "4px", cursor: "pointer" }}
+      onMouseLeave={() => setHoverRating(0)}
+    >
+      {[1, 2, 3, 4, 5].map((star) => {
+        const active = (hoverRating || rating) >= star;
+        return (
+          <FiStar
+            key={star}
+            style={{
+              fontSize: size,
+              color: active ? GOLD : GOLD_EMPTY,
+              fill: active ? GOLD : "none",
+              cursor: "pointer",
+              transition: "all 0.15s ease",
+            }}
+            onMouseEnter={() => setHoverRating(star)}
+            onClick={() => onRatingChange(star)}
+          />
+        );
+      })}
+    </Box>
   );
 };
 
-// Rating Breakdown Component
 export const RatingBreakdown = ({ ratingBreakdown, totalReviews }) => {
   if (!ratingBreakdown || totalReviews === 0) return null;
 
   return (
-    <div className="rating-breakdown">
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
       {[5, 4, 3, 2, 1].map((stars) => {
         const count = ratingBreakdown[stars] || 0;
-        const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
-
+        const pct = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
         return (
-          <div key={stars} className="rating-bar-row">
-            <span className="rating-bar-label">{stars} star</span>
-            <div className="rating-bar-container">
-              <div
-                className="rating-bar-fill"
-                style={{ width: `${percentage}%` }}
-              />
-            </div>
-            <span className="rating-bar-count">{count}</span>
-          </div>
+          <Box key={stars} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Typography variant="caption" sx={{ width: 38, flexShrink: 0, color: "text.secondary" }}>
+              {stars} star
+            </Typography>
+            <LinearProgress
+              variant="determinate"
+              value={pct}
+              sx={{
+                flex: 1, height: 7, borderRadius: 9999,
+                bgcolor: GOLD_EMPTY,
+                "& .MuiLinearProgress-bar": { bgcolor: GOLD },
+              }}
+            />
+            <Typography variant="caption" sx={{ width: 24, flexShrink: 0, textAlign: "right", color: "text.secondary" }}>
+              {count}
+            </Typography>
+          </Box>
         );
       })}
-    </div>
+    </Box>
   );
 };
 
-// Rating Summary Component
-export const RatingSummary = ({
-  averageRating,
-  reviewCount,
-  ratingBreakdown,
-}) => {
-  return (
-    <div className="rating-summary">
-      <div className="d-flex flex-wrap align-items-start gap-4">
-        <div className="rating-overview">
-          <div>
-            <span className="rating-number">
-              {averageRating?.toFixed(1) || "0.0"}
-            </span>
-            <div className="mt-2">
-              <StarRating rating={averageRating || 0} size="1.25rem" />
-            </div>
-            <div className="rating-count">
-              {reviewCount || 0} {reviewCount === 1 ? "review" : "reviews"}
-            </div>
-          </div>
-        </div>
-
-        <div className="flex-grow-1" style={{ minWidth: "200px" }}>
-          <RatingBreakdown
-            ratingBreakdown={ratingBreakdown}
-            totalReviews={reviewCount}
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
+export const RatingSummary = ({ averageRating, reviewCount, ratingBreakdown }) => (
+  <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", gap: 4 }}>
+    <Box sx={{ textAlign: "center" }}>
+      <Typography variant="h2" sx={{ fontWeight: 800, color: "text.primary", lineHeight: 1 }}>
+        {averageRating?.toFixed(1) || "0.0"}
+      </Typography>
+      <Box sx={{ mt: 1 }}>
+        <StarRating rating={averageRating || 0} size="1.25rem" />
+      </Box>
+      <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mt: 0.5 }}>
+        {reviewCount || 0} {reviewCount === 1 ? "review" : "reviews"}
+      </Typography>
+    </Box>
+    <Box sx={{ flex: 1, minWidth: 200 }}>
+      <RatingBreakdown ratingBreakdown={ratingBreakdown} totalReviews={reviewCount} />
+    </Box>
+  </Box>
+);
 
 export default StarRating;

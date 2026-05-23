@@ -1,6 +1,8 @@
 import "./App.css";
 import "./styles/buttons.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ThemeProvider, CssBaseline } from "@mui/material";
+import muiTheme from "./theme/muiTheme";
 import {
   useEffect,
   useRef,
@@ -280,6 +282,8 @@ function App() {
   }, [userId]);
 
   return (
+    <ThemeProvider theme={muiTheme}>
+      <CssBaseline enableColorScheme={false} />
     <div className="App">
       <ErrorBoundary>
         <HelmetProvider>
@@ -716,6 +720,7 @@ function App() {
         </HelmetProvider>
       </ErrorBoundary>
     </div>
+    </ThemeProvider>
   );
 }
 

@@ -1,4 +1,6 @@
 import React from "react";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
 import "../styles/skeletonLoaders.css";
 
 export const SkeletonText = ({ lines = 1, width = "100%", className = "" }) => {
@@ -67,13 +69,13 @@ export const SkeletonListLoader = ({ items = 3 }) => {
 
 export const SkeletonProductGrid = ({ count = 4 }) => {
   return (
-    <div className="row">
+    <Grid container spacing={2}>
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="col-md-6 col-lg-3 mb-4">
+        <Grid key={i} item xs={6} sm={4} md={3}>
           <SkeletonProductCard />
-        </div>
+        </Grid>
       ))}
-    </div>
+    </Grid>
   );
 };
 

@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Card, Row, Col } from "react-bootstrap";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Card,
+  CardContent,
+  Grid,
+  Box,
+  Typography,
+  IconButton,
+  Button,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   FiShoppingBag,
   FiUser,
@@ -270,26 +283,51 @@ const OrderDetailsModal = ({
   const hasShipment = false; // Shiprocket — re-enable when integrated
 
   return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      size="xl"
-      centered
+    <Dialog
+      open={show}
+      onClose={onHide}
+      maxWidth="lg"
+      fullWidth
       className="order-details-modal"
     >
-      <Modal.Header closeButton>
-        <Modal.Title style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <div style={{ background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: 8, display: "flex", alignItems: "center" }}>
+      <DialogTitle
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+          color: "white",
+          p: "1rem 1.5rem",
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <Box
+            sx={{
+              background: "rgba(255,255,255,0.15)",
+              borderRadius: 2,
+              p: 1,
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
             <FiShoppingBag size={20} />
-          </div>
+          </Box>
           Order #{selectedOrder?.orderNumber || selectedOrder?._id?.slice(-6)}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body style={{ padding: 0, background: "#f8fafc" }}>
+        </Box>
+        <IconButton
+          onClick={onHide}
+          sx={{ color: "white", ml: 1 }}
+          size="small"
+        >
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+
+      <DialogContent sx={{ padding: 0, background: "#f8fafc" }}>
         {selectedOrder && (
           <div>
-            <div
-              style={{
+            <Box
+              sx={{
                 background: "linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)",
                 padding: "1.25rem",
                 borderBottom: "1px solid #e2e8f0",
@@ -350,17 +388,22 @@ const OrderDetailsModal = ({
                   )}
                 </div>
               </div>
-            </div>
+            </Box>
 
-            <div style={{ padding: "1.25rem" }}>
-              <Row className="g-3">
-                <Col lg={6}>
+            <Box sx={{ padding: "1.25rem" }}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} lg={6}>
                   <Card
-                    className="h-100 border-0 shadow-sm"
-                    style={{ borderRadius: "12px", overflow: "hidden" }}
+                    sx={{
+                      height: "100%",
+                      border: "none",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+                      borderRadius: "12px",
+                      overflow: "hidden",
+                    }}
                   >
-                    <div
-                      style={{
+                    <Box
+                      sx={{
                         background:
                           "linear-gradient(135deg, #10b981 0%, #059669 100%)",
                         color: "white",
@@ -376,92 +419,48 @@ const OrderDetailsModal = ({
                           fontSize: "0.9rem",
                         }}
                       >
-                        <FiUser size={16} className="me-2" />
+                        <FiUser size={16} style={{ marginRight: "0.5rem" }} />
                         Customer Information
                       </h6>
-                    </div>
-                    <Card.Body style={{ padding: "1rem" }}>
-                      <div className="mb-2">
-                        <label
-                          style={{
-                            fontSize: "0.8rem",
-                            color: "#64748b",
-                            fontWeight: 500,
-                          }}
-                        >
-                          Username
-                        </label>
-                        <p
-                          style={{
-                            margin: "0.15rem 0 0 0",
-                            fontSize: "0.9rem",
-                            fontWeight: 600,
-                            color: "#1e293b",
-                          }}
-                        >
+                    </Box>
+                    <CardContent sx={{ padding: "1rem" }}>
+                      <Box sx={{ mb: 1.5 }}>
+                        <label style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: 500 }}>Username</label>
+                        <p style={{ margin: "0.15rem 0 0 0", fontSize: "0.9rem", fontWeight: 600, color: "#1e293b" }}>
                           {typeof selectedOrder.userId === "object"
-                            ? selectedOrder.userId?.username ||
-                              selectedOrder.customerName ||
-                              "Unknown Customer"
+                            ? selectedOrder.userId?.username || selectedOrder.customerName || "Unknown Customer"
                             : selectedOrder.customerName || "Unknown Customer"}
                         </p>
-                      </div>
-                      <div className="mb-2">
-                        <label
-                          style={{
-                            fontSize: "0.8rem",
-                            color: "#64748b",
-                            fontWeight: 500,
-                          }}
-                        >
-                          Email Address
-                        </label>
-                        <p
-                          style={{
-                            margin: "0.15rem 0 0 0",
-                            fontSize: "0.85rem",
-                            color: "#475569",
-                          }}
-                        >
+                      </Box>
+                      <Box sx={{ mb: 1.5 }}>
+                        <label style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: 500 }}>Email Address</label>
+                        <p style={{ margin: "0.15rem 0 0 0", fontSize: "0.85rem", color: "#475569" }}>
                           {typeof selectedOrder.userId === "object"
-                            ? selectedOrder.userId?.email ||
-                              selectedOrder.customerEmail ||
-                              "N/A"
+                            ? selectedOrder.userId?.email || selectedOrder.customerEmail || "N/A"
                             : selectedOrder.customerEmail || "N/A"}
                         </p>
-                      </div>
-                      <div>
-                        <label
-                          style={{
-                            fontSize: "0.8rem",
-                            color: "#64748b",
-                            fontWeight: 500,
-                          }}
-                        >
-                          Phone Number
-                        </label>
-                        <p
-                          style={{
-                            margin: "0.15rem 0 0 0",
-                            fontSize: "0.85rem",
-                            color: "#475569",
-                          }}
-                        >
-                          {selectedOrder.shippingAddress?.phone ||
-                            selectedOrder.phone ||
-                            "N/A"}
+                      </Box>
+                      <Box>
+                        <label style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: 500 }}>Phone Number</label>
+                        <p style={{ margin: "0.15rem 0 0 0", fontSize: "0.85rem", color: "#475569" }}>
+                          {selectedOrder.shippingAddress?.phone || selectedOrder.phone || "N/A"}
                         </p>
-                      </div>
-                    </Card.Body>
+                      </Box>
+                    </CardContent>
                   </Card>
-                </Col>
-                <Col lg={6}>
+                </Grid>
+                <Grid item xs={12} lg={6}>
                   <Card
-                    className="h-100 border-0 shadow-sm"
-                    style={{ borderRadius: "12px", overflow: "hidden" }}
+                    sx={{
+                      height: "100%",
+                      border: "none",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+                      borderRadius: "12px",
+                      overflow: "hidden",
+                    }}
                   >
-                    <div
-                      style={{
+                    <Box
+                      sx={{
                         background:
                           "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
                         color: "white",
@@ -477,11 +476,11 @@ const OrderDetailsModal = ({
                           fontSize: "0.9rem",
                         }}
                       >
-                        <FiMapPin size={16} className="me-2" />
+                        <FiMapPin size={16} style={{ marginRight: "0.5rem" }} />
                         Shipping Address
                       </h6>
-                    </div>
-                    <Card.Body style={{ padding: "1rem" }}>
+                    </Box>
+                    <CardContent sx={{ padding: "1rem" }}>
                       {selectedOrder.shippingAddress ? (
                         <div
                           style={{
@@ -510,7 +509,7 @@ const OrderDetailsModal = ({
                           </p>
                         </div>
                       ) : (
-                        <div className="text-center py-2">
+                        <Box sx={{ textAlign: "center", py: 1 }}>
                           <FiMapPin
                             size={36}
                             style={{ color: "#cbd5e1", margin: "0 0 0.5rem 0" }}
@@ -524,21 +523,25 @@ const OrderDetailsModal = ({
                           >
                             No shipping address provided
                           </p>
-                        </div>
+                        </Box>
                       )}
-                    </Card.Body>
+                    </CardContent>
                   </Card>
-                </Col>
-              </Row>
+                </Grid>
+              </Grid>
 
               <Card
-                className="mt-3 border-0 shadow-sm"
-                style={{ borderRadius: "12px", overflow: "hidden" }}
+                sx={{
+                  mt: 2,
+                  border: "none",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+                  borderRadius: "12px",
+                  overflow: "hidden",
+                }}
               >
-                <div
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #0f172a, #1e293b)",
+                <Box
+                  sx={{
+                    background: "linear-gradient(135deg, #0f172a, #1e293b)",
                     color: "white",
                     padding: "0.875rem 1rem",
                   }}
@@ -552,10 +555,10 @@ const OrderDetailsModal = ({
                       fontSize: "0.9rem",
                     }}
                   >
-                    <FiPackage size={16} className="me-2" />
+                    <FiPackage size={16} style={{ marginRight: "0.5rem" }} />
                     Order Items ({selectedOrder.items?.length || 0} items)
                   </h6>
-                </div>
+                </Box>
                 <div style={{ padding: 0 }}>
                   {selectedOrder.items?.length > 0 ? (
                     <div>
@@ -571,7 +574,7 @@ const OrderDetailsModal = ({
                             background: idx % 2 === 0 ? "white" : "#fafbfc",
                           }}
                         >
-                          <div className="d-flex justify-content-between align-items-start">
+                          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                             <div style={{ flex: 1 }}>
                               <h6
                                 style={{
@@ -653,12 +656,12 @@ const OrderDetailsModal = ({
                                 )}
                               </div>
                             </div>
-                          </div>
+                          </Box>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center">
+                    <Box sx={{ textAlign: "center" }}>
                       <FiPackage
                         size={48}
                         style={{ color: "#cbd5e1", margin: "0 0 0.75rem 0" }}
@@ -672,7 +675,7 @@ const OrderDetailsModal = ({
                       >
                         No items found in this order
                       </p>
-                    </div>
+                    </Box>
                   )}
                 </div>
               </Card>
@@ -680,12 +683,17 @@ const OrderDetailsModal = ({
               {/* ── Tracking Section ── */}
               {hasShipment && (
                 <Card
-                  className="mt-3 border-0 shadow-sm"
-                  style={{ borderRadius: "12px", overflow: "hidden" }}
+                  sx={{
+                    mt: 2,
+                    border: "none",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+                    borderRadius: "12px",
+                    overflow: "hidden",
+                  }}
                 >
-                  <div
-                    style={{
-                      background: "linear-gradient(135deg, #3b82f6, #2563eb)",
+                  <Box
+                    sx={{
+                      background: "linear-gradient(135deg, #C9A84C, #8B1A4A)",
                       color: "white",
                       padding: "0.875rem 1rem",
                       display: "flex",
@@ -702,7 +710,7 @@ const OrderDetailsModal = ({
                         fontSize: "0.9rem",
                       }}
                     >
-                      <FiTruck size={16} className="me-2" />
+                      <FiTruck size={16} style={{ marginRight: "0.5rem" }} />
                       Shipment & Tracking
                     </h6>
                     {orderId && hasShipment && (
@@ -722,7 +730,7 @@ const OrderDetailsModal = ({
                         Full Tracking →
                       </button>
                     )}
-                  </div>
+                  </Box>
                   <div style={{ padding: "1rem", background: "white" }}>
                     {trackingLoading ? (
                       <div style={{ textAlign: "center", padding: "1rem", color: "#94a3b8" }}>
@@ -740,13 +748,27 @@ const OrderDetailsModal = ({
 
               {/* ── Return Request Section (admin view) ── */}
               {selectedOrder.hasReturnRequest && selectedOrder.returnRequestId && (
-                <Card className="mt-3 border-0 shadow-sm" style={{ borderRadius: "12px", overflow: "hidden" }}>
-                  <div style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)", color: "white", padding: "0.875rem 1rem" }}>
+                <Card
+                  sx={{
+                    mt: 2,
+                    border: "none",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+                    borderRadius: "12px",
+                    overflow: "hidden",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                      color: "white",
+                      padding: "0.875rem 1rem",
+                    }}
+                  >
                     <h6 style={{ margin: 0, fontWeight: 600, display: "flex", alignItems: "center", fontSize: "0.9rem" }}>
-                      <FiRotateCcw size={16} className="me-2" />
+                      <FiRotateCcw size={16} style={{ marginRight: "0.5rem" }} />
                       Return Request
                     </h6>
-                  </div>
+                  </Box>
                   <ReturnRequestPanel
                     returnRequestId={selectedOrder.returnRequestId}
                     onStatusChanged={() => {}}
@@ -755,15 +777,16 @@ const OrderDetailsModal = ({
               )}
 
               <Card
-                className="mt-3 border-0 shadow-sm"
-                style={{
+                sx={{
+                  mt: 2,
+                  border: "1px solid #e2e8f0",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
                   borderRadius: "12px",
                   overflow: "hidden",
-                  border: "1px solid #e2e8f0",
                 }}
               >
-                <div
-                  style={{
+                <Box
+                  sx={{
                     background:
                       "linear-gradient(135deg, #059669 0%, #047857 100%)",
                     color: "white",
@@ -779,66 +802,42 @@ const OrderDetailsModal = ({
                       fontSize: "0.9rem",
                     }}
                   >
-                    <FiCreditCard size={16} className="me-2" />
+                    <FiCreditCard size={16} style={{ marginRight: "0.5rem" }} />
                     Payment Summary
                   </h6>
-                </div>
+                </Box>
                 <div style={{ padding: "1rem", background: "white" }}>
-                  <div style={{ marginBottom: "0.75rem" }}>
-                    <div className="d-flex justify-content-between align-items-center mb-1">
-                      <span style={{ color: "#64748b", fontSize: "0.85rem" }}>
-                        Subtotal:
-                      </span>
-                      <span
-                        style={{
-                          color: "#475569",
-                          fontWeight: 600,
-                          fontSize: "0.9rem",
-                        }}
-                      >
+                  <Box sx={{ mb: 1.5 }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5 }}>
+                      <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Subtotal:</span>
+                      <span style={{ color: "#475569", fontWeight: 600, fontSize: "0.9rem" }}>
                         {formatCurrency(
                           selectedOrder.subtotal ||
                           (selectedOrder.totalAmount || selectedOrder.total) -
                             (selectedOrder.shipping || selectedOrder.shippingCost || 0),
                         )}
                       </span>
-                    </div>
-                    <div className="d-flex justify-content-between align-items-center mb-1">
-                      <span style={{ color: "#64748b", fontSize: "0.85rem" }}>
-                        Shipping:
-                      </span>
-                      <span
-                        style={{
-                          color: "#475569",
-                          fontWeight: 600,
-                          fontSize: "0.9rem",
-                        }}
-                      >
+                    </Box>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5 }}>
+                      <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Shipping:</span>
+                      <span style={{ color: "#475569", fontWeight: 600, fontSize: "0.9rem" }}>
                         {formatCurrency(selectedOrder.shipping || selectedOrder.shippingCost || 0)}
                       </span>
-                    </div>
+                    </Box>
                     {selectedOrder.tax && (
-                      <div className="d-flex justify-content-between align-items-center mb-1">
-                        <span style={{ color: "#64748b", fontSize: "0.85rem" }}>
-                          Tax:
-                        </span>
-                        <span
-                          style={{
-                            color: "#475569",
-                            fontWeight: 600,
-                            fontSize: "0.9rem",
-                          }}
-                        >
+                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5 }}>
+                        <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Tax:</span>
+                        <span style={{ color: "#475569", fontWeight: 600, fontSize: "0.9rem" }}>
                           {formatCurrency(selectedOrder.tax)}
                         </span>
-                      </div>
+                      </Box>
                     )}
-                  </div>
+                  </Box>
                   <hr
                     style={{ margin: "0.75rem 0", border: "1px solid #e2e8f0" }}
                   />
-                  <div
-                    className="d-flex justify-content-between align-items-center"
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
                     style={{
                       background:
                         "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
@@ -868,55 +867,61 @@ const OrderDetailsModal = ({
                         selectedOrder.totalAmount || selectedOrder.total,
                       )}
                     </span>
-                  </div>
+                  </Box>
                 </div>
               </Card>
-            </div>
+            </Box>
           </div>
         )}
-      </Modal.Body>
-      <Modal.Footer
-        style={{
+      </DialogContent>
+
+      <DialogActions
+        sx={{
           background: "#f8fafc",
           border: "none",
           borderRadius: "0 0 12px 12px",
           padding: "1rem 1.5rem",
         }}
       >
-        <div className="d-flex w-100" style={{ gap: 8 }}>
-          <button
-            className="btn btn-outline-secondary flex-fill"
+        <Box sx={{ display: "flex", width: "100%", gap: 1 }}>
+          <Button
+            variant="outlined"
             onClick={onHide}
-            style={{
-              borderRadius: 8,
+            sx={{
+              flex: 1,
+              borderRadius: 2,
               padding: "0.6rem 1.5rem",
               fontWeight: 500,
-              border: "1px solid #e2e8f0",
+              borderColor: "#e2e8f0",
+              color: "#475569",
               fontSize: "0.9rem",
+              "&:hover": { borderColor: "#cbd5e1", background: "#f8fafc" },
             }}
           >
             Close
-          </button>
+          </Button>
           {orderId && hasShipment && (
-            <button
-              className="btn flex-fill"
+            <Button
+              variant="contained"
               onClick={() => { onHide(); navigate(`/track/${orderId}`); }}
-              style={{
-                borderRadius: 8,
+              sx={{
+                flex: 1,
+                borderRadius: 2,
                 padding: "0.6rem 1.5rem",
                 fontWeight: 600,
                 fontSize: "0.9rem",
-                background: "linear-gradient(135deg, #3b82f6, #2563eb)",
+                background: "linear-gradient(135deg, #C9A84C, #8B1A4A)",
                 color: "white",
                 border: "none",
+                "&:hover": { background: "linear-gradient(135deg, #8B1A4A, #7a1640)" },
               }}
             >
               🚚 Track Order
-            </button>
+            </Button>
           )}
-        </div>
-      </Modal.Footer>
-    </Modal>
+        </Box>
+      </DialogActions>
+    </Dialog>
   );
 };
 

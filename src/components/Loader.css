@@ -18,9 +18,9 @@
 }
 
 @keyframes pulse-ring {
-  0%   { box-shadow: 0 0 0 0   rgba(37, 99, 235, 0.5); }
-  70%  { box-shadow: 0 0 0 18px rgba(37, 99, 235, 0);  }
-  100% { box-shadow: 0 0 0 0   rgba(37, 99, 235, 0);   }
+  0%   { box-shadow: 0 0 0 0   rgba(139, 26, 74, 0.5); }
+  70%  { box-shadow: 0 0 0 18px rgba(139, 26, 74, 0);  }
+  100% { box-shadow: 0 0 0 0   rgba(139, 26, 74, 0);   }
 }
 
 @keyframes fade-in-up {
@@ -81,8 +81,8 @@
 }
 
 .loader-orbit__ring--1 {
-  border-top-color: var(--primary, #2563eb);
-  border-right-color: rgba(37, 99, 235, 0.15);
+  border-top-color: var(--primary, #8B1A4A);
+  border-right-color: rgba(139, 26, 74, 0.15);
   animation-duration: 0.85s;
 }
 
@@ -151,7 +151,7 @@
 .loader-bars__bar {
   width: 4px;
   border-radius: 2px;
-  background: var(--primary, #2563eb);
+  background: var(--primary, #8B1A4A);
   animation: bar-grow 1s ease-in-out infinite;
   transform-origin: bottom;
 }

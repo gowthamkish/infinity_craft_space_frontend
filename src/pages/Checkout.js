@@ -2,6 +2,16 @@ import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
+  Box,
+  Container,
+  Stepper,
+  Step,
+  StepLabel,
+  Typography,
+  Stack,
+} from "@mui/material";
+import LockIcon from "@mui/icons-material/Lock";
+import {
   clearCart,
   updateCartItemQuantity,
   removeItemCompletely,
@@ -18,13 +28,11 @@ import {
   trackViewCart,
 } from "../utils/analytics";
 import { CartReviewStep } from "./checkout/CartReviewStep";
-import { CheckoutProgressBar } from "./checkout/CheckoutProgressBar";
 import { ShippingStep } from "./checkout/ShippingStep";
 import { PaymentStep } from "./checkout/PaymentStep";
 import { ConfirmationStep } from "./checkout/ConfirmationStep";
 import { EmptyCart } from "./checkout/EmptyCart";
 import CustomOrderModal from "../components/CustomOrderModal";
-import "./checkout/checkout.css";
 
 const CUSTOM_KEYWORDS = ["embroidery", "kundan", "thread bangle", "thread bangles"];
 const isCustomProduct = (item) => {
@@ -32,14 +40,15 @@ const isCustomProduct = (item) => {
   return CUSTOM_KEYWORDS.some((kw) => text.includes(kw));
 };
 
+const STEPS = ["Cart Review", "Shipping", "Payment", "Confirmation"];
+
 export default function Checkout() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const cartItems = useSelector((state) => state.cart.items);
   const user = useSelector((state) => state.auth.user);
 
-  // Multi-step checkout state
-  const [currentStep, setCurrentStep] = useState(1); // 1: Cart Review, 2: Checkout, 3: Payment, 4: Confirmation
+  const [currentStep, setCurrentStep] = useState(1);
   const [orderData, setOrderData] = useState(null);
   const [paymentData, setPaymentData] = useState(null);
   const [appliedCoupon, setAppliedCoupon] = useState(null);
@@ -50,7 +59,6 @@ export default function Checkout() {
     state: "",
     zipCode: "",
     country: "India",
-    // Note: always store plain "India" — not "India (भारत)" which breaks Shiprocket
     phone: "",
     label: "",
     isDefault: false,
@@ -63,24 +71,16 @@ export default function Checkout() {
   const [saveAddressToBook, setSaveAddressToBook] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
 
-  // Selected shipping rate (Shiprocket — re-enable when integrated)
   const [shippingRate, setShippingRate] = useState(null);
-  // Backend order returned from verify-payment
   const [backendOrder, setBackendOrder] = useState(null);
-  // Custom order notice modal
   const [showCustomModal, setShowCustomModal] = useState(false);
   const [customItems, setCustomItems] = useState([]);
 
-  // Calculate totals
-  const subtotal = cartItems.reduce(
-    (total, item) => total + item.totalPrice,
-    0,
-  );
+  const subtotal = cartItems.reduce((total, item) => total + item.totalPrice, 0);
   const shipping = shippingRate?.rate || 0;
   const tax = 0;
   const total = subtotal + shipping + tax;
 
-  // Step configuration
   const steps = [
     { number: 1, title: "Cart Review" },
     { number: 2, title: "Shipping" },
@@ -90,76 +90,48 @@ export default function Checkout() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setShippingAddress((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setShippingAddress((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Fetch saved addresses from backend
   const fetchSavedAddresses = async () => {
     setLoadingAddresses(true);
     try {
-      if (!user) {
-        setSavedAddresses([]);
-        setLoadingAddresses(false);
-        return;
-      }
+      if (!user) { setSavedAddresses([]); setLoadingAddresses(false); return; }
       const res = await api.get("/api/auth/addresses");
       const addrs = res.data.addresses || [];
       setSavedAddresses(addrs);
-      // Auto-select address marked as default in the address book
-      const defaultAddr = addrs.find(
-        (a) => a.isDefault || a.isDefault === true,
-      );
+      const defaultAddr = addrs.find((a) => a.isDefault || a.isDefault === true);
       if (defaultAddr) {
-        // populate the form and set selected id
         selectSavedAddress(defaultAddr);
         setSelectedAddressId(defaultAddr._id);
       }
     } catch (err) {
-      console.error(
-        "Failed to load saved addresses",
-        err.response?.data || err.message,
-      );
+      console.error("Failed to load saved addresses", err.response?.data || err.message);
     } finally {
       setLoadingAddresses(false);
     }
   };
 
-  // Save current shippingAddress to user's address book
   const handleSaveAddress = async () => {
     try {
-      if (!user) {
-        setError("Please login to save addresses");
-        return;
-      }
+      if (!user) { setError("Please login to save addresses"); return; }
       const payload = { ...shippingAddress };
       const res = await api.post("/api/auth/addresses", payload);
       setSavedAddresses(res.data.addresses || []);
       setSaveAddressToBook(false);
     } catch (err) {
-      console.error(
-        "Failed to save address",
-        err.response?.data || err.message,
-      );
+      console.error("Failed to save address", err.response?.data || err.message);
       setError("Failed to save address");
     }
   };
 
   const handleDeleteAddress = async (addressId) => {
     try {
-      if (!user) {
-        setError("Please login to manage addresses");
-        return;
-      }
+      if (!user) { setError("Please login to manage addresses"); return; }
       const res = await api.delete(`/api/auth/addresses/${addressId}`);
       setSavedAddresses(res.data.addresses || []);
     } catch (err) {
-      console.error(
-        "Failed to delete address",
-        err.response?.data || err.message,
-      );
+      console.error("Failed to delete address", err.response?.data || err.message);
       setError("Failed to delete address");
     }
   };
@@ -179,13 +151,11 @@ export default function Checkout() {
     setError(null);
   };
 
-  // Load addresses on mount
   useEffect(() => {
     fetchSavedAddresses();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Track view cart when checkout page loads
   useEffect(() => {
     if (cartItems.length > 0 && currentStep === 1) {
       trackViewCart(cartItems, total);
@@ -213,10 +183,7 @@ export default function Checkout() {
   };
 
   const proceedToCheckout = () => {
-    if (cartItems.length === 0) {
-      setError("Your cart is empty!");
-      return;
-    }
+    if (cartItems.length === 0) { setError("Your cart is empty!"); return; }
     const matched = cartItems.filter(isCustomProduct);
     if (matched.length > 0) {
       setCustomItems(matched);
@@ -233,25 +200,13 @@ export default function Checkout() {
   };
 
   const proceedToPayment = () => {
-    // Validate shipping address
     const requiredFields = ["street", "city", "state", "zipCode", "phone"];
-    const missingFields = requiredFields.filter(
-      (field) => !shippingAddress[field].trim(),
-    );
-
+    const missingFields = requiredFields.filter((field) => !shippingAddress[field].trim());
     if (missingFields.length > 0) {
-      setError(
-        `Please fill in all required fields: ${missingFields.join(", ")}`,
-      );
+      setError(`Please fill in all required fields: ${missingFields.join(", ")}`);
       return;
     }
-
-    // Track shipping info added
-    trackAddShippingInfo(
-      cartItems,
-      total,
-      shipping === 0 ? "free" : "standard",
-    );
+    trackAddShippingInfo(cartItems, total, shipping === 0 ? "free" : "standard");
     setCurrentStep(3);
     setError(null);
   };
@@ -260,12 +215,8 @@ export default function Checkout() {
     return new Promise((resolve) => {
       const script = document.createElement("script");
       script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.onload = () => {
-        resolve(true);
-      };
-      script.onerror = () => {
-        resolve(false);
-      };
+      script.onload = () => { resolve(true); };
+      script.onerror = () => { resolve(false); };
       document.body.appendChild(script);
     });
   };
@@ -273,23 +224,16 @@ export default function Checkout() {
   const handlePayment = async () => {
     setLoading(true);
     setError(null);
-
-    // Track payment info added
     trackAddPaymentInfo(cartItems, total, "razorpay");
-
     try {
-      // Initialize Razorpay
       const res = await initializeRazorpay();
       if (!res) {
-        setError(
-          "Razorpay SDK failed to load. Please check your internet connection.",
-        );
+        setError("Razorpay SDK failed to load. Please check your internet connection.");
         setLoading(false);
         return;
       }
-      // Create order on backend
       const orderResponse = await api.post("/api/payment", {
-        amount: Math.round(total * 100), // Razorpay expects amount in paise
+        amount: Math.round(total * 100),
         currency: "INR",
         shippingAddress: shippingAddress,
         items: cartItems,
@@ -299,41 +243,31 @@ export default function Checkout() {
       const { razorpayOrderId, currency } = orderResponse.data.order;
       const orderId = orderResponse.data.order.id;
 
-      // Razorpay options
       const options = {
-        key: orderResponse.data.razorpayKeyId, // Replace with your Razorpay key
-        amount: Math.round(total * 100), // Use actual amount in paise
+        key: orderResponse.data.razorpayKeyId,
+        amount: Math.round(total * 100),
         currency: currency,
         name: "Infinity Craft Space",
         description: "Order Payment",
         order_id: razorpayOrderId,
         handler: async function (response) {
           try {
-            // Verify payment on backend
             const verifyResponse = await api.post("/api/payment/verify-payment", {
               razorpayOrderId: response.razorpay_order_id,
               razorpayPaymentId: response.razorpay_payment_id,
               razorpaySignature: response.razorpay_signature,
               orderId: orderId,
             });
-
             if (verifyResponse.data.success) {
-              // Payment successful — pass backend order (with shiprocket data) to completion
               await completeOrder(response, verifyResponse.data.order);
             } else {
               console.error("Verification failed:", verifyResponse.data);
-              setError(
-                "Payment verification failed. " +
-                  (verifyResponse.data.message || "Please try again."),
-              );
+              setError("Payment verification failed. " + (verifyResponse.data.message || "Please try again."));
               trackPaymentFailed(cartItems, total, "Verification failed");
               setLoading(false);
             }
           } catch (error) {
-            console.error(
-              "Payment verification error:",
-              error.response?.data || error.message,
-            );
+            console.error("Payment verification error:", error.response?.data || error.message);
             setError("Payment verification failed. Please contact support.");
             setLoading(false);
           }
@@ -343,15 +277,11 @@ export default function Checkout() {
           email: user?.email || "",
           contact: user?.phone || "",
         },
-        theme: {
-          color: "#10b981",
-        },
+        theme: { color: "#10b981" },
         modal: {
           ondismiss: function () {
             setLoading(false);
-            setError(
-              "Payment cancelled. Please try again to complete your order.",
-            );
+            setError("Payment cancelled. Please try again to complete your order.");
           },
         },
       };
@@ -369,8 +299,6 @@ export default function Checkout() {
   const completeOrder = async (paymentResponse, verifiedOrder = null) => {
     try {
       setLoading(true);
-
-      // Capture items and totals from current cart before clearing it
       const items = cartItems.map((item) => ({
         product: item.product._id,
         productName: item.product.name,
@@ -378,17 +306,12 @@ export default function Checkout() {
         unitPrice: item.product.price,
         totalPrice: item.totalPrice,
       }));
-
       const subtotalLocal = subtotal;
       const shippingLocal = shipping;
       const taxLocal = tax;
       const totalLocal = total;
-
       const finalOrderData = {
-        orderId:
-          paymentResponse?.order_id ||
-          paymentResponse?.razorpay_order_id ||
-          `ORD-${Date.now()}`,
+        orderId: paymentResponse?.order_id || paymentResponse?.razorpay_order_id || `ORD-${Date.now()}`,
         items,
         subtotal: subtotalLocal,
         shipping: shippingLocal,
@@ -404,19 +327,12 @@ export default function Checkout() {
         orderDate: new Date().toISOString(),
         status: "confirmed",
       };
-
-      // Clear the cart after capturing items
       dispatch(clearCart());
-
-      // Store the backend order (has shiprocket data) for ConfirmationStep
       if (verifiedOrder) setBackendOrder(verifiedOrder);
-
       setOrderData(finalOrderData);
       setPaymentData(paymentResponse);
       setCurrentStep(4);
       setError(null);
-
-      // Track successful purchase - REVENUE TRACKING
       trackPurchase(finalOrderData);
     } catch (err) {
       console.error("Order completion error:", err);
@@ -431,10 +347,10 @@ export default function Checkout() {
 
   if (cartItems.length === 0 && currentStep === 1) {
     return (
-      <div className="App co-page">
+      <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
         <Header />
         <EmptyCart navigate={navigate} />
-      </div>
+      </Box>
     );
   }
 
@@ -455,78 +371,113 @@ export default function Checkout() {
         noindex={true}
         canonical={`${SEO_CONFIG.SITE_URL}/checkout`}
       />
-      <div className="App co-page">
+      <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
         <Header />
-        <div className="co-wrap">
-          <div className="co-inner">
-            <CheckoutProgressBar steps={steps} currentStep={currentStep} />
+        <Container maxWidth="lg" sx={{ py: { xs: 2, md: 4 } }}>
+          {/* Stepper */}
+          <Box
+            sx={{
+              mb: { xs: 3, md: 4 },
+              p: { xs: 2, md: 3 },
+              bgcolor: "background.paper",
+              borderRadius: 3,
+              border: "1px solid #f0e8e2",
+              boxShadow: "0 2px 12px rgba(139,26,74,0.07)",
+            }}
+          >
+            <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.75} sx={{ mb: 2.5 }}>
+              <LockIcon sx={{ fontSize: 13, color: "#8B1A4A" }} />
+              <Typography variant="caption" sx={{ color: "#8B1A4A", fontWeight: 700, letterSpacing: "0.05em" }}>
+                Secure &amp; Encrypted Checkout
+              </Typography>
+            </Stack>
+            <Stepper
+              activeStep={currentStep - 1}
+              alternativeLabel
+              sx={{
+                "& .MuiStepLabel-label": { fontWeight: 600, fontSize: "0.8rem" },
+                "& .MuiStepLabel-label.Mui-active": { color: "#8B1A4A", fontWeight: 700 },
+                "& .MuiStepLabel-label.Mui-completed": { color: "#8B1A4A" },
+                "& .MuiStepIcon-root.Mui-active": { color: "#8B1A4A" },
+                "& .MuiStepIcon-root.Mui-completed": { color: "#8B1A4A" },
+                "& .MuiStepConnector-line": { borderColor: "#f0e8e2" },
+                "& .MuiStepConnector-root.Mui-active .MuiStepConnector-line": { borderColor: "#8B1A4A" },
+                "& .MuiStepConnector-root.Mui-completed .MuiStepConnector-line": { borderColor: "#8B1A4A" },
+              }}
+            >
+              {steps.map((step) => (
+                <Step key={step.number} completed={currentStep > step.number}>
+                  <StepLabel>{step.title}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+          </Box>
 
-            {currentStep === 1 && (
-              <CartReviewStep
-                cartItems={cartItems}
-                subtotal={subtotal}
-                total={total}
-                error={error}
-                proceedToCheckout={proceedToCheckout}
-                navigate={navigate}
-                handleQuantityChange={handleQuantityChange}
-                handleRemoveItem={handleRemoveItem}
-                onCouponApplied={handleCouponApplied}
-                onRemoveCoupon={handleRemoveCoupon}
-                appliedCoupon={appliedCoupon}
-              />
-            )}
-            {currentStep === 2 && (
-              <ShippingStep
-                cartItems={cartItems}
-                subtotal={subtotal}
-                total={total}
-                shippingAddress={shippingAddress}
-                loadingAddresses={loadingAddresses}
-                savedAddresses={savedAddresses}
-                selectedAddressId={selectedAddressId}
-                selectSavedAddress={selectSavedAddress}
-                handleDeleteAddress={handleDeleteAddress}
-                saveAddressToBook={saveAddressToBook}
-                setSaveAddressToBook={setSaveAddressToBook}
-                setShippingAddress={setShippingAddress}
-                handleInputChange={handleInputChange}
-                error={error}
-                setCurrentStep={setCurrentStep}
-                loading={loading}
-                proceedToPayment={proceedToPayment}
-                handleSaveAddress={handleSaveAddress}
-                shippingRate={shippingRate}
-                onShippingRateSelected={setShippingRate}
-              />
-            )}
-            {currentStep === 3 && (
-              <PaymentStep
-                cartItems={cartItems}
-                shippingAddress={shippingAddress}
-                subtotal={subtotal}
-                shipping={shipping}
-                tax={tax}
-                total={total}
-                error={error}
-                loading={loading}
-                handlePayment={handlePayment}
-                setCurrentStep={setCurrentStep}
-              />
-            )}
-            {currentStep === 4 && (
-              <ConfirmationStep
-                orderData={orderData}
-                paymentData={paymentData}
-                shippingAddress={shippingAddress}
-                total={total}
-                navigate={navigate}
-                backendOrder={backendOrder}
-              />
-            )}
-          </div>
-        </div>
-      </div>
+          {currentStep === 1 && (
+            <CartReviewStep
+              cartItems={cartItems}
+              subtotal={subtotal}
+              total={total}
+              error={error}
+              proceedToCheckout={proceedToCheckout}
+              navigate={navigate}
+              handleQuantityChange={handleQuantityChange}
+              handleRemoveItem={handleRemoveItem}
+              onCouponApplied={handleCouponApplied}
+              onRemoveCoupon={handleRemoveCoupon}
+              appliedCoupon={appliedCoupon}
+            />
+          )}
+          {currentStep === 2 && (
+            <ShippingStep
+              cartItems={cartItems}
+              subtotal={subtotal}
+              total={total}
+              shippingAddress={shippingAddress}
+              loadingAddresses={loadingAddresses}
+              savedAddresses={savedAddresses}
+              selectedAddressId={selectedAddressId}
+              selectSavedAddress={selectSavedAddress}
+              handleDeleteAddress={handleDeleteAddress}
+              saveAddressToBook={saveAddressToBook}
+              setSaveAddressToBook={setSaveAddressToBook}
+              setShippingAddress={setShippingAddress}
+              handleInputChange={handleInputChange}
+              error={error}
+              setCurrentStep={setCurrentStep}
+              loading={loading}
+              proceedToPayment={proceedToPayment}
+              handleSaveAddress={handleSaveAddress}
+              shippingRate={shippingRate}
+              onShippingRateSelected={setShippingRate}
+            />
+          )}
+          {currentStep === 3 && (
+            <PaymentStep
+              cartItems={cartItems}
+              shippingAddress={shippingAddress}
+              subtotal={subtotal}
+              shipping={shipping}
+              tax={tax}
+              total={total}
+              error={error}
+              loading={loading}
+              handlePayment={handlePayment}
+              setCurrentStep={setCurrentStep}
+            />
+          )}
+          {currentStep === 4 && (
+            <ConfirmationStep
+              orderData={orderData}
+              paymentData={paymentData}
+              shippingAddress={shippingAddress}
+              total={total}
+              navigate={navigate}
+              backendOrder={backendOrder}
+            />
+          )}
+        </Container>
+      </Box>
     </>
   );
 }

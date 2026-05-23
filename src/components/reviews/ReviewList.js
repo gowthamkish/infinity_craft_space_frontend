@@ -1,7 +1,20 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Form, Modal } from "react-bootstrap";
-import { OrbitLoader, DotsLoader } from "../Loader";
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import MenuItem from "@mui/material/MenuItem";
+import TextField from "@mui/material/TextField";
+import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import IconButton from "@mui/material/IconButton";
+import MuiLink from "@mui/material/Link";
+import CloseIcon from "@mui/icons-material/Close";
+import { DotsLoader } from "../Loader";
 import { FiMessageSquare, FiAlertCircle } from "react-icons/fi";
 import {
   fetchProductReviews,
@@ -11,6 +24,15 @@ import { RatingSummary } from "./StarRating";
 import ReviewCard from "./ReviewCard";
 import AddReviewForm from "./AddReviewForm";
 import "./reviews.css";
+
+const SORT_OPTIONS = [
+  { value: "verified", label: "Verified Purchases First" },
+  { value: "newest",   label: "Newest First" },
+  { value: "oldest",   label: "Oldest First" },
+  { value: "highest",  label: "Highest Rated" },
+  { value: "lowest",   label: "Lowest Rated" },
+  { value: "helpful",  label: "Most Helpful" },
+];
 
 const ReviewList = ({ productId, productName }) => {
   const dispatch = useDispatch();
@@ -45,10 +67,6 @@ const ReviewList = ({ productId, productName }) => {
     }
   }, [dispatch, productId, isAuthenticated]);
 
-  const handleSortChange = (newSortBy) => {
-    setSortBy(newSortBy);
-  };
-
   const handleLoadMore = () => {
     if (productReviews?.pagination?.hasMore) {
       const nextPage = productReviews.pagination.currentPage + 1;
@@ -71,8 +89,6 @@ const ReviewList = ({ productId, productName }) => {
   };
 
   const rawReviews = productReviews?.reviews || [];
-
-  // "verified" sort: verified purchases + photo reviews first, then by rating desc
   const reviews = sortBy === "verified"
     ? [...rawReviews].sort((a, b) => {
         const scoreA = (a.verifiedPurchase ? 2 : 0) + (a.images?.length > 0 ? 1 : 0);
@@ -86,32 +102,20 @@ const ReviewList = ({ productId, productName }) => {
   const pagination = productReviews?.pagination;
 
   return (
-    <div className="reviews-section">
-      <div className="reviews-header d-flex flex-wrap justify-content-between align-items-center gap-3">
-        <h4
-          style={{
-            fontWeight: "700",
-            color: "var(--text-primary)",
-            margin: 0,
-          }}
-        >
+    <Box>
+      {/* Header */}
+      <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={1.5} sx={{ mb: 2 }}>
+        <Typography variant="h6" fontWeight={700}>
           Customer Reviews
-        </h4>
+        </Typography>
+        {isAuthenticated && canReviewInfo?.reason !== "already_reviewed" && !showAddReview && (
+          <Button variant="contained" size="small" onClick={() => setShowAddReview(true)}>
+            Write a Review
+          </Button>
+        )}
+      </Stack>
 
-        {/* Show Write a Review button for authenticated users who haven't reviewed yet */}
-        {isAuthenticated &&
-          canReviewInfo?.reason !== "already_reviewed" &&
-          !showAddReview && (
-            <button
-              className="ics-btn ics-btn--primary ics-btn--sm"
-              onClick={() => setShowAddReview(true)}
-            >
-              Write a Review
-            </button>
-          )}
-      </div>
-
-      {/* Rating Summary */}
+      {/* Rating summary */}
       {ratingStats && (
         <RatingSummary
           averageRating={ratingStats.averageRating}
@@ -120,79 +124,65 @@ const ReviewList = ({ productId, productName }) => {
         />
       )}
 
-      {/* Already Reviewed Message */}
+      {/* Already reviewed notice */}
       {canReviewInfo?.reason === "already_reviewed" && (
-        <div
-          className="d-flex align-items-center gap-2 p-3 mb-3"
-          style={{
-            background: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
-            borderRadius: "12px",
-            border: "1px solid #bae6fd",
-          }}
+        <Alert
+          severity="info"
+          icon={<FiAlertCircle size={18} />}
+          sx={{ mb: 2, borderRadius: 2 }}
         >
-          <FiAlertCircle size={20} style={{ color: "#0284c7" }} />
-          <span style={{ color: "#0369a1" }}>
-            You have already reviewed this product. Thank you for your feedback!
-          </span>
-        </div>
+          You have already reviewed this product. Thank you for your feedback!
+        </Alert>
       )}
 
-      {/* Add Review Form Modal */}
+      {/* Add review form */}
       {showAddReview && (
-        <div className="mb-4">
+        <Box sx={{ mb: 3 }}>
           <AddReviewForm
             productId={productId}
             productName={productName}
             onReviewSubmitted={handleReviewSubmitted}
           />
-          <button
-            className="ics-btn ics-btn--outline ics-btn--sm mt-3"
+          <Button
+            variant="outlined"
+            size="small"
             onClick={() => setShowAddReview(false)}
+            sx={{ mt: 1.5 }}
           >
             Cancel
-          </button>
-        </div>
+          </Button>
+        </Box>
       )}
 
-      {/* Sort Options */}
+      {/* Sort + count row */}
       {reviews.length > 0 && (
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <span style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={1} sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary">
             Showing {reviews.length} of {pagination?.totalReviews || 0} reviews
-          </span>
-
-          <div className="sort-dropdown">
-            <span
-              style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}
-            >
-              Sort by:
-            </span>
-            <Form.Select
-              value={sortBy}
-              onChange={(e) => handleSortChange(e.target.value)}
-              className="sort-select"
-              style={{ width: "auto" }}
-            >
-              <option value="verified">Verified Purchases First</option>
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="highest">Highest Rated</option>
-              <option value="lowest">Lowest Rated</option>
-              <option value="helpful">Most Helpful</option>
-            </Form.Select>
-          </div>
-        </div>
+          </Typography>
+          <TextField
+            select
+            size="small"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            sx={{ minWidth: 200 }}
+          >
+            {SORT_OPTIONS.map(({ value, label }) => (
+              <MenuItem key={value} value={value}>{label}</MenuItem>
+            ))}
+          </TextField>
+        </Stack>
       )}
 
-      {/* Loading State */}
+      {/* Loading */}
       {loading && reviews.length === 0 && (
-        <div className="text-center py-5 d-flex flex-column align-items-center gap-3">
-          <OrbitLoader />
-          <p className="text-muted mb-0">Loading reviews…</p>
-        </div>
+        <Stack alignItems="center" gap={2} sx={{ py: 5 }}>
+          <CircularProgress size={32} />
+          <Typography variant="body2" color="text.secondary">Loading reviews…</Typography>
+        </Stack>
       )}
 
-      {/* Reviews List */}
+      {/* Reviews */}
       {reviews.length > 0 ? (
         <>
           {reviews.map((review) => (
@@ -202,108 +192,93 @@ const ReviewList = ({ productId, productName }) => {
               onImageClick={handleImageClick}
             />
           ))}
-
-          {/* Load More Button */}
           {pagination?.hasMore && (
-            <button
-              className="load-more-btn"
-              onClick={handleLoadMore}
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <DotsLoader size="sm" />
-                  Loading…
-                </>
-              ) : (
-                `Load More Reviews (${pagination.totalReviews - reviews.length} remaining)`
-              )}
-            </button>
+            <Box sx={{ textAlign: "center", mt: 2 }}>
+              <Button
+                variant="outlined"
+                onClick={handleLoadMore}
+                disabled={loading}
+                startIcon={loading ? <CircularProgress size={16} color="inherit" /> : null}
+              >
+                {loading
+                  ? "Loading…"
+                  : `Load More (${pagination.totalReviews - reviews.length} remaining)`}
+              </Button>
+            </Box>
           )}
         </>
       ) : (
         !loading && (
-          <div className="no-reviews">
-            <FiMessageSquare className="no-reviews-icon" />
-            <div className="no-reviews-text">No reviews yet</div>
-            <div className="no-reviews-subtext">
+          <Stack alignItems="center" gap={1.5} sx={{ py: 5 }}>
+            <FiMessageSquare size={36} color="#94a3b8" />
+            <Typography variant="subtitle1" fontWeight={700} color="text.secondary">
+              No reviews yet
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
               Be the first to share your experience with this product!
-            </div>
-            {isAuthenticated &&
-              canReviewInfo?.reason !== "already_reviewed" &&
-              !showAddReview && (
-                <button
-                  className="ics-btn ics-btn--primary mt-3"
-                  onClick={() => setShowAddReview(true)}
-                >
-                  Write the First Review
-                </button>
-              )}
-            {!isAuthenticated && (
-              <div className="mt-3 text-muted">
-                <a
-                  href="/login"
-                  style={{ color: "var(--primary-color)", fontWeight: "600" }}
-                >
-                  Login
-                </a>{" "}
-                to write a review
-              </div>
+            </Typography>
+            {isAuthenticated && canReviewInfo?.reason !== "already_reviewed" && !showAddReview && (
+              <Button variant="contained" onClick={() => setShowAddReview(true)} sx={{ mt: 0.5 }}>
+                Write the First Review
+              </Button>
             )}
-          </div>
+            {!isAuthenticated && (
+              <Typography variant="body2" color="text.secondary">
+                <MuiLink href="/login" sx={{ fontWeight: 600 }}>Login</MuiLink> to write a review
+              </Typography>
+            )}
+          </Stack>
         )
       )}
 
-      {/* Image Modal */}
-      <Modal
-        show={imageModalOpen}
-        onHide={() => setImageModalOpen(false)}
-        centered
-        size="lg"
+      {/* Image lightbox dialog */}
+      <Dialog
+        open={imageModalOpen}
+        onClose={() => setImageModalOpen(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{ sx: { m: { xs: 1, sm: 2 } } }}
       >
-        <Modal.Header closeButton>
-          <Modal.Title>Review Photo</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="text-center p-0">
+        <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", py: 1.5 }}>
+          Review Photo
+          <IconButton onClick={() => setImageModalOpen(false)} size="small" sx={{ position: "absolute", right: 8, top: 8 }}>
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ textAlign: "center", p: 0 }}>
           {selectedImages.length > 0 && (
             <>
-              <img
+              <Box
+                component="img"
                 src={selectedImages[selectedImageIndex]?.url}
                 alt="Review"
-                style={{
-                  maxWidth: "100%",
-                  maxHeight: "70vh",
-                  objectFit: "contain",
-                }}
+                sx={{ maxWidth: "100%", maxHeight: "70vh", objectFit: "contain" }}
               />
               {selectedImages.length > 1 && (
-                <div className="d-flex justify-content-center gap-2 p-3">
+                <Stack direction="row" justifyContent="center" gap={1} sx={{ p: 2 }}>
                   {selectedImages.map((img, idx) => (
-                    <img
+                    <Box
                       key={idx}
+                      component="img"
                       src={img.url}
                       alt={`Thumbnail ${idx + 1}`}
                       onClick={() => setSelectedImageIndex(idx)}
-                      style={{
-                        width: "60px",
-                        height: "60px",
-                        objectFit: "cover",
-                        borderRadius: "8px",
-                        cursor: "pointer",
-                        border:
-                          idx === selectedImageIndex
-                            ? "2px solid var(--primary-color)"
-                            : "2px solid transparent",
+                      sx={{
+                        width: 60, height: 60, objectFit: "cover",
+                        borderRadius: 1.5, cursor: "pointer",
+                        border: "2px solid",
+                        borderColor: idx === selectedImageIndex ? "primary.main" : "transparent",
+                        transition: "border-color 0.15s ease",
                       }}
                     />
                   ))}
-                </div>
+                </Stack>
               )}
             </>
           )}
-        </Modal.Body>
-      </Modal>
-    </div>
+        </DialogContent>
+      </Dialog>
+    </Box>
   );
 };
 

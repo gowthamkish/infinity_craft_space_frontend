@@ -1,5 +1,8 @@
 import React from "react";
-import { Container, Row, Col, Card } from "react-bootstrap";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import MuiCard from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
 import { Link } from "react-router-dom";
 import { FiX } from "react-icons/fi";
 import { useRecentlyViewed } from "../hooks/useRecentlyViewed";
@@ -28,7 +31,7 @@ const RecentlyViewed = ({ limit = 8 }) => {
         backgroundColor: "var(--bg-secondary)",
       }}
     >
-      <Container>
+      <Box>
         <div
           style={{
             display: "flex",
@@ -56,13 +59,14 @@ const RecentlyViewed = ({ limit = 8 }) => {
           )}
         </div>
 
-        <Row className="g-3">
+        <Grid container spacing={2}>
+
           {displayedProducts.map((product) => (
-            <Col key={product._id} xs={6} md={4} lg={3}>
+            <Grid item key={product._id} xs={6} md={4} lg={3}>
               <RecentlyViewedCard product={product} onRemove={removeProduct} />
-            </Col>
+            </Grid>
           ))}
-        </Row>
+        </Grid>
 
         {recentlyViewed.length > limit && (
           <div style={{ textAlign: "center", marginTop: "var(--spacing-xl)" }}>
@@ -81,7 +85,7 @@ const RecentlyViewed = ({ limit = 8 }) => {
             </Link>
           </div>
         )}
-      </Container>
+      </Box>
     </section>
   );
 };
@@ -98,7 +102,7 @@ const RecentlyViewedCard = ({ product, onRemove }) => {
   };
 
   return (
-    <Card
+    <MuiCard
       className="card-elevated card-hover h-100"
       style={{ position: "relative" }}
     >
@@ -167,7 +171,7 @@ const RecentlyViewedCard = ({ product, onRemove }) => {
         </div>
       </Link>
 
-      <Card.Body style={{ padding: "var(--spacing-md)" }}>
+      <CardContent style={{ padding: "var(--spacing-md)" }}>
         <p
           style={{
             margin: 0,
@@ -196,8 +200,8 @@ const RecentlyViewedCard = ({ product, onRemove }) => {
         >
           ₹{product.price.toLocaleString()}
         </p>
-      </Card.Body>
-    </Card>
+      </CardContent>
+    </MuiCard>
   );
 };
 

@@ -2,7 +2,32 @@ import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { ToastContext } from "../../context/ToastContext";
-import { Modal } from "react-bootstrap";
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Button,
+  IconButton,
+  Chip,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableContainer,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  InputAdornment,
+  Alert,
+  Stack,
+  Avatar,
+  Tooltip,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import { OrbitLoader, DotsLoader } from "../Loader";
 import AdminLayout from "../admin/AdminLayout";
 import {
@@ -124,111 +149,138 @@ const UsersList = () => {
   return (
     <AdminLayout>
       {/* Page header */}
-      <div className="adm-page-header">
-        <div>
-          <h1 className="adm-page-title">
-            <FiUsers size={22} style={{ color: "var(--adm-primary)" }} />
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}>
+        <Box>
+          <Typography variant="h5" fontWeight={700} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <FiUsers size={22} style={{ color: "#8B1A4A" }} />
             Users
-          </h1>
-          <p className="adm-page-sub">{users.length} registered accounts</p>
-        </div>
-      </div>
+          </Typography>
+          <Typography variant="body2" color="text.secondary">{users.length} registered accounts</Typography>
+        </Box>
+      </Box>
 
       {/* Filter bar */}
-      <div className="adm-card" style={{ marginBottom: "var(--adm-space-4)" }}>
-        <div style={{ padding: "var(--adm-space-4) var(--adm-space-5)" }}>
-          <div className="adm-filter-bar">
-            <div className="adm-search-wrap">
-              <FiSearch className="adm-search-icon" size={15} />
-              <input
-                className="adm-search-input"
-                placeholder="Search by name or email…"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
+      <Card elevation={0} sx={{ mb: 2, border: "1px solid #e2e8f0", borderRadius: 2 }}>
+        <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <TextField
+              size="small"
+              placeholder="Search by name or email…"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start"><FiSearch size={15} color="#94a3b8" /></InputAdornment>
+                  ),
+                },
+              }}
+              sx={{ minWidth: 280, "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
+            />
             {searchTerm && (
-              <span style={{ fontSize: "var(--adm-font-xs)", color: "var(--adm-text-tertiary)" }}>
+              <Typography variant="caption" color="text.secondary">
                 {filteredUsers.length} result{filteredUsers.length !== 1 ? "s" : ""}
-              </span>
+              </Typography>
             )}
-          </div>
-        </div>
-      </div>
+          </Stack>
+        </CardContent>
+      </Card>
 
       {/* Users table */}
-      <div className="adm-card">
+      <Card elevation={0} sx={{ border: "1px solid #e2e8f0", borderRadius: 2 }}>
         {loading ? (
-          <div className="adm-loading"><OrbitLoader size="lg" /><span>Loading users…</span></div>
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 8, gap: 2 }}>
+            <OrbitLoader size="lg" />
+            <Typography color="text.secondary">Loading users…</Typography>
+          </Box>
         ) : error ? (
-          <div className="adm-empty">
-            <div className="adm-empty-icon"><FiUserX size={28} /></div>
-            <p className="adm-empty-title" style={{ color: "var(--adm-danger)" }}>Error loading users</p>
-            <p className="adm-empty-sub">{error}</p>
-          </div>
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 8, gap: 1 }}>
+            <Box sx={{ color: "#cbd5e1", mb: 1 }}><FiUserX size={36} /></Box>
+            <Typography fontWeight={600} color="error.main">Error loading users</Typography>
+            <Typography variant="body2" color="text.secondary">{error}</Typography>
+          </Box>
         ) : filteredUsers.length === 0 ? (
-          <div className="adm-empty">
-            <div className="adm-empty-icon"><FiUsers size={28} /></div>
-            <p className="adm-empty-title">No users found</p>
-            <p className="adm-empty-sub">
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 8, gap: 1 }}>
+            <Box sx={{ color: "#cbd5e1", mb: 1 }}><FiUsers size={36} /></Box>
+            <Typography fontWeight={600} color="text.primary">No users found</Typography>
+            <Typography variant="body2" color="text.secondary">
               {searchTerm ? "Try adjusting your search terms." : "No users are registered yet."}
-            </p>
-          </div>
+            </Typography>
+          </Box>
         ) : (
-          <div className="adm-table-wrap">
-            <table className="adm-table">
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Status</th>
-                  <th style={{ textAlign: "center" }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
+          <TableContainer>
+            <Table size="small">
+              <TableHead>
+                <TableRow sx={{ bgcolor: "#f8fafc" }}>
+                  {["User", "Email", "Role", "Status", "Actions"].map((h, i) => (
+                    <TableCell
+                      key={h}
+                      align={h === "Actions" ? "center" : "left"}
+                      sx={{ fontWeight: 700, color: "#64748b", fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.04em" }}
+                    >
+                      {h}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
                 {filteredUsers.map((user) => (
-                  <tr key={user._id || user.id}>
-                    <td>
-                      <div style={{ display: "flex", alignItems: "center", gap: "var(--adm-space-3)" }}>
-                        <div
-                          className="adm-avatar"
-                          style={{ background: user.isAdmin ? "linear-gradient(135deg, #f59e0b, #d97706)" : "var(--adm-primary-gradient)" }}
+                  <TableRow key={user._id || user.id} sx={{ "&:hover": { bgcolor: "#faf5ff" }, transition: "background 150ms" }}>
+                    <TableCell>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                        <Avatar
+                          sx={{
+                            width: 36, height: 36, fontSize: "0.85rem", fontWeight: 700,
+                            background: user.isAdmin
+                              ? "linear-gradient(135deg, #f59e0b, #d97706)"
+                              : "linear-gradient(135deg, #8B1A4A, #6b1238)",
+                          }}
                         >
                           {initials(user)}
-                        </div>
-                        <div>
-                          <div style={{ fontWeight: 600, color: "var(--adm-text-primary)" }}>{user.username}</div>
-                          <div className="adm-td-muted">#{(user._id || user.id || "").toString().slice(-6)}</div>
-                        </div>
-                      </div>
-                    </td>
+                        </Avatar>
+                        <Box>
+                          <Typography variant="body2" fontWeight={600} color="text.primary">{user.username}</Typography>
+                          <Typography variant="caption" color="text.secondary">#{(user._id || user.id || "").toString().slice(-6)}</Typography>
+                        </Box>
+                      </Box>
+                    </TableCell>
 
-                    <td>
-                      <div style={{ display: "flex", alignItems: "center", gap: "var(--adm-space-2)", color: "var(--adm-text-secondary)" }}>
-                        <FiMail size={13} style={{ color: "var(--adm-success)", flexShrink: 0 }} />
-                        {user.email}
-                      </div>
-                    </td>
+                    <TableCell>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, color: "text.secondary" }}>
+                        <FiMail size={13} style={{ color: "#059669", flexShrink: 0 }} />
+                        <Typography variant="body2">{user.email}</Typography>
+                      </Box>
+                    </TableCell>
 
-                    <td>
-                      {user.isAdmin
-                        ? <span className="adm-badge adm-badge--amber"><FiShield size={10} />Admin</span>
-                        : <span className="adm-badge adm-badge--green"><FiUser size={10} />User</span>
-                      }
-                    </td>
+                    <TableCell>
+                      {user.isAdmin ? (
+                        <Chip
+                          icon={<FiShield size={10} />}
+                          label="Admin"
+                          size="small"
+                          sx={{ bgcolor: "#fef3c7", color: "#92400e", fontWeight: 600, fontSize: "0.72rem" }}
+                        />
+                      ) : (
+                        <Chip
+                          icon={<FiUser size={10} />}
+                          label="User"
+                          size="small"
+                          sx={{ bgcolor: "#d1fae5", color: "#065f46", fontWeight: 600, fontSize: "0.72rem" }}
+                        />
+                      )}
+                    </TableCell>
 
-                    <td>
-                      <span className="adm-badge adm-badge--green">Active</span>
-                    </td>
+                    <TableCell>
+                      <Chip label="Active" size="small" sx={{ bgcolor: "#d1fae5", color: "#065f46", fontWeight: 600, fontSize: "0.72rem" }} />
+                    </TableCell>
 
-                    <td style={{ textAlign: "center" }}>
-                      <div style={{ display: "flex", gap: "var(--adm-space-2)", justifyContent: "center" }}>
+                    <TableCell align="center">
+                      <Stack direction="row" spacing={0.75} justifyContent="center">
                         <button
                           className="adm-btn adm-btn-sm adm-btn-secondary"
                           onClick={() => openEditModal(user)}
                           title="Edit email / password"
-                          style={{ borderColor: "var(--adm-primary)", color: "var(--adm-primary)" }}
+                          style={{ borderColor: "#8B1A4A", color: "#8B1A4A" }}
                         >
                           <FiEdit2 size={12} /> Edit
                         </button>
@@ -237,8 +289,8 @@ const UsersList = () => {
                           onClick={() => handleRoleChange(user)}
                           disabled={roleActionLoading}
                           style={{
-                            borderColor: user.isAdmin ? "var(--adm-warning)" : "var(--adm-success)",
-                            color: user.isAdmin ? "var(--adm-warning)" : "var(--adm-success)",
+                            borderColor: user.isAdmin ? "#f59e0b" : "#059669",
+                            color: user.isAdmin ? "#f59e0b" : "#059669",
                           }}
                         >
                           {user.isAdmin ? <><FiUser size={12} />Make User</> : <><FiShield size={12} />Make Admin</>}
@@ -247,190 +299,166 @@ const UsersList = () => {
                           className="adm-btn adm-btn-sm adm-btn-secondary"
                           onClick={() => openDeleteModal(user)}
                           title="Delete user"
-                          style={{ borderColor: "var(--adm-danger)", color: "var(--adm-danger)" }}
+                          style={{ borderColor: "#dc2626", color: "#dc2626" }}
                         >
                           <FiTrash2 size={12} /> Delete
                         </button>
-                      </div>
-                    </td>
-                  </tr>
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </TableBody>
+            </Table>
+          </TableContainer>
         )}
-      </div>
+      </Card>
 
       {/* Edit user modal */}
-      <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered className="adm-modal">
-        <Modal.Header closeButton>
-          <Modal.Title>
-            <FiEdit2 size={16} style={{ color: "var(--adm-primary)", marginRight: 8 }} />
-            Edit User
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+      <Dialog open={showEditModal} onClose={() => setShowEditModal(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1, pb: 1 }}>
+          <FiEdit2 size={16} style={{ color: "#8B1A4A" }} />
+          Edit User
+        </DialogTitle>
+        <DialogContent>
           {editUser && (
-            <>
-              <div style={{ display: "flex", alignItems: "center", gap: "var(--adm-space-3)", background: "var(--adm-surface-raised)", borderRadius: "var(--adm-radius-md)", padding: "var(--adm-space-3)", marginBottom: "var(--adm-space-4)" }}>
-                <div className="adm-avatar">{initials(editUser)}</div>
-                <div>
-                  <div style={{ fontWeight: 700 }}>{editUser.username}</div>
-                  <div style={{ fontSize: "var(--adm-font-sm)", color: "var(--adm-text-secondary)" }}>#{(editUser._id || "").slice(-6)}</div>
-                </div>
-              </div>
+            <Stack spacing={2} sx={{ pt: 1 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, bgcolor: "#f8fafc", borderRadius: 2, p: 1.5 }}>
+                <Avatar sx={{ width: 36, height: 36, fontSize: "0.85rem", fontWeight: 700, background: "linear-gradient(135deg, #8B1A4A, #6b1238)" }}>
+                  {initials(editUser)}
+                </Avatar>
+                <Box>
+                  <Typography fontWeight={700}>{editUser.username}</Typography>
+                  <Typography variant="caption" color="text.secondary">#{(editUser._id || "").slice(-6)}</Typography>
+                </Box>
+              </Box>
 
-              {editError && (
-                <div className="adm-alert adm-alert--error" style={{ marginBottom: "var(--adm-space-3)" }}>
-                  {editError}
-                </div>
-              )}
-              {editSuccess && (
-                <div className="adm-alert adm-alert--success" style={{ marginBottom: "var(--adm-space-3)" }}>
-                  {editSuccess}
-                </div>
-              )}
+              {editError && <Alert severity="error">{editError}</Alert>}
+              {editSuccess && <Alert severity="success">{editSuccess}</Alert>}
 
-              <div style={{ marginBottom: "var(--adm-space-3)" }}>
-                <label style={{ display: "block", fontSize: "var(--adm-font-sm)", fontWeight: 600, marginBottom: "var(--adm-space-1)", color: "var(--adm-text-secondary)" }}>
-                  Email address
-                </label>
-                <input
-                  type="email"
-                  className="adm-input"
-                  value={editEmail}
-                  onChange={(e) => setEditEmail(e.target.value)}
-                  placeholder="Enter new email"
-                  style={{ width: "100%" }}
-                />
-              </div>
+              <TextField
+                label="Email address"
+                type="email"
+                value={editEmail}
+                onChange={(e) => setEditEmail(e.target.value)}
+                placeholder="Enter new email"
+                size="small"
+                fullWidth
+              />
 
-              <div>
-                <label style={{ display: "block", fontSize: "var(--adm-font-sm)", fontWeight: 600, marginBottom: "var(--adm-space-1)", color: "var(--adm-text-secondary)" }}>
-                  New password <span style={{ fontWeight: 400, color: "var(--adm-text-tertiary)" }}>(leave blank to keep current)</span>
-                </label>
-                <div style={{ position: "relative" }}>
-                  <input
-                    type={showEditPw ? "text" : "password"}
-                    className="adm-input"
-                    value={editPassword}
-                    onChange={(e) => setEditPassword(e.target.value)}
-                    placeholder="Enter new password"
-                    style={{ width: "100%", paddingRight: "2.5rem" }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowEditPw((v) => !v)}
-                    style={{ position: "absolute", right: "0.75rem", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--adm-text-tertiary)", padding: 0 }}
-                    aria-label={showEditPw ? "Hide password" : "Show password"}
-                  >
-                    {showEditPw ? <FiEyeOff size={15} /> : <FiEye size={15} />}
-                  </button>
-                </div>
-              </div>
-            </>
+              <TextField
+                label="New password"
+                helperText="Leave blank to keep current password"
+                type={showEditPw ? "text" : "password"}
+                value={editPassword}
+                onChange={(e) => setEditPassword(e.target.value)}
+                placeholder="Enter new password"
+                size="small"
+                fullWidth
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton size="small" onClick={() => setShowEditPw((v) => !v)} aria-label={showEditPw ? "Hide password" : "Show password"}>
+                          {showEditPw ? <FiEyeOff size={15} /> : <FiEye size={15} />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+              />
+            </Stack>
           )}
-        </Modal.Body>
-        <Modal.Footer>
+        </DialogContent>
+        <DialogActions>
           <button className="adm-btn adm-btn-secondary" onClick={() => setShowEditModal(false)}>Cancel</button>
           <button
             className="adm-btn"
-            style={{ background: "var(--adm-primary)", color: "white" }}
+            style={{ background: "#8B1A4A", color: "white" }}
             onClick={handleEditSave}
             disabled={editLoading}
           >
             {editLoading ? <><DotsLoader size="sm" /> Saving…</> : <><FiEdit2 size={14} /> Save Changes</>}
           </button>
-        </Modal.Footer>
-      </Modal>
+        </DialogActions>
+      </Dialog>
 
       {/* Delete user confirmation modal */}
-      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered className="adm-modal">
-        <Modal.Header closeButton>
-          <Modal.Title>
-            <FiTrash2 size={16} style={{ color: "var(--adm-danger)", marginRight: 8 }} />
-            Delete User
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+      <Dialog open={showDeleteModal} onClose={() => setShowDeleteModal(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1, pb: 1 }}>
+          <FiTrash2 size={16} style={{ color: "#dc2626" }} />
+          Delete User
+        </DialogTitle>
+        <DialogContent>
           {deleteUser && (
-            <>
-              <div style={{ display: "flex", alignItems: "center", gap: "var(--adm-space-3)", background: "var(--adm-surface-raised)", borderRadius: "var(--adm-radius-md)", padding: "var(--adm-space-3)", marginBottom: "var(--adm-space-4)" }}>
-                <div className="adm-avatar">{initials(deleteUser)}</div>
-                <div>
-                  <div style={{ fontWeight: 700 }}>{deleteUser.username}</div>
-                  <div style={{ fontSize: "var(--adm-font-sm)", color: "var(--adm-text-secondary)" }}>{deleteUser.email}</div>
-                </div>
-              </div>
-              {deleteError && (
-                <div className="adm-alert adm-alert--error" style={{ marginBottom: "var(--adm-space-3)" }}>
-                  {deleteError}
-                </div>
-              )}
-              <div className="adm-alert adm-alert--error">
-                <FiTrash2 size={14} style={{ flexShrink: 0, marginTop: 1 }} />
-                <div>
-                  <strong style={{ display: "block", marginBottom: 4 }}>This action is permanent</strong>
-                  <span style={{ fontSize: "var(--adm-font-xs)" }}>
-                    Deleting this user will permanently remove their account and all associated data. This cannot be undone.
-                  </span>
-                </div>
-              </div>
-            </>
+            <Stack spacing={2} sx={{ pt: 1 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, bgcolor: "#f8fafc", borderRadius: 2, p: 1.5 }}>
+                <Avatar sx={{ width: 36, height: 36, fontSize: "0.85rem", fontWeight: 700, background: "linear-gradient(135deg, #8B1A4A, #6b1238)" }}>
+                  {initials(deleteUser)}
+                </Avatar>
+                <Box>
+                  <Typography fontWeight={700}>{deleteUser.username}</Typography>
+                  <Typography variant="body2" color="text.secondary">{deleteUser.email}</Typography>
+                </Box>
+              </Box>
+              {deleteError && <Alert severity="error">{deleteError}</Alert>}
+              <Alert severity="error" icon={<FiTrash2 size={14} style={{ marginTop: 1 }} />}>
+                <strong style={{ display: "block", marginBottom: 4 }}>This action is permanent</strong>
+                <span style={{ fontSize: "0.78rem" }}>
+                  Deleting this user will permanently remove their account and all associated data. This cannot be undone.
+                </span>
+              </Alert>
+            </Stack>
           )}
-        </Modal.Body>
-        <Modal.Footer>
+        </DialogContent>
+        <DialogActions>
           <button className="adm-btn adm-btn-secondary" onClick={() => setShowDeleteModal(false)}>Cancel</button>
           <button
             className="adm-btn"
-            style={{ background: "var(--adm-danger)", color: "white" }}
+            style={{ background: "#dc2626", color: "white" }}
             onClick={confirmDelete}
             disabled={deleteLoading}
           >
             {deleteLoading ? <><DotsLoader size="sm" /> Deleting…</> : <><FiTrash2 size={14} /> Delete User</>}
           </button>
-        </Modal.Footer>
-      </Modal>
+        </DialogActions>
+      </Dialog>
 
       {/* Role change confirmation modal */}
-      <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)} centered className="adm-modal">
-        <Modal.Header closeButton>
-          <Modal.Title>
-            <FiShield size={16} style={{ color: "var(--adm-warning)", marginRight: 8 }} />
-            {selectedUser?.isAdmin ? "Remove Admin Access" : "Grant Admin Access"}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+      <Dialog open={showConfirmModal} onClose={() => setShowConfirmModal(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1, pb: 1 }}>
+          <FiShield size={16} style={{ color: "#f59e0b" }} />
+          {selectedUser?.isAdmin ? "Remove Admin Access" : "Grant Admin Access"}
+        </DialogTitle>
+        <DialogContent>
           {selectedUser && (
-            <>
-              <div style={{ display: "flex", alignItems: "center", gap: "var(--adm-space-3)", background: "var(--adm-surface-raised)", borderRadius: "var(--adm-radius-md)", padding: "var(--adm-space-3)", marginBottom: "var(--adm-space-4)" }}>
-                <div className="adm-avatar">{initials(selectedUser)}</div>
-                <div>
-                  <div style={{ fontWeight: 700 }}>{selectedUser.username}</div>
-                  <div style={{ fontSize: "var(--adm-font-sm)", color: "var(--adm-text-secondary)" }}>{selectedUser.email}</div>
-                </div>
-              </div>
-              <div className="adm-alert adm-alert--info">
-                <FiShield size={14} style={{ flexShrink: 0, marginTop: 1 }} />
-                <div>
-                  <strong style={{ display: "block", marginBottom: 4 }}>
-                    {selectedUser.isAdmin ? "Remove Admin Privileges" : "Grant Admin Privileges"}
-                  </strong>
-                  <span style={{ fontSize: "var(--adm-font-xs)" }}>
-                    {selectedUser.isAdmin
-                      ? "This user will lose admin access and become a regular user."
-                      : "This user will gain full admin access to manage products, orders, and users."}
-                  </span>
-                </div>
-              </div>
-            </>
+            <Stack spacing={2} sx={{ pt: 1 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, bgcolor: "#f8fafc", borderRadius: 2, p: 1.5 }}>
+                <Avatar sx={{ width: 36, height: 36, fontSize: "0.85rem", fontWeight: 700, background: "linear-gradient(135deg, #8B1A4A, #6b1238)" }}>
+                  {initials(selectedUser)}
+                </Avatar>
+                <Box>
+                  <Typography fontWeight={700}>{selectedUser.username}</Typography>
+                  <Typography variant="body2" color="text.secondary">{selectedUser.email}</Typography>
+                </Box>
+              </Box>
+              <Alert severity="info" icon={<FiShield size={14} style={{ marginTop: 1 }} />}>
+                <strong style={{ display: "block", marginBottom: 4 }}>
+                  {selectedUser.isAdmin ? "Remove Admin Privileges" : "Grant Admin Privileges"}
+                </strong>
+                <span style={{ fontSize: "0.78rem" }}>
+                  {selectedUser.isAdmin
+                    ? "This user will lose admin access and become a regular user."
+                    : "This user will gain full admin access to manage products, orders, and users."}
+                </span>
+              </Alert>
+            </Stack>
           )}
-        </Modal.Body>
-        <Modal.Footer>
+        </DialogContent>
+        <DialogActions>
           <button className="adm-btn adm-btn-secondary" onClick={() => setShowConfirmModal(false)}>Cancel</button>
           <button
             className="adm-btn"
-            style={{ background: selectedUser?.isAdmin ? "var(--adm-warning)" : "var(--adm-success)", color: "white" }}
+            style={{ background: selectedUser?.isAdmin ? "#f59e0b" : "#059669", color: "white" }}
             onClick={confirmRoleChange}
             disabled={roleActionLoading}
           >
@@ -442,8 +470,8 @@ const UsersList = () => {
               <><FiShield size={14} /> Make Admin</>
             )}
           </button>
-        </Modal.Footer>
-      </Modal>
+        </DialogActions>
+      </Dialog>
     </AdminLayout>
   );
 };

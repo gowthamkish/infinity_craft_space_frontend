@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Box from '@mui/material/Box';
 import { FiWifiOff, FiWifi } from 'react-icons/fi';
 
 const OfflineIndicator = () => {
@@ -30,15 +31,15 @@ const OfflineIndicator = () => {
   return (
     <div className="offline-indicator">
       {isOnline ? (
-        <div className="d-flex align-items-center justify-content-center">
-          <FiWifi className="me-2" />
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <FiWifi style={{ marginRight: 8 }} />
           <span>Connection restored!</span>
-        </div>
+        </Box>
       ) : (
-        <div className="d-flex align-items-center justify-content-center">
-          <FiWifiOff className="me-2" />
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <FiWifiOff style={{ marginRight: 8 }} />
           <span>You're offline. Some features may not be available.</span>
-        </div>
+        </Box>
       )}
     </div>
   );

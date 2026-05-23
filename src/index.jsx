@@ -7,7 +7,6 @@ import { store } from "./app/store";
 import { ToastProvider } from "./context/ToastContext";
 import { fetchCurrentUser } from "./features/authSlice";
 import { fetchUserCart } from "./features/cartSlice";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 // Restore session from httpOnly cookie — no localStorage needed.
 // On mobile (iOS Safari ITP), cookies may not be immediately available after login.

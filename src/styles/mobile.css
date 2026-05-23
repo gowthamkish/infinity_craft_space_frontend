@@ -364,7 +364,7 @@
 @media (max-width: 768px) {
   /* Larger focus indicators */
   *:focus {
-    outline: 3px solid rgba(37, 99, 235, 0.5) !important;
+    outline: 3px solid rgba(139, 26, 74, 0.5) !important;
     outline-offset: 2px;
   }
 

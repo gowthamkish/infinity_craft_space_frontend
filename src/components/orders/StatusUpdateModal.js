@@ -1,320 +1,150 @@
 import React from "react";
-import { Modal, Card, Row, Col, Form } from "react-bootstrap";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import InputAdornment from "@mui/material/InputAdornment";
+import Button from "@mui/material/Button";
+import CloseIcon from "@mui/icons-material/Close";
 import { DotsLoader } from "../Loader";
 import {
-  FiShoppingBag,
-  FiUser,
-  FiCalendar,
-  FiDollarSign,
-  FiPackage,
-  FiEdit,
-  FiX,
-  FiCheck,
+  FiShoppingBag, FiUser, FiCalendar, FiDollarSign,
+  FiPackage, FiEdit, FiX, FiCheck,
 } from "react-icons/fi";
 
+const STATUS_OPTIONS = [
+  { value: "pending",    label: "📋 Pending — Order received, awaiting confirmation" },
+  { value: "confirmed",  label: "✅ Confirmed — Order confirmed and being prepared" },
+  { value: "processing", label: "📦 Processing — Order is being processed" },
+  { value: "shipped",    label: "🚚 Shipped — Order has been shipped" },
+  { value: "delivered",  label: "🎉 Delivered — Order successfully delivered" },
+  { value: "cancelled",  label: "❌ Cancelled — Order has been cancelled" },
+];
+
 const StatusUpdateModal = ({
-  show,
-  onHide,
-  selectedOrder,
-  newStatus,
-  setNewStatus,
-  confirmStatusUpdate,
-  updating,
-  getStatusBadge,
-  formatDate,
-  formatCurrency,
+  show, onHide, selectedOrder, newStatus, setNewStatus,
+  confirmStatusUpdate, updating, getStatusBadge, formatDate, formatCurrency,
 }) => {
   return (
-    <Modal show={show} onHide={onHide} centered className="status-update-modal">
-      <Modal.Header closeButton>
-        <Modal.Title style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
-          <div style={{ background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: 6, display: "flex" }}>
+    <Dialog open={show} onClose={onHide} maxWidth="sm" fullWidth>
+      <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between",
+          background: "linear-gradient(135deg, #8B1A4A 0%, #6b1238 100%)", color: "white", py: 1.5, px: 2.5 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box sx={{ background: "rgba(255,255,255,0.15)", borderRadius: 1, p: 0.75, display: "flex" }}>
             <FiEdit size={16} />
-          </div>
-          Update Order Status
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body style={{ padding: "1.25rem", background: "#f8fafc" }}>
-        <Card
-          className="mb-3 border-0 shadow-sm"
-          style={{ borderRadius: "10px", overflow: "hidden" }}
-        >
-          <Card.Body style={{ padding: "1rem", background: "white" }}>
-            <div className="text-center mb-2">
-              <div
-                style={{
-                  width: 45,
-                  height: 45,
-                  background: "rgba(37,99,235,0.1)",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  margin: "0 auto 0.75rem auto",
-                  border: "2px solid rgba(37,99,235,0.3)",
-                }}
-              >
-                <FiShoppingBag size={20} style={{ color: "#2563eb" }} />
-              </div>
-              <h6
-                style={{
-                  margin: "0 0 0.25rem 0",
-                  color: "#1e293b",
-                  fontWeight: "600",
-                }}
-              >
-                Order #
-                {selectedOrder?.orderNumber || selectedOrder?._id?.slice(-6)}
-              </h6>
-              <p style={{ margin: 0, color: "#64748b", fontSize: "0.85rem" }}>
-                Current Status: {getStatusBadge(selectedOrder?.status)}
-              </p>
-            </div>
+          </Box>
+          <Typography variant="subtitle1" fontWeight={700}>Update Order Status</Typography>
+        </Box>
+        <IconButton onClick={onHide} size="small" sx={{ color: "white" }}>
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      </DialogTitle>
+
+      <DialogContent sx={{ p: 2, background: "#f8fafc" }}>
+        {/* Order summary card */}
+        <Card sx={{ mb: 2, border: "1px solid #e2e8f0" }} elevation={0}>
+          <CardContent sx={{ p: 2, textAlign: "center" }}>
+            <Box sx={{ width: 45, height: 45, background: "rgba(139,26,74,0.1)", borderRadius: "50%",
+                border: "2px solid rgba(139,26,74,0.3)", display: "flex", alignItems: "center",
+                justifyContent: "center", mx: "auto", mb: 1 }}>
+              <FiShoppingBag size={20} style={{ color: "#8B1A4A" }} />
+            </Box>
+            <Typography variant="subtitle2" fontWeight={700} color="text.primary">
+              Order #{selectedOrder?.orderNumber || selectedOrder?._id?.slice(-6)}
+            </Typography>
+            <Box sx={{ mt: 0.5, display: "flex", alignItems: "center", justifyContent: "center", gap: 1 }}>
+              <Typography variant="caption" color="text.secondary">Current Status:</Typography>
+              {getStatusBadge(selectedOrder?.status)}
+            </Box>
 
             {selectedOrder && (
-              <div
-                style={{
-                  background: "#f1f5f9",
-                  borderRadius: 6,
-                  padding: "0.75rem",
-                  border: "1px solid #e2e8f0",
-                }}
-              >
-                <Row className="g-2 text-center">
-                  <Col xs={4}>
-                    <div>
-                      <FiUser
-                        size={16}
-                        style={{ color: "#10b981", marginBottom: 4 }}
-                      />
-                      <div
-                        style={{
-                          fontSize: "0.7rem",
-                          color: "#64748b",
-                          fontWeight: 500,
-                        }}
-                      >
-                        Customer
-                      </div>
-                      <div
-                        style={{
-                          fontSize: "0.8rem",
-                          color: "#1e293b",
-                          fontWeight: 600,
-                        }}
-                      >
-                        {selectedOrder.userId?.username || selectedOrder.customerName || "Unknown"}
-                      </div>
-                    </div>
-                  </Col>
-                  <Col xs={4}>
-                    <div>
-                      <FiCalendar
-                        size={16}
-                        style={{ color: "#f59e0b", marginBottom: 4 }}
-                      />
-                      <div
-                        style={{
-                          fontSize: "0.7rem",
-                          color: "#64748b",
-                          fontWeight: 500,
-                        }}
-                      >
-                        Date
-                      </div>
-                      <div
-                        style={{
-                          fontSize: "0.8rem",
-                          color: "#1e293b",
-                          fontWeight: 600,
-                        }}
-                      >
-                        {
-                          formatDate(
-                            selectedOrder.createdAt || selectedOrder.orderDate,
-                          ).split(",")[0]
-                        }
-                      </div>
-                    </div>
-                  </Col>
-                  <Col xs={4}>
-                    <div>
-                      <FiDollarSign
-                        size={16}
-                        style={{ color: "#059669", marginBottom: 4 }}
-                      />
-                      <div
-                        style={{
-                          fontSize: "0.7rem",
-                          color: "#64748b",
-                          fontWeight: 500,
-                        }}
-                      >
-                        Amount
-                      </div>
-                      <div
-                        style={{
-                          fontSize: "0.8rem",
-                          color: "#059669",
-                          fontWeight: 700,
-                        }}
-                      >
-                        {formatCurrency(
-                          selectedOrder.totalAmount || selectedOrder.total,
-                        )}
-                      </div>
-                    </div>
-                  </Col>
-                </Row>
-              </div>
+              <Grid container spacing={1} sx={{ mt: 1.5, background: "#f1f5f9",
+                  borderRadius: 1.5, p: 1, border: "1px solid #e2e8f0" }}>
+                {[
+                  { icon: <FiUser size={14} style={{ color: "#10b981" }} />, label: "Customer",
+                    value: selectedOrder.userId?.username || selectedOrder.customerName || "Unknown" },
+                  { icon: <FiCalendar size={14} style={{ color: "#f59e0b" }} />, label: "Date",
+                    value: formatDate(selectedOrder.createdAt || selectedOrder.orderDate)?.split(",")[0] },
+                  { icon: <FiDollarSign size={14} style={{ color: "#059669" }} />, label: "Amount",
+                    value: formatCurrency(selectedOrder.totalAmount || selectedOrder.total), green: true },
+                ].map(({ icon, label, value, green }) => (
+                  <Grid item xs={4} key={label} sx={{ textAlign: "center" }}>
+                    <Box sx={{ display: "flex", justifyContent: "center", mb: 0.5 }}>{icon}</Box>
+                    <Typography variant="caption" display="block" color="text.secondary">{label}</Typography>
+                    <Typography variant="caption" fontWeight={700} color={green ? "#059669" : "text.primary"}>
+                      {value}
+                    </Typography>
+                  </Grid>
+                ))}
+              </Grid>
             )}
-          </Card.Body>
+          </CardContent>
         </Card>
 
-        <Card
-          className="border-0 shadow-sm"
-          style={{ borderRadius: 10, overflow: "hidden" }}
-        >
-          <div
-            style={{
-              background: "linear-gradient(135deg, #059669 0%, #047857 100%)",
-              color: "white",
-              padding: "0.75rem 1rem",
-            }}
-          >
-            <h6
-              style={{
-                margin: 0,
-                fontWeight: 600,
-                display: "flex",
-                alignItems: "center",
-                fontSize: "0.9rem",
+        {/* Status selector card */}
+        <Card sx={{ border: "1px solid #e2e8f0", overflow: "hidden" }} elevation={0}>
+          <Box sx={{ background: "linear-gradient(135deg, #059669 0%, #047857 100%)",
+              color: "white", px: 2, py: 1 }}>
+            <Typography variant="subtitle2" fontWeight={700} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <FiEdit size={14} /> Select New Status
+            </Typography>
+          </Box>
+          <CardContent sx={{ p: 2 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+              Choose the new status for this order:
+            </Typography>
+            <TextField
+              select fullWidth size="small"
+              value={newStatus}
+              onChange={(e) => setNewStatus(e.target.value)}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start"><FiPackage size={14} color="#94a3b8" /></InputAdornment>
+                  ),
+                },
               }}
+              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
             >
-              <FiEdit size={14} className="me-2" /> Select New Status
-            </h6>
-          </div>
-          <Card.Body style={{ padding: "1rem", background: "white" }}>
-            <Form.Group>
-              <Form.Label
-                style={{
-                  fontWeight: 500,
-                  color: "#374151",
-                  marginBottom: 8,
-                  fontSize: "0.9rem",
-                }}
-              >
-                Choose the new status for this order:
-              </Form.Label>
-              <div className="position-relative">
-                <FiPackage
-                  className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"
-                  size={14}
-                />
-                <Form.Select
-                  value={newStatus}
-                  onChange={(e) => setNewStatus(e.target.value)}
-                  style={{
-                    borderRadius: 8,
-                    border: "1px solid #e2e8f0",
-                    fontSize: "0.9rem",
-                    padding: "10px 10px 10px 2.2rem",
-                    fontWeight: 500,
-                    color: "#374151",
-                  }}
-                >
-                  <option value="pending">
-                    📋 Pending - Order received, awaiting confirmation
-                  </option>
-                  <option value="confirmed">
-                    ✅ Confirmed - Order confirmed and being prepared
-                  </option>
-                  <option value="processing">
-                    📦 Processing - Order is being processed
-                  </option>
-                  <option value="shipped">
-                    🚚 Shipped - Order has been shipped
-                  </option>
-                  <option value="delivered">
-                    🎉 Delivered - Order successfully delivered
-                  </option>
-                  <option value="cancelled">
-                    ❌ Cancelled - Order has been cancelled
-                  </option>
-                </Form.Select>
-              </div>
-            </Form.Group>
+              {STATUS_OPTIONS.map(({ value, label }) => (
+                <MenuItem key={value} value={value}>{label}</MenuItem>
+              ))}
+            </TextField>
 
             {newStatus && (
-              <div
-                style={{
-                  marginTop: 12,
-                  padding: 12,
-                  background:
-                    "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
-                  borderRadius: 6,
-                  border: "1px solid #bbf7d0",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: "0.85rem",
-                      color: "#166534",
-                      fontWeight: 500,
-                    }}
-                  >
-                    Preview of new status:
-                  </span>
-                  {getStatusBadge(newStatus)}
-                </div>
-              </div>
+              <Box sx={{ mt: 1.5, p: 1.5, background: "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
+                  borderRadius: 1.5, border: "1px solid #bbf7d0", display: "flex",
+                  alignItems: "center", justifyContent: "space-between" }}>
+                <Typography variant="caption" color="#166534" fontWeight={500}>Preview of new status:</Typography>
+                {getStatusBadge(newStatus)}
+              </Box>
             )}
-          </Card.Body>
+          </CardContent>
         </Card>
-      </Modal.Body>
-      <Modal.Footer
-        style={{
-          background: "#f8fafc",
-          border: "none",
-          borderRadius: "0 0 12px 12px",
-          padding: "1rem 1.5rem",
-          gap: "0.5rem",
-        }}
-      >
-        <button
-          className="adm-btn adm-btn--secondary"
-          onClick={onHide}
-          style={{ flex: 1 }}
-        >
-          <FiX className="me-1" size={14} /> Cancel
-        </button>
-        <button
-          className="adm-btn adm-btn--success"
-          onClick={confirmStatusUpdate}
+      </DialogContent>
+
+      <DialogActions sx={{ background: "#f8fafc", borderTop: "1px solid #e2e8f0", px: 2.5, py: 1.5, gap: 1 }}>
+        <Button variant="outlined" onClick={onHide} startIcon={<FiX size={14} />}
+          sx={{ flex: 1, borderColor: "#e2e8f0", color: "text.secondary", borderRadius: 2 }}>
+          Cancel
+        </Button>
+        <Button variant="contained" color="success" onClick={confirmStatusUpdate}
           disabled={updating || !newStatus || newStatus === selectedOrder?.status}
-          style={{ flex: 2 }}
-        >
-          {updating ? (
-            <>
-              <DotsLoader size="sm" />
-              Updating...
-            </>
-          ) : (
-            <>
-              <FiCheck className="me-1" size={14} />
-              {newStatus === selectedOrder?.status ? "No Changes" : "Update Status"}
-            </>
-          )}
-        </button>
-      </Modal.Footer>
-    </Modal>
+          startIcon={updating ? null : <FiCheck size={14} />}
+          sx={{ flex: 2, borderRadius: 2 }}>
+          {updating ? <><DotsLoader size="sm" /> Updating…</> :
+            newStatus === selectedOrder?.status ? "No Changes" : "Update Status"}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Container, Row, Col } from "react-bootstrap";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 import { useSelector } from "react-redux";
 import {
   FiRefreshCw,
@@ -94,7 +97,7 @@ export default function TrackOrder() {
           <h1>Track Your Order</h1>
           <p>Loading shipment details…</p>
         </div>
-        <Container className="mt-4">
+        <Box sx={{ mt: 4 }}>
           <div className="to-card">
             <div className="to-card-body">
               <div
@@ -104,7 +107,7 @@ export default function TrackOrder() {
               <div className="to-skeleton" style={{ height: 200 }} />
             </div>
           </div>
-        </Container>
+        </Box>
       </div>
     );
   }
@@ -113,7 +116,7 @@ export default function TrackOrder() {
     return (
       <div className="to-page">
         <Header />
-        <Container className="mt-5">
+        <Box sx={{ mt: 5 }}>
           <div
             style={{
               textAlign: "center",
@@ -142,7 +145,7 @@ export default function TrackOrder() {
               <FiArrowLeft size={15} /> Back to Orders
             </button>
           </div>
-        </Container>
+        </Box>
       </div>
     );
   }
@@ -160,12 +163,9 @@ export default function TrackOrder() {
         <p>Order #{String(orderId).slice(-8).toUpperCase()}</p>
       </div>
 
-      <Container className="mt-4 mb-5">
+      <Box sx={{ mt: 4, mb: 5 }}>
         {/* ── Action row ── */}
-        <div
-          className="d-flex justify-content-between align-items-center mb-3 flex-wrap"
-          style={{ gap: "0.5rem" }}
-        >
+        <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={1} sx={{ mb: 2 }}>
           <button
             className="to-refresh-btn"
             onClick={() => navigate("/orders")}
@@ -173,11 +173,11 @@ export default function TrackOrder() {
             <FiArrowLeft size={15} /> My Orders
           </button>
 
-          <div className="d-flex align-items-center gap-2">
+          <Stack direction="row" alignItems="center" gap={1}>
             {lastUpdated && (
-              <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>
+              <Typography variant="caption" color="text.secondary">
                 Updated {lastUpdated.toLocaleTimeString("en-IN")}
-              </span>
+              </Typography>
             )}
             <button
               className="to-refresh-btn"
@@ -190,12 +190,12 @@ export default function TrackOrder() {
               />
               {refreshing ? "Refreshing…" : "Refresh"}
             </button>
-          </div>
-        </div>
+          </Stack>
+        </Stack>
 
-        <Row className="g-3">
+        <Grid container spacing={2}>
           {/* ── Left: Tracking ── */}
-          <Col lg={8}>
+          <Grid item xs={12} lg={8}>
             {/* Order status card */}
             <div className="to-card mb-3">
               <div
@@ -208,25 +208,24 @@ export default function TrackOrder() {
                 Shipment Status
               </div>
               <div className="to-card-body">
-                <div className="d-flex align-items-center gap-3 mb-3 flex-wrap">
+                <Stack direction="row" alignItems="center" flexWrap="wrap" gap={1.5} sx={{ mb: 2 }}>
                   <div className={badgeClass}>
                     {STATUS_ICON[status] || "📦"}{" "}
                     {status.charAt(0).toUpperCase() + status.slice(1)}
                   </div>
                   {order?.estimatedDelivery && (
-                    <span style={{ fontSize: "0.85rem", color: "#475569" }}>
-                      Est. delivery:{" "}
-                      <strong>{fmtDate(order.estimatedDelivery)}</strong>
-                    </span>
+                    <Typography variant="body2" color="text.secondary">
+                      Est. delivery: <strong>{fmtDate(order.estimatedDelivery)}</strong>
+                    </Typography>
                   )}
-                </div>
+                </Stack>
                 <TrackingTimeline order={order} tracking={tracking} />
               </div>
             </div>
-          </Col>
+          </Grid>
 
           {/* ── Right: Order Summary ── */}
-          <Col lg={4}>
+          <Grid item xs={12} lg={4}>
             {/* Shipping address */}
             <div className="to-card mb-3">
               <div
@@ -278,7 +277,7 @@ export default function TrackOrder() {
               <div
                 className="to-card-header"
                 style={{
-                  background: "linear-gradient(135deg, #3b82f6, #2563eb)",
+                  background: "linear-gradient(135deg, #C9A84C, #8B1A4A)",
                 }}
               >
                 <FiShoppingBag size={16} />
@@ -324,9 +323,9 @@ export default function TrackOrder() {
                 </button>
               </div>
             </div>
-          </Col>
-        </Row>
-      </Container>
+          </Grid>
+        </Grid>
+      </Box>
     </div>
   );
 }

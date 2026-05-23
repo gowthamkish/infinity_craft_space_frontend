@@ -1,10 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Card, Spinner } from "react-bootstrap";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardActions from "@mui/material/CardActions";
+import CardMedia from "@mui/material/CardMedia";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
 import { FiChevronRight } from "react-icons/fi";
 import { recommendationsAPI } from "../api/features";
-import { SkeletonProductGrid, SkeletonProductCard } from "./SkeletonLoaders";
+import { SkeletonProductGrid } from "./SkeletonLoaders";
 import OptimizedImage from "./OptimizedImage";
-import "../styles/designPatterns.css";
+import { StarRating } from "./reviews/StarRating";
+
+const BRAND = {
+  primary: "#8B1A4A",
+  secondary: "#C9A84C",
+  bg: "#FDF6EC",
+  text: "#2C2C2C",
+};
 
 /**
  * ProductRecommendations Component
@@ -68,12 +83,15 @@ const ProductRecommendations = ({
 
   if (loading) {
     return (
-      <section className="recommendations-section py-5">
-        <Container>
-          <h2 className="section-title mb-4">{title}</h2>
-          <SkeletonProductGrid count={Math.min(limit, 4)} />
-        </Container>
-      </section>
+      <Box component="section" sx={{ py: 6, backgroundColor: BRAND.bg }}>
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: 700, mb: 3, color: BRAND.text }}
+        >
+          {title}
+        </Typography>
+        <SkeletonProductGrid count={Math.min(limit, 4)} />
+      </Box>
     );
   }
 
@@ -82,36 +100,46 @@ const ProductRecommendations = ({
   }
 
   return (
-    <section
-      className="recommendations-section py-5"
-      style={{ backgroundColor: "#f9fafb" }}
-    >
-      <Container>
-        <div className="section-header">
-          <h2 className="section-title">{title}</h2>
-          <a
-            href="/products"
-            style={{
-              color: "var(--color-primary)",
-              textDecoration: "none",
-              display: "flex",
-              alignItems: "center",
-              gap: "4px",
-            }}
-          >
-            View All <FiChevronRight size={18} />
-          </a>
-        </div>
+    <Box component="section" sx={{ py: 6, backgroundColor: BRAND.bg }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          mb: 3,
+        }}
+      >
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: 700, color: BRAND.text }}
+        >
+          {title}
+        </Typography>
+        <Box
+          component="a"
+          href="/products"
+          sx={{
+            color: BRAND.primary,
+            textDecoration: "none",
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+            fontWeight: 600,
+            "&:hover": { textDecoration: "underline" },
+          }}
+        >
+          View All <FiChevronRight size={18} />
+        </Box>
+      </Box>
 
-        <Row className="g-4">
-          {products.map((product) => (
-            <Col key={product._id} md={6} lg={3} className="mb-4">
-              <ProductRecommendationCard product={product} />
-            </Col>
-          ))}
-        </Row>
-      </Container>
-    </section>
+      <Grid container spacing={3}>
+        {products.map((product) => (
+          <Grid item key={product._id} xs={12} sm={6} lg={3}>
+            <ProductRecommendationCard product={product} />
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
   );
 };
 
@@ -128,104 +156,149 @@ const ProductRecommendationCard = ({ product }) => {
 
   return (
     <Card
-      className="card-elevated card-hover h-100"
-      style={{ cursor: "pointer" }}
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        cursor: "pointer",
+        borderRadius: "16px",
+        boxShadow: "0 4px 16px rgba(139,26,74,0.08)",
+        transition: "box-shadow 0.3s ease, transform 0.3s ease",
+        "&:hover": {
+          boxShadow: "0 8px 32px rgba(139,26,74,0.18)",
+          transform: "translateY(-4px)",
+        },
+      }}
     >
-      <div
-        style={{
+      {/* Image area */}
+      <Box
+        sx={{
           position: "relative",
           aspectRatio: "1",
           overflow: "hidden",
           backgroundColor: "#f5f5f5",
         }}
         onClick={handleViewProduct}
-        onMouseEnter={(e) => { const img = e.currentTarget.querySelector("img"); if (img) img.style.transform = "scale(1.05)"; }}
-        onMouseLeave={(e) => { const img = e.currentTarget.querySelector("img"); if (img) img.style.transform = "scale(1)"; }}
+        onMouseEnter={(e) => {
+          const img = e.currentTarget.querySelector("img");
+          if (img) img.style.transform = "scale(1.05)";
+        }}
+        onMouseLeave={(e) => {
+          const img = e.currentTarget.querySelector("img");
+          if (img) img.style.transform = "scale(1)";
+        }}
       >
         {product.images && product.images[0] ? (
           <OptimizedImage
             src={product.images[0].url}
             alt={product.name}
             width={300}
-            style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s ease" }}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              transition: "transform 0.3s ease",
+            }}
           />
         ) : (
-          <div
-            style={{
+          <Box
+            sx={{
               width: "100%",
               height: "100%",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               backgroundColor: "#e5e5e5",
+              color: "text.secondary",
             }}
           >
             No Image
-          </div>
+          </Box>
         )}
 
         {product.stock > 0 && product.stock <= 5 && (
-          <div
-            className="badge-danger"
-            style={{ position: "absolute", top: "8px", right: "8px" }}
-          >
-            Only {product.stock} left
-          </div>
+          <Chip
+            label={`Only ${product.stock} left`}
+            size="small"
+            sx={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+              backgroundColor: "#8B1A4A",
+              color: "white",
+              fontWeight: 700,
+              fontSize: "0.7rem",
+            }}
+          />
         )}
-      </div>
+      </Box>
 
-      <Card.Body
-        className="d-flex flex-column"
-        style={{ padding: "var(--spacing-md)" }}
+      <CardContent
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          flexGrow: 1,
+          p: 2,
+        }}
       >
-        <p
-          className="m-0 mb-2"
-          style={{
+        <Typography
+          variant="body2"
+          sx={{
             fontWeight: 600,
-            color: "var(--text-primary)",
-            fontSize: "var(--font-size-sm)",
+            color: BRAND.text,
             overflow: "hidden",
             textOverflow: "ellipsis",
             WebkitLineClamp: 2,
             display: "-webkit-box",
             WebkitBoxOrient: "vertical",
             minHeight: "2.8em",
+            mb: 1,
           }}
         >
           {product.name}
-        </p>
+        </Typography>
 
         {product.ratingCount > 0 && (
-          <div
-            className="rating-display mb-2"
-            style={{ fontSize: "var(--font-size-xs)" }}
-          >
-            <div className="rating-stars">
-              {"★".repeat(Math.round(product.averageRating))}
-              {"☆".repeat(5 - Math.round(product.averageRating))}
-            </div>
-            <span className="rating-count">({product.ratingCount})</span>
-          </div>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}>
+            <StarRating rating={product.averageRating} size="0.85rem" />
+            <Typography variant="caption" color="text.secondary">
+              ({product.ratingCount})
+            </Typography>
+          </Box>
         )}
 
-        <p
-          className="m-0 mb-3 mt-auto"
-          style={{
-            fontSize: "var(--font-size-lg)",
+        <Typography
+          variant="body1"
+          sx={{
             fontWeight: 700,
-            color: "var(--color-primary)",
+            color: BRAND.primary,
+            mt: "auto",
+            mb: 0,
           }}
         >
           ₹{product.price.toLocaleString()}
-        </p>
+        </Typography>
+      </CardContent>
 
-        <button
+      <CardActions sx={{ p: 2, pt: 0 }}>
+        <Button
           onClick={handleViewProduct}
-          className="ics-btn ics-btn--primary ics-btn--full"
+          fullWidth
+          variant="contained"
+          sx={{
+            background: `linear-gradient(135deg, ${BRAND.primary} 0%, ${BRAND.secondary} 100%)`,
+            color: "white",
+            borderRadius: "10px",
+            fontWeight: 600,
+            textTransform: "none",
+            "&:hover": {
+              background: `linear-gradient(135deg, #5c0f30 0%, #a8882e 100%)`,
+            },
+          }}
         >
           View Product
-        </button>
-      </Card.Body>
+        </Button>
+      </CardActions>
     </Card>
   );
 };

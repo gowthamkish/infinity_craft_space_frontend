@@ -1,15 +1,31 @@
 import React, { useState, useEffect, useCallback } from "react";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Card from "react-bootstrap/Card";
-import Badge from "react-bootstrap/Badge";
-import Table from "react-bootstrap/Table";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import MuiCard from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import Chip from "@mui/material/Chip";
+import MuiTable from "@mui/material/Table";
+import TableHead from "@mui/material/TableHead";
+import TableBody from "@mui/material/TableBody";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import MuiAlert from "@mui/material/Alert";
+import MuiButton from "@mui/material/Button";
+import ButtonGroup from "@mui/material/ButtonGroup";
+import LinearProgress from "@mui/material/LinearProgress";
+
+
+
+
+
+
 import { OrbitLoader } from "../Loader";
-import Alert from "react-bootstrap/Alert";
-import Button from "react-bootstrap/Button";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
-import ProgressBar from "react-bootstrap/ProgressBar";
+
+
+
+
 import AdminLayout from "./AdminLayout";
 import api from "../../api/axios";
 import SEOHead, { SEO_CONFIG } from "../SEOHead";
@@ -107,74 +123,55 @@ const usePredictions = () => {
 };
 
 // Stat Card Component
-const StatCard = ({
-  icon: Icon,
-  title,
-  value,
-  subtitle,
-  trend,
-  color,
-  prefix = "",
-}) => (
-  <Card
-    className="h-100 border-0 shadow-sm"
-    style={{
-      borderRadius: "16px",
+const StatCard = ({ icon: Icon, title, value, subtitle, trend, color, prefix = "" }) => (
+  <MuiCard
+    elevation={1}
+    sx={{
+      borderRadius: 3,
+      border: "1px solid #e7e5e4",
+      height: "100%",
       transition: "transform 0.2s, box-shadow 0.2s",
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = "translateY(-4px)";
-      e.currentTarget.style.boxShadow = "0 12px 24px rgba(0,0,0,0.1)";
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = "translateY(0)";
-      e.currentTarget.style.boxShadow = "0 4px 6px rgba(0,0,0,0.05)";
+      "&:hover": { transform: "translateY(-4px)", boxShadow: "0 12px 24px rgba(0,0,0,0.1)" },
     }}
   >
-    <Card.Body className="p-4">
-      <div className="d-flex justify-content-between align-items-start">
-        <div>
-          <p className="text-muted mb-1" style={{ fontSize: "0.875rem" }}>
+    <CardContent sx={{ p: 3 }}>
+      <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 2 }}>
+        <Box>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
             {title}
-          </p>
-          <h3 className="mb-0 fw-bold" style={{ color: "#1e293b" }}>
-            {prefix}
-            {typeof value === "number" ? value.toLocaleString("en-IN") : value}
-          </h3>
-          {subtitle && <small className="text-muted">{subtitle}</small>}
-        </div>
-        <div
-          style={{
-            width: "48px",
-            height: "48px",
-            borderRadius: "12px",
+          </Typography>
+          <Typography variant="h5" fontWeight={800} sx={{ color: "#1e293b", mb: 0.25 }}>
+            {prefix}{typeof value === "number" ? value.toLocaleString("en-IN") : value}
+          </Typography>
+          {subtitle && (
+            <Typography variant="caption" color="text.secondary">{subtitle}</Typography>
+          )}
+        </Box>
+        <Box
+          sx={{
+            width: 48, height: 48, borderRadius: 2,
             background: `linear-gradient(135deg, ${color}20, ${color}40)`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            display: "flex", alignItems: "center", justifyContent: "center",
           }}
         >
           <Icon size={24} style={{ color }} />
-        </div>
-      </div>
+        </Box>
+      </Stack>
       {trend !== undefined && (
-        <div className="mt-3 d-flex align-items-center">
+        <Stack direction="row" alignItems="center" gap={0.5} sx={{ mt: 1 }}>
           {trend >= 0 ? (
-            <FiTrendingUp size={16} className="text-success me-1" />
+            <FiTrendingUp size={16} color="#059669" />
           ) : (
-            <FiTrendingDown size={16} className="text-danger me-1" />
+            <FiTrendingDown size={16} color="#dc2626" />
           )}
-          <span className={trend >= 0 ? "text-success" : "text-danger"}>
-            {trend >= 0 ? "+" : ""}
-            {trend}%
-          </span>
-          <span className="text-muted ms-1" style={{ fontSize: "0.75rem" }}>
-            vs last month
-          </span>
-        </div>
+          <Typography variant="caption" sx={{ color: trend >= 0 ? "#059669" : "#dc2626", fontWeight: 600 }}>
+            {trend >= 0 ? "+" : ""}{trend}%
+          </Typography>
+          <Typography variant="caption" color="text.secondary">vs last month</Typography>
+        </Stack>
       )}
-    </Card.Body>
-  </Card>
+    </CardContent>
+  </MuiCard>
 );
 
 const formatRupee = (d) => {
@@ -425,77 +422,58 @@ export default function AnalyticsDashboard() {
       <AdminLayout>
 
             {/* Header */}
-            <Row className="mb-4">
-              <Col>
-                <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
-                  <div>
-                    <h1
-                      className="mb-2"
-                      style={{
-                        fontSize: "clamp(1.5rem, 4vw, 2rem)",
-                        fontWeight: "700",
-                        color: "#1e293b",
-                      }}
+            <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" alignItems={{ xs: "flex-start", md: "center" }} gap={2} sx={{ mb: 3 }}>
+              <Box>
+                <Stack direction="row" alignItems="center" gap={1.5} sx={{ mb: 0.5 }}>
+                  <FiBarChart2 size={22} color="#8B1A4A" />
+                  <Typography variant="h4" fontWeight={800} sx={{ color: "#1c1917", letterSpacing: "-0.025em" }}>
+                    Analytics Dashboard
+                  </Typography>
+                </Stack>
+                <Typography variant="body2" color="text.secondary">
+                  Track your store performance and insights
+                </Typography>
+              </Box>
+              <Stack direction="row" gap={1} flexWrap="wrap">
+                <ButtonGroup size="small">
+                  {[7, 30, 90].map((days) => (
+                    <MuiButton
+                      key={days}
+                      variant={period === days ? "contained" : "outlined"}
+                      onClick={() => setPeriod(days)}
+                      sx={{ textTransform: "none", fontWeight: 600 }}
                     >
-                      <FiBarChart2
-                        size={32}
-                        className="me-2"
-                        style={{ color: "#3b82f6" }}
-                      />
-                      Analytics Dashboard
-                    </h1>
-                    <p className="text-muted mb-0">
-                      Track your store performance and insights
-                    </p>
-                  </div>
-                  <div className="d-flex gap-2 flex-wrap">
-                    <ButtonGroup size="sm">
-                      {[7, 30, 90].map((days) => (
-                        <Button
-                          key={days}
-                          variant={
-                            period === days ? "primary" : "outline-primary"
-                          }
-                          onClick={() => setPeriod(days)}
-                        >
-                          {days}D
-                        </Button>
-                      ))}
-                    </ButtonGroup>
-                    <Button
-                      variant="outline-secondary"
-                      size="sm"
-                      onClick={refetch}
-                      disabled={summaryLoading}
-                    >
-                      <FiRefreshCw
-                        size={16}
-                        className={summaryLoading ? "spin" : ""}
-                      />
-                    </Button>
-                  </div>
-                </div>
-              </Col>
-            </Row>
+                      {days}D
+                    </MuiButton>
+                  ))}
+                </ButtonGroup>
+                <MuiButton variant="outlined" size="small" onClick={refetch} disabled={summaryLoading}>
+                  <FiRefreshCw size={16} style={{ animation: summaryLoading ? "spin 0.8s linear infinite" : "none" }} />
+                </MuiButton>
+              </Stack>
+            </Stack>
 
             {summaryLoading && !summaryData ? (
-              <div className="text-center py-5 d-flex flex-column align-items-center gap-3">
+              <Stack alignItems="center" gap={2} sx={{ py: 8 }}>
                 <OrbitLoader size="lg" />
-                <p className="text-muted mb-0">Loading analytics…</p>
-              </div>
+                <Typography variant="body2" color="text.secondary">Loading analytics…</Typography>
+              </Stack>
             ) : summaryError ? (
-              <Alert variant="danger">
-                <Alert.Heading>Error loading analytics</Alert.Heading>
-                <p>{summaryError}</p>
-                <Button variant="outline-danger" onClick={refetch}>
-                  Retry
-                </Button>
-              </Alert>
+              <MuiAlert
+                severity="error"
+                action={
+                  <MuiButton color="inherit" size="small" onClick={refetch}>
+                    Retry
+                  </MuiButton>
+                }
+              >
+                <strong>Error loading analytics</strong> — {summaryError}
+              </MuiAlert>
             ) : summaryData ? (
               <>
                 {/* Summary Stats — renders immediately (~100ms) */}
-                <Row className="g-4 mb-4">
-                  <Col xs={12} sm={6} lg={3}>
+                <Grid container spacing={2} sx={{ mb: 3 }}>
+                  <Grid item xs={12} sm={6} lg={3}>
                     <StatCard
                       icon={FiDollarSign}
                       title="Total Revenue"
@@ -503,8 +481,8 @@ export default function AnalyticsDashboard() {
                       subtitle={`${summaryData.summary?.totalOrders || 0} total orders`}
                       color="#10b981"
                     />
-                  </Col>
-                  <Col xs={12} sm={6} lg={3}>
+                  </Grid>
+                  <Grid item xs={12} sm={6} lg={3}>
                     <StatCard
                       icon={FiShoppingCart}
                       title={`Orders (${period}D)`}
@@ -513,8 +491,8 @@ export default function AnalyticsDashboard() {
                       trend={summaryData.summary?.revenueGrowth}
                       color="#3b82f6"
                     />
-                  </Col>
-                  <Col xs={12} sm={6} lg={3}>
+                  </Grid>
+                  <Grid item xs={12} sm={6} lg={3}>
                     <StatCard
                       icon={FiUsers}
                       title="Total Users"
@@ -522,8 +500,8 @@ export default function AnalyticsDashboard() {
                       subtitle={`+${summaryData.summary?.newUsersInPeriod || 0} new this period`}
                       color="#8b5cf6"
                     />
-                  </Col>
-                  <Col xs={12} sm={6} lg={3}>
+                  </Grid>
+                  <Grid item xs={12} sm={6} lg={3}>
                     <StatCard
                       icon={FiPackage}
                       title="Avg Order Value"
@@ -531,45 +509,36 @@ export default function AnalyticsDashboard() {
                       subtitle={`${summaryData.summary?.totalProducts || 0} products`}
                       color="#f59e0b"
                     />
-                  </Col>
-                </Row>
+                  </Grid>
+                </Grid>
 
                 {/* Charts — progressive load (1–5s) */}
                 {chartsLoading ? (
-                  <div className="text-center py-4 d-flex flex-column align-items-center gap-2 mb-4">
+                  <Stack alignItems="center" gap={2} sx={{ py: 6, mb: 3 }}>
                     <OrbitLoader />
-                    <p className="text-muted mb-0" style={{ fontSize: "0.875rem" }}>Loading charts…</p>
-                  </div>
+                    <Typography variant="body2" color="text.secondary">Loading charts…</Typography>
+                  </Stack>
                 ) : chartsData ? (
                   <>
 
                 {/* Charts Row */}
-                <Row className="g-4 mb-4">
+                <Grid container spacing={2} sx={{ mb: 3 }}>
                   {/* Revenue Chart */}
-                  <Col xs={12} lg={8}>
-                    <Card
-                      className="border-0 shadow-sm h-100"
-                      style={{ borderRadius: "16px" }}
-                    >
-                      <Card.Body className="p-4">
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                          <div>
-                            <h5 className="mb-1 fw-bold">
-                              <FiTrendingUp
-                                size={20}
-                                className="me-2"
-                                style={{ color: "#10b981" }}
-                              />
-                              Revenue Trend
-                            </h5>
-                            <small className="text-muted">
+                  <Grid item xs={12}>
+                    <MuiCard elevation={1} sx={{ borderRadius: 3, border: "1px solid #e7e5e4" }}>
+                      <CardContent sx={{ p: 3 }}>
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                          <Box>
+                            <Stack direction="row" alignItems="center" gap={1} sx={{ mb: 0.25 }}>
+                              <FiTrendingUp size={18} color="#10b981" />
+                              <Typography variant="subtitle1" fontWeight={700}>Revenue Trend</Typography>
+                            </Stack>
+                            <Typography variant="caption" color="text.secondary">
                               Daily revenue for last {period} days
-                            </small>
-                          </div>
-                          <Badge bg="success" className="px-3 py-2">
-                            {formatCurrency(summaryData.summary?.revenueInPeriod || 0)}
-                          </Badge>
-                        </div>
+                            </Typography>
+                          </Box>
+                          <Chip label={formatCurrency(summaryData.summary?.revenueInPeriod || 0)} size="small" />
+                        </Stack>
                         <C3BarChart
                           data={chartsData.charts?.dailyData || []}
                           dataKey="revenue"
@@ -577,53 +546,37 @@ export default function AnalyticsDashboard() {
                           color="#10b981"
                           height={280}
                         />
-                      </Card.Body>
-                    </Card>
-                  </Col>
+                      </CardContent>
+                    </MuiCard>
+                  </Grid>
 
                   {/* Order Status Distribution */}
-                  <Col xs={12} lg={4}>
-                    <Card
-                      className="border-0 shadow-sm h-100"
-                      style={{ borderRadius: "16px" }}
+                  <Grid item xs={12}>
+                    <MuiCard
+                      elevation={1} sx={{ borderRadius: 3, border: "1px solid #e7e5e4", height: "100%" }}
                     >
-                      <Card.Body className="p-4">
-                        <h5 className="mb-3 fw-bold">
-                          <FiPieChart
-                            size={20}
-                            className="me-2"
-                            style={{ color: "#8b5cf6" }}
-                          />
-                          Order Status
-                        </h5>
+                      <CardContent sx={{ p: 3 }}>
+                        <Stack direction="row" alignItems="center" gap={1} sx={{ mb: 2 }}><FiPieChart size={20} color="#8b5cf6" /><Typography variant="subtitle1" fontWeight={700}>Order Status</Typography></Stack>
                         <C3DonutChart
                           data={chartsData.charts?.orderStatusDistribution || []}
                           nameKey="status"
                           valueKey="count"
                           height={320}
                         />
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                </Row>
+                      </CardContent>
+                    </MuiCard>
+                  </Grid>
+                </Grid>
 
                 {/* Second Charts Row */}
-                <Row className="g-4 mb-4">
+                <Grid container spacing={2} sx={{}}>
                   {/* Top Products */}
-                  <Col xs={12} lg={6}>
-                    <Card
-                      className="border-0 shadow-sm h-100"
-                      style={{ borderRadius: "16px" }}
+                  <Grid item xs={12}>
+                    <MuiCard
+                      elevation={1} sx={{ borderRadius: 3, border: "1px solid #e7e5e4", height: "100%" }}
                     >
-                      <Card.Body className="p-4">
-                        <h5 className="mb-3 fw-bold">
-                          <FiPackage
-                            size={20}
-                            className="me-2"
-                            style={{ color: "#f59e0b" }}
-                          />
-                          Top Selling Products
-                        </h5>
+                      <CardContent sx={{ p: 3 }}>
+                        <Stack direction="row" alignItems="center" gap={1} sx={{ mb: 2 }}><FiPackage size={20} color="#f59e0b" /><Typography variant="subtitle1" fontWeight={700}>Top Selling Products</Typography></Stack>
                         {chartsData.charts?.topProducts?.length > 0 ? (
                           <div>
                             {chartsData.charts.topProducts
@@ -634,61 +587,36 @@ export default function AnalyticsDashboard() {
                                 const percent =
                                   (product.quantity / maxQty) * 100;
                                 return (
-                                  <div key={i} className="mb-3">
-                                    <div className="d-flex justify-content-between mb-1">
-                                      <small
-                                        className="fw-medium text-truncate"
-                                        style={{ maxWidth: "60%" }}
-                                      >
+                                  <Box key={i} sx={{ mb: 2 }}>
+                                    <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
+                                      <Typography variant="body2" fontWeight={600} noWrap sx={{ maxWidth: "60%" }}>
                                         {product.name}
-                                      </small>
-                                      <small className="text-muted">
-                                        {product.quantity} sold •{" "}
-                                        {formatCurrency(product.revenue)}
-                                      </small>
-                                    </div>
-                                    <ProgressBar
-                                      now={percent}
-                                      variant={
-                                        i === 0
-                                          ? "success"
-                                          : i === 1
-                                            ? "info"
-                                            : "primary"
-                                      }
-                                      style={{
-                                        height: "8px",
-                                        borderRadius: "4px",
-                                      }}
-                                    />
-                                  </div>
+                                      </Typography>
+                                      <Typography variant="caption" color="text.secondary">
+                                        {product.quantity} sold · {formatCurrency(product.revenue)}
+                                      </Typography>
+                                    </Stack>
+                                    <LinearProgress variant="determinate" value={percent} />
+                                  </Box>
                                 );
                               })}
                           </div>
                         ) : (
-                          <p className="text-muted">
+                          <Typography variant="body2" color="text.secondary">
                             No product data available
-                          </p>
+                          </Typography>
                         )}
-                      </Card.Body>
-                    </Card>
-                  </Col>
+                      </CardContent>
+                    </MuiCard>
+                  </Grid>
 
                   {/* Revenue by Category */}
-                  <Col xs={12} lg={6}>
-                    <Card
-                      className="border-0 shadow-sm h-100"
-                      style={{ borderRadius: "16px" }}
+                  <Grid item xs={12}>
+                    <MuiCard
+                      elevation={1} sx={{ borderRadius: 3, border: "1px solid #e7e5e4", height: "100%" }}
                     >
-                      <Card.Body className="p-4">
-                        <h5 className="mb-3 fw-bold">
-                          <FiBarChart2
-                            size={20}
-                            className="me-2"
-                            style={{ color: "#3b82f6" }}
-                          />
-                          Revenue by Category
-                        </h5>
+                      <CardContent sx={{ p: 3 }}>
+                        <Stack direction="row" alignItems="center" gap={1} sx={{ mb: 2 }}><FiBarChart2 size={20} color="#3b82f6" /><Typography variant="subtitle1" fontWeight={700}>Revenue by Category</Typography></Stack>
                         <C3CategoryChart
                           data={chartsData.charts?.revenueByCategory || []}
                           dataKey="revenue"
@@ -696,316 +624,216 @@ export default function AnalyticsDashboard() {
                           color="#3b82f6"
                           height={220}
                         />
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                </Row>
+                      </CardContent>
+                    </MuiCard>
+                  </Grid>
+                </Grid>
 
                 {/* Weekly Pattern */}
-                <Row className="g-4 mb-4">
-                  <Col xs={12}>
-                    <Card
-                      className="border-0 shadow-sm"
-                      style={{ borderRadius: "16px" }}
+                <Grid container spacing={2} sx={{}}>
+                  <Grid item xs={12}>
+                    <MuiCard
+                      elevation={1} sx={{ borderRadius: 3, border: "1px solid #e7e5e4" }}
                     >
-                      <Card.Body className="p-4">
-                        <h5 className="mb-3 fw-bold">
-                          <FiCalendar
-                            size={20}
-                            className="me-2"
-                            style={{ color: "#8b5cf6" }}
-                          />
-                          Orders by Day of Week
-                        </h5>
-                        <Row>
+                      <CardContent sx={{ p: 3 }}>
+                        <Stack direction="row" alignItems="center" gap={1} sx={{ mb: 2 }}><FiCalendar size={20} color="#8b5cf6" /><Typography variant="subtitle1" fontWeight={700}>Orders by Day of Week</Typography></Stack>
+                        <Grid container spacing={1.5}>
                           {(chartsData.charts?.weeklyData || []).map((day, i) => (
-                            <Col key={i} className="text-center mb-3 mb-md-0">
-                              <div
-                                className="p-3 rounded-3"
-                                style={{
-                                  background:
-                                    i === 0 || i === 6 ? "#f1f5f9" : "#fff",
-                                  border: "1px solid #e2e8f0",
+                            <Grid item xs={6} sm={4} md={3} lg={12 / 7} key={day.day || i}>
+                              <Box
+                                sx={{
+                                  p: 2, borderRadius: 2, textAlign: "center",
+                                  background: i === 0 || i === 6 ? "#f5f5f4" : "#fff",
+                                  border: "1px solid #e7e5e4",
                                 }}
                               >
-                                <h6 className="fw-bold mb-1">{day.day}</h6>
-                                <div
-                                  className="fs-4 fw-bold"
-                                  style={{ color: "#3b82f6" }}
-                                >
+                                <Typography variant="body2" fontWeight={700} sx={{ mb: 0.5 }}>{day.day}</Typography>
+                                <Typography variant="h5" fontWeight={800} sx={{ color: "#3b82f6" }}>
                                   {day.orders}
-                                </div>
-                                <small className="text-muted">orders</small>
-                                <div className="mt-1">
-                                  <small className="text-success">
-                                    {formatCurrency(day.revenue)}
-                                  </small>
-                                </div>
-                              </div>
-                            </Col>
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">orders</Typography>
+                                <Typography variant="caption" sx={{ display: "block", color: "#059669", fontWeight: 600, mt: 0.5 }}>
+                                  {formatCurrency(day.revenue)}
+                                </Typography>
+                              </Box>
+                            </Grid>
                           ))}
-                        </Row>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                </Row>
+                        </Grid>
+                      </CardContent>
+                    </MuiCard>
+                  </Grid>
+                </Grid>
                   </>
                 ) : null}
 
                 {/* Recent Orders Table — from summary (fast) */}
-                <Row>
-                  <Col>
-                    <Card
-                      className="border-0 shadow-sm"
-                      style={{ borderRadius: "16px" }}
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <MuiCard
+                      elevation={1} sx={{ borderRadius: 3, border: "1px solid #e7e5e4" }}
                     >
-                      <Card.Body className="p-4">
-                        <h5 className="mb-3 fw-bold">
-                          <FiShoppingCart
-                            size={20}
-                            className="me-2"
-                            style={{ color: "#10b981" }}
-                          />
-                          Recent Orders
-                        </h5>
+                      <CardContent sx={{ p: 3 }}>
+                        <Stack direction="row" alignItems="center" gap={1} sx={{ mb: 2 }}><FiShoppingCart size={20} color="#10b981" /><Typography variant="subtitle1" fontWeight={700}>Recent Orders</Typography></Stack>
                         <div className="table-responsive">
-                          <Table hover className="mb-0">
-                            <thead style={{ backgroundColor: "#f8fafc" }}>
-                              <tr>
-                                <th>Order ID</th>
-                                <th>Customer</th>
-                                <th>Items</th>
-                                <th>Total</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                              </tr>
-                            </thead>
-                            <tbody>
+                          <MuiTable>
+                            <TableHead style={{ backgroundColor: "#f8fafc" }}>
+                              <TableRow>
+                                <TableCell component="th">Order ID</TableCell>
+                                <TableCell component="th">Customer</TableCell>
+                                <TableCell component="th">Items</TableCell>
+                                <TableCell component="th">Total</TableCell>
+                                <TableCell component="th">Status</TableCell>
+                                <TableCell component="th">Date</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
                               {summaryData.recentOrders?.length > 0 ? (
                                 summaryData.recentOrders.map((order) => (
-                                  <tr key={order._id}>
-                                    <td>
+                                  <TableRow key={order._id}>
+                                    <TableCell>
                                       <code style={{ fontSize: "0.75rem" }}>
                                         {order.orderId?.substring(0, 12) ||
                                           order._id?.substring(0, 12)}
                                         ...
                                       </code>
-                                    </td>
-                                    <td>{order.customer}</td>
-                                    <td>
-                                      <Badge bg="secondary">
-                                        {order.itemCount} items
-                                      </Badge>
-                                    </td>
-                                    <td className="fw-bold">
+                                    </TableCell>
+                                    <TableCell>{order.customer}</TableCell>
+                                    <TableCell>
+                                      <Chip label={`${order.itemCount} items`} size="small" />
+                                    </TableCell>
+                                    <TableCell className="fw-bold">
                                       {formatCurrency(order.total)}
-                                    </td>
-                                    <td>
-                                      <Badge
-                                        bg={getStatusColor(order.status)}
-                                        className="text-capitalize"
-                                      >
-                                        {order.status}
-                                      </Badge>
-                                    </td>
-                                    <td>
-                                      <small className="text-muted">
+                                    </TableCell>
+                                    <TableCell>
+                                      <Chip
+                                        label={order.status}
+                                        size="small"
+                                        color={
+                                          order.status === "confirmed" || order.status === "delivered" ? "success" :
+                                          order.status === "processing" ? "info" :
+                                          order.status === "shipped" ? "primary" :
+                                          order.status === "pending" ? "warning" :
+                                          order.status === "cancelled" ? "error" : "default"
+                                        }
+                                        sx={{ textTransform: "capitalize" }}
+                                      />
+                                    </TableCell>
+                                    <TableCell>
+                                      <Typography variant="caption" color="text.secondary">
                                         {formatDate(order.date)}
-                                      </small>
-                                    </td>
-                                  </tr>
+                                      </Typography>
+                                    </TableCell>
+                                  </TableRow>
                                 ))
                               ) : (
-                                <tr>
-                                  <td
+                                <TableRow>
+                                  <TableCell
                                     colSpan={6}
                                     className="text-center text-muted py-4"
                                   >
                                     No recent orders
-                                  </td>
-                                </tr>
+                                  </TableCell>
+                                </TableRow>
                               )}
-                            </tbody>
-                          </Table>
+                            </TableBody>
+                          </MuiTable>
                         </div>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                </Row>
+                      </CardContent>
+                    </MuiCard>
+                  </Grid>
+                </Grid>
 
                 {/* Product Predictions Section */}
-                <Row className="g-4 mb-4 mt-2">
-                  <Col xs={12}>
-                    <Card
-                      className="border-0 shadow-sm"
-                      style={{ borderRadius: "16px" }}
+                <Grid container spacing={2} sx={{}}>
+                  <Grid item xs={12}>
+                    <MuiCard
+                      elevation={1} sx={{ borderRadius: 3, border: "1px solid #e7e5e4" }}
                     >
-                      <Card.Body className="p-4">
-                        <div className="d-flex justify-content-between align-items-center mb-4">
-                          <div>
-                            <h4 className="mb-1 fw-bold">
-                              <FiTarget
-                                size={24}
-                                className="me-2"
-                                style={{ color: "#8b5cf6" }}
-                              />
-                              Product Order Predictions
-                            </h4>
-                            <p className="text-muted mb-0">
-                              AI-powered predictions for current month based on
-                              historical order patterns
-                            </p>
-                          </div>
-                          <Button
-                            variant="outline-primary"
-                            size="sm"
+                      <CardContent sx={{ p: 3 }}>
+                        <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ sm: "center" }} gap={2} sx={{ mb: 3 }}>
+                          <Box>
+                            <Stack direction="row" alignItems="center" gap={1} sx={{ mb: 0.5 }}>
+                              <FiTarget size={20} color="#8b5cf6" />
+                              <Typography variant="subtitle1" fontWeight={700}>Product Order Predictions</Typography>
+                            </Stack>
+                            <Typography variant="body2" color="text.secondary">
+                              AI-powered predictions for current month based on historical order patterns
+                            </Typography>
+                          </Box>
+                          <MuiButton variant="contained"
+                            size="small"
                             onClick={refetchPredictions}
                             disabled={predictionsLoading}
                           >
                             <FiRefreshCw
                               size={16}
-                              className={
-                                predictionsLoading ? "spin me-1" : "me-1"
-                              }
+                              style={{ marginRight: 4, animation: predictionsLoading ? "spin 0.8s linear infinite" : "none" }}
                             />
                             Refresh
-                          </Button>
-                        </div>
+                          </MuiButton>
+                        </Stack>
 
                         {predictionsLoading ? (
-                          <div className="text-center py-5 d-flex flex-column align-items-center gap-3">
+                          <Stack alignItems="center" gap={2} sx={{ py: 6 }}>
                             <OrbitLoader />
-                            <p className="text-muted mb-0">
+                            <Typography variant="body2" color="text.secondary">
                               Analyzing order patterns…
-                            </p>
-                          </div>
+                            </Typography>
+                          </Stack>
                         ) : predictionsData?.predictions?.length > 0 ? (
                           <>
                             {/* Prediction Summary Cards */}
-                            <Row className="g-3 mb-4">
-                              <Col xs={12} sm={6} md={3}>
-                                <div
-                                  className="p-3 rounded-3 text-center"
-                                  style={{
-                                    background:
-                                      "linear-gradient(135deg, #8b5cf620, #8b5cf640)",
-                                    border: "1px solid #8b5cf630",
-                                  }}
-                                >
-                                  <FiActivity
-                                    size={24}
-                                    style={{ color: "#8b5cf6" }}
-                                  />
-                                  <h5
-                                    className="mt-2 mb-0 fw-bold"
-                                    style={{ color: "#8b5cf6" }}
-                                  >
-                                    {predictionsData.metadata?.summary
-                                      ?.totalProductsAnalyzed || 0}
-                                  </h5>
-                                  <small className="text-muted">
-                                    Products Analyzed
-                                  </small>
-                                </div>
-                              </Col>
-                              <Col xs={12} sm={6} md={3}>
-                                <div
-                                  className="p-3 rounded-3 text-center"
-                                  style={{
-                                    background:
-                                      "linear-gradient(135deg, #94a3b820, #94a3b840)",
-                                    border: "1px solid #94a3b830",
-                                  }}
-                                >
-                                  <FiPackage
-                                    size={24}
-                                    style={{ color: "#64748b" }}
-                                  />
-                                  <h5
-                                    className="mt-2 mb-0 fw-bold"
-                                    style={{ color: "#64748b" }}
-                                  >
-                                    {predictionsData.metadata?.summary
-                                      ?.totalLastMonthOrders || 0}
-                                  </h5>
-                                  <small className="text-muted">
-                                    Last Month Orders
-                                  </small>
-                                </div>
-                              </Col>
-                              <Col xs={12} sm={6} md={3}>
-                                <div
-                                  className="p-3 rounded-3 text-center"
-                                  style={{
-                                    background:
-                                      "linear-gradient(135deg, #3b82f620, #3b82f640)",
-                                    border: "1px solid #3b82f630",
-                                  }}
-                                >
-                                  <FiTarget
-                                    size={24}
-                                    style={{ color: "#3b82f6" }}
-                                  />
-                                  <h5
-                                    className="mt-2 mb-0 fw-bold"
-                                    style={{ color: "#3b82f6" }}
-                                  >
-                                    {predictionsData.metadata?.summary
-                                      ?.totalPredictedThisMonth || 0}
-                                  </h5>
-                                  <small className="text-muted">
-                                    Predicted This Month
-                                  </small>
-                                </div>
-                              </Col>
-                              <Col xs={12} sm={6} md={3}>
-                                <div
-                                  className="p-3 rounded-3 text-center"
-                                  style={{
-                                    background:
-                                      "linear-gradient(135deg, #10b98120, #10b98140)",
-                                    border: "1px solid #10b98130",
-                                  }}
-                                >
-                                  <FiTrendingUp
-                                    size={24}
-                                    style={{ color: "#10b981" }}
-                                  />
-                                  <h5
-                                    className="mt-2 mb-0 fw-bold"
-                                    style={{ color: "#10b981" }}
-                                  >
-                                    {predictionsData.metadata
-                                      ?.currentMonthProgress?.percentComplete ||
-                                      0}
-                                    %
-                                  </h5>
-                                  <small className="text-muted">
-                                    Month Progress
-                                  </small>
-                                </div>
-                              </Col>
-                            </Row>
+                            <Grid container spacing={2} sx={{ mb: 2 }}>
+                              <Grid item xs={6} sm={3}>
+                                <Box sx={{ p: 2, borderRadius: 2, textAlign: "center", background: "linear-gradient(135deg, #8b5cf620, #8b5cf640)", border: "1px solid #8b5cf630" }}>
+                                  <FiActivity size={24} style={{ color: "#8b5cf6" }} />
+                                  <Typography variant="h6" fontWeight={800} sx={{ color: "#8b5cf6", mt: 1 }}>
+                                    {predictionsData.metadata?.summary?.totalProductsAnalyzed || 0}
+                                  </Typography>
+                                  <Typography variant="caption" color="text.secondary">Products Analyzed</Typography>
+                                </Box>
+                              </Grid>
+                              <Grid item xs={6} sm={3}>
+                                <Box sx={{ p: 2, borderRadius: 2, textAlign: "center", background: "linear-gradient(135deg, #94a3b820, #94a3b840)", border: "1px solid #94a3b830" }}>
+                                  <FiPackage size={24} style={{ color: "#64748b" }} />
+                                  <Typography variant="h6" fontWeight={800} sx={{ color: "#64748b", mt: 1 }}>
+                                    {predictionsData.metadata?.summary?.totalLastMonthOrders || 0}
+                                  </Typography>
+                                  <Typography variant="caption" color="text.secondary">Last Month Orders</Typography>
+                                </Box>
+                              </Grid>
+                              <Grid item xs={6} sm={3}>
+                                <Box sx={{ p: 2, borderRadius: 2, textAlign: "center", background: "linear-gradient(135deg, #3b82f620, #3b82f640)", border: "1px solid #3b82f630" }}>
+                                  <FiTarget size={24} style={{ color: "#3b82f6" }} />
+                                  <Typography variant="h6" fontWeight={800} sx={{ color: "#3b82f6", mt: 1 }}>
+                                    {predictionsData.metadata?.summary?.totalPredictedThisMonth || 0}
+                                  </Typography>
+                                  <Typography variant="caption" color="text.secondary">Predicted This Month</Typography>
+                                </Box>
+                              </Grid>
+                              <Grid item xs={6} sm={3}>
+                                <Box sx={{ p: 2, borderRadius: 2, textAlign: "center", background: "linear-gradient(135deg, #10b98120, #10b98140)", border: "1px solid #10b98130" }}>
+                                  <FiTrendingUp size={24} style={{ color: "#10b981" }} />
+                                  <Typography variant="h6" fontWeight={800} sx={{ color: "#10b981", mt: 1 }}>
+                                    {predictionsData.metadata?.currentMonthProgress?.percentComplete || 0}%
+                                  </Typography>
+                                  <Typography variant="caption" color="text.secondary">Month Progress</Typography>
+                                </Box>
+                              </Grid>
+                            </Grid>
 
-                            <Row className="g-4">
+                            <Grid container spacing={2} sx={{}}>
                               {/* Main Prediction Chart */}
-                              <Col xs={12} lg={8}>
-                                <Card
+                              <Grid item xs={12}>
+                                <MuiCard
                                   className="border-0 h-100"
                                   style={{
                                     borderRadius: "12px",
                                     background: "#f8fafc",
                                   }}
                                 >
-                                  <Card.Body className="p-3">
-                                    <h6 className="mb-3 fw-bold">
-                                      <FiBarChart2
-                                        size={18}
-                                        className="me-2"
-                                        style={{ color: "#3b82f6" }}
-                                      />
-                                      Top 10 Product Predictions
-                                    </h6>
+                                  <CardContent sx={{ p: 2 }}>
+                                    <Stack direction="row" alignItems="center" gap={1} sx={{ mb: 2 }}><FiBarChart2 size={18} color="#3b82f6" /><Typography variant="subtitle2" fontWeight={700}>Top 10 Product Predictions</Typography></Stack>
                                     <C3PredictionChart
                                       data={predictionsData.predictions}
                                       height={380}
@@ -1021,9 +849,9 @@ export default function AnalyticsDashboard() {
                                             backgroundColor: "#94a3b8",
                                           }}
                                         />
-                                        <small className="text-muted">
+                                        <Typography variant="caption" color="text.secondary">
                                           Last Month Actual
-                                        </small>
+                                        </Typography>
                                       </div>
                                       <div className="d-flex align-items-center">
                                         <div
@@ -1035,9 +863,9 @@ export default function AnalyticsDashboard() {
                                             backgroundColor: "#3b82f6",
                                           }}
                                         />
-                                        <small className="text-muted">
+                                        <Typography variant="caption" color="text.secondary">
                                           Predicted
-                                        </small>
+                                        </Typography>
                                       </div>
                                       <div className="d-flex align-items-center">
                                         <div
@@ -1049,85 +877,71 @@ export default function AnalyticsDashboard() {
                                             backgroundColor: "#10b981",
                                           }}
                                         />
-                                        <small className="text-muted">
+                                        <Typography variant="caption" color="text.secondary">
                                           Current Month (So Far)
-                                        </small>
+                                        </Typography>
                                       </div>
                                     </div>
-                                  </Card.Body>
-                                </Card>
-                              </Col>
+                                  </CardContent>
+                                </MuiCard>
+                              </Grid>
 
                               {/* Category Prediction Donut */}
-                              <Col xs={12} lg={4}>
-                                <Card
+                              <Grid item xs={12}>
+                                <MuiCard
                                   className="border-0 h-100"
                                   style={{
                                     borderRadius: "12px",
                                     background: "#f8fafc",
                                   }}
                                 >
-                                  <Card.Body className="p-3">
-                                    <h6 className="mb-3 fw-bold">
-                                      <FiPieChart
-                                        size={18}
-                                        className="me-2"
-                                        style={{ color: "#8b5cf6" }}
-                                      />
-                                      Predictions by Category
-                                    </h6>
+                                  <CardContent sx={{ p: 2 }}>
+                                    <Stack direction="row" alignItems="center" gap={1} sx={{ mb: 2 }}><FiPieChart size={18} color="#8b5cf6" /><Typography variant="subtitle2" fontWeight={700}>Predictions by Category</Typography></Stack>
                                     <C3CategoryPredictionChart
                                       data={predictionsData.categoryPredictions}
                                       height={300}
                                     />
-                                  </Card.Body>
-                                </Card>
-                              </Col>
-                            </Row>
+                                  </CardContent>
+                                </MuiCard>
+                              </Grid>
+                            </Grid>
 
                             {/* Detailed Predictions Table */}
-                            <Card
+                            <MuiCard
                               className="border-0 mt-4"
                               style={{
                                 borderRadius: "12px",
                                 background: "#f8fafc",
                               }}
                             >
-                              <Card.Body className="p-3">
-                                <h6 className="mb-3 fw-bold">
-                                  <FiPackage
-                                    size={18}
-                                    className="me-2"
-                                    style={{ color: "#f59e0b" }}
-                                  />
-                                  Detailed Product Predictions
-                                </h6>
+                              <CardContent sx={{ p: 2 }}>
+                                <Stack direction="row" alignItems="center" gap={1} sx={{ mb: 2 }}><FiPackage size={18} color="#f59e0b" /><Typography variant="subtitle2" fontWeight={700}>Detailed Product Predictions</Typography></Stack>
                                 <div className="table-responsive">
-                                  <Table hover className="mb-0" size="sm">
-                                    <thead
+                                  <MuiTable>
+                                    <TableHead
                                       style={{ backgroundColor: "#e2e8f0" }}
                                     >
-                                      <tr>
-                                        <th>Product</th>
-                                        <th>Category</th>
-                                        <th className="text-center">
+                                      <TableRow>
+                                        <TableCell component="th">Product</TableCell>
+                                        <TableCell component="th">Category</TableCell>
+                                        <TableCell component="th" className="text-center">
                                           Last Month
-                                        </th>
-                                        <th className="text-center">
+                                        </TableCell>
+                                        <TableCell component="th" className="text-center">
                                           Predicted
-                                        </th>
-                                        <th className="text-center">Current</th>
-                                        <th className="text-center">Trend</th>
-                                        <th className="text-center">
+                                        </TableCell>
+                                        <TableCell component="th" className="text-center">Current</TableCell>
+                                        <TableCell component="th" className="text-center">Trend</TableCell>
+                                        <TableCell component="th" className="text-center">
                                           Confidence
-                                        </th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
+                                        </TableCell>
+                                      </TableRow>
+                                    </TableHead>
+                                    <TableBody>
                                       {predictionsData.predictions.map(
                                         (item, index) => (
-                                          <tr key={index}>
-                                            <td>
+                                          <TableRow key={index}>
+                                            <TableCell>
                                               <span
                                                 className="fw-medium"
                                                 title={item.productName}
@@ -1139,92 +953,74 @@ export default function AnalyticsDashboard() {
                                                     ) + "..."
                                                   : item.productName}
                                               </span>
-                                            </td>
-                                            <td>
-                                              <Badge
-                                                bg="light"
-                                                text="dark"
-                                                className="fw-normal"
-                                              >
-                                                {item.category}
-                                              </Badge>
-                                            </td>
-                                            <td className="text-center">
+                                            </TableCell>
+                                            <TableCell>
+                                              <Chip label={item.category} size="small" />
+                                            </TableCell>
+                                            <TableCell className="text-center">
                                               <span className="text-muted">
                                                 {item.lastMonthQuantity}
                                               </span>
-                                            </td>
-                                            <td className="text-center">
+                                            </TableCell>
+                                            <TableCell className="text-center">
                                               <span className="fw-bold text-primary">
                                                 {item.predictedQuantity}
                                               </span>
-                                            </td>
-                                            <td className="text-center">
+                                            </TableCell>
+                                            <TableCell className="text-center">
                                               <span className="text-success">
                                                 {item.currentMonthQuantity}
                                               </span>
-                                            </td>
-                                            <td className="text-center">
+                                            </TableCell>
+                                            <TableCell sx={{ textAlign: "center" }}>
                                               {item.trendPercentage >= 0 ? (
-                                                <Badge
-                                                  bg="success"
-                                                  className="d-inline-flex align-items-center"
-                                                >
-                                                  <FiTrendingUp
-                                                    size={12}
-                                                    className="me-1"
-                                                  />
-                                                  +{item.trendPercentage}%
-                                                </Badge>
+                                                <Chip
+                                                  icon={<FiTrendingUp size={12} />}
+                                                  label={`+${item.trendPercentage}%`}
+                                                  size="small"
+                                                  color="success"
+                                                />
                                               ) : (
-                                                <Badge
-                                                  bg="danger"
-                                                  className="d-inline-flex align-items-center"
-                                                >
-                                                  <FiTrendingDown
-                                                    size={12}
-                                                    className="me-1"
-                                                  />
-                                                  {item.trendPercentage}%
-                                                </Badge>
+                                                <Chip
+                                                  icon={<FiTrendingDown size={12} />}
+                                                  label={`${item.trendPercentage}%`}
+                                                  size="small"
+                                                  color="error"
+                                                />
                                               )}
-                                            </td>
-                                            <td className="text-center">
-                                              <Badge
-                                                bg={
-                                                  item.confidence === "High"
-                                                    ? "success"
-                                                    : item.confidence ===
-                                                        "Medium"
-                                                      ? "warning"
-                                                      : "secondary"
+                                            </TableCell>
+                                            <TableCell sx={{ textAlign: "center" }}>
+                                              <Chip
+                                                label={item.confidence}
+                                                size="small"
+                                                color={
+                                                  item.confidence === "High" ? "success" :
+                                                  item.confidence === "Medium" ? "warning" : "default"
                                                 }
-                                              >
-                                                {item.confidence}
-                                              </Badge>
-                                            </td>
-                                          </tr>
+                                              />
+                                            </TableCell>
+                                          </TableRow>
                                         ),
                                       )}
-                                    </tbody>
-                                  </Table>
+                                    </TableBody>
+                                  </MuiTable>
                                 </div>
-                              </Card.Body>
-                            </Card>
+                              </CardContent>
+                            </MuiCard>
                           </>
                         ) : (
                           <div className="text-center py-5">
                             <FiTarget size={48} className="text-muted mb-3" />
-                            <p className="text-muted">
+                            <Typography variant="body2" color="text.secondary">
                               No prediction data available. Predictions require
                               order history from previous months.
-                            </p>
+                            </Typography>
                           </div>
                         )}
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                </Row>
+                      </CardContent>
+                    </MuiCard>
+                  </Grid>
+                </Grid>
               </>
             ) : null}
       <style>{`

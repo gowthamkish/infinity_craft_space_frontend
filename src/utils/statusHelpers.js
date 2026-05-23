@@ -1,5 +1,5 @@
 import React from "react";
-import Badge from "react-bootstrap/Badge";
+import Chip from "@mui/material/Chip";
 import {
   FiClock,
   FiCheck,
@@ -86,23 +86,19 @@ export const getStatusBadge = (status) => {
     ? status.charAt(0).toUpperCase() + status.slice(1)
     : "Unknown";
   return (
-    <Badge
-      className="d-flex align-items-center"
-      style={{
+    <Chip
+      icon={<span style={{ color: "white", display: "flex", alignItems: "center" }}>{getStatusIcon(status)}</span>}
+      label={label}
+      size="small"
+      sx={{
         backgroundColor: color,
         color: "white",
-        borderRadius: "8px",
+        fontWeight: 600,
         fontSize: "0.75rem",
-        padding: "0.4rem 0.6rem",
-        gap: "0.25rem",
-        border: "none",
-        backgroundImage: "none",
+        borderRadius: "8px",
+        "& .MuiChip-icon": { color: "white", ml: 0.5 },
       }}
-      bg=""
-    >
-      {getStatusIcon(status)}
-      {label}
-    </Badge>
+    />
   );
 };
 

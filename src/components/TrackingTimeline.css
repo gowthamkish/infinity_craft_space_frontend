@@ -62,9 +62,9 @@
 }
 
 .tt-step-dot--active {
-  border-color: #3b82f6;
+  border-color: #C9A84C;
   background: white;
-  color: #3b82f6;
+  color: #C9A84C;
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
   animation: ttPulse 2s infinite;
 }
@@ -96,7 +96,7 @@
 }
 
 .tt-step-label--done   { color: #059669; }
-.tt-step-label--active { color: #2563eb; }
+.tt-step-label--active { color: #8B1A4A; }
 .tt-step-label--cancelled { color: #ef4444; }
 
 /* ── Microcopy ───────────────────────────────────────────────── */
@@ -186,7 +186,7 @@
 }
 
 .tt-info-value a {
-  color: #2563eb;
+  color: #8B1A4A;
   text-decoration: none;
 }
 .tt-info-value a:hover { text-decoration: underline; }

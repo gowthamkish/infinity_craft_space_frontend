@@ -1,4 +1,5 @@
 import React, { useState, useCallback, memo } from "react";
+import Box from "@mui/material/Box";
 import { DotsLoader } from "./Loader";
 
 /**
@@ -78,9 +79,11 @@ const OptimizedImage = memo(
     return (
       <div style={{ position: "relative", ...style }}>
         {imageLoading && !hasError && (
-          <div
-            className="d-flex justify-content-center align-items-center"
-            style={{
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
               position: "absolute",
               top: 0,
               left: 0,
@@ -91,7 +94,7 @@ const OptimizedImage = memo(
             }}
           >
             <DotsLoader size="sm" />
-          </div>
+          </Box>
         )}
         <img
           src={imageSrc}

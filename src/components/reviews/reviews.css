@@ -130,7 +130,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B1A4A 0%, #7a1640 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -250,7 +250,7 @@
 }
 
 .helpful-button.voted {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #C9A84C 0%, #7a1640 100%);
   color: white;
   border-color: transparent;
 }

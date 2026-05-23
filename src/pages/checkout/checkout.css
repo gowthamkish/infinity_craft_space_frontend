@@ -141,7 +141,7 @@
 }
 .co-section-icon--purple { background: var(--co-primary-sub); color: var(--co-primary); }
 .co-section-icon--green  { background: var(--co-green-sub);   color: var(--co-green);   }
-.co-section-icon--blue   { background: #eff6ff; color: #2563eb; }
+.co-section-icon--blue   { background: #eff6ff; color: #8B1A4A; }
 .co-section-icon--amber  { background: #fffbeb; color: #d97706; }
 
 .co-section-title {
@@ -1446,7 +1446,7 @@
 }
 
 .co-confirm-btn--track {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  background: linear-gradient(135deg, #C9A84C, #7a1640);
   color: white;
   box-shadow: 0 6px 16px rgba(59,130,246,0.3);
 }
@@ -1676,7 +1676,7 @@
 }
 
 .co-cta--blue {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  background: linear-gradient(135deg, #C9A84C, #7a1640);
   box-shadow: 0 6px 20px rgba(59,130,246,0.3);
 }
 

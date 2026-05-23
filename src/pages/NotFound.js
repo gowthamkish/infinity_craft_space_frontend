@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Container, Row, Col } from "react-bootstrap";
+import Box from "@mui/material/Box";
 import { Helmet } from "react-helmet-async";
 import "./NotFound.css";
 
@@ -97,9 +97,9 @@ const NotFound = () => {
       </Helmet>
 
       <div className="not-found-page">
-        <Container>
-          <Row className="justify-content-center align-items-center min-vh-100">
-            <Col xs={12} md={10} lg={8} xl={6}>
+        <Box sx={{ maxWidth: "100%", mx: "auto", display: "flex", justifyContent: "center",
+            alignItems: "center", minHeight: "100vh" }}>
+          <Box sx={{ width: "100%", maxWidth: 600, px: 2 }}>
               <div className="not-found-content">
                 {/* Animated 404 Illustration */}
                 <div className="not-found-illustration">
@@ -167,9 +167,8 @@ const NotFound = () => {
                   <div className="float-element diamond"></div>
                 </div>
               </div>
-            </Col>
-          </Row>
-        </Container>
+          </Box>
+        </Box>
       </div>
     </>
   );

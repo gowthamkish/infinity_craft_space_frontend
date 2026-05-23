@@ -31,7 +31,7 @@
   font-size: 2rem;
   font-weight: 800;
   color: white;
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 8px 24px rgba(139, 26, 74, 0.25);
   margin-bottom: 1rem;
 }
 
@@ -138,7 +138,7 @@
 
 .account-item:hover {
   border-color: var(--primary-light);
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.08);
+  box-shadow: 0 4px 16px rgba(139, 26, 74, 0.08);
 }
 
 .account-item--wishlist:hover {
@@ -330,7 +330,7 @@
 }
 .acct-input:focus {
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+  box-shadow: 0 0 0 3px rgba(139, 26, 74, 0.12) !important;
   background: var(--bg-primary) !important;
 }
 
@@ -452,7 +452,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /* box-shadow: 0 8px 24px rgba(37, 99, 235, 0.2); */
+  /* box-shadow: 0 8px 24px rgba(139, 26, 74, 0.2); */
   margin-bottom: 0.5rem;
 }
 

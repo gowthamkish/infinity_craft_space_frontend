@@ -14,7 +14,7 @@
 .auth-brand-panel {
   display: none; /* hidden on mobile — shown ≥ lg */
   flex: 0 0 420px;
-  background: linear-gradient(160deg, #1e293b 0%, #1d4ed8 60%, #10b981 100%);
+  background: linear-gradient(160deg, #1e293b 0%, #7a1640 60%, #10b981 100%);
   padding: 3rem 2.5rem;
   position: relative;
   overflow: hidden;
@@ -197,7 +197,7 @@
 
 .auth-input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+  box-shadow: 0 0 0 3px rgba(139,26,74,0.12);
 }
 
 .auth-input--error {
@@ -371,11 +371,11 @@
 }
 .pw-strength--weak   .pw-strength-fill { width: 25%; background: #ef4444; }
 .pw-strength--fair   .pw-strength-fill { width: 50%; background: #f59e0b; }
-.pw-strength--good   .pw-strength-fill { width: 75%; background: #3b82f6; }
+.pw-strength--good   .pw-strength-fill { width: 75%; background: #C9A84C; }
 .pw-strength--strong .pw-strength-fill { width: 100%; background: #10b981; }
 .pw-strength--weak   .pw-strength-label { color: #ef4444; }
 .pw-strength--fair   .pw-strength-label { color: #f59e0b; }
-.pw-strength--good   .pw-strength-label { color: #3b82f6; }
+.pw-strength--good   .pw-strength-label { color: #C9A84C; }
 .pw-strength--strong .pw-strength-label { color: #10b981; }
 
 /* ── Password requirements checklist ───────────────────────── */

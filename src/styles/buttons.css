@@ -37,14 +37,14 @@
 
 /* ── DESIGN TOKENS ────────────────────────────────────────────────────────── */
 :root {
-  /* Brand — Purple */
-  --btn-brand:          #7c3aed;
-  --btn-brand-dark:     #6d28d9;
-  --btn-brand-darker:   #5b21b6;
-  --btn-brand-glow:     rgba(124, 58, 237, 0.28);
-  --btn-brand-subtle:   rgba(124, 58, 237, 0.08);
-  --btn-brand-grad:     linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-  --btn-brand-grad-h:   linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
+  /* Brand — Deep Rose */
+  --btn-brand:          #8B1A4A;
+  --btn-brand-dark:     #7a1640;
+  --btn-brand-darker:   #5e1232;
+  --btn-brand-glow:     rgba(139, 26, 74, 0.28);
+  --btn-brand-subtle:   rgba(139, 26, 74, 0.08);
+  --btn-brand-grad:     linear-gradient(135deg, #8B1A4A 0%, #7a1640 100%);
+  --btn-brand-grad-h:   linear-gradient(135deg, #7a1640 0%, #5e1232 100%);
 
   /* Success — Green */
   --btn-success:        #059669;

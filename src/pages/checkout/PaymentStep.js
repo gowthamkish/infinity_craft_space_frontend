@@ -1,14 +1,28 @@
 import { useState } from "react";
-import { Lock, CreditCard, Check, ArrowLeft } from "react-feather";
-import { DotsLoader } from "../../components/Loader";
+import {
+  Box,
+  Grid,
+  Paper,
+  Typography,
+  Button,
+  Stack,
+  Divider,
+  Chip,
+  Alert,
+  CircularProgress,
+} from "@mui/material";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import CreditCardOutlinedIcon from "@mui/icons-material/CreditCardOutlined";
+import CheckIcon from "@mui/icons-material/Check";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
+import VerifiedUserOutlinedIcon from "@mui/icons-material/VerifiedUserOutlined";
 import CheckoutDeliveryPanel from "../../components/CheckoutDeliveryPanel";
 import { ProductThumb } from "./CartReviewStep";
 
 const PAYMENT_METHODS = [
   {
     id: "razorpay",
-    icon: <CreditCard size={20} color="white" />,
-    iconBg: "linear-gradient(135deg, #3b82f6, #1d4ed8)",
     title: "Card / UPI / NetBanking",
     subtitle: "Powered by Razorpay · Instant & Secure",
     badge: "Recommended",
@@ -16,13 +30,54 @@ const PAYMENT_METHODS = [
 ];
 
 const SECURITY_FEATURES = [
-  "256-bit SSL Encryption",
-  "PCI DSS Compliant",
-  "No Card Details Stored",
-  "Bank-Level Security",
+  { icon: "🔐", label: "256-bit SSL Encryption" },
+  { icon: "🏦", label: "PCI DSS Compliant" },
+  { icon: "🚫", label: "No Card Details Stored" },
+  { icon: "🛡️", label: "Bank-Level Security" },
 ];
 
 const ACCEPTED_PAYMENTS = ["Visa", "Mastercard", "UPI", "Paytm", "GPay", "PhonePe"];
+
+/* ── Card header shared pattern ──────────────────────────────────────── */
+function CardHeader({ icon: Icon, title, subtitle }) {
+  return (
+    <Box
+      sx={{
+        px: 3,
+        py: 2.25,
+        display: "flex",
+        alignItems: "center",
+        gap: 2,
+        borderBottom: "1px solid #f0ebe8",
+        background: "linear-gradient(135deg, #fdf6f0 0%, #fdf2f6 100%)",
+      }}
+    >
+      <Box
+        sx={{
+          width: 38,
+          height: 38,
+          borderRadius: 2,
+          background: "linear-gradient(135deg, #8B1A4A, #C9A84C)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+          boxShadow: "0 2px 8px rgba(139,26,74,0.25)",
+        }}
+      >
+        <Icon sx={{ color: "white", fontSize: 20 }} />
+      </Box>
+      <Box>
+        <Typography variant="subtitle1" fontWeight={700} sx={{ lineHeight: 1.2 }}>
+          {title}
+        </Typography>
+        {subtitle && (
+          <Typography variant="caption" color="text.secondary">{subtitle}</Typography>
+        )}
+      </Box>
+    </Box>
+  );
+}
 
 export const PaymentStep = ({
   cartItems,
@@ -43,183 +98,343 @@ export const PaymentStep = ({
   };
 
   return (
-    <>
-      <div className="co-grid">
-        {/* ── Left: payment method ── */}
-        <div className="co-main">
-          <section className="co-section" aria-label="Payment method">
-            <header className="co-section-head co-section-head--pay">
-              <div className="co-section-icon co-section-icon--purple">
-                <Lock size={18} />
-              </div>
-              <div>
-                <h2 className="co-section-title">Secure Payment</h2>
-                <p className="co-section-sub">Bank-level encryption · No card details stored</p>
-              </div>
-            </header>
+    <Grid container spacing={3}>
+      {/* Left: payment method */}
+      <Grid item xs={12} md={8}>
+        <Paper
+          elevation={0}
+          sx={{
+            border: "1px solid #f0e8e2",
+            borderRadius: 3,
+            overflow: "hidden",
+            boxShadow: "0 2px 16px rgba(139,26,74,0.07)",
+          }}
+        >
+          <CardHeader
+            icon={LockOutlinedIcon}
+            title="Secure Payment"
+            subtitle="Bank-level encryption · No card details stored"
+          />
 
-            <div className="co-section-body">
-              <p className="co-method-heading">Choose Payment Method</p>
+          <Box sx={{ p: 2.5 }}>
+            <Typography variant="body2" fontWeight={700} sx={{ mb: 2, color: "#44403c" }}>
+              Choose Payment Method
+            </Typography>
 
-              <div className="co-method-cards">
-                {PAYMENT_METHODS.map((method) => (
-                  <div
+            {/* Payment method card */}
+            <Stack spacing={1.5} sx={{ mb: 3 }}>
+              {PAYMENT_METHODS.map((method) => {
+                const selected = selectedMethod === method.id;
+                return (
+                  <Box
                     key={method.id}
                     role="radio"
-                    aria-checked={selectedMethod === method.id}
+                    aria-checked={selected}
                     tabIndex={0}
-                    className={`co-method-card${selectedMethod === method.id ? " co-method-card--selected" : ""}`}
                     onClick={() => setSelectedMethod(method.id)}
                     onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setSelectedMethod(method.id); }}
+                    sx={{
+                      p: 2.5,
+                      border: "2px solid",
+                      borderColor: selected ? "#8B1A4A" : "#e7e5e4",
+                      borderRadius: 2.5,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 2,
+                      cursor: "pointer",
+                      bgcolor: selected ? "#fdf2f6" : "#fff",
+                      transition: "all 0.15s ease",
+                      "&:hover": { borderColor: "#8B1A4A" },
+                    }}
                   >
-                    <div className={`co-method-radio${selectedMethod === method.id ? " co-method-radio--on" : ""}`} aria-hidden="true">
-                      {selectedMethod === method.id && <Check size={11} strokeWidth={3.5} />}
-                    </div>
-                    <div className="co-method-icon" style={{ background: method.iconBg }}>
-                      {method.icon}
-                    </div>
-                    <div className="co-method-info">
-                      <p className="co-method-title">{method.title}</p>
-                      <p className="co-method-sub">{method.subtitle}</p>
-                    </div>
+                    {/* Radio circle */}
+                    <Box
+                      sx={{
+                        width: 22,
+                        height: 22,
+                        borderRadius: "50%",
+                        border: "2px solid",
+                        borderColor: selected ? "#8B1A4A" : "#c4c4c4",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        bgcolor: selected ? "#8B1A4A" : "transparent",
+                        flexShrink: 0,
+                        transition: "all 0.15s",
+                      }}
+                    >
+                      {selected && <CheckIcon sx={{ color: "white", fontSize: 13 }} />}
+                    </Box>
+
+                    {/* Payment icon */}
+                    <Box
+                      sx={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: 2,
+                        background: "linear-gradient(135deg, #8B1A4A, #C9A84C)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                        boxShadow: "0 2px 8px rgba(139,26,74,0.25)",
+                      }}
+                    >
+                      <CreditCardOutlinedIcon sx={{ color: "white", fontSize: 24 }} />
+                    </Box>
+
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="body2" fontWeight={700}>{method.title}</Typography>
+                      <Typography variant="caption" color="text.secondary">{method.subtitle}</Typography>
+                    </Box>
+
                     {method.badge && (
-                      <span className="co-method-badge">{method.badge}</span>
+                      <Chip
+                        label={method.badge}
+                        size="small"
+                        sx={{
+                          bgcolor: "#f0fdf4",
+                          color: "#16a34a",
+                          border: "1px solid #86efac",
+                          fontWeight: 700,
+                          height: 22,
+                        }}
+                      />
                     )}
-                  </div>
-                ))}
-              </div>
+                  </Box>
+                );
+              })}
+            </Stack>
 
-              {/* Security box */}
-              <div className="co-security">
-                <p className="co-security-title">🔒 Your Payment is Protected</p>
-                <div className="co-security-grid">
-                  {SECURITY_FEATURES.map((item) => (
-                    <div key={item} className="co-security-item">
-                      <div className="co-security-check" aria-hidden="true">
-                        <Check size={9} strokeWidth={3.5} />
-                      </div>
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Accepted payments */}
-              <div className="co-pay-chips">
-                <span className="co-pay-chips-label">Accepted:</span>
+            {/* Accepted payments */}
+            <Box
+              sx={{
+                p: 2,
+                bgcolor: "#fafaf9",
+                border: "1px solid #f0e8e2",
+                borderRadius: 2,
+                mb: 2.5,
+              }}
+            >
+              <Typography variant="caption" color="text.secondary" fontWeight={600} display="block" sx={{ mb: 1 }}>
+                Accepted Payment Methods
+              </Typography>
+              <Stack direction="row" flexWrap="wrap" gap={0.75}>
                 {ACCEPTED_PAYMENTS.map((p) => (
-                  <span key={p} className="co-pay-chip">{p}</span>
+                  <Chip
+                    key={p}
+                    label={p}
+                    size="small"
+                    variant="outlined"
+                    sx={{ borderColor: "#e7e5e4", fontSize: "0.72rem", height: 22 }}
+                  />
                 ))}
-              </div>
+              </Stack>
+            </Box>
 
-              {error && (
-                <div className="co-error" role="alert">⚠ {error}</div>
-              )}
+            {/* Security box */}
+            <Box
+              sx={{
+                p: 2,
+                bgcolor: "#f0fdf4",
+                border: "1px solid #86efac",
+                borderRadius: 2,
+                mb: 2.5,
+              }}
+            >
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
+                <VerifiedUserOutlinedIcon sx={{ fontSize: 18, color: "#16a34a" }} />
+                <Typography variant="body2" fontWeight={700} sx={{ color: "#15803d" }}>
+                  Your Payment is Protected
+                </Typography>
+              </Stack>
+              <Grid container spacing={1}>
+                {SECURITY_FEATURES.map(({ icon, label }) => (
+                  <Grid item xs={12} sm={6} key={label}>
+                    <Stack direction="row" alignItems="center" spacing={0.75}>
+                      <Typography fontSize={14}>{icon}</Typography>
+                      <Typography variant="caption" sx={{ color: "#166534" }}>{label}</Typography>
+                    </Stack>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
 
-              <div className="co-actions">
-                <button className="co-back" onClick={() => setCurrentStep(2)} disabled={loading}>
-                  <ArrowLeft size={15} /> Back
-                </button>
-                <button
-                  className="co-cta co-cta--pay"
-                  onClick={handlePay}
-                  disabled={loading}
-                  aria-label={`Pay ₹${total.toFixed(2)} securely`}
-                >
-                  {loading ? (
-                    <><DotsLoader size="sm" /> Processing…</>
-                  ) : (
-                    <><Lock size={15} /> Pay ₹{total.toFixed(2)} Securely</>
-                  )}
-                </button>
-              </div>
-            </div>
-          </section>
-        </div>
+            {error && (
+              <Alert severity="error" sx={{ mb: 2.5, borderRadius: 2 }}>
+                {error}
+              </Alert>
+            )}
 
-        {/* ── Right: payment summary ── */}
-        <aside className="co-sidebar" aria-label="Payment summary">
-          <div className="co-summary">
-            <div className="co-summary-head">
-              <p className="co-summary-head-title">Payment Summary</p>
-              <p className="co-summary-head-sub">Final order review</p>
-            </div>
+            <Stack direction="row" spacing={1.5}>
+              <Button
+                variant="outlined"
+                startIcon={<ArrowBackIcon />}
+                onClick={() => setCurrentStep(2)}
+                disabled={loading}
+                sx={{
+                  minWidth: 100,
+                  py: 1.25,
+                  borderRadius: 2,
+                  borderColor: "#e7e5e4",
+                  color: "text.secondary",
+                  "&:hover": { borderColor: "#8B1A4A", color: "#8B1A4A" },
+                }}
+              >
+                Back
+              </Button>
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <LockOutlinedIcon />}
+                onClick={handlePay}
+                disabled={loading}
+                sx={{
+                  flex: 1,
+                  py: 1.5,
+                  fontSize: "1rem",
+                  fontWeight: 700,
+                  borderRadius: 2,
+                  background: "linear-gradient(135deg, #8B1A4A, #7a1640)",
+                  boxShadow: "0 4px 14px rgba(139,26,74,0.35)",
+                  "&:hover": { background: "linear-gradient(135deg, #7a1640, #6b1236)", boxShadow: "0 6px 18px rgba(139,26,74,0.4)" },
+                }}
+                aria-label={`Pay ₹${total.toFixed(2)} securely`}
+              >
+                {loading ? "Processing Payment…" : `Pay ₹${total.toFixed(2)} Securely`}
+              </Button>
+            </Stack>
+          </Box>
+        </Paper>
+      </Grid>
 
-            <div className="co-summary-body">
-              <p className="co-summary-items-label">Order Items ({cartItems.length})</p>
+      {/* Right: payment summary */}
+      <Grid item xs={12} md={4}>
+        <Paper
+          elevation={0}
+          sx={{
+            border: "1px solid #f0e8e2",
+            borderRadius: 3,
+            overflow: "hidden",
+            position: { md: "sticky" },
+            top: { md: 80 },
+            boxShadow: "0 4px 24px rgba(139,26,74,0.10)",
+          }}
+        >
+          {/* Rose gradient header */}
+          <Box
+            sx={{
+              px: 3,
+              py: 2.5,
+              background: "linear-gradient(135deg, #8B1A4A 0%, #7a1640 100%)",
+            }}
+          >
+            <Typography variant="subtitle1" fontWeight={700} sx={{ color: "white", mb: 0.25 }}>
+              Payment Summary
+            </Typography>
+            <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.7)" }}>
+              Final order review
+            </Typography>
+          </Box>
+
+          <Box sx={{ p: 2.5 }}>
+            {/* Items preview */}
+            <Typography variant="caption" color="text.secondary" fontWeight={700} sx={{ mb: 1.5, display: "block", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              Order Items ({cartItems.length})
+            </Typography>
+            <Stack spacing={1.5} sx={{ mb: 2.5 }}>
               {cartItems.slice(0, 3).map((item) => (
-                <div key={item.product._id} className="co-summary-item">
+                <Stack key={item.product._id} direction="row" alignItems="center" spacing={1.25}>
                   <ProductThumb product={item.product} size="xs" />
-                  <div className="co-summary-item-info">
-                    <p className="co-summary-item-name">{item.product.name}</p>
-                    <p className="co-summary-item-qty">Qty {item.quantity} × ₹{item.product.price}</p>
-                  </div>
-                  <span className="co-summary-item-price">₹{item.totalPrice}</span>
-                </div>
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography variant="caption" fontWeight={600} noWrap display="block">
+                      {item.product.name}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Qty {item.quantity} × ₹{item.product.price}
+                    </Typography>
+                  </Box>
+                  <Typography variant="caption" fontWeight={700}>₹{item.totalPrice}</Typography>
+                </Stack>
               ))}
               {cartItems.length > 3 && (
-                <p className="co-summary-more">+{cartItems.length - 3} more items</p>
+                <Typography variant="caption" color="text.secondary">
+                  +{cartItems.length - 3} more items
+                </Typography>
               )}
+            </Stack>
 
-              {/* Shipping address preview */}
-              <div className="co-addr-preview">
-                <p className="co-addr-preview-label">📍 Shipping to</p>
-                <p className="co-addr-preview-text">
-                  {shippingAddress.street}<br />
-                  {shippingAddress.city}, {shippingAddress.state} {shippingAddress.zipCode}
-                </p>
-              </div>
+            {/* Shipping address */}
+            <Box
+              sx={{
+                p: 1.75,
+                bgcolor: "#fafaf9",
+                borderRadius: 2,
+                border: "1px solid #f0e8e2",
+                mb: 2,
+              }}
+            >
+              <Stack direction="row" alignItems="flex-start" spacing={1}>
+                <LocationOnOutlinedIcon sx={{ fontSize: 16, color: "#8B1A4A", mt: 0.25, flexShrink: 0 }} />
+                <Box>
+                  <Typography variant="caption" fontWeight={700} sx={{ color: "#8B1A4A", display: "block", mb: 0.25 }}>
+                    Shipping to
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+                    {shippingAddress.street}<br />
+                    {shippingAddress.city}, {shippingAddress.state} – {shippingAddress.zipCode}
+                  </Typography>
+                </Box>
+              </Stack>
+            </Box>
 
-              <CheckoutDeliveryPanel cartItems={cartItems} pincode={shippingAddress.zipCode} />
+            <CheckoutDeliveryPanel cartItems={cartItems} pincode={shippingAddress.zipCode} />
 
-              <hr className="co-divider" />
+            <Divider sx={{ borderColor: "#f0e8e2", my: 2 }} />
 
-              <div className="co-price-row">
-                <span className="co-price-label">Subtotal</span>
-                <span className="co-price-val">₹{subtotal.toFixed(2)}</span>
-              </div>
-              <div className="co-price-row">
-                <span className="co-price-label">
-                  Shipping
-                  {shipping === 0 && <span className="co-free-badge">FREE</span>}
-                </span>
-                <span className="co-price-val">₹{shipping.toFixed(2)}</span>
-              </div>
+            <Stack spacing={1.25}>
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2" color="text.secondary">Subtotal</Typography>
+                <Typography variant="body2" fontWeight={600}>₹{subtotal.toFixed(2)}</Typography>
+              </Stack>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Typography variant="body2" color="text.secondary">Shipping</Typography>
+                  {shipping === 0 && (
+                    <Chip label="FREE" size="small" sx={{ height: 18, bgcolor: "#f0fdf4", color: "#16a34a", border: "1px solid #86efac", fontSize: "0.65rem" }} />
+                  )}
+                </Stack>
+                <Typography variant="body2" fontWeight={600}>₹{shipping.toFixed(2)}</Typography>
+              </Stack>
               {tax > 0 && (
-                <div className="co-price-row">
-                  <span className="co-price-label">Tax (18% GST)</span>
-                  <span className="co-price-val">₹{tax.toFixed(2)}</span>
-                </div>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography variant="body2" color="text.secondary">Tax (18% GST)</Typography>
+                  <Typography variant="body2" fontWeight={600}>₹{tax.toFixed(2)}</Typography>
+                </Stack>
               )}
-              <div className="co-price-row co-price-row--total">
-                <span className="co-total-label">Total to Pay</span>
-                <span className="co-total-val">₹{total.toFixed(2)}</span>
-              </div>
-            </div>
+            </Stack>
 
-            <div className="co-trust" aria-label="Trust indicators">
-              <div className="co-trust-item"><span className="co-trust-icon">🔒</span>Encrypted</div>
-              <div className="co-trust-item"><span className="co-trust-icon">🏦</span>PCI-DSS</div>
-              <div className="co-trust-item"><span className="co-trust-icon">✅</span>Verified</div>
-            </div>
-          </div>
-        </aside>
-      </div>
+            <Divider sx={{ borderColor: "#f0e8e2", my: 2 }} />
 
-      {/* Mobile sticky pay bar */}
-      <div className="co-sticky-bar">
-        <div className="co-sticky-total">
-          <p className="co-sticky-lbl">Total to Pay</p>
-          <p className="co-sticky-amount">₹{total.toFixed(2)}</p>
-        </div>
-        <button
-          className="co-cta co-cta--pay"
-          onClick={handlePay}
-          disabled={loading}
-        >
-          {loading ? <DotsLoader size="sm" /> : <><Lock size={15} /> Pay Now</>}
-        </button>
-      </div>
-    </>
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Typography variant="subtitle1" fontWeight={700}>Total to Pay</Typography>
+              <Typography variant="h6" fontWeight={800} sx={{ color: "#8B1A4A" }}>
+                ₹{total.toFixed(2)}
+              </Typography>
+            </Stack>
+          </Box>
+
+          <Box sx={{ borderTop: "1px solid #f0e8e2", bgcolor: "#fafaf9", px: 2.5, py: 2 }}>
+            <Stack direction="row" justifyContent="space-around">
+              {["🔒 Encrypted", "🏦 PCI-DSS", "✅ Verified"].map((t) => (
+                <Typography key={t} variant="caption" color="text.secondary" sx={{ fontSize: "0.72rem" }}>
+                  {t}
+                </Typography>
+              ))}
+            </Stack>
+          </Box>
+        </Paper>
+      </Grid>
+    </Grid>
   );
 };
