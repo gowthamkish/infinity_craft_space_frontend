@@ -31,9 +31,9 @@
   height: 1px;
   background: linear-gradient(
     to right,
-    rgba(37, 99, 235, 0) 0%,
-    rgba(37, 99, 235, 0.3) 50%,
-    rgba(37, 99, 235, 0) 100%
+    rgba(139, 26, 74, 0) 0%,
+    rgba(139, 26, 74, 0.3) 50%,
+    rgba(139, 26, 74, 0) 100%
   );
 }
 

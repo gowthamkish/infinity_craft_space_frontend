@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, memo } from 'react';
 import { FixedSizeGrid as Grid } from 'react-window';
-import { Row, Col } from 'react-bootstrap';
+import Grid from "@mui/material/Grid";
 
 // Virtualized Product Grid for better performance with large datasets
 const VirtualizedProductGrid = memo(({
@@ -46,13 +46,13 @@ const VirtualizedProductGrid = memo(({
   // For small datasets, use regular rendering for better UX
   if (products.length <= 20) {
     return (
-      <Row xs={1} sm={2} lg={3} xl={4} className="g-4">
+      <Grid container spacing={2}>
         {products.map((product, index) => (
-          <Col key={product._id || index}>
+          <Grid item key={product._id || index} xs={12} sm={6} lg={4} xl={3}>
             {renderProduct(product, index)}
-          </Col>
+          </Grid>
         ))}
-      </Row>
+      </Grid>
     );
   }
 

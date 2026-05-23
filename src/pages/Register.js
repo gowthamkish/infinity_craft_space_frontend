@@ -5,26 +5,151 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 import { SECURITY_QUESTIONS } from "../constants/securityQuestions";
-import "./auth.css";
+import {
+  Box,
+  Button,
+  TextField,
+  Alert,
+  Typography,
+  Divider,
+  Link,
+  IconButton,
+  InputAdornment,
+  MenuItem,
+  CircularProgress,
+} from "@mui/material";
+import { FiEye, FiEyeOff, FiCheck } from "react-icons/fi";
 
-// Password strength helpers
+// ── Brand panel (same as Login) ──────────────────────────────────────────────
+function BrandPanel({ title, subtitle, perks }) {
+  return (
+    <Box
+      aria-hidden="true"
+      sx={{
+        display: { xs: "none", lg: "flex" },
+        flex: "0 0 420px",
+        background: "linear-gradient(135deg, #3D1A2A 0%, #5C2038 45%, #6b1238 100%)",
+        alignItems: "center",
+        justifyContent: "center",
+        p: "3rem 2.5rem",
+        position: "relative",
+        overflow: "hidden",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(ellipse at 30% 80%, rgba(201,168,76,0.20) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(244,167,185,0.18) 0%, transparent 50%)",
+        },
+      }}
+    >
+      <Box sx={{ position: "relative", zIndex: 1, color: "white" }}>
+        <Box
+          component="img"
+          src="/ICS_Logo.jpeg"
+          alt="Infinity Craft Space"
+          sx={{ width: 80, height: 80, borderRadius: "20px", objectFit: "cover", mb: 2.5, boxShadow: "0 8px 32px rgba(0,0,0,0.35)" }}
+        />
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 800,
+            mb: 0.75,
+            background: "linear-gradient(135deg, #fff 0%, #F4A7B9 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}
+        >
+          {title}
+        </Typography>
+        <Typography sx={{ color: "rgba(255,255,255,0.70)", mb: 3, fontSize: "0.9375rem", lineHeight: 1.5 }}>
+          {subtitle}
+        </Typography>
+        <Box component="ul" sx={{ listStyle: "none", p: 0, m: 0, display: "flex", flexDirection: "column", gap: 1.5 }}>
+          {perks.map(({ icon, text }) => (
+            <Box component="li" key={text} sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <Box
+                sx={{
+                  width: 36, height: 36, borderRadius: "10px",
+                  background: "rgba(255,255,255,0.10)", backdropFilter: "blur(4px)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "1rem", flexShrink: 0,
+                }}
+              >
+                {icon}
+              </Box>
+              <Typography sx={{ color: "rgba(255,255,255,0.85)", fontSize: "0.9375rem" }}>
+                {text}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+
+// ── Password strength helpers ────────────────────────────────────────────────
 const PW_RULES = [
-  { key: "length", label: "8+ characters", test: (p) => p.length >= 8 },
-  { key: "upper", label: "Uppercase", test: (p) => /[A-Z]/.test(p) },
-  { key: "lower", label: "Lowercase", test: (p) => /[a-z]/.test(p) },
-  { key: "number", label: "Number", test: (p) => /\d/.test(p) },
-  { key: "special", label: "Special char", test: (p) => /[@$!%*?&]/.test(p) },
+  { key: "length",  label: "8+ characters",  test: (p) => p.length >= 8 },
+  { key: "upper",   label: "Uppercase",       test: (p) => /[A-Z]/.test(p) },
+  { key: "lower",   label: "Lowercase",       test: (p) => /[a-z]/.test(p) },
+  { key: "number",  label: "Number",          test: (p) => /\d/.test(p) },
+  { key: "special", label: "Special char",    test: (p) => /[@$!%*?&]/.test(p) },
 ];
 
 function getStrength(password) {
   if (!password) return null;
   const met = PW_RULES.filter((r) => r.test(password)).length;
-  if (met <= 1) return { level: "weak", label: "Weak" };
-  if (met === 2) return { level: "fair", label: "Fair" };
-  if (met === 3) return { level: "good", label: "Good" };
-  return { level: "strong", label: "Strong" };
+  if (met <= 1) return { level: "weak",   label: "Weak",   color: "#ef4444", pct: "20%" };
+  if (met === 2) return { level: "fair",   label: "Fair",   color: "#f59e0b", pct: "40%" };
+  if (met === 3) return { level: "good",   label: "Good",   color: "#3b82f6", pct: "70%" };
+  return           { level: "strong", label: "Strong", color: "#10b981", pct: "100%" };
 }
 
+// ── Step indicator ────────────────────────────────────────────────────────────
+function StepIndicator({ step }) {
+  const steps = ["Account info", "Security questions"];
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2.5 }}>
+      {steps.map((label, i) => {
+        const s = i + 1;
+        const done = step > s;
+        const active = step === s;
+        return (
+          <Box key={label} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+              <Box
+                sx={{
+                  width: 28, height: 28, borderRadius: "50%",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "0.8rem", fontWeight: 700,
+                  background: done || active ? "linear-gradient(135deg,#10b981,#059669)" : "#e5e7eb",
+                  color: done || active ? "white" : "#9ca3af",
+                  transition: "all 0.2s",
+                }}
+              >
+                {done ? <FiCheck size={13} /> : s}
+              </Box>
+              <Typography
+                variant="caption"
+                sx={{ fontWeight: 600, color: done || active ? "#065f46" : "#9ca3af" }}
+              >
+                {label}
+              </Typography>
+            </Box>
+            {i < steps.length - 1 && (
+              <Box sx={{ width: 32, height: 2, background: step > s ? "#10b981" : "#e5e7eb", borderRadius: 1 }} />
+            )}
+          </Box>
+        );
+      })}
+    </Box>
+  );
+}
+
+// ── Register page ────────────────────────────────────────────────────────────
 export default function Register() {
   const [step, setStep] = useState(1);
 
@@ -52,7 +177,6 @@ export default function Register() {
   const clearFieldError = (field) =>
     setValidationErrors((prev) => ({ ...prev, [field]: "" }));
 
-  // ── Step 1 → Step 2 ─────────────────────────────────────────────
   const handleNextStep = (e) => {
     e.preventDefault();
     setTouched({ username: true, email: true, password: true });
@@ -63,14 +187,12 @@ export default function Register() {
     setStep(2);
   };
 
-  // ── Validate security questions ─────────────────────────────────
   const validateSQ = () => {
-    const errs = sq.map((q, i) => {
+    const errs = sq.map((q) => {
       if (q.questionIndex === "") return "Please select a question.";
       if (!q.answer || q.answer.trim().length < 2) return "Answer must be at least 2 characters.";
       return "";
     });
-    // Duplicate question check
     if (sq[0].questionIndex !== "" && sq[0].questionIndex === sq[1].questionIndex) {
       errs[1] = "Please choose a different question.";
     }
@@ -78,7 +200,6 @@ export default function Register() {
     return errs.every((e) => e === "");
   };
 
-  // ── Final submit ─────────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -126,216 +247,240 @@ export default function Register() {
         canonical={`${SEO_CONFIG.SITE_URL}/register`}
       />
 
-      <div className="auth-page">
-        {/* Left panel */}
-        <div className="auth-brand-panel" aria-hidden="true">
-          <div className="auth-brand-content">
-            <img src="/ICS_Logo.jpeg" alt="Infinity Craft Space" className="auth-brand-logo" />
-            <h2 className="auth-brand-title">Join our creative community</h2>
-            <p className="auth-brand-subtitle">
-              Get access to thousands of premium craft products and exclusive member perks.
-            </p>
-            <ul className="auth-brand-perks">
-              <li><span className="perk-icon">🎁</span> Exclusive member offers</li>
-              <li><span className="perk-icon">📦</span> Order tracking &amp; history</li>
-              <li><span className="perk-icon">❤️</span> Save to wishlist</li>
-              <li><span className="perk-icon">⭐</span> Leave product reviews</li>
-            </ul>
-          </div>
-        </div>
+      <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "background.default" }}>
+        <BrandPanel
+          title="Join our creative community"
+          subtitle="Get access to thousands of premium craft products and exclusive member perks."
+          perks={[
+            { icon: "🎁", text: "Exclusive member offers" },
+            { icon: "📦", text: "Order tracking & history" },
+            { icon: "❤️", text: "Save to wishlist" },
+            { icon: "⭐", text: "Leave product reviews" },
+          ]}
+        />
 
-        {/* Right panel */}
-        <div className="auth-form-panel">
-          <div className="auth-card">
-            {/* Step indicator */}
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1.5rem" }}>
-              {[1, 2].map((s) => (
-                <div key={s} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  <div style={{
-                    width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center",
-                    justifyContent: "center", fontSize: "0.8rem", fontWeight: 700,
-                    background: step >= s ? "linear-gradient(135deg,#10b981,#059669)" : "#e5e7eb",
-                    color: step >= s ? "white" : "#9ca3af",
-                    transition: "all 0.2s",
-                  }}>
-                    {step > s ? "✓" : s}
-                  </div>
-                  <span style={{ fontSize: "0.78rem", fontWeight: 600, color: step >= s ? "#065f46" : "#9ca3af" }}>
-                    {s === 1 ? "Account info" : "Security questions"}
-                  </span>
-                  {s < 2 && <div style={{ width: 32, height: 2, background: step > s ? "#10b981" : "#e5e7eb", borderRadius: 2 }} />}
-                </div>
-              ))}
-            </div>
+        {/* Right: form panel */}
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            p: { xs: "2rem 1.25rem", sm: "2rem" },
+            overflowY: "auto",
+          }}
+        >
+          <Box sx={{ width: "100%", maxWidth: 420 }}>
+            <StepIndicator step={step} />
 
-            <div className="auth-card-header">
-              <h1 className="auth-title">
-                {step === 1 ? "Create your account" : "Set up account recovery"}
-              </h1>
-              <p className="auth-subtitle">
-                {step === 1
-                  ? "Join Infinity Craft Space — it's free"
-                  : "Choose 2 security questions to recover your password if you ever forget it."}
-              </p>
-            </div>
+            <Typography variant="h5" sx={{ fontWeight: 800, mb: 0.5 }}>
+              {step === 1 ? "Create your account" : "Set up account recovery"}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
+              {step === 1
+                ? "Join Infinity Craft Space — it's free"
+                : "Choose 2 security questions to recover your password if you ever forget it."}
+            </Typography>
 
             {error && (
-              <div className="auth-alert auth-alert--error" role="alert">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm-.75 3.75a.75.75 0 011.5 0v3.5a.75.75 0 01-1.5 0v-3.5zm.75 7a1 1 0 110-2 1 1 0 010 2z" fill="currentColor" />
-                </svg>
+              <Alert severity="error" sx={{ mb: 2 }}>
                 {error}
-              </div>
+              </Alert>
             )}
 
-            {/* ── Step 1: account info ─────────────────────── */}
+            {/* ── Step 1: account info ───────────────────────────────── */}
             {step === 1 && (
-              <form onSubmit={handleNextStep} noValidate>
-                <div className="auth-field">
-                  <label htmlFor="reg-username" className="auth-label">Username</label>
-                  <input
-                    id="reg-username"
-                    type="text"
-                    className={`auth-input ${touched.username && validationErrors.username ? "auth-input--error" : ""} ${touched.username && !validationErrors.username && form.username ? "auth-input--valid" : ""}`}
-                    value={form.username}
-                    onChange={(e) => { setForm({ ...form, username: e.target.value }); clearFieldError("username"); }}
-                    onBlur={() => setTouched((p) => ({ ...p, username: true }))}
-                    placeholder="Choose a username"
-                    autoComplete="username"
-                    required
-                  />
-                  {touched.username && validationErrors.username && (
-                    <p className="auth-field-error" role="alert">{validationErrors.username}</p>
-                  )}
-                </div>
+              <Box component="form" onSubmit={handleNextStep} noValidate>
+                <TextField
+                  label="Username"
+                  type="text"
+                  fullWidth
+                  required
+                  autoComplete="username"
+                  placeholder="Choose a username"
+                  value={form.username}
+                  onChange={(e) => { setForm({ ...form, username: e.target.value }); clearFieldError("username"); }}
+                  onBlur={() => setTouched((p) => ({ ...p, username: true }))}
+                  error={!!(touched.username && validationErrors.username)}
+                  helperText={touched.username && validationErrors.username ? validationErrors.username : ""}
+                  sx={{ mb: 2 }}
+                />
 
-                <div className="auth-field">
-                  <label htmlFor="reg-email" className="auth-label">Email address</label>
-                  <input
-                    id="reg-email"
-                    type="email"
-                    className={`auth-input ${touched.email && validationErrors.email ? "auth-input--error" : ""} ${touched.email && !validationErrors.email && form.email ? "auth-input--valid" : ""}`}
-                    value={form.email}
-                    onChange={(e) => { setForm({ ...form, email: e.target.value }); clearFieldError("email"); }}
-                    onBlur={() => setTouched((p) => ({ ...p, email: true }))}
-                    placeholder="you@example.com"
-                    autoComplete="email"
-                    required
-                  />
-                  {touched.email && validationErrors.email && (
-                    <p className="auth-field-error" role="alert">{validationErrors.email}</p>
-                  )}
-                </div>
+                <TextField
+                  label="Email address"
+                  type="email"
+                  fullWidth
+                  required
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  value={form.email}
+                  onChange={(e) => { setForm({ ...form, email: e.target.value }); clearFieldError("email"); }}
+                  onBlur={() => setTouched((p) => ({ ...p, email: true }))}
+                  error={!!(touched.email && validationErrors.email)}
+                  helperText={touched.email && validationErrors.email ? validationErrors.email : ""}
+                  sx={{ mb: 2 }}
+                />
 
-                <div className="auth-field">
-                  <label htmlFor="reg-password" className="auth-label">Password</label>
-                  <div className="auth-input-wrapper">
-                    <input
-                      id="reg-password"
-                      type={showPassword ? "text" : "password"}
-                      className={`auth-input auth-input--with-icon ${touched.password && validationErrors.password ? "auth-input--error" : ""} ${touched.password && !validationErrors.password && form.password ? "auth-input--valid" : ""}`}
-                      value={form.password}
-                      onChange={(e) => { setForm({ ...form, password: e.target.value }); clearFieldError("password"); }}
-                      onBlur={() => setTouched((p) => ({ ...p, password: true }))}
-                      placeholder="Create a strong password"
-                      autoComplete="new-password"
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="auth-eye-btn"
-                      onClick={() => setShowPassword((s) => !s)}
-                      aria-label={showPassword ? "Hide password" : "Show password"}
-                      tabIndex={-1}
-                    >
-                      {showPassword ? (
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" />
-                          <line x1="1" y1="1" x2="23" y2="23" />
-                        </svg>
-                      ) : (
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                          <circle cx="12" cy="12" r="3" />
-                        </svg>
-                      )}
-                    </button>
-                  </div>
+                <TextField
+                  label="Password"
+                  type={showPassword ? "text" : "password"}
+                  fullWidth
+                  required
+                  autoComplete="new-password"
+                  placeholder="Create a strong password"
+                  value={form.password}
+                  onChange={(e) => { setForm({ ...form, password: e.target.value }); clearFieldError("password"); }}
+                  onBlur={() => setTouched((p) => ({ ...p, password: true }))}
+                  error={!!(touched.password && validationErrors.password)}
+                  helperText={touched.password && validationErrors.password ? validationErrors.password : ""}
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowPassword((s) => !s)}
+                            aria-label={showPassword ? "Hide password" : "Show password"}
+                            edge="end"
+                            tabIndex={-1}
+                            size="small"
+                          >
+                            {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                  sx={{ mb: 1 }}
+                />
 
-                  {form.password && strength && (
-                    <div className={`pw-strength pw-strength--${strength.level}`}>
-                      <div className="pw-strength-bar">
-                        <div className="pw-strength-fill" />
-                      </div>
-                      <span className="pw-strength-label">Password strength: {strength.label}</span>
-                    </div>
-                  )}
+                {/* Password strength */}
+                {form.password && strength && (
+                  <Box sx={{ mb: 1.5 }}>
+                    <Box sx={{ height: 4, borderRadius: 1, bgcolor: "#e5e7eb", overflow: "hidden", mb: 0.5 }}>
+                      <Box
+                        sx={{
+                          height: "100%",
+                          width: strength.pct,
+                          bgcolor: strength.color,
+                          borderRadius: 1,
+                          transition: "width 300ms ease, background-color 300ms ease",
+                        }}
+                      />
+                    </Box>
+                    <Typography variant="caption" sx={{ color: strength.color, fontWeight: 500 }}>
+                      Password strength: {strength.label}
+                    </Typography>
+                  </Box>
+                )}
 
-                  {(form.password || (touched.password && validationErrors.password)) && (
-                    <div className="pw-requirements" aria-label="Password requirements">
-                      {PW_RULES.map((rule) => {
-                        const met = rule.test(form.password);
-                        return (
-                          <div key={rule.key} className={`pw-req${met ? " pw-req--met" : ""}`}>
-                            <span className="pw-req-icon" aria-hidden="true">{met ? "✓" : ""}</span>
+                {/* Requirements checklist */}
+                {form.password && (
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: "0.3rem 0.5rem",
+                      mb: 2,
+                      p: 1.25,
+                      bgcolor: "grey.50",
+                      borderRadius: 2,
+                      border: "1px solid",
+                      borderColor: "divider",
+                    }}
+                  >
+                    {PW_RULES.map((rule) => {
+                      const met = rule.test(form.password);
+                      return (
+                        <Box key={rule.key} sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                          <Box
+                            sx={{
+                              width: 14, height: 14, borderRadius: "50%",
+                              border: "1.5px solid",
+                              borderColor: met ? "#10b981" : "grey.400",
+                              bgcolor: met ? "#10b981" : "transparent",
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              flexShrink: 0,
+                              transition: "all 200ms ease",
+                            }}
+                          >
+                            {met && <FiCheck size={8} color="white" />}
+                          </Box>
+                          <Typography variant="caption" sx={{ color: met ? "#10b981" : "text.secondary" }}>
                             {rule.label}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                          </Typography>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                )}
 
-                  {touched.password && validationErrors.password && (
-                    <p className="auth-field-error" role="alert">{validationErrors.password}</p>
-                  )}
-                </div>
-
-                <button
+                <Button
                   type="submit"
-                  className="auth-btn auth-btn--success"
+                  variant="contained"
+                  color="secondary"
+                  fullWidth
                   disabled={!form.username || !form.email || !form.password}
+                  sx={{ height: 52, fontWeight: 700, fontSize: "0.9375rem", mb: 1.5, borderRadius: "12px" }}
                 >
                   Continue →
-                </button>
+                </Button>
 
-                <div className="auth-divider"><span>or</span></div>
+                <Divider sx={{ my: 1.5 }}>
+                  <Typography variant="caption" color="text.secondary">or</Typography>
+                </Divider>
 
-                <button type="button" className="auth-btn auth-btn--outline" onClick={() => navigate("/login")}>
+                <Button
+                  type="button"
+                  variant="outlined"
+                  color="primary"
+                  fullWidth
+                  onClick={() => navigate("/login")}
+                  sx={{ height: 52, fontWeight: 600, fontSize: "0.9375rem", borderRadius: "12px" }}
+                >
                   Sign in to existing account
-                </button>
+                </Button>
 
-                <div className="auth-footer-link">
-                  <button type="button" onClick={() => navigate("/products")}>
+                <Box sx={{ textAlign: "center", mt: 2.5 }}>
+                  <Link
+                    component="button"
+                    type="button"
+                    variant="body2"
+                    onClick={() => navigate("/products")}
+                    sx={{ cursor: "pointer", fontWeight: 500 }}
+                  >
                     Continue browsing without an account →
-                  </button>
-                </div>
-              </form>
+                  </Link>
+                </Box>
+              </Box>
             )}
 
-            {/* ── Step 2: security questions ───────────────── */}
+            {/* ── Step 2: security questions ─────────────────────────── */}
             {step === 2 && (
-              <form onSubmit={handleSubmit} noValidate>
-                <div style={{
-                  background: "linear-gradient(135deg,#ecfdf5,#d1fae5)",
-                  border: "1.5px solid #a7f3d0",
-                  borderRadius: 12,
-                  padding: "0.75rem 1rem",
-                  marginBottom: "1.25rem",
-                  fontSize: "0.82rem",
-                  color: "#065f46",
-                  display: "flex",
-                  gap: "0.5rem",
-                  alignItems: "flex-start",
-                }}>
-                  <span style={{ fontSize: "1rem", flexShrink: 0 }}>🔒</span>
-                  <span>These answers will be used to verify your identity if you ever need to reset your password. Answers are stored securely and encrypted.</span>
-                </div>
+              <Box component="form" onSubmit={handleSubmit} noValidate>
+                <Alert
+                  severity="info"
+                  icon="🔒"
+                  sx={{
+                    mb: 2.5,
+                    background: "linear-gradient(135deg,#ecfdf5,#d1fae5)",
+                    border: "1.5px solid #a7f3d0",
+                    color: "#065f46",
+                    borderRadius: 2,
+                    "& .MuiAlert-icon": { color: "#065f46" },
+                  }}
+                >
+                  These answers will be used to verify your identity if you need to reset your password. Stored securely and encrypted.
+                </Alert>
 
                 {[0, 1].map((i) => (
-                  <div key={i} className="auth-field">
-                    <label className="auth-label">Security question {i + 1}</label>
-                    <select
-                      className={`auth-input ${sqErrors[i] && sq[i].questionIndex === "" ? "auth-input--error" : sq[i].questionIndex !== "" ? "auth-input--valid" : ""}`}
+                  <Box key={i} sx={{ mb: 2.5 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 600, display: "block", mb: 0.5, color: "text.primary" }}>
+                      Security question {i + 1}
+                    </Typography>
+
+                    <TextField
+                      select
+                      fullWidth
                       value={sq[i].questionIndex}
                       onChange={(e) => {
                         const next = [...sq];
@@ -345,24 +490,23 @@ export default function Register() {
                         errs[i] = "";
                         setSqErrors(errs);
                       }}
-                      style={{ cursor: "pointer" }}
+                      error={!!(sqErrors[i] && sq[i].questionIndex === "")}
+                      sx={{ mb: 1 }}
                     >
-                      <option value="">— Select a question —</option>
+                      <MenuItem value="">— Select a question —</MenuItem>
                       {SECURITY_QUESTIONS.map((q, idx) => (
-                        <option
+                        <MenuItem
                           key={idx}
                           value={idx}
                           disabled={usedIndices.includes(String(idx)) && String(sq[i].questionIndex) !== String(idx)}
                         >
                           {q}
-                        </option>
+                        </MenuItem>
                       ))}
-                    </select>
+                    </TextField>
 
-                    <input
-                      type="text"
-                      className={`auth-input ${sqErrors[i] && sq[i].answer.trim().length < 2 ? "auth-input--error" : sq[i].answer.trim().length >= 2 ? "auth-input--valid" : ""}`}
-                      style={{ marginTop: "0.5rem" }}
+                    <TextField
+                      fullWidth
                       placeholder="Type your answer"
                       value={sq[i].answer}
                       onChange={(e) => {
@@ -373,45 +517,45 @@ export default function Register() {
                         errs[i] = "";
                         setSqErrors(errs);
                       }}
+                      error={!!(sqErrors[i] && sq[i].answer.trim().length < 2)}
+                      helperText={sqErrors[i] || ""}
                       autoComplete="off"
-                      autoCapitalize="none"
-                      autoCorrect="off"
+                      slotProps={{ htmlInput: { autoCapitalize: "none", autoCorrect: "off" } }}
                     />
-
-                    {sqErrors[i] && (
-                      <p className="auth-field-error" role="alert">{sqErrors[i]}</p>
-                    )}
-                  </div>
+                  </Box>
                 ))}
 
-                <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
-                  <button
+                <Box sx={{ display: "flex", gap: 1.5, mt: 1 }}>
+                  <Button
                     type="button"
-                    className="auth-btn auth-btn--outline"
-                    style={{ flex: "0 0 auto", width: "auto", padding: "12px 20px" }}
+                    variant="outlined"
+                    color="primary"
                     onClick={() => { setStep(1); setError(""); }}
                     disabled={loading}
+                    sx={{ height: 52, fontWeight: 600, borderRadius: "12px", flexShrink: 0, px: 3 }}
                   >
                     ← Back
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="submit"
-                    className="auth-btn auth-btn--success"
-                    style={{ flex: 1 }}
+                    variant="contained"
+                    color="secondary"
+                    fullWidth
                     disabled={loading}
+                    sx={{ height: 52, fontWeight: 700, fontSize: "0.9375rem", borderRadius: "12px" }}
                   >
                     {loading ? (
-                      <><span className="auth-spinner" aria-hidden="true" /> Creating account…</>
+                      <><CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />Creating account…</>
                     ) : (
                       "Create account"
                     )}
-                  </button>
-                </div>
-              </form>
+                  </Button>
+                </Box>
+              </Box>
             )}
-          </div>
-        </div>
-      </div>
+          </Box>
+        </Box>
+      </Box>
     </>
   );
 }

@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Alert } from "react-bootstrap";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import MuiAlert from "@mui/material/Alert";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
 import { FiSmartphone, FiDownload } from "react-icons/fi";
 
 const PWAInstallPrompt = () => {
@@ -80,14 +86,13 @@ const PWAInstallPrompt = () => {
 
   // iOS Install Modal
   const IOSInstallModal = () => (
-    <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>
+    <Dialog open={showModal} onClose={() => setShowModal(false)} maxWidth="xs" fullWidth>
+      <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        
           <FiSmartphone className="me-2" />
           Install Infinity Craft App
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+        </DialogTitle>
+      <DialogContent>
         <div className="text-center">
           <div className="mb-3">
             <img
@@ -133,30 +138,27 @@ const PWAInstallPrompt = () => {
             </div>
           </div>
         </div>
-      </Modal.Body>
-      <Modal.Footer>
+      </DialogContent>
+      <DialogActions sx={{ p: 2 }}>
         <button className="ics-btn ics-btn--secondary" onClick={() => setShowModal(false)}>
           Maybe Later
         </button>
-      </Modal.Footer>
-    </Modal>
+      </DialogActions>
+    </Dialog>
   );
 
   if (!showInstallPrompt) return null;
 
   return (
     <>
-      <Alert
-        variant="primary"
-        dismissible
+      <MuiAlert
+        severity="info"
         onClose={handleDismiss}
-        className="m-3 border-0 shadow-sm"
-        style={{
-          borderRadius: "12px",
-          background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-          color: "white",
-          top: "5rem",
-        }}
+        sx={{ m: 1.5, borderRadius: "12px",
+          background: "linear-gradient(135deg, #8B1A4A 0%, #6b1238 100%)",
+          color: "white", "& .MuiAlert-icon": { color: "white" },
+          "& .MuiAlert-action": { color: "white" },
+          top: "5rem" }}
       >
         <div className="d-flex justify-content-between align-items-center">
           <div className="d-flex align-items-center">
@@ -194,7 +196,7 @@ const PWAInstallPrompt = () => {
             </button>
           </div>
         </div>
-      </Alert>
+      </MuiAlert>
 
       {isIOS && <IOSInstallModal />}
     </>

@@ -15,7 +15,6 @@ import StatusUpdateModal from "./StatusUpdateModal";
 import OrderDetailsModal from "./OrderDetailsModal";
 import Pagination from "./Pagination";
 import "../admin/admin.css";
-import "./orders.css";
 
 const Orders = () => {
   const navigate = useNavigate();

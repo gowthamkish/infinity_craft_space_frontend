@@ -1,27 +1,45 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Modal } from "react-bootstrap";
-import { OrbitLoader, DotsLoader } from "../components/Loader";
 import {
-  FiMapPin,
-  FiHeart,
-  FiEdit2,
-  FiTrash2,
-  FiShoppingCart,
-  FiCheckCircle,
-  FiPhone,
-  FiMap,
-  FiUser,
-  FiGift,
-  FiShare2,
-  FiCopy,
-  FiAward,
-} from "react-icons/fi";
+  Box,
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  Button,
+  IconButton,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Grid,
+  Avatar,
+  Stack,
+  Divider,
+  CircularProgress,
+  Alert,
+  Paper,
+  Checkbox,
+  FormControlLabel,
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import PhoneIcon from "@mui/icons-material/Phone";
+import MapIcon from "@mui/icons-material/Map";
+import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+
 import api from "../api/axios";
 import Header from "../components/Header";
 import { addToCart } from "../features/cartSlice";
-import "./Account.css";
 
 const ADDRESS_FIELDS = [
   { key: "label", label: "Label" },
@@ -141,30 +159,61 @@ export default function Account() {
     navigate("/checkout");
   };
 
+  const tierColors = {
+    bronze: { bg: "#fef3c7", color: "#92400e" },
+    silver: { bg: "#f1f5f9", color: "#475569" },
+    gold: { bg: "#fffbeb", color: "#b45309" },
+  };
+
   return (
-    <div className="account-page">
+    <Box sx={{ bgcolor: "grey.50", minHeight: "100vh" }}>
       <Header />
-      <div className="account-container">
+      <Container maxWidth="lg" sx={{ py: 4 }}>
         {loading ? (
-          <div className="account-loading">
-            <div className="account-loading-spinner">
-              <OrbitLoader size="lg" />
-            </div>
-            <h5>Loading your account…</h5>
-            <p>Fetching addresses and wishlist</p>
-          </div>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              minHeight: "50vh",
+              gap: 2,
+            }}
+          >
+            <CircularProgress size={56} />
+            <Typography variant="h6" color="text.secondary">
+              Loading your account…
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Fetching addresses and wishlist
+            </Typography>
+          </Box>
         ) : (
           <>
             {/* Hero */}
-            <div className="account-hero">
-              <div className="account-avatar">IC</div>
-              <h1 className="account-hero-title">My Account</h1>
-              <p className="account-hero-sub">
+            <Box sx={{ textAlign: "center", mb: 4 }}>
+              <Avatar
+                sx={{
+                  width: 72,
+                  height: 72,
+                  bgcolor: "primary.main",
+                  fontSize: "1.5rem",
+                  fontWeight: 700,
+                  mx: "auto",
+                  mb: 2,
+                }}
+              >
+                IC
+              </Avatar>
+              <Typography variant="h4" fontWeight={700} gutterBottom>
+                My Account
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
                 Manage your addresses and wishlist
-              </p>
-            </div>
+              </Typography>
+            </Box>
 
-            {/* ── Loyalty + Referral strip ── */}
+            {/* Loyalty + Referral strip */}
             {(profile || authUser) &&
               (() => {
                 const pts =
@@ -174,262 +223,411 @@ export default function Account() {
                 const code = profile?.referralCode ?? authUser?.referralCode;
                 const credits =
                   profile?.referralCredits ?? authUser?.referralCredits ?? 0;
-                const tierColors = {
-                  bronze: "#92400e",
-                  silver: "#475569",
-                  gold: "#b45309",
-                };
-                const tierBg = {
-                  bronze: "#fef3c7",
-                  silver: "#f1f5f9",
-                  gold: "#fffbeb",
-                };
+                const tc = tierColors[tier] || tierColors.bronze;
 
                 return (
-                  <div className="account-loyalty-strip">
+                  <Grid container spacing={3} sx={{ mb: 4 }}>
                     {/* Loyalty points card */}
-                    <div className="account-loyalty-card">
-                      <div
-                        className="account-loyalty-icon"
-                        style={{ background: tierBg[tier] }}
+                    <Grid item xs={12} md={code ? 6 : 12}>
+                      <Paper
+                        elevation={0}
+                        sx={{
+                          p: 3,
+                          border: "1px solid",
+                          borderColor: "divider",
+                          borderRadius: 2,
+                          display: "flex",
+                          gap: 2,
+                          alignItems: "flex-start",
+                        }}
                       >
-                        <FiAward size={22} color={tierColors[tier]} />
-                      </div>
-                      <div className="account-loyalty-body">
-                        <p className="account-loyalty-label">Loyalty Points</p>
-                        <p className="account-loyalty-pts">
-                          {pts.toLocaleString()} pts
-                        </p>
-                        <span
-                          className="account-loyalty-tier"
-                          style={{
-                            background: tierBg[tier],
-                            color: tierColors[tier],
+                        <Box
+                          sx={{
+                            p: 1.5,
+                            borderRadius: 2,
+                            bgcolor: tc.bg,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
                           }}
                         >
-                          {tier.charAt(0).toUpperCase() + tier.slice(1)} member
-                        </span>
-                      </div>
-                      <div className="account-loyalty-note">
-                        Earn points on every purchase. Redeem at checkout.
-                      </div>
-                    </div>
+                          <EmojiEventsIcon sx={{ color: tc.color, fontSize: 24 }} />
+                        </Box>
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="body2" color="text.secondary">
+                            Loyalty Points
+                          </Typography>
+                          <Typography variant="h5" fontWeight={700}>
+                            {pts.toLocaleString()} pts
+                          </Typography>
+                          <Chip
+                            label={`${tier.charAt(0).toUpperCase() + tier.slice(1)} member`}
+                            size="small"
+                            sx={{
+                              bgcolor: tc.bg,
+                              color: tc.color,
+                              fontWeight: 600,
+                              mt: 0.5,
+                            }}
+                          />
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            display="block"
+                            sx={{ mt: 1 }}
+                          >
+                            Earn points on every purchase. Redeem at checkout.
+                          </Typography>
+                        </Box>
+                      </Paper>
+                    </Grid>
 
                     {/* Referral card */}
                     {code && (
-                      <div className="account-loyalty-card">
-                        <div
-                          className="account-loyalty-icon"
-                          style={{ background: "#ede9fe" }}
+                      <Grid item xs={12} md={6}>
+                        <Paper
+                          elevation={0}
+                          sx={{
+                            p: 3,
+                            border: "1px solid",
+                            borderColor: "divider",
+                            borderRadius: 2,
+                            display: "flex",
+                            gap: 2,
+                            alignItems: "flex-start",
+                          }}
                         >
-                          <FiGift size={22} color="#7c3aed" />
-                        </div>
-                        <div className="account-loyalty-body">
-                          <p className="account-loyalty-label">Referral Code</p>
-                          <div className="account-referral-code-row">
-                            <span className="account-referral-code">
-                              {code}
-                            </span>
-                            <button
-                              className="account-copy-btn"
-                              onClick={handleCopyReferral}
-                              title="Copy code"
+                          <Box
+                            sx={{
+                              p: 1.5,
+                              borderRadius: 2,
+                              bgcolor: "#ede9fe",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0,
+                            }}
+                          >
+                            <CardGiftcardIcon sx={{ color: "#8B1A4A", fontSize: 24 }} />
+                          </Box>
+                          <Box sx={{ flex: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              Referral Code
+                            </Typography>
+                            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 0.5 }}>
+                              <Typography
+                                variant="h6"
+                                fontWeight={700}
+                                sx={{
+                                  fontFamily: "monospace",
+                                  bgcolor: "grey.100",
+                                  px: 1.5,
+                                  py: 0.5,
+                                  borderRadius: 1,
+                                }}
+                              >
+                                {code}
+                              </Typography>
+                              <IconButton
+                                size="small"
+                                onClick={handleCopyReferral}
+                                title="Copy code"
+                              >
+                                {copiedCode ? (
+                                  <CheckCircleIcon sx={{ color: "#10b981", fontSize: 18 }} />
+                                ) : (
+                                  <ContentCopyIcon sx={{ fontSize: 18 }} />
+                                )}
+                              </IconButton>
+                            </Stack>
+                            {credits > 0 && (
+                              <Typography variant="body2" sx={{ color: "#8B1A4A", mt: 0.5 }}>
+                                ₹{credits} referral credits available
+                              </Typography>
+                            )}
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              display="block"
+                              sx={{ mt: 1 }}
                             >
-                              {copiedCode ? (
-                                <FiCheckCircle size={15} color="#10b981" />
-                              ) : (
-                                <FiCopy size={15} />
-                              )}
-                            </button>
-                          </div>
-                          {credits > 0 && (
-                            <p className="account-referral-credits">
-                              ₹{credits} referral credits available
-                            </p>
-                          )}
-                        </div>
-                        <div className="account-loyalty-note">
-                          Share your code — you both get ₹100 store credit when
-                          they order!
-                        </div>
-                      </div>
+                              Share your code — you both get ₹100 store credit when they order!
+                            </Typography>
+                          </Box>
+                        </Paper>
+                      </Grid>
                     )}
-                  </div>
+                  </Grid>
                 );
               })()}
 
-            <div className="account-grid">
-              {/* ── Address Book ── */}
-              <div>
-                <div className="account-card card">
-                  <div className="account-card-header account-card-header--address">
-                    <FiMapPin size={24} />
-                    <div className="account-card-header-text">
-                      <h4>Address Book</h4>
-                      <small>Manage your delivery addresses</small>
-                    </div>
-                  </div>
-                  <div className="account-card-body card-body">
-                    {addresses.length === 0 ? (
-                      <div className="account-empty">
-                        <FiMapPin size={56} className="account-empty-icon" />
-                        <p className="account-empty-title">
-                          No saved addresses yet
-                        </p>
-                        <p className="account-empty-sub">
-                          Add an address to get started with deliveries
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="account-items">
-                        {addresses.map((a) => (
-                          <div key={a._id} className="account-item">
-                            <div className="account-item-name">
-                              {a.label || `${a.city}, ${a.state}`}
-                              {a.isDefault && (
-                                <span className="account-default-badge">
-                                  <FiCheckCircle size={11} /> Default
-                                </span>
-                              )}
-                            </div>
-                            <div className="account-item-meta">
-                              <FiMap size={13} />
-                              {a.street}, {a.city}, {a.state} {a.zipCode}
-                            </div>
-                            <div className="account-item-meta">
-                              <FiPhone size={13} />
-                              {a.phone}
-                            </div>
-                            <div className="account-item-actions">
-                              <button
-                                className="acct-btn acct-btn--edit"
-                                onClick={() => openEdit(a)}
-                              >
-                                <FiEdit2 size={13} /> Edit
-                              </button>
-                              <button
-                                className="acct-btn acct-btn--default"
-                                onClick={() => handleSetDefault(a._id)}
-                              >
-                                <FiCheckCircle size={13} /> Set Default
-                              </button>
-                              <button
-                                className="acct-btn acct-btn--delete"
-                                onClick={() => handleDeleteAddress(a._id)}
-                              >
-                                <FiTrash2 size={13} /> Delete
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+            <Grid container spacing={3}>
+              {/* Address Book */}
+              <Grid item xs={12} md={6}>
+                <Card
+                  elevation={0}
+                  sx={{ border: "1px solid", borderColor: "divider", borderRadius: 2, height: "100%" }}
+                >
+                  <CardContent sx={{ p: 0 }}>
+                    <Box
+                      sx={{
+                        p: 3,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        borderBottom: "1px solid",
+                        borderColor: "divider",
+                        bgcolor: "primary.50",
+                      }}
+                    >
+                      <LocationOnIcon color="primary" sx={{ fontSize: 28 }} />
+                      <Box>
+                        <Typography variant="h6" fontWeight={700}>
+                          Address Book
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Manage your delivery addresses
+                        </Typography>
+                      </Box>
+                    </Box>
 
-              {/* ── Wishlist ── */}
-              <div>
-                <div className="account-card card">
-                  <div className="account-card-header account-card-header--wishlist">
-                    <FiHeart size={24} />
-                    <div className="account-card-header-text">
-                      <h4>Wishlist</h4>
-                      <small>Your favorite products</small>
-                    </div>
-                  </div>
-                  <div className="account-card-body card-body">
-                    {wishlist.length === 0 ? (
-                      <div className="account-empty">
-                        <FiHeart size={56} className="account-empty-icon" />
-                        <p className="account-empty-title">
-                          Your wishlist is empty
-                        </p>
-                        <p className="account-empty-sub">
-                          Add products you love to save them for later
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="account-items">
-                        {wishlist.map((p) => (
-                          <div
-                            key={p._id}
-                            className="account-item account-item--wishlist"
-                          >
-                            <p className="account-item-name">{p.name}</p>
-                            <p className="account-item-price">₹{p.price}</p>
-                            <div className="account-item-actions">
-                              <button
-                                className="acct-btn acct-btn--cart"
-                                onClick={() => moveToCart(p)}
-                              >
-                                <FiShoppingCart size={13} /> Add to Cart
-                              </button>
-                              <button
-                                className="acct-btn acct-btn--delete"
-                                onClick={() => handleRemoveWishlist(p._id)}
-                              >
-                                <FiTrash2 size={13} /> Remove
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
+                    <Box sx={{ p: 3 }}>
+                      {addresses.length === 0 ? (
+                        <Box
+                          sx={{
+                            textAlign: "center",
+                            py: 6,
+                            color: "text.secondary",
+                          }}
+                        >
+                          <LocationOnIcon sx={{ fontSize: 56, mb: 2, opacity: 0.3 }} />
+                          <Typography variant="body1" fontWeight={500} gutterBottom>
+                            No saved addresses yet
+                          </Typography>
+                          <Typography variant="body2">
+                            Add an address to get started with deliveries
+                          </Typography>
+                        </Box>
+                      ) : (
+                        <Stack spacing={2}>
+                          {addresses.map((a) => (
+                            <Paper
+                              key={a._id}
+                              elevation={0}
+                              sx={{
+                                p: 2,
+                                border: "1px solid",
+                                borderColor: a.isDefault ? "primary.main" : "divider",
+                                borderRadius: 2,
+                                bgcolor: a.isDefault ? "primary.50" : "background.paper",
+                              }}
+                            >
+                              <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
+                                <Box>
+                                  <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
+                                    <Typography variant="subtitle2" fontWeight={700}>
+                                      {a.label || `${a.city}, ${a.state}`}
+                                    </Typography>
+                                    {a.isDefault && (
+                                      <Chip
+                                        icon={<CheckCircleIcon />}
+                                        label="Default"
+                                        size="small"
+                                        color="primary"
+                                      />
+                                    )}
+                                  </Stack>
+                                  <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.5 }}>
+                                    <MapIcon sx={{ fontSize: 14, color: "text.secondary" }} />
+                                    <Typography variant="body2" color="text.secondary">
+                                      {a.street}, {a.city}, {a.state} {a.zipCode}
+                                    </Typography>
+                                  </Stack>
+                                  <Stack direction="row" alignItems="center" spacing={0.5}>
+                                    <PhoneIcon sx={{ fontSize: 14, color: "text.secondary" }} />
+                                    <Typography variant="body2" color="text.secondary">
+                                      {a.phone}
+                                    </Typography>
+                                  </Stack>
+                                </Box>
+                              </Stack>
+                              <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  startIcon={<EditIcon />}
+                                  onClick={() => openEdit(a)}
+                                >
+                                  Edit
+                                </Button>
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  color="success"
+                                  startIcon={<CheckCircleIcon />}
+                                  onClick={() => handleSetDefault(a._id)}
+                                >
+                                  Set Default
+                                </Button>
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  color="error"
+                                  startIcon={<DeleteIcon />}
+                                  onClick={() => handleDeleteAddress(a._id)}
+                                >
+                                  Delete
+                                </Button>
+                              </Stack>
+                            </Paper>
+                          ))}
+                        </Stack>
+                      )}
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              {/* Wishlist */}
+              <Grid item xs={12} md={6}>
+                <Card
+                  elevation={0}
+                  sx={{ border: "1px solid", borderColor: "divider", borderRadius: 2, height: "100%" }}
+                >
+                  <CardContent sx={{ p: 0 }}>
+                    <Box
+                      sx={{
+                        p: 3,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        borderBottom: "1px solid",
+                        borderColor: "divider",
+                        bgcolor: "error.50",
+                      }}
+                    >
+                      <FavoriteIcon color="error" sx={{ fontSize: 28 }} />
+                      <Box>
+                        <Typography variant="h6" fontWeight={700}>
+                          Wishlist
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Your favorite products
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ p: 3 }}>
+                      {wishlist.length === 0 ? (
+                        <Box
+                          sx={{
+                            textAlign: "center",
+                            py: 6,
+                            color: "text.secondary",
+                          }}
+                        >
+                          <FavoriteIcon sx={{ fontSize: 56, mb: 2, opacity: 0.3 }} />
+                          <Typography variant="body1" fontWeight={500} gutterBottom>
+                            Your wishlist is empty
+                          </Typography>
+                          <Typography variant="body2">
+                            Add products you love to save them for later
+                          </Typography>
+                        </Box>
+                      ) : (
+                        <Stack spacing={2}>
+                          {wishlist.map((p) => (
+                            <Paper
+                              key={p._id}
+                              elevation={0}
+                              sx={{
+                                p: 2,
+                                border: "1px solid",
+                                borderColor: "divider",
+                                borderRadius: 2,
+                              }}
+                            >
+                              <Typography variant="subtitle2" fontWeight={700} gutterBottom>
+                                {p.name}
+                              </Typography>
+                              <Typography variant="h6" color="primary" fontWeight={700} sx={{ mb: 1.5 }}>
+                                ₹{p.price}
+                              </Typography>
+                              <Stack direction="row" spacing={1}>
+                                <Button
+                                  size="small"
+                                  variant="contained"
+                                  color="primary"
+                                  startIcon={<ShoppingCartIcon />}
+                                  onClick={() => moveToCart(p)}
+                                >
+                                  Add to Cart
+                                </Button>
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  color="error"
+                                  startIcon={<DeleteIcon />}
+                                  onClick={() => handleRemoveWishlist(p._id)}
+                                >
+                                  Remove
+                                </Button>
+                              </Stack>
+                            </Paper>
+                          ))}
+                        </Stack>
+                      )}
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
           </>
         )}
 
-        {/* ── Edit Address Modal ── */}
-        <Modal
-          show={showEditModal}
-          onHide={() => setShowEditModal(false)}
-          centered
+        {/* Edit Address Modal */}
+        <Dialog
+          open={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          maxWidth="sm"
+          fullWidth
+          PaperProps={{ sx: { borderRadius: 2 } }}
         >
-          <div className="acct-modal-header">
-            <h5>
-              <FiEdit2
-                size={20}
-                className="me-2"
-                style={{ display: "inline" }}
-              />
-              Edit Address
-            </h5>
-            <small>Update your delivery address</small>
-          </div>
-          <Modal.Body className="acct-modal-body">
+          <DialogTitle>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <EditIcon />
+              <Box>
+                <Typography variant="h6" fontWeight={700}>
+                  Edit Address
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Update your delivery address
+                </Typography>
+              </Box>
+            </Stack>
+          </DialogTitle>
+          <DialogContent dividers>
             {editingAddress && (
-              <div style={{ display: "grid", gap: "1rem" }}>
+              <Stack spacing={2} sx={{ pt: 1 }}>
                 {ADDRESS_FIELDS.map(({ key, label }) => (
-                  <div key={key}>
-                    <label className="acct-field-label">{label}</label>
-                    <input
-                      type="text"
-                      className="acct-input form-control"
-                      value={editingAddress[key] || ""}
-                      onChange={(e) =>
-                        setEditingAddress((prev) => ({
-                          ...prev,
-                          [key]: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
+                  <TextField
+                    key={key}
+                    label={label}
+                    value={editingAddress[key] || ""}
+                    onChange={(e) =>
+                      setEditingAddress((prev) => ({
+                        ...prev,
+                        [key]: e.target.value,
+                      }))
+                    }
+                    fullWidth
+                    size="small"
+                  />
                 ))}
-                <div>
-                  <label
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.5rem",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <input
-                      type="checkbox"
+                <FormControlLabel
+                  control={
+                    <Checkbox
                       checked={!!editingAddress.isDefault}
                       onChange={(e) =>
                         setEditingAddress((prev) => ({
@@ -438,27 +636,25 @@ export default function Account() {
                         }))
                       }
                     />
-                    <span className="acct-field-label" style={{ margin: 0 }}>
-                      Set as default
-                    </span>
-                  </label>
-                </div>
-              </div>
+                  }
+                  label="Set as default"
+                />
+              </Stack>
             )}
-          </Modal.Body>
-          <div className="acct-modal-footer">
-            <button
-              className="acct-btn acct-btn--cancel btn"
+          </DialogContent>
+          <DialogActions sx={{ p: 2, gap: 1 }}>
+            <Button
+              variant="outlined"
               onClick={() => setShowEditModal(false)}
             >
               Cancel
-            </button>
-            <button className="acct-btn acct-btn--save btn" onClick={saveEdit}>
+            </Button>
+            <Button variant="contained" onClick={saveEdit}>
               Save Changes
-            </button>
-          </div>
-        </Modal>
-      </div>
-    </div>
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Container>
+    </Box>
   );
 }

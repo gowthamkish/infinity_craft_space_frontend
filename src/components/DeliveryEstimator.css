@@ -87,7 +87,7 @@
 .de-input::-webkit-outer-spin-button { display: none; }
 
 .de-input:focus {
-  border-color: #667eea;
+  border-color: #8B1A4A;
 }
 
 .de-input--error {
@@ -117,7 +117,7 @@
   align-items: center;
   gap: 0.25rem;
   padding: 0 1.1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B1A4A 0%, #7a1640 100%);
   color: #fff;
   border: none;
   border-radius: 0 8px 8px 0;
@@ -318,7 +318,7 @@
     border-color: #334155;
   }
 
-  .de-input:focus { border-color: #818cf8; }
+  .de-input:focus { border-color: #8B1A4A; }
 
   .de-result {
     background: linear-gradient(135deg, #052e16 0%, #14532d 100%);

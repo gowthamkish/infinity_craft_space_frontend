@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Form, Alert } from "react-bootstrap";
+import TextField from "@mui/material/TextField";
+import MuiAlert from "@mui/material/Alert";
 import { DotsLoader } from "../Loader";
 import { FiCamera, FiX, FiCheck } from "react-icons/fi";
 import {
@@ -167,12 +168,12 @@ const AddReviewForm = ({ productId, productName, onReviewSubmitted }) => {
 
   if (!isAuthenticated) {
     return (
-      <Alert variant="info" className="text-center">
+      <MuiAlert severity="info" sx={{ textAlign: "center" }}>
         <strong>Please login to write a review</strong>
         <p className="mb-0 mt-2">
           Share your experience with this product after logging in.
         </p>
-      </Alert>
+      </MuiAlert>
     );
   }
 
@@ -189,15 +190,14 @@ const AddReviewForm = ({ productId, productName, onReviewSubmitted }) => {
       </h5>
 
       {successMessage && (
-        <Alert variant="success" className="d-flex align-items-center gap-2">
+        <MuiAlert severity="success" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <FiCheck size={18} />
           {successMessage}
-        </Alert>
+        </MuiAlert>
       )}
 
       {(error || validationError) && (
-        <Alert
-          variant="danger"
+        <MuiAlert severity="error"
           onClose={() => {
             setValidationError("");
             dispatch(clearReviewError());
@@ -205,10 +205,10 @@ const AddReviewForm = ({ productId, productName, onReviewSubmitted }) => {
           dismissible
         >
           {validationError || error}
-        </Alert>
+        </MuiAlert>
       )}
 
-      <Form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         {/* Rating */}
         <div className="form-section">
           <label className="form-section-label">Your Rating *</label>
@@ -227,13 +227,14 @@ const AddReviewForm = ({ productId, productName, onReviewSubmitted }) => {
         {/* Title */}
         <div className="form-section">
           <label className="form-section-label">Review Title *</label>
-          <Form.Control
+          <TextField
+            fullWidth size="small"
             type="text"
             placeholder="Summarize your experience (e.g., 'Beautiful bangles, perfect for wedding!')"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            maxLength={100}
-            style={{ borderRadius: "8px" }}
+            slotProps={{ htmlInput: { maxLength: 100 } }}
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: "8px" } }}
           />
           <small className="text-muted">{title.length}/100 characters</small>
         </div>
@@ -241,14 +242,13 @@ const AddReviewForm = ({ productId, productName, onReviewSubmitted }) => {
         {/* Comment */}
         <div className="form-section">
           <label className="form-section-label">Your Review *</label>
-          <Form.Control
-            as="textarea"
-            rows={4}
+          <TextField
+            fullWidth size="small" multiline rows={4}
             placeholder="Share your experience with this product. What did you like? How is the quality? Would you recommend it to others?"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            maxLength={1000}
-            style={{ borderRadius: "8px", resize: "none" }}
+            slotProps={{ htmlInput: { maxLength: 1000 } }}
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: "8px" }, "& textarea": { resize: "none" } }}
           />
           <small className="text-muted">{comment.length}/1000 characters</small>
         </div>
@@ -326,7 +326,7 @@ const AddReviewForm = ({ productId, productName, onReviewSubmitted }) => {
             "Submit Review"
           )}
         </button>
-      </Form>
+      </form>
     </div>
   );
 };

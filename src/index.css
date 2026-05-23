@@ -40,10 +40,9 @@ code {
     source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
-/* Remove default focus outline and add custom one */
+/* Remove default browser focus outline — MUI theme handles :focus-visible styling */
 *:focus {
-  outline: none !important;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3) !important;
+  outline: none;
 }
 
 /* Smooth scroll behavior */
@@ -53,7 +52,7 @@ html {
 
 /* Custom selection color */
 ::selection {
-  background-color: rgba(37, 99, 235, 0.2);
+  background-color: rgba(139, 26, 74, 0.18);
   color: var(--text-primary);
 }
 
@@ -88,13 +87,13 @@ input[type="number"] {
 /* Button hover animation */
 @keyframes buttonPulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+    box-shadow: 0 0 0 0 rgba(139, 26, 74, 0.4);
   }
   70% {
-    box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+    box-shadow: 0 0 0 10px rgba(139, 26, 74, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+    box-shadow: 0 0 0 0 rgba(139, 26, 74, 0);
   }
 }
 

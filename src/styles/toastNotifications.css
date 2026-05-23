@@ -91,7 +91,7 @@
 }
 
 .toast.info {
-  border-left-color: var(--primary, #2563eb);
+  border-left-color: var(--primary, #8B1A4A);
   background: linear-gradient(135deg, #eff6ff, #fff);
 }
 
@@ -124,8 +124,8 @@
 }
 
 .toast.info .toast-icon {
-  background: rgba(37, 99, 235, 0.1);
-  color: var(--primary, #2563eb);
+  background: rgba(139, 26, 74, 0.1);
+  color: var(--primary, #8B1A4A);
 }
 
 /* ── Content ────────────────────────────────────────────────── */
@@ -184,7 +184,7 @@
 .toast.success .toast-progress { background: var(--success, #10b981); }
 .toast.error   .toast-progress { background: var(--danger, #dc2626); }
 .toast.warning .toast-progress { background: var(--accent, #f59e0b); }
-.toast.info    .toast-progress { background: var(--primary, #2563eb); }
+.toast.info    .toast-progress { background: var(--primary, #8B1A4A); }
 
 /* ── Mobile ─────────────────────────────────────────────────── */
 @media (max-width: 640px) {

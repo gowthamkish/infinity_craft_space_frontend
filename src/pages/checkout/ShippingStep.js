@@ -1,6 +1,26 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { Trash2, ArrowLeft, ArrowRight, MapPin, Package } from "react-feather";
-import { DotsLoader } from "../../components/Loader";
+import {
+  Box,
+  Grid,
+  Paper,
+  Typography,
+  Button,
+  TextField,
+  Stack,
+  Divider,
+  Chip,
+  Alert,
+  CircularProgress,
+  FormControlLabel,
+  Checkbox,
+  IconButton,
+} from "@mui/material";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteForeverOutlined";
+import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlined";
 import { ProductThumb } from "./CartReviewStep";
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -44,7 +64,7 @@ const ROAD_ZONES = {
     label: "South India",
     sublabel: "AP, Telangana, Kerala, Tamil Nadu",
     deliveryDays: "3–5",
-    color: "#7c3aed",
+    color: "#8B1A4A",
     rates: [
       { maxG: 250, price: 85 },  { maxG: 500, price: 110 },
       { maxG: 750, price: 135 }, { maxG: 1000, price: 160 },
@@ -60,7 +80,7 @@ const ROAD_ZONES = {
     label: "Pan-India",
     sublabel: "MH, GJ, Goa, Delhi, UP, MP, RJ, HR, WB & more",
     deliveryDays: "5–8",
-    color: "#2563eb",
+    color: "#8B1A4A",
     rates: [
       { maxG: 250, price: 120 },  { maxG: 500, price: 155 },
       { maxG: 750, price: 190 },  { maxG: 1000, price: 225 },
@@ -92,7 +112,7 @@ const ROAD_ZONES = {
 
 function getZoneKey(state, city) {
   const s = (state || "").toLowerCase().trim();
-  const c = (city  || "").toLowerCase().trim();
+  const c = (city || "").toLowerCase().trim();
   if (c.includes("bangalore") || c.includes("bengaluru")) return "LOCAL";
   if (s.includes("karnataka")) return "STATE";
   if (s.includes("andhra") || s.includes("telangana") || s.includes("kerala") || s.includes("tamil")) return "SOUTH";
@@ -126,8 +146,49 @@ function expectedDeliveryRange(deliveryDays, dispatchBuffer = 0) {
   const maxDays = (parts[1] || minDays + 3) + dispatchBuffer;
   const fmt = (d) => d.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
   const from = new Date(); from.setDate(from.getDate() + minDays);
-  const to   = new Date(); to.setDate(to.getDate() + maxDays);
+  const to = new Date(); to.setDate(to.getDate() + maxDays);
   return `${fmt(from)} – ${fmt(to)}`;
+}
+
+/* ── Card header shared pattern ──────────────────────────────────────── */
+function CardHeader({ icon: Icon, title, subtitle, iconColor }) {
+  return (
+    <Box
+      sx={{
+        px: 3,
+        py: 2.25,
+        display: "flex",
+        alignItems: "center",
+        gap: 2,
+        borderBottom: "1px solid #f0ebe8",
+        background: "linear-gradient(135deg, #fdf6f0 0%, #fdf2f6 100%)",
+      }}
+    >
+      <Box
+        sx={{
+          width: 38,
+          height: 38,
+          borderRadius: 2,
+          background: iconColor || "linear-gradient(135deg, #8B1A4A, #C9A84C)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+          boxShadow: "0 2px 8px rgba(139,26,74,0.22)",
+        }}
+      >
+        <Icon sx={{ color: "white", fontSize: 20 }} />
+      </Box>
+      <Box>
+        <Typography variant="subtitle1" fontWeight={700} sx={{ lineHeight: 1.2 }}>
+          {title}
+        </Typography>
+        {subtitle && (
+          <Typography variant="caption" color="text.secondary">{subtitle}</Typography>
+        )}
+      </Box>
+    </Box>
+  );
 }
 
 /* ── Shipping rate card ─────────────────────────────────────────────── */
@@ -135,91 +196,112 @@ function ShippingWidget({ zoneKey, weightKg, rate, dispatchBuffer = 0 }) {
   if (!zoneKey) return null;
   const zone = ROAD_ZONES[zoneKey];
   if (!zone) return null;
-
   const deliveryRange = expectedDeliveryRange(zone.deliveryDays, dispatchBuffer);
 
   return (
-    <div className="co-rate-card" role="region" aria-label="Shipping estimate">
-      <div className="co-rate-icon">🚛</div>
-      <div className="co-rate-info">
-        <p className="co-rate-method">
-          Standard Road Delivery
-          <span style={{
-            marginLeft: 8,
-            fontSize: "0.65rem",
-            fontWeight: 700,
-            background: `${zone.color}18`,
-            color: zone.color,
-            padding: "2px 8px",
-            borderRadius: "99px",
-          }}>
-            {zone.label}
-          </span>
-        </p>
-        <p className="co-rate-eta">
-          📅 {deliveryRange}
+    <Box
+      sx={{
+        p: 2,
+        border: "1.5px solid",
+        borderColor: zone.color + "40",
+        borderRadius: 2.5,
+        display: "flex",
+        alignItems: "center",
+        gap: 2,
+        mb: 2.5,
+        bgcolor: zone.color + "08",
+      }}
+    >
+      <Box
+        sx={{
+          width: 40,
+          height: 40,
+          borderRadius: 2,
+          bgcolor: zone.color + "18",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        <LocalShippingOutlinedIcon sx={{ color: zone.color, fontSize: 22 }} />
+      </Box>
+      <Box sx={{ flex: 1 }}>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.25, flexWrap: "wrap" }}>
+          <Typography variant="body2" fontWeight={700}>Standard Road Delivery</Typography>
+          <Chip
+            label={zone.label}
+            size="small"
+            sx={{ bgcolor: zone.color + "18", color: zone.color, fontWeight: 700, height: 20, fontSize: "0.68rem" }}
+          />
+        </Stack>
+        <Typography variant="caption" color="text.secondary" display="block">
+          {deliveryRange}
           {dispatchBuffer > 0 && (
-            <span style={{ marginLeft: 8, color: "#d97706" }}>+ 10–12 day handcraft</span>
+            <Box component="span" sx={{ ml: 1, color: "warning.main", fontWeight: 600 }}>
+              + 10–12 day handcraft
+            </Box>
           )}
-        </p>
-        <p style={{ fontSize: "0.68rem", color: "#6b7280", margin: "2px 0 0" }}>
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
           {zone.sublabel} · {weightKg < 1 ? `${Math.round(weightKg * 1000)} g` : `${weightKg.toFixed(2)} kg`}
-        </p>
-      </div>
-      <span className="co-rate-price">{rate === 0 ? "FREE" : `₹${rate}`}</span>
-    </div>
+        </Typography>
+      </Box>
+      <Typography variant="h6" fontWeight={800} sx={{ color: zone.color, flexShrink: 0 }}>
+        {rate === 0 ? "FREE" : `₹${rate}`}
+      </Typography>
+    </Box>
   );
 }
 
-/* ── Address label chips ────────────────────────────────────────────── */
+/* ── Address label chips ─────────────────────────────────────────── */
 const LABEL_PRESETS = ["Home", "Office", "Other"];
 
 function AddressLabelChips({ value, onChange }) {
   const [custom, setCustom] = useState(LABEL_PRESETS.includes(value) || !value ? "" : value);
   const isPreset = LABEL_PRESETS.includes(value);
-  const isOther  = !isPreset && value;
+  const isOther = !isPreset && value;
 
   const select = (label) => {
     if (label === "Other") { onChange("Other"); }
     else { setCustom(""); onChange(label); }
   };
 
-  const chipStyle = (active) => ({
-    padding: "5px 14px",
-    borderRadius: "99px",
-    border: `1.5px solid ${active ? "#6d28d9" : "#ced1e8"}`,
-    background: active ? "#6d28d9" : "white",
-    color: active ? "white" : "#475569",
-    fontSize: "0.8rem",
-    fontWeight: 600,
-    cursor: "pointer",
-    transition: "all 120ms ease",
-    fontFamily: "inherit",
-  });
+  const LABELS_DISPLAY = { Home: "🏠 Home", Office: "🏢 Office", Other: "✏️ Other" };
 
   return (
-    <div>
-      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "8px" }}>
+    <Box>
+      <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mb: 1 }}>
         {LABEL_PRESETS.map((lbl) => {
           const active = lbl === "Other" ? (value === "Other" || isOther) : value === lbl;
           return (
-            <button key={lbl} type="button" onClick={() => select(lbl)} style={chipStyle(active)}>
-              {lbl === "Home" ? "🏠 Home" : lbl === "Office" ? "🏢 Office" : "✏️ Other"}
-            </button>
+            <Chip
+              key={lbl}
+              label={LABELS_DISPLAY[lbl]}
+              onClick={() => select(lbl)}
+              variant={active ? "filled" : "outlined"}
+              sx={{
+                cursor: "pointer",
+                fontWeight: 600,
+                ...(active
+                  ? { bgcolor: "rgba(139,26,74,0.1)", color: "#8B1A4A", border: "1px solid rgba(139,26,74,0.3)" }
+                  : { borderColor: "#e7e5e4" }),
+              }}
+            />
           );
         })}
-      </div>
+      </Stack>
       {(value === "Other" || (isOther && !isPreset)) && (
-        <input
-          type="text"
-          className="co-input"
+        <TextField
+          size="small"
+          fullWidth
           placeholder="e.g. Parents' house, Gym…"
           value={isOther && value !== "Other" ? value : custom}
           onChange={(e) => { setCustom(e.target.value); onChange(e.target.value || "Other"); }}
           autoFocus
         />
       )}
-    </div>
+    </Box>
   );
 }
 
@@ -249,24 +331,23 @@ export const ShippingStep = ({
   onShippingRateSelected,
 }) => {
   const phoneInputRef = useRef(null);
-  const itiRef        = useRef(null);
-  const [localError, setLocalError]             = useState(null);
-  const [pincodeLoading, setPincodeLoading]     = useState(false);
+  const itiRef = useRef(null);
+  const [localError, setLocalError] = useState(null);
+  const [pincodeLoading, setPincodeLoading] = useState(false);
   const [pincodeAutoFilled, setPincodeAutoFilled] = useState(false);
-  const [pincodeError, setPincodeError]         = useState(null);
+  const [pincodeError, setPincodeError] = useState(null);
 
-  /* ── Pincode auto-fill ─────────────────────────────────────────────── */
   const fetchPincodeDetails = useCallback(async (pin) => {
     setPincodeLoading(true);
     setPincodeError(null);
     try {
-      const res  = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
+      const res = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
       const data = await res.json();
       if (data?.[0]?.Status === "Success" && data[0].PostOffice?.length) {
         const po = data[0].PostOffice[0];
         setShippingAddress((prev) => ({
           ...prev,
-          city:  po.District || po.Division || prev.city,
+          city: po.District || po.Division || prev.city,
           state: po.State || prev.state,
         }));
         setPincodeAutoFilled(true);
@@ -281,22 +362,20 @@ export const ShippingStep = ({
     }
   }, [setShippingAddress]);
 
-  /* ── Custom order dispatch buffer ──────────────────────────────────── */
   const CUSTOM_KEYWORDS = ["embroidery", "kundan", "thread bangle", "thread bangles"];
-  const hasCustomItems  = cartItems.some((item) => {
+  const hasCustomItems = cartItems.some((item) => {
     const text = `${item.product?.name ?? ""} ${item.product?.category ?? ""} ${item.product?.subCategory ?? ""}`.toLowerCase();
     return CUSTOM_KEYWORDS.some((kw) => text.includes(kw));
   });
   const dispatchBuffer = hasCustomItems ? 14 : 0;
 
-  /* ── Shipping weight & zone ────────────────────────────────────────── */
   const cartWeight = cartItems.reduce(
     (sum, item) => sum + ((item.product?.weightInGrams ?? 500) / 1000) * item.quantity, 0,
   );
 
   const zoneKey = useMemo(() => {
     const state = shippingAddress.state?.trim();
-    const city  = shippingAddress.city?.trim();
+    const city = shippingAddress.city?.trim();
     if (!state && !city) return null;
     return getZoneKey(state, city);
   }, [shippingAddress.state, shippingAddress.city]);
@@ -319,7 +398,6 @@ export const ShippingStep = ({
     }
   }, [zoneKey, shippingCharge, onShippingRateSelected]);
 
-  /* ── Pincode trigger ───────────────────────────────────────────────── */
   useEffect(() => {
     const pin = shippingAddress.zipCode?.trim();
     if (pin?.length === 6 && /^\d{6}$/.test(pin)) {
@@ -334,14 +412,12 @@ export const ShippingStep = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shippingAddress.zipCode]);
 
-  /* ── intl-tel-input phone widget ───────────────────────────────────── */
   useEffect(() => {
     const input = phoneInputRef.current;
     if (!input) return;
-
-    const CSS_HREF   = "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css";
+    const CSS_HREF = "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css";
     const SCRIPT_SRC = "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js";
-    const UTILS_SRC  = "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js";
+    const UTILS_SRC = "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js";
 
     if (!document.querySelector(`link[href='${CSS_HREF}']`)) {
       const link = document.createElement("link");
@@ -372,9 +448,9 @@ export const ShippingStep = ({
       });
       itiRef.current = iti;
 
-      const flagContainer  = input.parentElement?.querySelector(".iti__flag-container");
+      const flagContainer = input.parentElement?.querySelector(".iti__flag-container");
       const countryListBtn = input.parentElement?.querySelector(".iti__selected-flag");
-      if (flagContainer)  { flagContainer.style.cursor = "not-allowed"; flagContainer.onclick = (e) => { e.preventDefault(); e.stopPropagation(); }; }
+      if (flagContainer) { flagContainer.style.cursor = "not-allowed"; flagContainer.onclick = (e) => { e.preventDefault(); e.stopPropagation(); }; }
       if (countryListBtn) { countryListBtn.style.pointerEvents = "none"; countryListBtn.style.cursor = "not-allowed"; }
 
       if (shippingAddress?.phone) {
@@ -386,7 +462,6 @@ export const ShippingStep = ({
       const handleChange = () => {
         setShippingAddress((prev) => ({ ...prev, phone: input.value, country: "India", countryCode: "+91" }));
       };
-
       input.addEventListener("change", handleChange);
       input.addEventListener("blur", handleChange);
       input.addEventListener("keyup", handleChange);
@@ -400,7 +475,7 @@ export const ShippingStep = ({
       if (itiRef.current) { try { itiRef.current.destroy(); } catch (e) {} }
       itiRef.current = null;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shippingAddress.country, setShippingAddress]);
 
   const validatePhone = () => {
@@ -413,8 +488,7 @@ export const ShippingStep = ({
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+    if (e) { e.preventDefault(); e.stopPropagation(); }
     if (!validatePhone()) { setLocalError("Please enter a valid 10-digit Indian phone number"); return; }
     setLocalError(null);
     if (saveAddressToBook) await handleSaveAddress();
@@ -423,357 +497,506 @@ export const ShippingStep = ({
 
   const displayTotal = subtotal + (shippingRate?.rate || 0);
 
+  const fieldSx = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2,
+      "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#8B1A4A" },
+      "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#8B1A4A" },
+    },
+    "& .MuiInputLabel-root.Mui-focused": { color: "#8B1A4A" },
+  };
+
   return (
-    <>
-      <div className="co-grid">
-        {/* ── Main: form ─── */}
-        <div className="co-main">
+    <Grid container spacing={3}>
+      {/* Main: form */}
+      <Grid item xs={12} md={8}>
 
-          {/* Saved addresses */}
-          {loadingAddresses ? (
-            <section className="co-section" style={{ padding: "24px", textAlign: "center", color: "var(--co-ink-3)" }}>
-              <DotsLoader size="sm" />
-              <span style={{ marginLeft: 10 }}>Loading saved addresses…</span>
-            </section>
-          ) : savedAddresses.length > 0 && (
-            <section className="co-section" aria-label="Saved addresses">
-              <header className="co-section-head">
-                <div className="co-section-icon co-section-icon--green">
-                  <MapPin size={16} />
-                </div>
-                <div>
-                  <h2 className="co-section-title">Saved Addresses</h2>
-                  <p className="co-section-sub">Select a delivery address below</p>
-                </div>
-              </header>
-
-              <div className="co-section-body">
-                <div className="co-addr-grid">
-                  {savedAddresses.map((addr) => (
-                    <div
-                      key={addr._id}
-                      className={`co-addr-card${selectedAddressId === addr._id ? " selected" : ""}`}
-                      role="button"
-                      tabIndex={0}
-                      aria-pressed={selectedAddressId === addr._id}
-                      onClick={() => selectSavedAddress(addr)}
-                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectSavedAddress(addr); } }}
-                    >
-                      <div className="co-addr-radio" aria-hidden="true">
-                        {selectedAddressId === addr._id && <div className="co-addr-dot" />}
-                      </div>
-                      <div className="co-addr-info">
-                        {addr.label && <p className="co-addr-label-tag">{addr.label}</p>}
-                        <p className="co-addr-street">{addr.street}</p>
-                        <p className="co-addr-city">{addr.city}, {addr.state} {addr.zipCode}</p>
-                        {addr.phone && <p style={{ fontSize: "0.72rem", color: "var(--co-ink-3)", margin: "2px 0 0" }}>📞 {addr.phone}</p>}
-                        {addr.isDefault && <span className="co-addr-default-badge">Default</span>}
-                        <button
-                          type="button"
-                          className="co-addr-del"
+        {/* Saved addresses */}
+        {loadingAddresses ? (
+          <Paper
+            elevation={0}
+            sx={{ p: 3, border: "1px solid #f0e8e2", borderRadius: 3, mb: 3, textAlign: "center" }}
+          >
+            <CircularProgress size={22} sx={{ color: "#8B1A4A", mr: 1 }} />
+            <Typography variant="body2" color="text.secondary" component="span">
+              Loading saved addresses…
+            </Typography>
+          </Paper>
+        ) : savedAddresses.length > 0 && (
+          <Paper
+            elevation={0}
+            sx={{
+              border: "1px solid #f0e8e2",
+              borderRadius: 3,
+              mb: 3,
+              overflow: "hidden",
+              boxShadow: "0 2px 12px rgba(139,26,74,0.07)",
+            }}
+          >
+            <CardHeader
+              icon={CheckCircleOutlineIcon}
+              title="Saved Addresses"
+              subtitle="Select a delivery address below"
+              iconColor="linear-gradient(135deg, #16a34a, #15803d)"
+            />
+            <Box sx={{ p: 2.5 }}>
+              <Grid container spacing={1.5}>
+                {savedAddresses.map((addr) => {
+                  const selected = selectedAddressId === addr._id;
+                  return (
+                    <Grid item xs={12} sm={6} key={addr._id}>
+                      <Box
+                        onClick={() => selectSavedAddress(addr)}
+                        sx={{
+                          p: 2,
+                          border: "2px solid",
+                          borderColor: selected ? "#8B1A4A" : "#e7e5e4",
+                          borderRadius: 2.5,
+                          cursor: "pointer",
+                          bgcolor: selected ? "#fdf2f6" : "#fff",
+                          "&:hover": { borderColor: "#8B1A4A" },
+                          transition: "all 0.15s ease",
+                          position: "relative",
+                        }}
+                        role="button"
+                        tabIndex={0}
+                        aria-pressed={selected}
+                        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectSavedAddress(addr); } }}
+                      >
+                        {selected && (
+                          <Box
+                            sx={{
+                              position: "absolute",
+                              top: 10,
+                              left: 10,
+                              width: 18,
+                              height: 18,
+                              borderRadius: "50%",
+                              bgcolor: "#8B1A4A",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <CheckCircleOutlineIcon sx={{ color: "white", fontSize: 14 }} />
+                          </Box>
+                        )}
+                        <Box sx={{ pl: selected ? 3 : 0 }}>
+                          {addr.label && (
+                            <Chip
+                              label={addr.label}
+                              size="small"
+                              sx={{
+                                mb: 0.75,
+                                bgcolor: "rgba(139,26,74,0.08)",
+                                color: "#8B1A4A",
+                                fontWeight: 700,
+                                height: 20,
+                                fontSize: "0.68rem",
+                              }}
+                            />
+                          )}
+                          <Typography variant="body2" fontWeight={600}>{addr.street}</Typography>
+                          <Typography variant="caption" color="text.secondary" display="block">
+                            {addr.city}, {addr.state} – {addr.zipCode}
+                          </Typography>
+                          {addr.phone && (
+                            <Typography variant="caption" color="text.secondary" display="block">
+                              📞 {addr.phone}
+                            </Typography>
+                          )}
+                          {addr.isDefault && (
+                            <Chip
+                              label="Default"
+                              size="small"
+                              sx={{ mt: 0.5, bgcolor: "#fdf2f6", color: "#8B1A4A", border: "1px solid rgba(139,26,74,0.3)", height: 18, fontSize: "0.65rem" }}
+                            />
+                          )}
+                        </Box>
+                        <IconButton
+                          size="small"
                           onClick={(e) => { e.stopPropagation(); handleDeleteAddress(addr._id); }}
-                          aria-label={`Delete address ${addr.street}`}
+                          sx={{ position: "absolute", top: 8, right: 8, color: "#ef4444", "&:hover": { bgcolor: "#fef2f2" } }}
                         >
-                          <Trash2 size={11} /> Delete
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+                          <DeleteOutlineIcon sx={{ fontSize: 16 }} />
+                        </IconButton>
+                      </Box>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+              <Divider sx={{ my: 2.5, borderColor: "#f0e8e2" }}>
+                <Typography variant="caption" color="text.secondary" sx={{ px: 1 }}>
+                  or enter a new address
+                </Typography>
+              </Divider>
+            </Box>
+          </Paper>
+        )}
 
-              <div className="co-or-divider" style={{ padding: "0 22px" }}>or enter a new address</div>
-            </section>
-          )}
+        {/* Address form */}
+        <Paper
+          elevation={0}
+          sx={{
+            border: "1px solid #f0e8e2",
+            borderRadius: 3,
+            overflow: "hidden",
+            boxShadow: "0 2px 12px rgba(139,26,74,0.07)",
+          }}
+        >
+          <CardHeader
+            icon={LocationOnOutlinedIcon}
+            title="Delivery Address"
+            subtitle="Where should we deliver your order?"
+          />
 
-          {/* Address form */}
-          <section className="co-section" aria-label="Shipping address form">
-            <header className="co-section-head">
-              <div className="co-section-icon co-section-icon--purple">
-                <MapPin size={16} />
-              </div>
-              <div>
-                <h2 className="co-section-title">Delivery Address</h2>
-                <p className="co-section-sub">Where should we deliver your order?</p>
-              </div>
-            </header>
+          <Box sx={{ p: 2.5 }}>
+            <Box component="form" noValidate onSubmit={handleSubmit}>
 
-            <div className="co-section-body">
-              <form noValidate onSubmit={handleSubmit}>
+              {/* Address label */}
+              <Box sx={{ mb: 2.5 }}>
+                <Typography variant="body2" fontWeight={600} sx={{ mb: 1, color: "#44403c" }}>
+                  Address Label{" "}
+                  <Typography component="span" variant="caption" color="text.secondary">(optional)</Typography>
+                </Typography>
+                <AddressLabelChips
+                  value={shippingAddress.label}
+                  onChange={(val) => setShippingAddress((prev) => ({ ...prev, label: val }))}
+                />
+              </Box>
 
-                {/* Address label chips */}
-                <div className="co-field" style={{ marginBottom: 16 }}>
-                  <label className="co-label">
-                    Address Label <span style={{ fontWeight: 400, color: "var(--co-ink-4)" }}>(optional)</span>
-                  </label>
-                  <AddressLabelChips
-                    value={shippingAddress.label}
-                    onChange={(val) => setShippingAddress((prev) => ({ ...prev, label: val }))}
-                  />
-                </div>
+              {/* Street */}
+              <TextField
+                label="Street Address"
+                name="street"
+                value={shippingAddress.street}
+                onChange={handleInputChange}
+                placeholder="House/Flat no., Building name, Street, Area…"
+                required
+                fullWidth
+                multiline
+                rows={2}
+                sx={{ mb: 2.5, ...fieldSx }}
+                autoComplete="street-address"
+              />
 
-                {/* Street */}
-                <div className="co-field co-form-full" style={{ marginBottom: 16 }}>
-                  <label className="co-label co-label--req" htmlFor="co-street">Street Address</label>
-                  <textarea
-                    id="co-street"
-                    className="co-input"
-                    name="street"
-                    value={shippingAddress.street}
-                    onChange={handleInputChange}
-                    placeholder="House/Flat no., Building name, Street, Area…"
+              {/* Pincode / City / State / Country */}
+              <Grid container spacing={2} sx={{ mb: 2.5 }}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label={
+                      <span>
+                        PIN Code
+                        {pincodeLoading && <CircularProgress size={11} sx={{ ml: 0.75 }} />}
+                      </span>
+                    }
+                    name="zipCode"
+                    value={shippingAddress.zipCode}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "").slice(0, 6);
+                      handleInputChange({ target: { name: "zipCode", value: val } });
+                      if (val.length < 6) { setPincodeAutoFilled(false); setPincodeError(null); }
+                    }}
+                    placeholder="6-digit PIN"
                     required
-                    rows={2}
-                    style={{ resize: "none", lineHeight: 1.5 }}
-                    autoComplete="street-address"
+                    fullWidth
+                    slotProps={{ htmlInput: { maxLength: 6, inputMode: "numeric" } }}
+                    autoComplete="postal-code"
+                    error={!!pincodeError}
+                    helperText={
+                      pincodeError
+                        ? pincodeError
+                        : pincodeAutoFilled && !pincodeLoading
+                        ? "✓ City & state auto-filled"
+                        : undefined
+                    }
+                    FormHelperTextProps={{
+                      sx: { color: pincodeAutoFilled && !pincodeError ? "#16a34a" : undefined, fontWeight: 600 },
+                    }}
+                    sx={fieldSx}
                   />
-                </div>
-
-                {/* Pincode / City / State */}
-                <div className="co-form-grid" style={{ marginBottom: 16 }}>
-                  <div className="co-field">
-                    <label className="co-label co-label--req" htmlFor="co-zipcode">
-                      PIN Code
-                      {pincodeLoading && <span style={{ marginLeft: 6, fontSize: "0.68rem", color: "var(--co-ink-4)" }}>⟳ Loading…</span>}
-                    </label>
-                    <input
-                      id="co-zipcode"
-                      className={`co-input${pincodeError ? " co-input--error" : ""}`}
-                      type="text"
-                      name="zipCode"
-                      value={shippingAddress.zipCode}
-                      onChange={(e) => {
-                        const val = e.target.value.replace(/\D/g, "").slice(0, 6);
-                        handleInputChange({ target: { name: "zipCode", value: val } });
-                        if (val.length < 6) { setPincodeAutoFilled(false); setPincodeError(null); }
-                      }}
-                      placeholder="6-digit PIN"
-                      required
-                      maxLength={6}
-                      inputMode="numeric"
-                      autoComplete="postal-code"
-                    />
-                    {pincodeAutoFilled && !pincodeLoading && (
-                      <span style={{ fontSize: "0.7rem", color: "var(--co-green)", fontWeight: 600 }}>✓ City &amp; state auto-filled</span>
-                    )}
-                    {pincodeError && (
-                      <span style={{ fontSize: "0.7rem", color: "var(--co-warn)" }}>⚠ {pincodeError}</span>
-                    )}
-                  </div>
-
-                  <div className="co-field">
-                    <label className="co-label co-label--req" htmlFor="co-city">
-                      City
-                      {pincodeAutoFilled && <span style={{ marginLeft: 5, fontSize: "0.64rem", color: "var(--co-green)", fontWeight: 700 }}>Auto</span>}
-                    </label>
-                    <input
-                      id="co-city"
-                      className="co-input"
-                      type="text"
-                      name="city"
-                      value={shippingAddress.city}
-                      onChange={(e) => { setPincodeAutoFilled(false); handleInputChange(e); }}
-                      placeholder="City / District"
-                      required
-                      autoComplete="address-level2"
-                      style={pincodeAutoFilled ? { background: "#f0fdf4", borderColor: "#86efac" } : undefined}
-                    />
-                  </div>
-
-                  <div className="co-field">
-                    <label className="co-label co-label--req" htmlFor="co-state">
-                      State
-                      {pincodeAutoFilled && <span style={{ marginLeft: 5, fontSize: "0.64rem", color: "var(--co-green)", fontWeight: 700 }}>Auto</span>}
-                    </label>
-                    <input
-                      id="co-state"
-                      className="co-input"
-                      type="text"
-                      name="state"
-                      value={shippingAddress.state}
-                      onChange={(e) => { setPincodeAutoFilled(false); handleInputChange(e); }}
-                      placeholder="State"
-                      required
-                      autoComplete="address-level1"
-                      style={pincodeAutoFilled ? { background: "#f0fdf4", borderColor: "#86efac" } : undefined}
-                    />
-                  </div>
-
-                  <div className="co-field">
-                    <label className="co-label" htmlFor="co-country">Country</label>
-                    <input
-                      id="co-country"
-                      className="co-input"
-                      type="text"
-                      name="country"
-                      value={shippingAddress.country}
-                      readOnly
-                      style={{ background: "var(--co-surface-2)", color: "var(--co-ink-3)", cursor: "not-allowed" }}
-                    />
-                  </div>
-                </div>
-
-                {/* Phone */}
-                <div className="co-field" style={{ marginBottom: 16 }}>
-                  <label className="co-label co-label--req" htmlFor="co-phone">
-                    Phone Number
-                    <span style={{ fontWeight: 400, color: "var(--co-ink-4)", marginLeft: 5, fontSize: "0.72rem" }}>(India · 10 digits)</span>
-                  </label>
-                  <input
-                    ref={phoneInputRef}
-                    id="co-phone"
-                    type="tel"
-                    name="phone"
-                    defaultValue={shippingAddress.phone}
-                    placeholder="9876543210"
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label={
+                      <span>
+                        City
+                        {pincodeAutoFilled && (
+                          <Chip label="Auto" size="small" color="success" sx={{ ml: 0.5, height: 16, fontSize: "0.6rem" }} />
+                        )}
+                      </span>
+                    }
+                    name="city"
+                    value={shippingAddress.city}
+                    onChange={(e) => { setPincodeAutoFilled(false); handleInputChange(e); }}
+                    placeholder="City / District"
                     required
-                    className="co-input"
-                    style={{ width: "100%" }}
-                    autoComplete="tel-national"
-                    inputMode="numeric"
+                    fullWidth
+                    autoComplete="address-level2"
+                    sx={{
+                      ...fieldSx,
+                      ...(pincodeAutoFilled ? { "& .MuiOutlinedInput-root": { bgcolor: "#f0fdf4" } } : {}),
+                    }}
                   />
-                </div>
-
-                {/* Shipping rate widget */}
-                {zoneKey && shippingCharge !== null && (
-                  <ShippingWidget
-                    zoneKey={zoneKey}
-                    weightKg={Math.max(cartWeight, 0.25)}
-                    rate={shippingCharge}
-                    dispatchBuffer={dispatchBuffer}
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label={
+                      <span>
+                        State
+                        {pincodeAutoFilled && (
+                          <Chip label="Auto" size="small" color="success" sx={{ ml: 0.5, height: 16, fontSize: "0.6rem" }} />
+                        )}
+                      </span>
+                    }
+                    name="state"
+                    value={shippingAddress.state}
+                    onChange={(e) => { setPincodeAutoFilled(false); handleInputChange(e); }}
+                    placeholder="State"
+                    required
+                    fullWidth
+                    autoComplete="address-level1"
+                    sx={{
+                      ...fieldSx,
+                      ...(pincodeAutoFilled ? { "& .MuiOutlinedInput-root": { bgcolor: "#f0fdf4" } } : {}),
+                    }}
                   />
-                )}
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Country"
+                    name="country"
+                    value={shippingAddress.country}
+                    fullWidth
+                    slotProps={{ input: { readOnly: true } }}
+                    sx={{ "& .MuiOutlinedInput-root": { bgcolor: "#f5f5f4", borderRadius: 2 } }}
+                  />
+                </Grid>
+              </Grid>
 
-                {/* Save checkbox row */}
-                <div style={{ marginBottom: 20 }}>
-                  <label className="co-check-row" htmlFor="co-save-addr">
-                    <div className={`co-check-box${saveAddressToBook ? " checked" : ""}`} aria-hidden="true">
-                      {saveAddressToBook && (
-                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                          <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      )}
-                    </div>
-                    <input
-                      id="co-save-addr"
-                      type="checkbox"
+              {/* Phone */}
+              <Box sx={{ mb: 2.5 }}>
+                <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75, color: "#44403c" }}>
+                  Phone Number{" "}
+                  <Typography component="span" variant="caption" color="text.secondary">
+                    (India · 10 digits)
+                  </Typography>
+                </Typography>
+                <input
+                  ref={phoneInputRef}
+                  id="co-phone"
+                  type="tel"
+                  name="phone"
+                  defaultValue={shippingAddress.phone}
+                  placeholder="9876543210"
+                  required
+                  autoComplete="tel-national"
+                  inputMode="numeric"
+                  style={{
+                    width: "100%",
+                    padding: "12px 14px",
+                    border: "1px solid #c4c4c4",
+                    borderRadius: 8,
+                    fontSize: "1rem",
+                    fontFamily: "inherit",
+                    outline: "none",
+                    boxSizing: "border-box",
+                    transition: "border-color 0.15s",
+                  }}
+                />
+              </Box>
+
+              {/* Shipping rate */}
+              {zoneKey && shippingCharge !== null && (
+                <ShippingWidget
+                  zoneKey={zoneKey}
+                  weightKg={Math.max(cartWeight, 0.25)}
+                  rate={shippingCharge}
+                  dispatchBuffer={dispatchBuffer}
+                />
+              )}
+
+              {/* Save checkboxes */}
+              <Box
+                sx={{
+                  mb: 2.5,
+                  p: 2,
+                  bgcolor: "#fafaf9",
+                  border: "1px solid #f0e8e2",
+                  borderRadius: 2,
+                }}
+              >
+                <FormControlLabel
+                  control={
+                    <Checkbox
                       checked={saveAddressToBook}
                       onChange={(e) => setSaveAddressToBook(e.target.checked)}
-                      style={{ position: "absolute", opacity: 0, pointerEvents: "none" }}
+                      sx={{ "&.Mui-checked": { color: "#8B1A4A" } }}
                     />
-                    <span className="co-check-lbl">Save this address to my account</span>
-                  </label>
-
-                  <label className="co-check-row" htmlFor="co-default-addr" style={{ marginTop: 10 }}>
-                    <div className={`co-check-box${shippingAddress.isDefault ? " checked" : ""}`} aria-hidden="true">
-                      {shippingAddress.isDefault && (
-                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                          <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      )}
-                    </div>
-                    <input
-                      id="co-default-addr"
-                      type="checkbox"
+                  }
+                  label={<Typography variant="body2" fontWeight={500}>Save this address to my account</Typography>}
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
                       checked={shippingAddress.isDefault}
                       onChange={(e) => setShippingAddress((prev) => ({ ...prev, isDefault: e.target.checked }))}
-                      style={{ position: "absolute", opacity: 0, pointerEvents: "none" }}
+                      sx={{ "&.Mui-checked": { color: "#8B1A4A" } }}
                     />
-                    <span className="co-check-lbl">Make this my default address</span>
-                  </label>
-                </div>
+                  }
+                  label={<Typography variant="body2" fontWeight={500}>Make this my default address</Typography>}
+                />
+              </Box>
 
-                {(error || localError) && (
-                  <div className="co-error" role="alert">⚠ {localError || error}</div>
-                )}
+              {(error || localError) && (
+                <Alert severity="error" sx={{ mb: 2.5, borderRadius: 2 }}>
+                  {localError || error}
+                </Alert>
+              )}
 
-                <div className="co-btn-row">
-                  <button type="button" className="co-back" onClick={() => setCurrentStep(1)}>
-                    <ArrowLeft size={15} /> Back
-                  </button>
-                  <button type="submit" className="co-cta" disabled={loading} style={{ flex: 1 }}>
-                    {loading ? <><DotsLoader size="sm" /> Saving…</> : <>Continue to Payment <ArrowRight size={16} /></>}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </section>
-        </div>
+              <Stack direction="row" spacing={1.5}>
+                <Button
+                  variant="outlined"
+                  startIcon={<ArrowBackIcon />}
+                  onClick={() => setCurrentStep(1)}
+                  sx={{
+                    minWidth: 100,
+                    py: 1.25,
+                    borderColor: "#e7e5e4",
+                    color: "text.secondary",
+                    borderRadius: 2,
+                    "&:hover": { borderColor: "#8B1A4A", color: "#8B1A4A" },
+                  }}
+                >
+                  Back
+                </Button>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  size="large"
+                  endIcon={loading ? <CircularProgress size={16} color="inherit" /> : <ArrowForwardIcon />}
+                  disabled={loading}
+                  sx={{
+                    flex: 1,
+                    py: 1.5,
+                    fontSize: "0.95rem",
+                    fontWeight: 700,
+                    borderRadius: 2,
+                    background: "linear-gradient(135deg, #8B1A4A, #7a1640)",
+                    boxShadow: "0 4px 14px rgba(139,26,74,0.35)",
+                    "&:hover": { background: "linear-gradient(135deg, #7a1640, #6b1236)" },
+                  }}
+                >
+                  {loading ? "Saving…" : "Continue to Payment"}
+                </Button>
+              </Stack>
+            </Box>
+          </Box>
+        </Paper>
+      </Grid>
 
-        {/* ── Sidebar: order summary ─── */}
-        <aside className="co-sidebar" aria-label="Order summary">
-          <div className="co-summary">
-            <div className="co-summary-head">
-              <p className="co-summary-head-title">Order Summary</p>
-              <p className="co-summary-head-sub">{cartItems.length} item{cartItems.length !== 1 ? "s" : ""}</p>
-            </div>
+      {/* Sidebar: order summary */}
+      <Grid item xs={12} md={4}>
+        <Paper
+          elevation={0}
+          sx={{
+            border: "1px solid #f0e8e2",
+            borderRadius: 3,
+            overflow: "hidden",
+            position: { md: "sticky" },
+            top: { md: 80 },
+            boxShadow: "0 4px 24px rgba(139,26,74,0.10)",
+          }}
+        >
+          {/* Rose gradient header */}
+          <Box
+            sx={{
+              px: 3,
+              py: 2.5,
+              background: "linear-gradient(135deg, #8B1A4A 0%, #7a1640 100%)",
+            }}
+          >
+            <Typography variant="subtitle1" fontWeight={700} sx={{ color: "white", mb: 0.25 }}>
+              Order Summary
+            </Typography>
+            <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.7)" }}>
+              {cartItems.length} item{cartItems.length !== 1 ? "s" : ""}
+            </Typography>
+          </Box>
 
-            <div className="co-summary-body">
+          <Box sx={{ p: 2.5 }}>
+            <Stack spacing={1.5} sx={{ mb: 2.5 }}>
               {cartItems.slice(0, 3).map((item) => (
-                <div key={item.product._id} className="co-summary-item">
+                <Stack key={item.product._id} direction="row" alignItems="center" spacing={1.25}>
                   <ProductThumb product={item.product} size="xs" />
-                  <div className="co-summary-item-info">
-                    <p className="co-summary-item-name">{item.product.name}</p>
-                    <p className="co-summary-item-qty">Qty: {item.quantity}</p>
-                  </div>
-                  <span className="co-summary-item-price">₹{item.totalPrice}</span>
-                </div>
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography variant="caption" fontWeight={600} noWrap display="block">
+                      {item.product.name}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">Qty: {item.quantity}</Typography>
+                  </Box>
+                  <Typography variant="caption" fontWeight={700}>₹{item.totalPrice}</Typography>
+                </Stack>
               ))}
               {cartItems.length > 3 && (
-                <p className="co-summary-more">+{cartItems.length - 3} more items</p>
+                <Typography variant="caption" color="text.secondary">
+                  +{cartItems.length - 3} more items
+                </Typography>
               )}
+            </Stack>
 
-              <hr className="co-divider" />
+            <Divider sx={{ borderColor: "#f0e8e2", mb: 2 }} />
 
-              <div className="co-price-row">
-                <span className="co-price-label">Subtotal</span>
-                <span className="co-price-val">₹{subtotal.toFixed(2)}</span>
-              </div>
-
+            <Stack spacing={1.25}>
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2" color="text.secondary">Subtotal</Typography>
+                <Typography variant="body2" fontWeight={600}>₹{subtotal.toFixed(2)}</Typography>
+              </Stack>
               {shippingRate ? (
-                <div className="co-price-row">
-                  <div>
-                    <span className="co-price-label">Shipping</span>
-                    {zoneKey && <p style={{ fontSize: "0.68rem", color: "var(--co-ink-4)", margin: "1px 0 0" }}>{ROAD_ZONES[zoneKey]?.label}</p>}
-                  </div>
-                  <span className={`co-price-val${shippingRate.rate === 0 ? " co-price-row--discount" : ""}`}>
-                    {shippingRate.rate === 0
-                      ? <><span className="co-free-badge">FREE</span></>
-                      : `₹${shippingRate.rate}`}
-                  </span>
-                </div>
+                <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                  <Box>
+                    <Typography variant="body2" color="text.secondary">Shipping</Typography>
+                    {zoneKey && (
+                      <Typography variant="caption" color="text.secondary">{ROAD_ZONES[zoneKey]?.label}</Typography>
+                    )}
+                  </Box>
+                  {shippingRate.rate === 0 ? (
+                    <Chip label="FREE" size="small" color="success" sx={{ height: 20 }} />
+                  ) : (
+                    <Typography variant="body2" fontWeight={600}>₹{shippingRate.rate}</Typography>
+                  )}
+                </Stack>
               ) : (
-                <div className="co-price-row">
-                  <span className="co-price-label">Shipping</span>
-                  <span style={{ fontSize: "0.75rem", color: "var(--co-ink-4)" }}>Enter state to calculate</span>
-                </div>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography variant="body2" color="text.secondary">Shipping</Typography>
+                  <Typography variant="caption" sx={{ color: "#8B1A4A", fontStyle: "italic" }}>
+                    Enter PIN to calculate
+                  </Typography>
+                </Stack>
               )}
+            </Stack>
 
-              <div className="co-price-row co-price-row--total">
-                <span className="co-total-label">Total</span>
-                <span className="co-total-val">₹{displayTotal.toFixed(2)}</span>
-              </div>
-            </div>
+            <Divider sx={{ borderColor: "#f0e8e2", my: 2 }} />
 
-            <div className="co-trust" aria-label="Trust indicators">
-              <div className="co-trust-item"><span className="co-trust-icon">🔒</span>Secure</div>
-              <div className="co-trust-item"><span className="co-trust-icon">🚚</span>Tracked</div>
-              <div className="co-trust-item"><span className="co-trust-icon">↩</span>Returns</div>
-            </div>
-          </div>
-        </aside>
-      </div>
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Typography variant="subtitle1" fontWeight={700}>Total</Typography>
+              <Typography variant="h6" fontWeight={800} sx={{ color: "#8B1A4A" }}>
+                ₹{displayTotal.toFixed(2)}
+              </Typography>
+            </Stack>
+          </Box>
 
-      {/* ── Mobile sticky bar ─── */}
-      <div className="co-sticky-bar">
-        <div className="co-sticky-total">
-          <p className="co-sticky-lbl">Order Total</p>
-          <p className="co-sticky-amount">₹{displayTotal.toFixed(2)}</p>
-        </div>
-        <button type="button" className="co-cta" onClick={handleSubmit} disabled={loading}>
-          {loading ? <DotsLoader size="sm" /> : <>Continue <ArrowRight size={15} /></>}
-        </button>
-      </div>
-    </>
+          <Box sx={{ borderTop: "1px solid #f0e8e2", bgcolor: "#fafaf9", px: 2.5, py: 2 }}>
+            <Stack direction="row" justifyContent="space-around">
+              {["🔒 Secure", "🚚 Tracked", "↩ Returns"].map((t) => (
+                <Typography key={t} variant="caption" color="text.secondary" sx={{ fontSize: "0.72rem" }}>
+                  {t}
+                </Typography>
+              ))}
+            </Stack>
+          </Box>
+        </Paper>
+      </Grid>
+    </Grid>
   );
 };

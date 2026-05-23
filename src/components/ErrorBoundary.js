@@ -1,5 +1,11 @@
 import React, { Component } from "react";
-import { Container, Button, Alert, Card } from "react-bootstrap";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
+import Stack from "@mui/material/Stack";
 import {
   FiAlertTriangle,
   FiRefreshCw,
@@ -86,143 +92,80 @@ class ErrorBoundary extends Component {
 
       // Default error UI based on level
       if (level === "component") {
-        // Compact error for individual components
         return (
-          <Alert variant="danger" className="m-2">
-            <div className="d-flex align-items-center justify-content-between">
-              <div className="d-flex align-items-center">
-                <FiAlertTriangle size={20} className="me-2" />
-                <span>Something went wrong loading this section.</span>
-              </div>
-              <Button
-                variant="outline-danger"
-                size="sm"
-                onClick={this.handleRetry}
-              >
-                <FiRefreshCw size={14} className="me-1" />
+          <Alert severity="error" sx={{ m: 1, borderRadius: 2 }}
+            action={
+              <Button color="error" size="small" onClick={this.handleRetry}
+                startIcon={<FiRefreshCw size={14} />}>
                 Retry
               </Button>
-            </div>
+            }
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <FiAlertTriangle size={18} />
+              Something went wrong loading this section.
+            </Box>
           </Alert>
         );
       }
 
-      // Full-page error UI
       return (
-        <Container
-          className="d-flex flex-column justify-content-center align-items-center"
-          style={{ minHeight: "70vh", padding: "2rem" }}
-        >
-          <Card
-            className="text-center shadow-lg border-0"
-            style={{ maxWidth: "600px", width: "100%" }}
-          >
-            <Card.Body className="p-5">
-              <div
-                className="mb-4"
-                style={{
-                  width: "80px",
-                  height: "80px",
-                  borderRadius: "50%",
-                  background:
-                    "linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  margin: "0 auto",
-                }}
-              >
+        <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center",
+            alignItems: "center", minHeight: "70vh", p: 4 }}>
+          <Card sx={{ maxWidth: 600, width: "100%", textAlign: "center",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.12)", border: "none" }}>
+            <CardContent sx={{ p: 5 }}>
+              <Box sx={{ width: 80, height: 80, borderRadius: "50%",
+                  background: "linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  mx: "auto", mb: 3 }}>
                 <FiAlertTriangle size={40} color="white" />
-              </div>
+              </Box>
 
-              <h2 className="mb-3" style={{ color: "#2d3436" }}>
+              <Typography variant="h5" fontWeight={700} sx={{ mb: 1.5, color: "#1e293b" }}>
                 Oops! Something went wrong
-              </h2>
+              </Typography>
 
-              <p className="text-muted mb-4">
+              <Typography color="text.secondary" sx={{ mb: 4 }}>
                 We're sorry, but something unexpected happened. Don't worry, our
                 team has been notified and we're working to fix it.
-              </p>
+              </Typography>
 
-              <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center mb-4">
-                <Button
-                  variant="primary"
-                  onClick={this.handleRetry}
-                  className="d-flex align-items-center justify-content-center"
-                >
-                  <FiRefreshCw size={18} className="me-2" />
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={2} justifyContent="center" sx={{ mb: 3 }}>
+                <Button variant="contained" color="primary" onClick={this.handleRetry}
+                  startIcon={<FiRefreshCw size={18} />}>
                   Try Again
                 </Button>
-                <Button
-                  variant="outline-secondary"
-                  onClick={this.handleGoHome}
-                  className="d-flex align-items-center justify-content-center"
-                >
-                  <FiHome size={18} className="me-2" />
+                <Button variant="outlined" color="inherit" onClick={this.handleGoHome}
+                  startIcon={<FiHome size={18} />}>
                   Go to Home
                 </Button>
-                <Button
-                  variant="outline-secondary"
-                  onClick={this.handleRefreshPage}
-                  className="d-flex align-items-center justify-content-center"
-                >
-                  <FiRefreshCw size={18} className="me-2" />
+                <Button variant="outlined" color="inherit" onClick={this.handleRefreshPage}
+                  startIcon={<FiRefreshCw size={18} />}>
                   Refresh Page
                 </Button>
-              </div>
+              </Stack>
 
-              {/* Error details (collapsible, for debugging) */}
               {process.env.NODE_ENV === "development" && error && (
-                <div className="mt-4">
-                  <Button
-                    variant="link"
-                    onClick={this.toggleDetails}
-                    className="text-muted p-0 d-flex align-items-center mx-auto"
-                    style={{ fontSize: "0.875rem" }}
-                  >
-                    {showDetails ? (
-                      <>
-                        <FiChevronUp size={16} className="me-1" />
-                        Hide Error Details
-                      </>
-                    ) : (
-                      <>
-                        <FiChevronDown size={16} className="me-1" />
-                        Show Error Details
-                      </>
-                    )}
+                <Box sx={{ mt: 3 }}>
+                  <Button variant="text" onClick={this.toggleDetails} size="small"
+                    sx={{ color: "text.secondary", fontSize: "0.875rem" }}
+                    startIcon={showDetails ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}>
+                    {showDetails ? "Hide Error Details" : "Show Error Details"}
                   </Button>
-
                   {showDetails && (
-                    <Alert
-                      variant="light"
-                      className="mt-3 text-start"
-                      style={{
-                        maxHeight: "200px",
-                        overflow: "auto",
-                        fontSize: "0.75rem",
-                        fontFamily: "monospace",
-                      }}
-                    >
-                      <strong>Error:</strong>
-                      <pre className="mb-2" style={{ whiteSpace: "pre-wrap" }}>
-                        {error.toString()}
-                      </pre>
-                      {errorInfo && (
-                        <>
-                          <strong>Component Stack:</strong>
-                          <pre style={{ whiteSpace: "pre-wrap" }}>
-                            {errorInfo.componentStack}
-                          </pre>
-                        </>
-                      )}
+                    <Alert severity="info" sx={{ mt: 2, textAlign: "left",
+                        maxHeight: 200, overflow: "auto",
+                        "& pre": { fontSize: "0.75rem", fontFamily: "monospace", whiteSpace: "pre-wrap", m: 0 } }}>
+                      <pre>{error.toString()}</pre>
+                      {errorInfo && <pre>{errorInfo.componentStack}</pre>}
                     </Alert>
                   )}
-                </div>
+                </Box>
               )}
-            </Card.Body>
+            </CardContent>
           </Card>
-        </Container>
+        </Box>
       );
     }
 

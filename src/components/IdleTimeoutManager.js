@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Modal } from "react-bootstrap";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
 import { FiClock, FiLogOut, FiRefreshCw } from "react-icons/fi";
 import { autoLogout } from "../features/authSlice";
 import useIdleTimeout from "../hooks/useIdleTimeout";
@@ -111,14 +117,15 @@ const IdleTimeoutManager = () => {
     <>
       {/* Pre-warning notification */}
       {showPreWarning && (
-        <div
-          style={{
+        <Box
+          onClick={() => setShowPreWarning(false)}
+          sx={{
             position: "fixed",
             top: "20px",
             right: "20px",
             background: "linear-gradient(135deg, #ffa726 0%, #ff9800 100%)",
             color: "white",
-            padding: "16px 20px",
+            p: "16px 20px",
             borderRadius: "15px",
             fontSize: "14px",
             fontWeight: "600",
@@ -129,285 +136,348 @@ const IdleTimeoutManager = () => {
             animation: "slideIn 0.3s ease-out",
             cursor: "pointer",
             transition: "all 0.3s ease",
-          }}
-          onClick={() => setShowPreWarning(false)}
-          onMouseEnter={(e) => {
-            e.target.style.transform = "translateY(-2px)";
-            e.target.style.boxShadow = "0 12px 35px rgba(255, 167, 38, 0.5)";
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.transform = "translateY(0)";
-            e.target.style.boxShadow = "0 8px 25px rgba(255, 167, 38, 0.4)";
+            "&:hover": {
+              transform: "translateY(-2px)",
+              boxShadow: "0 12px 35px rgba(255, 167, 38, 0.5)",
+            },
           }}
         >
-          <div className="d-flex align-items-center">
-            <FiClock className="me-2" size={18} />
-            <div>
-              <div style={{ fontSize: "13px", fontWeight: "700" }}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <FiClock size={18} style={{ marginRight: 8 }} />
+            <Box>
+              <Box sx={{ fontSize: "13px", fontWeight: "700" }}>
                 Session Warning
-              </div>
-              <div style={{ fontSize: "12px", opacity: 0.9 }}>
+              </Box>
+              <Box sx={{ fontSize: "12px", opacity: 0.9 }}>
                 Your session will expire soon. Stay active!
-              </div>
-            </div>
-          </div>
-        </div>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
       )}
 
       {/* Warning Modal */}
-      <Modal
-        show={showWarning}
-        backdrop="static"
-        keyboard={false}
-        centered
-        size="md"
-        className="idle-timeout-modal"
-      >
-        <div
-          className="modal-content border-0 shadow-lg overflow-hidden"
-          style={{
+      <Dialog
+        open={showWarning}
+        disableEscapeKeyDown
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
             borderRadius: "25px",
+            overflow: "hidden",
             background: "linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)",
-          }}
-        >
-          {/* Gradient Header */}
-          <Modal.Header
-            className="border-0 text-white position-relative"
-            style={{
+          },
+        }}
+      >
+        {/* Gradient Header */}
+        <DialogTitle sx={{ p: 0 }}>
+          <Box
+            sx={{
               background:
-                "linear-gradient(135deg, #dc2626 0%, #ea580c 50%, #d97706 100%)",
-              padding: "25px 30px",
+                "linear-gradient(135deg, #8B1A4A 0%, #C9A84C 100%)",
+              p: "25px 30px",
               borderRadius: "25px 25px 0 0",
+              color: "white",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <Modal.Title
-              className="d-flex align-items-center w-100 justify-content-center"
-              style={{ fontSize: "1.4rem", fontWeight: "700" }}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "1.4rem",
+                fontWeight: "700",
+              }}
             >
-              <div
-                className="d-flex align-items-center justify-content-center me-3"
-                style={{
+              <Box
+                sx={{
                   width: "50px",
                   height: "50px",
                   background: "rgba(255,255,255,0.2)",
                   borderRadius: "15px",
                   border: "2px solid rgba(255,255,255,0.3)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  mr: 2,
                 }}
               >
-                <FiClock size={24} className="text-white" />
-              </div>
-              <div className="text-center">
-                <div>Session Timeout Warning</div>
-                <small
-                  className="opacity-75"
-                  style={{ fontSize: "0.9rem", fontWeight: "400" }}
+                <FiClock size={24} color="white" />
+              </Box>
+              <Box sx={{ textAlign: "center" }}>
+                <Box>Session Timeout Warning</Box>
+                <Box
+                  component="small"
+                  sx={{ fontSize: "0.9rem", fontWeight: "400", opacity: 0.75 }}
                 >
                   Action Required
-                </small>
-              </div>
-            </Modal.Title>
-          </Modal.Header>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </DialogTitle>
 
-          <Modal.Body className="text-center" style={{ padding: "40px 35px" }}>
-            {/* Main Content Card */}
-            <div
-              className="p-4 mb-4"
-              style={{
-                background: "linear-gradient(135deg, #fff5f5 0%, #ffebee 100%)",
-                borderRadius: "20px",
-                border: "1px solid rgba(255, 107, 107, 0.1)",
-                boxShadow: "0 8px 25px rgba(255, 107, 107, 0.1)",
+        <DialogContent sx={{ p: "40px 35px", textAlign: "center" }}>
+          {/* Main Content Card */}
+          <Box
+            sx={{
+              p: 4,
+              mb: 4,
+              background:
+                "linear-gradient(135deg, #fff5f5 0%, #ffebee 100%)",
+              borderRadius: "20px",
+              border: "1px solid rgba(139, 26, 74, 0.1)",
+              boxShadow: "0 8px 25px rgba(139, 26, 74, 0.08)",
+            }}
+          >
+            {/* Timer Circle */}
+            <Box
+              sx={{
+                mx: "auto",
+                mb: 4,
+                width: "120px",
+                height: "120px",
+                background:
+                  "linear-gradient(135deg, #8B1A4A 0%, #C9A84C 100%)",
+                borderRadius: "50%",
+                boxShadow: "0 10px 30px rgba(139, 26, 74, 0.3)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
               }}
             >
-              {/* Timer Circle */}
-              <div
-                className="mx-auto mb-4 d-flex align-items-center justify-content-center position-relative"
-                style={{
-                  width: "120px",
-                  height: "120px",
-                  background:
-                    "linear-gradient(135deg, #dc2626 0%, #f87171 100%)",
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "white",
+                  width: "100px",
+                  height: "100px",
+                  background: "rgba(255,255,255,0.1)",
                   borderRadius: "50%",
-                  boxShadow: "0 10px 30px rgba(220, 38, 38, 0.3)",
+                  border: "2px solid rgba(255,255,255,0.2)",
+                  fontSize: "2rem",
+                  fontWeight: "700",
                 }}
               >
-                <div
-                  className="d-flex align-items-center justify-content-center text-white"
-                  style={{
-                    width: "100px",
-                    height: "100px",
-                    background: "rgba(255,255,255,0.1)",
-                    borderRadius: "50%",
-                    border: "2px solid rgba(255,255,255,0.2)",
-                    fontSize: "2rem",
-                    fontWeight: "700",
-                  }}
-                >
-                  {countdown}
-                </div>
+                {countdown}
+              </Box>
 
-                {/* Animated ring */}
-                <svg
-                  className="position-absolute"
-                  width="140"
-                  height="140"
-                  style={{ top: "-10px", left: "-10px" }}
-                >
-                  <circle
-                    cx="70"
-                    cy="70"
-                    r="60"
-                    fill="transparent"
-                    stroke="rgba(255,255,255,0.3)"
-                    strokeWidth="3"
-                  />
-                  <circle
-                    cx="70"
-                    cy="70"
-                    r="60"
-                    fill="transparent"
-                    stroke="#ffffff"
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                    strokeDasharray={`${2 * Math.PI * 60}`}
-                    strokeDashoffset={`${2 * Math.PI * 60 * (1 - countdown / (IDLE_TIMEOUT_CONFIG.WARNING_TIME / 1000))}`}
-                    style={{
-                      transform: "rotate(-90deg)",
-                      transformOrigin: "70px 70px",
-                      transition: "stroke-dashoffset 1s ease",
-                    }}
-                  />
-                </svg>
-              </div>
-
-              <h5
-                className="fw-bold text-dark mb-3"
-                style={{ fontSize: "1.3rem" }}
+              {/* Animated ring */}
+              <svg
+                style={{ position: "absolute", top: "-10px", left: "-10px" }}
+                width="140"
+                height="140"
               >
-                Your session will expire in{" "}
-                <span className="text-danger">{countdown}</span> seconds
-              </h5>
-
-              {/* Progress bar with gradient */}
-              <div
-                className="mb-4"
-                style={{
-                  background: "#f1f3f4",
-                  borderRadius: "15px",
-                  height: "12px",
-                  overflow: "hidden",
-                  boxShadow: "inset 0 2px 4px rgba(0,0,0,0.1)",
-                }}
-              >
-                <div
-                  className="h-100"
+                <circle
+                  cx="70"
+                  cy="70"
+                  r="60"
+                  fill="transparent"
+                  stroke="rgba(255,255,255,0.3)"
+                  strokeWidth="3"
+                />
+                <circle
+                  cx="70"
+                  cy="70"
+                  r="60"
+                  fill="transparent"
+                  stroke="#ffffff"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  strokeDasharray={`${2 * Math.PI * 60}`}
+                  strokeDashoffset={`${2 * Math.PI * 60 * (1 - countdown / (IDLE_TIMEOUT_CONFIG.WARNING_TIME / 1000))}`}
                   style={{
-                    width: `${(countdown / (IDLE_TIMEOUT_CONFIG.WARNING_TIME / 1000)) * 100}%`,
-                    background:
-                      countdown > 5
-                        ? "linear-gradient(90deg, #dc2626 0%, #f87171 100%)"
-                        : "linear-gradient(90deg, #991b1b 0%, #7f1d1d 100%)",
-                    borderRadius: "15px",
-                    transition: "all 1s ease",
-                    boxShadow: "0 2px 8px rgba(220, 38, 38, 0.4)",
+                    transform: "rotate(-90deg)",
+                    transformOrigin: "70px 70px",
+                    transition: "stroke-dashoffset 1s ease",
                   }}
                 />
-              </div>
+              </svg>
+            </Box>
 
-              <p
-                className="text-muted mb-0"
-                style={{ fontSize: "1rem", lineHeight: "1.5" }}
-              >
-                <FiClock className="me-2" />
-                You've been inactive for too long. Please choose an action below
-                to continue your session.
-              </p>
-            </div>
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 700, color: "#2C2C2C", mb: 3, fontSize: "1.3rem" }}
+            >
+              Your session will expire in{" "}
+              <Box component="span" sx={{ color: "#8B1A4A" }}>
+                {countdown}
+              </Box>{" "}
+              seconds
+            </Typography>
 
-            {/* Security Notice */}
-            <div
-              className="d-flex align-items-center justify-content-center p-3 mb-3"
-              style={{
-                background: "linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%)",
+            {/* Progress bar */}
+            <Box
+              sx={{
+                mb: 4,
+                background: "#f1f3f4",
                 borderRadius: "15px",
-                border: "1px solid rgba(37, 99, 235, 0.1)",
+                height: "12px",
+                overflow: "hidden",
+                boxShadow: "inset 0 2px 4px rgba(0,0,0,0.1)",
               }}
             >
-              <div
-                className="me-3 d-flex align-items-center justify-content-center"
-                style={{
-                  width: "40px",
-                  height: "40px",
+              <Box
+                sx={{
+                  height: "100%",
+                  width: `${(countdown / (IDLE_TIMEOUT_CONFIG.WARNING_TIME / 1000)) * 100}%`,
                   background:
-                    "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
-                  borderRadius: "10px",
-                  color: "white",
+                    countdown > 5
+                      ? "linear-gradient(90deg, #8B1A4A 0%, #C9A84C 100%)"
+                      : "linear-gradient(90deg, #5c0f30 0%, #8B1A4A 100%)",
+                  borderRadius: "15px",
+                  transition: "all 1s ease",
+                  boxShadow: "0 2px 8px rgba(139, 26, 74, 0.4)",
                 }}
-              >
-                <FiClock size={20} />
-              </div>
-              <div>
-                <div className="fw-semibold text-dark mb-1">
-                  Security Feature
-                </div>
-                <small className="text-muted">
-                  This timeout helps protect your account from unauthorized
-                  access
-                </small>
-              </div>
-            </div>
-          </Modal.Body>
+              />
+            </Box>
 
-          <Modal.Footer
-            className="border-0 d-flex justify-content-center gap-3"
-            style={{ padding: "25px 35px 35px" }}
+            <Typography
+              variant="body1"
+              sx={{
+                color: "text.secondary",
+                fontSize: "1rem",
+                lineHeight: 1.5,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 1,
+              }}
+            >
+              <FiClock />
+              You've been inactive for too long. Please choose an action below
+              to continue your session.
+            </Typography>
+          </Box>
+
+          {/* Security Notice */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              p: 3,
+              mb: 3,
+              background:
+                "linear-gradient(135deg, #FDF6EC 0%, #f0fdf4 100%)",
+              borderRadius: "15px",
+              border: "1px solid rgba(201, 168, 76, 0.2)",
+            }}
           >
-            <button
-              onClick={handleLogoutNow}
-              className="ics-btn ics-btn--secondary"
-              style={{ minWidth: "140px" }}
+            <Box
+              sx={{
+                width: "40px",
+                height: "40px",
+                background:
+                  "linear-gradient(135deg, #8B1A4A 0%, #C9A84C 100%)",
+                borderRadius: "10px",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mr: 2,
+                flexShrink: 0,
+              }}
             >
-              <FiLogOut className="me-2" />
-              Logout Now
-            </button>
+              <FiClock size={20} />
+            </Box>
+            <Box>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 600, color: "#2C2C2C", mb: 0.5 }}
+              >
+                Security Feature
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                This timeout helps protect your account from unauthorized
+                access
+              </Typography>
+            </Box>
+          </Box>
+        </DialogContent>
 
-            <button
-              onClick={handleStayLoggedIn}
-              className="ics-btn ics-btn--primary"
-              style={{ minWidth: "160px" }}
-            >
-              <FiRefreshCw className="me-2" />
-              Stay Logged In
-            </button>
-          </Modal.Footer>
-        </div>
-      </Modal>
+        <DialogActions
+          sx={{
+            p: "25px 35px 35px",
+            borderTop: "none",
+            justifyContent: "center",
+            gap: 2,
+          }}
+        >
+          <Button
+            onClick={handleLogoutNow}
+            variant="outlined"
+            startIcon={<FiLogOut />}
+            sx={{
+              minWidth: "140px",
+              borderColor: "#8B1A4A",
+              color: "#8B1A4A",
+              borderRadius: "12px",
+              fontWeight: 600,
+              "&:hover": {
+                borderColor: "#5c0f30",
+                backgroundColor: "rgba(139,26,74,0.05)",
+              },
+            }}
+          >
+            Logout Now
+          </Button>
+
+          <Button
+            onClick={handleStayLoggedIn}
+            variant="contained"
+            startIcon={<FiRefreshCw />}
+            sx={{
+              minWidth: "160px",
+              background: "linear-gradient(135deg, #8B1A4A 0%, #C9A84C 100%)",
+              borderRadius: "12px",
+              fontWeight: 600,
+              color: "white",
+              "&:hover": {
+                background:
+                  "linear-gradient(135deg, #5c0f30 0%, #a8882e 100%)",
+              },
+            }}
+          >
+            Stay Logged In
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Development indicator (remove in production) */}
       {IDLE_TIMEOUT_CONFIG.DEBUG_MODE && (
-        <div
-          style={{
+        <Box
+          sx={{
             position: "fixed",
             bottom: "20px",
             right: "20px",
-            background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+            background:
+              "linear-gradient(135deg, #8B1A4A 0%, #C9A84C 100%)",
             color: "white",
-            padding: "12px 16px",
+            p: "12px 16px",
             borderRadius: "15px",
             fontSize: "13px",
             fontWeight: "600",
             zIndex: 9999,
             fontFamily: "system-ui, -apple-system, sans-serif",
-            boxShadow: "0 8px 25px rgba(37, 99, 235, 0.3)",
+            boxShadow: "0 8px 25px rgba(139, 26, 74, 0.3)",
             border: "1px solid rgba(255,255,255,0.2)",
             backdropFilter: "blur(10px)",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
           }}
         >
-          <div className="d-flex align-items-center">
-            <FiClock className="me-2" size={16} />
-            <span>Debug: {Math.ceil(getRemainingTime() / 1000)}s</span>
-          </div>
-        </div>
+          <FiClock size={16} />
+          <span>Debug: {Math.ceil(getRemainingTime() / 1000)}s</span>
+        </Box>
       )}
     </>
   );

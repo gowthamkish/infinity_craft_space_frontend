@@ -3,39 +3,145 @@ import { useNavigate } from "react-router-dom";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 import api from "../api/axios";
 import { ToastContext } from "../context/ToastContext";
-import "./auth.css";
-import "./reset.css";
+import {
+  Box,
+  Button,
+  TextField,
+  Alert,
+  Typography,
+  Link,
+  IconButton,
+  InputAdornment,
+  CircularProgress,
+} from "@mui/material";
+import { FiEye, FiEyeOff, FiCheck } from "react-icons/fi";
 
+// ── Brand panel ──────────────────────────────────────────────────────────────
+function BrandPanel({ title, subtitle, perks }) {
+  return (
+    <Box
+      aria-hidden="true"
+      sx={{
+        display: { xs: "none", lg: "flex" },
+        flex: "0 0 420px",
+        background: "linear-gradient(135deg, #3D1A2A 0%, #5C2038 45%, #6b1238 100%)",
+        alignItems: "center",
+        justifyContent: "center",
+        p: "3rem 2.5rem",
+        position: "relative",
+        overflow: "hidden",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(ellipse at 30% 80%, rgba(201,168,76,0.20) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(244,167,185,0.18) 0%, transparent 50%)",
+        },
+      }}
+    >
+      <Box sx={{ position: "relative", zIndex: 1, color: "white" }}>
+        <Box
+          component="img"
+          src="/ICS_Logo.jpeg"
+          alt="Infinity Craft Space"
+          sx={{ width: 80, height: 80, borderRadius: "20px", objectFit: "cover", mb: 2.5, boxShadow: "0 8px 32px rgba(0,0,0,0.35)" }}
+        />
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 800, mb: 0.75,
+            background: "linear-gradient(135deg, #fff 0%, #F4A7B9 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}
+        >
+          {title}
+        </Typography>
+        <Typography sx={{ color: "rgba(255,255,255,0.70)", mb: 3, fontSize: "0.9375rem", lineHeight: 1.5 }}>
+          {subtitle}
+        </Typography>
+        <Box component="ul" sx={{ listStyle: "none", p: 0, m: 0, display: "flex", flexDirection: "column", gap: 1.5 }}>
+          {perks.map(({ icon, text }) => (
+            <Box component="li" key={text} sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <Box
+                sx={{
+                  width: 36, height: 36, borderRadius: "10px",
+                  background: "rgba(255,255,255,0.10)", backdropFilter: "blur(4px)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "1rem", flexShrink: 0,
+                }}
+              >
+                {icon}
+              </Box>
+              <Typography sx={{ color: "rgba(255,255,255,0.85)", fontSize: "0.9375rem" }}>
+                {text}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+
+// ── Step bar ─────────────────────────────────────────────────────────────────
 const STEPS = ["Identify", "Verify", "Reset"];
 
 function StepBar({ current }) {
   return (
-    <div className="reset-steps" aria-label="Progress">
+    <Box aria-label="Progress" sx={{ display: "flex", alignItems: "center", mb: 3 }}>
       {STEPS.map((label, i) => {
-        const state = i < current ? "done" : i === current ? "active" : "";
+        const done = i < current;
+        const active = i === current;
         return (
-          <div key={label} style={{ display: "flex", alignItems: "center" }}>
-            <div className="reset-step">
-              <div className={`reset-step-circle reset-step-circle--${state || "idle"}`}>
-                {i < current ? (
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                ) : i + 1}
-              </div>
-              <span className={`reset-step-label reset-step-label--${state || "idle"}`}>{label}</span>
-            </div>
+          <Box key={label} sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.5 }}>
+              <Box
+                sx={{
+                  width: 32, height: 32, borderRadius: "50%",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontWeight: 700, fontSize: "0.85rem",
+                  background: done
+                    ? "linear-gradient(135deg,#10b981,#059669)"
+                    : active
+                    ? "linear-gradient(135deg,#8B1A4A,#6b1238)"
+                    : "#e5e7eb",
+                  color: done || active ? "white" : "#9ca3af",
+                  transition: "all 0.25s",
+                }}
+              >
+                {done ? <FiCheck size={14} /> : i + 1}
+              </Box>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 600,
+                  color: done ? "#059669" : active ? "#6b1238" : "#9ca3af",
+                  fontSize: "0.72rem",
+                }}
+              >
+                {label}
+              </Typography>
+            </Box>
             {i < STEPS.length - 1 && (
-              <div className={`reset-step-connector ${i < current ? "reset-step-connector--done" : ""}`} />
+              <Box
+                sx={{
+                  width: 40, height: 2, mx: 0.5, mb: 2.5,
+                  bgcolor: done ? "#10b981" : "#e5e7eb",
+                  borderRadius: 1,
+                  transition: "background-color 0.25s",
+                }}
+              />
             )}
-          </div>
+          </Box>
         );
       })}
-    </div>
+    </Box>
   );
 }
 
-// ── Password strength analyser ──────────────────────────────────────────────
+// ── Password strength analyser ───────────────────────────────────────────────
 function analysePassword(pw) {
   const reqs = [
     { label: "At least 8 characters",           met: pw.length >= 8 },
@@ -53,36 +159,64 @@ function analysePassword(pw) {
   return { reqs, score, level };
 }
 
+const STRENGTH_META = {
+  weak:   { color: "#ef4444", label: "Weak",   pct: "20%" },
+  fair:   { color: "#f59e0b", label: "Fair",   pct: "40%" },
+  good:   { color: "#3b82f6", label: "Good",   pct: "70%" },
+  strong: { color: "#10b981", label: "Strong", pct: "100%" },
+};
+
 function PasswordStrength({ password }) {
   if (!password) return null;
   const { reqs, score, level } = analysePassword(password);
-  const labels = { weak: "Weak", fair: "Fair", good: "Good", strong: "Strong" };
+  const meta = STRENGTH_META[level];
   return (
-    <div className="pw-strength">
-      <div className="pw-strength-bars">
+    <Box sx={{ mt: 1, mb: 1.5 }}>
+      {/* Segmented bars */}
+      <Box sx={{ display: "flex", gap: 0.5, mb: 0.75 }}>
         {[0, 1, 2, 3, 4].map((i) => (
-          <div
+          <Box
             key={i}
-            className={`pw-strength-bar ${i < score ? `pw-strength-bar--${level}` : ""}`}
+            sx={{
+              flex: 1, height: 4, borderRadius: 1,
+              bgcolor: i < score ? meta.color : "#e5e7eb",
+              transition: "background-color 300ms ease",
+            }}
           />
         ))}
-      </div>
-      <span className={`pw-strength-label pw-strength-label--${level}`}>
-        Password strength: {labels[level]}
-      </span>
-      <ul className="pw-requirements">
+      </Box>
+      <Typography variant="caption" sx={{ color: meta.color, fontWeight: 500 }}>
+        Password strength: {meta.label}
+      </Typography>
+      {/* Requirements list */}
+      <Box
+        component="ul"
+        sx={{
+          listStyle: "none", p: 1.25, m: 0, mt: 1,
+          bgcolor: "grey.50", borderRadius: 2, border: "1px solid", borderColor: "divider",
+          display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.3rem 0.5rem",
+        }}
+      >
         {reqs.map((r) => (
-          <li key={r.label} className={`pw-req ${r.met ? "pw-req--met" : ""}`}>
-            <span className="pw-req-dot" />
-            {r.label}
-          </li>
+          <Box component="li" key={r.label} sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <Box
+              sx={{
+                width: 10, height: 10, borderRadius: "50%",
+                bgcolor: r.met ? "#10b981" : "#e5e7eb",
+                flexShrink: 0, transition: "background-color 200ms ease",
+              }}
+            />
+            <Typography variant="caption" sx={{ color: r.met ? "#10b981" : "text.secondary", fontSize: "0.7rem" }}>
+              {r.label}
+            </Typography>
+          </Box>
         ))}
-      </ul>
-    </div>
+      </Box>
+    </Box>
   );
 }
 
-// ── Main component ──────────────────────────────────────────────────────────
+// ── ResetPassword page ────────────────────────────────────────────────────────
 export default function ResetPassword() {
   const navigate = useNavigate();
   const { addSuccess } = useContext(ToastContext);
@@ -115,14 +249,18 @@ export default function ResetPassword() {
         newPassword,
       });
       sessionStorage.removeItem("reset_rtoken");
-      addSuccess("Your password has been reset. Please sign in with your new password.", "Password Reset Successful", { duration: 6000 });
+      addSuccess(
+        "Your password has been reset. Please sign in with your new password.",
+        "Password Reset Successful",
+        { duration: 6000 },
+      );
       navigate("/login");
     } catch (err) {
       setError(
         err.response?.data?.error ||
           (err.response?.status === 429
             ? "Too many attempts. Please try again later."
-            : "Password reset failed. Your link may have expired — please start over.")
+            : "Password reset failed. Your link may have expired — please start over."),
       );
     } finally {
       setLoading(false);
@@ -136,123 +274,156 @@ export default function ResetPassword() {
         description="Create a new secure password for your account."
         noindex={true}
       />
-      <div className="auth-page">
-        <div className="auth-brand-panel" aria-hidden="true">
-          <div className="auth-brand-content">
-            <img src="/ICS_Logo.jpeg" alt="Infinity Craft Space" className="auth-brand-logo" />
-            <h2 className="auth-brand-title">Infinity Craft Space</h2>
-            <p className="auth-brand-subtitle">Premium craft supplies for creative minds</p>
-            <ul className="auth-brand-perks">
-              <li><span className="perk-icon">🔒</span> Hashed with bcrypt-12</li>
-              <li><span className="perk-icon">🔄</span> All sessions invalidated on reset</li>
-              <li><span className="perk-icon">🛡️</span> Previous password blocked</li>
-            </ul>
-          </div>
-        </div>
 
-        <div className="auth-form-panel">
-          <div className="auth-card">
+      <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "background.default" }}>
+        <BrandPanel
+          title="Infinity Craft Space"
+          subtitle="Premium craft supplies for creative minds"
+          perks={[
+            { icon: "🔒", text: "Hashed with bcrypt-12" },
+            { icon: "🔄", text: "All sessions invalidated on reset" },
+            { icon: "🛡️", text: "Previous password blocked" },
+          ]}
+        />
+
+        {/* Right: form panel */}
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            p: { xs: "2rem 1.25rem", sm: "2rem" },
+            overflowY: "auto",
+          }}
+        >
+          <Box sx={{ width: "100%", maxWidth: 420 }}>
             <StepBar current={2} />
 
-            <div className="auth-card-header">
-              <h1 className="auth-title">Create New Password</h1>
-              <p className="auth-subtitle">
-                Choose a strong password. Signing in from other devices will be required.
-              </p>
-            </div>
+            <Typography variant="h5" sx={{ fontWeight: 800, mb: 0.5 }}>
+              Create New Password
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
+              Choose a strong password. Signing in from other devices will be required.
+            </Typography>
 
             {error && (
-              <div className="auth-alert auth-alert--error" role="alert">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm-.75 3.75a.75.75 0 011.5 0v3.5a.75.75 0 01-1.5 0v-3.5zm.75 7a1 1 0 110-2 1 1 0 010 2z" fill="currentColor" />
-                </svg>
+              <Alert
+                severity="error"
+                sx={{ mb: 2 }}
+                action={
+                  error.includes("start over") ? (
+                    <Button
+                      color="inherit"
+                      size="small"
+                      onClick={() => navigate("/forgot-password")}
+                    >
+                      Start Over
+                    </Button>
+                  ) : undefined
+                }
+              >
                 {error}
-                {error.includes("start over") && (
-                  <button
-                    className="auth-alert-close"
-                    onClick={() => navigate("/forgot-password")}
-                    style={{ marginLeft: "auto", background: "none", border: "none", cursor: "pointer", fontSize: "0.8rem", color: "inherit", textDecoration: "underline" }}
-                  >
-                    Start Over
-                  </button>
-                )}
-              </div>
+              </Alert>
             )}
 
-            <form onSubmit={handleSubmit} noValidate>
+            <Box component="form" onSubmit={handleSubmit} noValidate>
               {/* New password */}
-              <div className="auth-field">
-                <label htmlFor="new-password" className="auth-label">New password</label>
-                <div className="auth-input-wrapper">
-                  <input
-                    id="new-password"
-                    type={showNew ? "text" : "password"}
-                    className={`auth-input auth-input--with-icon ${newPassword && !isStrong ? "auth-input--error" : ""} ${isStrong ? "auth-input--valid" : ""}`}
-                    value={newPassword}
-                    onChange={(e) => { setNewPassword(e.target.value); setError(""); }}
-                    placeholder="Create a strong password"
-                    autoComplete="new-password"
-                    required
-                  />
-                  <button type="button" className="auth-eye-btn" onClick={() => setShowNew((s) => !s)} aria-label={showNew ? "Hide" : "Show"} tabIndex={-1}>
-                    {showNew ? (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                    ) : (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    )}
-                  </button>
-                </div>
-                <PasswordStrength password={newPassword} />
-              </div>
+              <TextField
+                id="new-password"
+                label="New password"
+                type={showNew ? "text" : "password"}
+                fullWidth
+                required
+                autoComplete="new-password"
+                placeholder="Create a strong password"
+                value={newPassword}
+                onChange={(e) => { setNewPassword(e.target.value); setError(""); }}
+                error={!!(newPassword && !isStrong)}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowNew((s) => !s)}
+                          aria-label={showNew ? "Hide" : "Show"}
+                          edge="end"
+                          tabIndex={-1}
+                          size="small"
+                        >
+                          {showNew ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+                sx={{ mb: 0.5 }}
+              />
+              <PasswordStrength password={newPassword} />
 
               {/* Confirm password */}
-              <div className="auth-field">
-                <label htmlFor="confirm-password" className="auth-label">Confirm new password</label>
-                <div className="auth-input-wrapper">
-                  <input
-                    id="confirm-password"
-                    type={showConfirm ? "text" : "password"}
-                    className={`auth-input auth-input--with-icon ${mismatch ? "auth-input--error" : ""} ${confirmPassword && !mismatch ? "auth-input--valid" : ""}`}
-                    value={confirmPassword}
-                    onChange={(e) => { setConfirmPassword(e.target.value); setError(""); }}
-                    placeholder="Re-enter your password"
-                    autoComplete="new-password"
-                    required
-                  />
-                  <button type="button" className="auth-eye-btn" onClick={() => setShowConfirm((s) => !s)} aria-label={showConfirm ? "Hide" : "Show"} tabIndex={-1}>
-                    {showConfirm ? (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                    ) : (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    )}
-                  </button>
-                </div>
-                {mismatch && (
-                  <p className="auth-field-error" role="alert">Passwords do not match.</p>
-                )}
-              </div>
+              <TextField
+                id="confirm-password"
+                label="Confirm new password"
+                type={showConfirm ? "text" : "password"}
+                fullWidth
+                required
+                autoComplete="new-password"
+                placeholder="Re-enter your password"
+                value={confirmPassword}
+                onChange={(e) => { setConfirmPassword(e.target.value); setError(""); }}
+                error={!!mismatch}
+                helperText={mismatch ? "Passwords do not match." : ""}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowConfirm((s) => !s)}
+                          aria-label={showConfirm ? "Hide" : "Show"}
+                          edge="end"
+                          tabIndex={-1}
+                          size="small"
+                        >
+                          {showConfirm ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+                sx={{ mb: 2.5 }}
+              />
 
-              <button
+              <Button
                 type="submit"
-                className="auth-btn auth-btn--primary"
-                disabled={loading || !isStrong || !confirmPassword || mismatch}
+                variant="contained"
+                color="primary"
+                fullWidth
+                disabled={loading || !isStrong || !confirmPassword || !!mismatch}
+                sx={{ height: 52, fontWeight: 700, fontSize: "0.9375rem", borderRadius: "12px" }}
               >
                 {loading ? (
-                  <><span className="auth-spinner" aria-hidden="true" /> Resetting…</>
+                  <><CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />Resetting…</>
                 ) : (
                   "Reset Password"
                 )}
-              </button>
-            </form>
+              </Button>
+            </Box>
 
-            <div className="auth-footer-link" style={{ marginTop: "1.25rem", textAlign: "center" }}>
-              <button type="button" onClick={() => navigate("/forgot-password")}>
+            <Box sx={{ textAlign: "center", mt: 2.5 }}>
+              <Link
+                component="button"
+                type="button"
+                variant="body2"
+                onClick={() => navigate("/forgot-password")}
+                sx={{ cursor: "pointer", fontWeight: 500 }}
+              >
                 ← Start Over
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+              </Link>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
     </>
   );
 }

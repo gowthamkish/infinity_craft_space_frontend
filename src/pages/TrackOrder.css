@@ -92,7 +92,7 @@
   text-transform: capitalize;
 }
 
-.to-status-badge--confirmed  { background: #dbeafe; color: #1d4ed8; }
+.to-status-badge--confirmed  { background: #dbeafe; color: #7a1640; }
 .to-status-badge--processing { background: #fef3c7; color: #b45309; }
 .to-status-badge--shipped         { background: #e0f2fe; color: #0369a1; }
 .to-status-badge--out_for_delivery{ background: #fef3c7; color: #92400e; }
