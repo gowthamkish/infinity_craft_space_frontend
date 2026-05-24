@@ -16,11 +16,17 @@ import CreditCardOutlinedIcon from "@mui/icons-material/CreditCardOutlined";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 
+const P = "#8b2252";
+const P_LIGHT = "rgba(139,34,82,0.08)";
+const BORDER = "rgba(0,0,0,0.09)";
+
+/* ── Confetti ────────────────────────────────────────────────────────── */
 function Confetti({ container }) {
   useEffect(() => {
     if (!container.current) return;
-    const COLORS = ["#8B1A4A", "#C9A84C", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6"];
+    const COLORS = [P, "#C9A84C", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6"];
     const pieces = [];
     for (let i = 0; i < 60; i++) {
       const el = document.createElement("div");
@@ -43,11 +49,7 @@ function Confetti({ container }) {
     if (!document.getElementById(styleId)) {
       const style = document.createElement("style");
       style.id = styleId;
-      style.textContent = `
-        @keyframes confettiFall {
-          to { transform: translateY(500px) rotate(720deg); opacity: 0; }
-        }
-      `;
+      style.textContent = `@keyframes confettiFall { to { transform: translateY(500px) rotate(720deg); opacity: 0; } }`;
       document.head.appendChild(style);
     }
     const timer = setTimeout(() => { pieces.forEach((p) => p.remove()); }, 5000);
@@ -69,35 +71,34 @@ function estimatedDelivery(backendOrder, orderData) {
   return `${fmt(from)} – ${fmt(to)}`;
 }
 
-/* ── Detail card ─────────────────────────────────────────────────────── */
-function DetailCard({ icon: Icon, iconColor, title, children }) {
+/* ── Info card ───────────────────────────────────────────────────────── */
+function InfoCard({ icon: Icon, iconColor, title, children }) {
   return (
     <Paper
       elevation={0}
       sx={{
-        border: "1px solid #f0e8e2",
-        borderRadius: 3,
+        border: `0.5px solid ${BORDER}`,
+        borderRadius: "12px",
         overflow: "hidden",
         height: "100%",
-        boxShadow: "0 2px 12px rgba(139,26,74,0.06)",
+        bgcolor: "#fff",
       }}
     >
       <Box
         sx={{
           px: 2.5,
           py: 1.75,
-          borderBottom: "1px solid #f0e8e2",
+          borderBottom: `0.5px solid ${BORDER}`,
           display: "flex",
           alignItems: "center",
-          gap: 1.5,
-          background: "linear-gradient(135deg, #fdf6f0 0%, #fdf2f6 100%)",
+          gap: 1.25,
         }}
       >
         <Box
           sx={{
-            width: 32,
-            height: 32,
-            borderRadius: 1.5,
+            width: 30,
+            height: 30,
+            borderRadius: "8px",
             bgcolor: iconColor + "18",
             display: "flex",
             alignItems: "center",
@@ -105,9 +106,9 @@ function DetailCard({ icon: Icon, iconColor, title, children }) {
             flexShrink: 0,
           }}
         >
-          <Icon sx={{ fontSize: 18, color: iconColor }} />
+          <Icon sx={{ fontSize: 17, color: iconColor }} />
         </Box>
-        <Typography variant="subtitle2" fontWeight={700}>{title}</Typography>
+        <Typography sx={{ fontSize: "0.875rem", fontWeight: 500 }}>{title}</Typography>
       </Box>
       <Box sx={{ p: 2.5 }}>{children}</Box>
     </Paper>
@@ -132,46 +133,36 @@ export const ConfirmationStep = ({
     <Box ref={wrapRef} sx={{ position: "relative", overflow: "hidden" }} aria-live="polite">
       <Confetti container={wrapRef} />
 
-      {/* Hero banner */}
-      <Box
-        sx={{
-          textAlign: "center",
-          py: { xs: 5, md: 7 },
-          px: 2,
-          background: "linear-gradient(135deg, #fdf2f6 0%, #fdf6ec 50%, #f0fdf4 100%)",
-          borderRadius: 4,
-          mb: 4,
-          position: "relative",
-          border: "1px solid #f0e8e2",
-          overflow: "hidden",
-        }}
-      >
-        {/* Decorative circles */}
-        <Box sx={{ position: "absolute", top: -40, right: -40, width: 160, height: 160, borderRadius: "50%", bgcolor: "rgba(139,26,74,0.05)" }} />
-        <Box sx={{ position: "absolute", bottom: -30, left: -30, width: 120, height: 120, borderRadius: "50%", bgcolor: "rgba(201,168,76,0.08)" }} />
-
+      {/* ── Success hero ─────────────────────────────────────────────── */}
+      <Box sx={{ textAlign: "center", py: { xs: 5, md: 7 }, px: 2 }}>
+        {/* Checkmark circle */}
         <Box
           sx={{
-            width: 90,
-            height: 90,
+            width: 80,
+            height: 80,
             borderRadius: "50%",
-            bgcolor: "#f0fdf4",
-            border: "3px solid #86efac",
+            bgcolor: P,
+            border: `4px solid ${P_LIGHT}`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             mx: "auto",
-            mb: 2.5,
-            boxShadow: "0 8px 24px rgba(16,185,129,0.2)",
+            mb: 3,
+            boxShadow: `0 8px 28px rgba(139,34,82,0.35)`,
+            animation: "checkPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+            "@keyframes checkPop": {
+              "0%": { transform: "scale(0.5)", opacity: 0 },
+              "100%": { transform: "scale(1)", opacity: 1 },
+            },
           }}
         >
-          <CheckCircleIcon sx={{ fontSize: 52, color: "#10b981" }} />
+          <CheckCircleIcon sx={{ fontSize: 46, color: "#fff" }} />
         </Box>
 
-        <Typography variant="h4" fontWeight={800} sx={{ mb: 1, color: "#1c1917" }}>
+        <Typography sx={{ fontSize: "1.5rem", fontWeight: 500, mb: 1, color: "#1c1917" }}>
           Order Confirmed! 🎉
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 480, mx: "auto", mb: 2 }}>
+        <Typography sx={{ fontSize: "0.875rem", color: "#6b7280", lineHeight: 1.7, maxWidth: 440, mx: "auto", mb: 2.5 }}>
           Thank you for shopping with us! Your order has been received and we'll start processing it right away.
         </Typography>
 
@@ -180,36 +171,34 @@ export const ConfirmationStep = ({
             sx={{
               display: "inline-flex",
               alignItems: "center",
-              gap: 1,
-              px: 2.5,
-              py: 1,
-              bgcolor: "rgba(139,26,74,0.08)",
-              border: "1px solid rgba(139,26,74,0.2)",
-              borderRadius: 20,
+              gap: 0.75,
+              px: 2,
+              py: 0.75,
+              bgcolor: P_LIGHT,
+              border: `1px solid rgba(139,34,82,0.2)`,
+              borderRadius: "20px",
             }}
           >
-            <Typography variant="caption" fontWeight={600} sx={{ color: "#8B1A4A" }}>
-              Order ID:
-            </Typography>
-            <Typography variant="caption" fontWeight={800} sx={{ color: "#8B1A4A", wordBreak: "break-all" }}>
-              {orderId}
+            <Typography sx={{ fontSize: "0.8125rem", fontFamily: "monospace", color: P, fontWeight: 500 }}>
+              Order #{orderId}
             </Typography>
           </Box>
         )}
       </Box>
 
       {orderData && (
-        <Box sx={{ maxWidth: 960, mx: "auto", px: { xs: 1, sm: 0 } }}>
+        <Box sx={{ maxWidth: 900, mx: "auto" }}>
 
-          {/* Delivery estimate banner */}
+          {/* Delivery estimate */}
           {deliveryRange && (
-            <Box
+            <Paper
+              elevation={0}
               sx={{
-                p: 2.5,
+                p: 2,
                 border: "1.5px solid #86efac",
                 bgcolor: "#f0fdf4",
-                borderRadius: 3,
-                mb: 3,
+                borderRadius: "12px",
+                mb: 2.5,
                 display: "flex",
                 alignItems: "center",
                 gap: 2,
@@ -217,9 +206,9 @@ export const ConfirmationStep = ({
             >
               <Box
                 sx={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 2,
+                  width: 44,
+                  height: 44,
+                  borderRadius: "10px",
                   bgcolor: "#dcfce7",
                   display: "flex",
                   alignItems: "center",
@@ -227,46 +216,53 @@ export const ConfirmationStep = ({
                   flexShrink: 0,
                 }}
               >
-                <LocalShippingOutlinedIcon sx={{ color: "#16a34a", fontSize: 26 }} />
+                <LocalShippingOutlinedIcon sx={{ color: "#16a34a", fontSize: 24 }} />
               </Box>
               <Box>
-                <Typography variant="caption" color="text.secondary" fontWeight={600} display="block">
-                  Estimated Delivery
+                <Typography sx={{ fontSize: "0.75rem", color: "#6b7280", fontWeight: 500, display: "block" }}>
+                  Expected delivery
                 </Typography>
-                <Typography variant="h6" fontWeight={800} sx={{ color: "#15803d", lineHeight: 1.2 }}>
+                <Typography sx={{ fontSize: "1rem", fontWeight: 600, color: "#15803d" }}>
                   {deliveryRange}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  You'll receive tracking updates via WhatsApp &amp; email
+                <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>
+                  Tracking updates via WhatsApp & email
                 </Typography>
               </Box>
-            </Box>
+            </Paper>
           )}
 
           {/* Detail cards */}
-          <Grid container spacing={2.5} sx={{ mb: 3 }}>
-            {/* Order details */}
+          <Grid container spacing={2} sx={{ mb: 2.5 }}>
             <Grid item xs={12} md={4}>
-              <DetailCard icon={InventoryOutlinedIcon} iconColor="#8B1A4A" title="Order Details">
+              <InfoCard icon={InventoryOutlinedIcon} iconColor={P} title="Order Details">
                 <Stack spacing={1.5}>
                   <Box>
-                    <Typography variant="caption" color="text.secondary" fontWeight={600}>Order Total</Typography>
-                    <Typography variant="h6" fontWeight={800} sx={{ color: "#8B1A4A" }}>₹{orderTotal}</Typography>
+                    <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", fontWeight: 500, mb: 0.25 }}>
+                      Order Total
+                    </Typography>
+                    <Typography sx={{ fontSize: "1.25rem", fontWeight: 600, color: P }}>
+                      ₹{orderTotal}
+                    </Typography>
                   </Box>
                   <Box>
-                    <Typography variant="caption" color="text.secondary" fontWeight={600}>Items Ordered</Typography>
-                    <Typography variant="body2" fontWeight={600}>{items.length} item{items.length !== 1 ? "s" : ""}</Typography>
+                    <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", fontWeight: 500, mb: 0.25 }}>
+                      Items Ordered
+                    </Typography>
+                    <Typography sx={{ fontSize: "0.875rem", fontWeight: 500 }}>
+                      {items.length} item{items.length !== 1 ? "s" : ""}
+                    </Typography>
                   </Box>
                   {items.length > 0 && (
                     <>
-                      <Divider sx={{ borderColor: "#f0e8e2" }} />
+                      <Divider sx={{ borderColor: BORDER }} />
                       <Stack spacing={1}>
                         {items.map((it, idx) => (
                           <Stack key={idx} direction="row" justifyContent="space-between">
-                            <Typography variant="caption" sx={{ flex: 1, pr: 1, color: "#57534e" }}>
+                            <Typography sx={{ fontSize: "0.75rem", flex: 1, pr: 1, color: "#57534e" }}>
                               {it.productName || it.name || it.product?.name} × {it.quantity}
                             </Typography>
-                            <Typography variant="caption" fontWeight={700}>
+                            <Typography sx={{ fontSize: "0.75rem", fontWeight: 600 }}>
                               ₹{(it.totalPrice ?? it.unitPrice * it.quantity).toFixed(2)}
                             </Typography>
                           </Stack>
@@ -275,48 +271,45 @@ export const ConfirmationStep = ({
                     </>
                   )}
                 </Stack>
-              </DetailCard>
+              </InfoCard>
             </Grid>
 
-            {/* Payment info */}
             <Grid item xs={12} md={4}>
-              <DetailCard icon={CreditCardOutlinedIcon} iconColor="#C9A84C" title="Payment">
+              <InfoCard icon={CreditCardOutlinedIcon} iconColor="#C9A84C" title="Payment">
                 <Stack spacing={1.5}>
                   <Box>
-                    <Typography variant="caption" color="text.secondary" fontWeight={600}>Status</Typography>
-                    <Box sx={{ mt: 0.5 }}>
-                      <Chip
-                        label="Payment Successful"
-                        size="small"
-                        sx={{
-                          bgcolor: "#f0fdf4",
-                          color: "#16a34a",
-                          border: "1px solid #86efac",
-                          fontWeight: 700,
-                        }}
-                      />
-                    </Box>
+                    <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", fontWeight: 500, mb: 0.5 }}>
+                      Status
+                    </Typography>
+                    <Chip
+                      label="Payment Successful"
+                      size="small"
+                      sx={{ bgcolor: "#f0fdf4", color: "#16a34a", border: "1px solid #86efac", fontWeight: 600 }}
+                    />
                   </Box>
                   <Box>
-                    <Typography variant="caption" color="text.secondary" fontWeight={600}>Payment ID</Typography>
-                    <Typography variant="caption" display="block" sx={{ wordBreak: "break-all", color: "#44403c", fontWeight: 500 }}>
+                    <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", fontWeight: 500, mb: 0.25 }}>
+                      Payment ID
+                    </Typography>
+                    <Typography sx={{ fontSize: "0.72rem", wordBreak: "break-all", color: "#374151", fontFamily: "monospace" }}>
                       {paymentData?.razorpay_payment_id || paymentData?.payment_id || "N/A"}
                     </Typography>
                   </Box>
                   <Box>
-                    <Typography variant="caption" color="text.secondary" fontWeight={600}>Method</Typography>
-                    <Typography variant="body2" fontWeight={600}>
+                    <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", fontWeight: 500, mb: 0.25 }}>
+                      Method
+                    </Typography>
+                    <Typography sx={{ fontSize: "0.875rem", fontWeight: 500 }}>
                       {orderData.paymentDetails?.method || "Online Payment"}
                     </Typography>
                   </Box>
                 </Stack>
-              </DetailCard>
+              </InfoCard>
             </Grid>
 
-            {/* Shipping address */}
             <Grid item xs={12} md={4}>
-              <DetailCard icon={LocationOnOutlinedIcon} iconColor="#10b981" title="Shipping To">
-                <Typography variant="body2" sx={{ lineHeight: 1.9, color: "#44403c" }}>
+              <InfoCard icon={LocationOnOutlinedIcon} iconColor="#10b981" title="Shipping To">
+                <Typography sx={{ fontSize: "0.875rem", lineHeight: 1.9, color: "#374151" }}>
                   {shippingAddress.street || orderData.shippingAddress?.street}<br />
                   {shippingAddress.city || orderData.shippingAddress?.city},{" "}
                   {shippingAddress.state || orderData.shippingAddress?.state}<br />
@@ -324,31 +317,33 @@ export const ConfirmationStep = ({
                   {shippingAddress.country || orderData.shippingAddress?.country || "India"}
                 </Typography>
                 {shippingAddress.phone && (
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: "block" }}>
+                  <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", mt: 1, display: "block" }}>
                     📞 {shippingAddress.phone}
                   </Typography>
                 )}
-              </DetailCard>
+              </InfoCard>
             </Grid>
           </Grid>
 
           {/* CTAs */}
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mb: 3 }}>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mb: 2.5 }}>
             {orderId && (
               <Button
                 variant="contained"
                 size="large"
-                startIcon={<LocalShippingOutlinedIcon />}
                 endIcon={<ArrowForwardIcon />}
+                startIcon={<LocalShippingOutlinedIcon />}
                 onClick={() => navigate(`/track/${orderId}`)}
                 sx={{
                   flex: 1,
-                  py: 1.5,
-                  fontWeight: 700,
-                  borderRadius: 2,
-                  background: "linear-gradient(135deg, #8B1A4A, #7a1640)",
-                  boxShadow: "0 4px 14px rgba(139,26,74,0.35)",
-                  "&:hover": { background: "linear-gradient(135deg, #7a1640, #6b1236)" },
+                  height: 48,
+                  fontWeight: 500,
+                  fontSize: "0.875rem",
+                  borderRadius: "10px",
+                  bgcolor: P,
+                  textTransform: "none",
+                  boxShadow: "0 2px 12px rgba(139,34,82,0.28)",
+                  "&:hover": { bgcolor: "#7a1d47" },
                 }}
               >
                 Track My Order
@@ -357,47 +352,52 @@ export const ConfirmationStep = ({
             <Button
               variant="outlined"
               size="large"
-              startIcon={<InventoryOutlinedIcon />}
-              onClick={() => navigate("/orders")}
-              sx={{
-                flex: 1,
-                py: 1.5,
-                fontWeight: 700,
-                borderRadius: 2,
-                borderColor: "#e7e5e4",
-                color: "#44403c",
-                "&:hover": { borderColor: "#8B1A4A", color: "#8B1A4A", bgcolor: "#fdf2f6" },
-              }}
-            >
-              View Order History
-            </Button>
-            <Button
-              variant="outlined"
-              size="large"
               startIcon={<ShoppingBagOutlinedIcon />}
               onClick={() => navigate("/products")}
               sx={{
                 flex: 1,
-                py: 1.5,
-                fontWeight: 700,
-                borderRadius: 2,
-                borderColor: "#e7e5e4",
-                color: "#44403c",
-                "&:hover": { borderColor: "#8B1A4A", color: "#8B1A4A", bgcolor: "#fdf2f6" },
+                height: 48,
+                fontWeight: 500,
+                fontSize: "0.875rem",
+                borderRadius: "10px",
+                borderColor: P,
+                color: P,
+                textTransform: "none",
+                "&:hover": { bgcolor: P_LIGHT, borderColor: P },
               }}
             >
               Continue Shopping
             </Button>
+            <Button
+              variant="outlined"
+              size="large"
+              startIcon={<InventoryOutlinedIcon />}
+              onClick={() => navigate("/orders")}
+              sx={{
+                flex: 1,
+                height: 48,
+                fontWeight: 500,
+                fontSize: "0.875rem",
+                borderRadius: "10px",
+                borderColor: "#e5e7eb",
+                color: "#374151",
+                textTransform: "none",
+                "&:hover": { borderColor: P, color: P, bgcolor: P_LIGHT },
+              }}
+            >
+              View Orders
+            </Button>
           </Stack>
 
           {/* Share strip */}
-          <Box
+          <Paper
+            elevation={0}
             sx={{
               p: 2.5,
-              border: "1px solid #f0e8e2",
-              borderRadius: 3,
-              mb: 4,
-              bgcolor: "#fafaf9",
+              border: `0.5px solid ${BORDER}`,
+              borderRadius: "12px",
+              mb: 3,
+              bgcolor: "#fff",
               display: "flex",
               gap: 1.5,
               flexWrap: "wrap",
@@ -405,10 +405,10 @@ export const ConfirmationStep = ({
             }}
           >
             <Box sx={{ flex: 1, minWidth: 140 }}>
-              <Typography variant="body2" fontWeight={700} sx={{ color: "#1c1917" }}>
+              <Typography sx={{ fontSize: "0.875rem", fontWeight: 500, color: "#1c1917", mb: 0.25 }}>
                 Loved your experience?
               </Typography>
-              <Typography variant="caption" color="text.secondary">
+              <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>
                 Share your order with friends and family
               </Typography>
             </Box>
@@ -419,7 +419,7 @@ export const ConfirmationStep = ({
               href={`https://wa.me/?text=${encodeURIComponent(`I just ordered from InfinityCraftSpace! 🎁 Order ID: ${orderId ?? ""}\nTrack my order: ${window.location.origin}/track/${orderId ?? ""}`)}`}
               target="_blank"
               rel="noopener noreferrer"
-              sx={{ borderRadius: 2, fontWeight: 700, py: 1 }}
+              sx={{ borderRadius: "10px", fontWeight: 500, fontSize: "0.875rem", height: 40, textTransform: "none" }}
             >
               💬 Share on WhatsApp
             </Button>
@@ -434,17 +434,27 @@ export const ConfirmationStep = ({
                 }
               }}
               sx={{
-                borderRadius: 2,
-                fontWeight: 700,
-                py: 1,
-                borderColor: "#e7e5e4",
-                color: "#44403c",
-                "&:hover": { borderColor: "#8B1A4A", color: "#8B1A4A" },
+                borderRadius: "10px",
+                fontWeight: 500,
+                fontSize: "0.875rem",
+                height: 40,
+                textTransform: "none",
+                borderColor: "#e5e7eb",
+                color: "#374151",
+                "&:hover": { borderColor: P, color: P },
               }}
             >
               🔗 Share Order
             </Button>
-          </Box>
+          </Paper>
+
+          {/* Email note */}
+          <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.75} sx={{ mb: 4 }}>
+            <EmailOutlinedIcon sx={{ fontSize: 14, color: "#9ca3af" }} />
+            <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>
+              You'll receive a confirmation email with your order details shortly
+            </Typography>
+          </Stack>
         </Box>
       )}
     </Box>

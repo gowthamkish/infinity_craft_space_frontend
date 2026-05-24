@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import {
   Box,
   Grid,
@@ -21,18 +21,17 @@ import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteForeverOutlined";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlined";
+import CheckIcon from "@mui/icons-material/Check";
 import { ProductThumb } from "./CartReviewStep";
 
-// ══════════════════════════════════════════════════════════════════════════════
-// ROADWAYS SHIPPING — Domestic Slab Rate Card (Surface/Road only)
-// ══════════════════════════════════════════════════════════════════════════════
+const P = "#8b2252";
+const P_LIGHT = "rgba(139,34,82,0.08)";
+const BORDER = "rgba(0,0,0,0.09)";
 
+// ── Shipping zone data ────────────────────────────────────────────────
 const ROAD_ZONES = {
   LOCAL: {
-    label: "Local Delivery",
-    sublabel: "Bangalore / Bengaluru",
-    deliveryDays: "1–2",
-    color: "#16a34a",
+    label: "Local Delivery", sublabel: "Bangalore / Bengaluru", deliveryDays: "1–2", color: "#16a34a",
     rates: [
       { maxG: 250, price: 50 },  { maxG: 500, price: 70 },
       { maxG: 750, price: 90 },  { maxG: 1000, price: 110 },
@@ -45,10 +44,7 @@ const ROAD_ZONES = {
     perKgAbove10: 55, perKgAbove50: 45,
   },
   STATE: {
-    label: "Within Karnataka",
-    sublabel: "Rest of Karnataka",
-    deliveryDays: "2–3",
-    color: "#0891b2",
+    label: "Within Karnataka", sublabel: "Rest of Karnataka", deliveryDays: "2–3", color: "#0891b2",
     rates: [
       { maxG: 250, price: 65 },  { maxG: 500, price: 88 },
       { maxG: 750, price: 110 }, { maxG: 1000, price: 133 },
@@ -61,10 +57,7 @@ const ROAD_ZONES = {
     perKgAbove10: 70, perKgAbove50: 58,
   },
   SOUTH: {
-    label: "South India",
-    sublabel: "AP, Telangana, Kerala, Tamil Nadu",
-    deliveryDays: "3–5",
-    color: "#8B1A4A",
+    label: "South India", sublabel: "AP, Telangana, Kerala, Tamil Nadu", deliveryDays: "3–5", color: "#8b2252",
     rates: [
       { maxG: 250, price: 85 },  { maxG: 500, price: 110 },
       { maxG: 750, price: 135 }, { maxG: 1000, price: 160 },
@@ -77,10 +70,7 @@ const ROAD_ZONES = {
     perKgAbove10: 88, perKgAbove50: 72,
   },
   PAN_INDIA: {
-    label: "Pan-India",
-    sublabel: "MH, GJ, Goa, Delhi, UP, MP, RJ, HR, WB & more",
-    deliveryDays: "5–8",
-    color: "#8B1A4A",
+    label: "Pan-India", sublabel: "MH, GJ, Goa, Delhi, UP, MP, RJ, HR, WB & more", deliveryDays: "5–8", color: "#8b2252",
     rates: [
       { maxG: 250, price: 120 },  { maxG: 500, price: 155 },
       { maxG: 750, price: 190 },  { maxG: 1000, price: 225 },
@@ -93,10 +83,7 @@ const ROAD_ZONES = {
     perKgAbove10: 130, perKgAbove50: 108,
   },
   REMOTE: {
-    label: "Remote / Hilly Areas",
-    sublabel: "NE States, Andaman, J&K, Ladakh, HP",
-    deliveryDays: "7–12",
-    color: "#b45309",
+    label: "Remote / Hilly Areas", sublabel: "NE States, Andaman, J&K, Ladakh, HP", deliveryDays: "7–12", color: "#b45309",
     rates: [
       { maxG: 250, price: 145 },  { maxG: 500, price: 188 },
       { maxG: 750, price: 232 },  { maxG: 1000, price: 275 },
@@ -150,48 +137,7 @@ function expectedDeliveryRange(deliveryDays, dispatchBuffer = 0) {
   return `${fmt(from)} – ${fmt(to)}`;
 }
 
-/* ── Card header shared pattern ──────────────────────────────────────── */
-function CardHeader({ icon: Icon, title, subtitle, iconColor }) {
-  return (
-    <Box
-      sx={{
-        px: 3,
-        py: 2.25,
-        display: "flex",
-        alignItems: "center",
-        gap: 2,
-        borderBottom: "1px solid #f0ebe8",
-        background: "linear-gradient(135deg, #fdf6f0 0%, #fdf2f6 100%)",
-      }}
-    >
-      <Box
-        sx={{
-          width: 38,
-          height: 38,
-          borderRadius: 2,
-          background: iconColor || "linear-gradient(135deg, #8B1A4A, #C9A84C)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-          boxShadow: "0 2px 8px rgba(139,26,74,0.22)",
-        }}
-      >
-        <Icon sx={{ color: "white", fontSize: 20 }} />
-      </Box>
-      <Box>
-        <Typography variant="subtitle1" fontWeight={700} sx={{ lineHeight: 1.2 }}>
-          {title}
-        </Typography>
-        {subtitle && (
-          <Typography variant="caption" color="text.secondary">{subtitle}</Typography>
-        )}
-      </Box>
-    </Box>
-  );
-}
-
-/* ── Shipping rate card ─────────────────────────────────────────────── */
+/* ── Shipping widget ─────────────────────────────────────────────────── */
 function ShippingWidget({ zoneKey, weightKg, rate, dispatchBuffer = 0 }) {
   if (!zoneKey) return null;
   const zone = ROAD_ZONES[zoneKey];
@@ -202,21 +148,20 @@ function ShippingWidget({ zoneKey, weightKg, rate, dispatchBuffer = 0 }) {
     <Box
       sx={{
         p: 2,
-        border: "1.5px solid",
-        borderColor: zone.color + "40",
-        borderRadius: 2.5,
+        border: `1.5px solid ${zone.color}40`,
+        borderRadius: "10px",
         display: "flex",
         alignItems: "center",
-        gap: 2,
-        mb: 2.5,
-        bgcolor: zone.color + "08",
+        gap: 1.5,
+        mb: 2,
+        bgcolor: zone.color + "0a",
       }}
     >
       <Box
         sx={{
-          width: 40,
-          height: 40,
-          borderRadius: 2,
+          width: 36,
+          height: 36,
+          borderRadius: "8px",
           bgcolor: zone.color + "18",
           display: "flex",
           alignItems: "center",
@@ -224,38 +169,39 @@ function ShippingWidget({ zoneKey, weightKg, rate, dispatchBuffer = 0 }) {
           flexShrink: 0,
         }}
       >
-        <LocalShippingOutlinedIcon sx={{ color: zone.color, fontSize: 22 }} />
+        <LocalShippingOutlinedIcon sx={{ color: zone.color, fontSize: 20 }} />
       </Box>
       <Box sx={{ flex: 1 }}>
-        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.25, flexWrap: "wrap" }}>
-          <Typography variant="body2" fontWeight={700}>Standard Road Delivery</Typography>
+        <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 0.25, flexWrap: "wrap" }}>
+          <Typography sx={{ fontSize: "0.8125rem", fontWeight: 500 }}>Standard Road Delivery</Typography>
           <Chip
             label={zone.label}
             size="small"
-            sx={{ bgcolor: zone.color + "18", color: zone.color, fontWeight: 700, height: 20, fontSize: "0.68rem" }}
+            sx={{ bgcolor: zone.color + "18", color: zone.color, fontWeight: 600, height: 18, fontSize: "0.68rem" }}
           />
         </Stack>
-        <Typography variant="caption" color="text.secondary" display="block">
+        <Typography sx={{ fontSize: "0.75rem", color: "#6b7280", display: "block" }}>
           {deliveryRange}
           {dispatchBuffer > 0 && (
-            <Box component="span" sx={{ ml: 1, color: "warning.main", fontWeight: 600 }}>
+            <Box component="span" sx={{ ml: 1, color: "#d97706", fontWeight: 500 }}>
               + 10–12 day handcraft
             </Box>
           )}
         </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>
           {zone.sublabel} · {weightKg < 1 ? `${Math.round(weightKg * 1000)} g` : `${weightKg.toFixed(2)} kg`}
         </Typography>
       </Box>
-      <Typography variant="h6" fontWeight={800} sx={{ color: zone.color, flexShrink: 0 }}>
+      <Typography sx={{ fontSize: "1.125rem", fontWeight: 700, color: zone.color, flexShrink: 0 }}>
         {rate === 0 ? "FREE" : `₹${rate}`}
       </Typography>
     </Box>
   );
 }
 
-/* ── Address label chips ─────────────────────────────────────────── */
+/* ── Address label pills ─────────────────────────────────────────────── */
 const LABEL_PRESETS = ["Home", "Office", "Other"];
+const LABEL_ICONS = { Home: "🏠", Office: "🏢", Other: "✏️" };
 
 function AddressLabelChips({ value, onChange }) {
   const [custom, setCustom] = useState(LABEL_PRESETS.includes(value) || !value ? "" : value);
@@ -267,27 +213,43 @@ function AddressLabelChips({ value, onChange }) {
     else { setCustom(""); onChange(label); }
   };
 
-  const LABELS_DISPLAY = { Home: "🏠 Home", Office: "🏢 Office", Other: "✏️ Other" };
-
   return (
     <Box>
-      <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mb: 1 }}>
+      <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
         {LABEL_PRESETS.map((lbl) => {
           const active = lbl === "Other" ? (value === "Other" || isOther) : value === lbl;
           return (
-            <Chip
+            <Box
               key={lbl}
-              label={LABELS_DISPLAY[lbl]}
+              role="button"
+              tabIndex={0}
               onClick={() => select(lbl)}
-              variant={active ? "filled" : "outlined"}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") select(lbl); }}
               sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.5,
+                px: 1.5,
+                height: 32,
+                borderRadius: "20px",
+                border: "1.5px solid",
+                borderColor: active ? P : "#d1d5db",
+                bgcolor: active ? P : "#fff",
+                color: active ? "#fff" : "#6b7280",
+                fontSize: "0.8125rem",
+                fontWeight: active ? 500 : 400,
                 cursor: "pointer",
-                fontWeight: 600,
-                ...(active
-                  ? { bgcolor: "rgba(139,26,74,0.1)", color: "#8B1A4A", border: "1px solid rgba(139,26,74,0.3)" }
-                  : { borderColor: "#e7e5e4" }),
+                transition: "all 0.15s ease",
+                userSelect: "none",
+                "&:hover": {
+                  borderColor: P,
+                  color: active ? "#fff" : P,
+                },
               }}
-            />
+            >
+              <span>{LABEL_ICONS[lbl]}</span>
+              <span>{lbl}</span>
+            </Box>
           );
         })}
       </Stack>
@@ -299,11 +261,48 @@ function AddressLabelChips({ value, onChange }) {
           value={isOther && value !== "Other" ? value : custom}
           onChange={(e) => { setCustom(e.target.value); onChange(e.target.value || "Other"); }}
           autoFocus
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "8px",
+              height: 40,
+              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: P },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: P, boxShadow: `0 0 0 3px rgba(139,34,82,0.12)` },
+            },
+          }}
         />
       )}
     </Box>
   );
 }
+
+const fieldSx = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "8px",
+    height: 40,
+    fontSize: "0.875rem",
+    "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: P },
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: P,
+      boxShadow: `0 0 0 3px rgba(139,34,82,0.12)`,
+    },
+  },
+  "& .MuiInputLabel-root.Mui-focused": { color: P },
+  "& .MuiInputLabel-root": { fontSize: "0.875rem" },
+};
+
+const multilineSx = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "8px",
+    fontSize: "0.875rem",
+    "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: P },
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: P,
+      boxShadow: `0 0 0 3px rgba(139,34,82,0.12)`,
+    },
+  },
+  "& .MuiInputLabel-root.Mui-focused": { color: P },
+  "& .MuiInputLabel-root": { fontSize: "0.875rem" },
+};
 
 /* ══════════════════════════════════════════════════════════════════════
    MAIN — ShippingStep
@@ -497,49 +496,35 @@ export const ShippingStep = ({
 
   const displayTotal = subtotal + (shippingRate?.rate || 0);
 
-  const fieldSx = {
-    "& .MuiOutlinedInput-root": {
-      borderRadius: 2,
-      "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#8B1A4A" },
-      "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#8B1A4A" },
-    },
-    "& .MuiInputLabel-root.Mui-focused": { color: "#8B1A4A" },
-  };
-
   return (
-    <Grid container spacing={3}>
-      {/* Main: form */}
-      <Grid item xs={12} md={8}>
+    <Grid container spacing={3} alignItems="flex-start">
+      {/* ── Left: form ───────────────────────────────────────────────── */}
+      <Grid item xs={12} sm={7} lg={8}>
 
         {/* Saved addresses */}
         {loadingAddresses ? (
           <Paper
             elevation={0}
-            sx={{ p: 3, border: "1px solid #f0e8e2", borderRadius: 3, mb: 3, textAlign: "center" }}
+            sx={{ p: 3, border: `0.5px solid ${BORDER}`, borderRadius: "12px", mb: 2.5, textAlign: "center" }}
           >
-            <CircularProgress size={22} sx={{ color: "#8B1A4A", mr: 1 }} />
-            <Typography variant="body2" color="text.secondary" component="span">
+            <CircularProgress size={20} sx={{ color: P, mr: 1 }} />
+            <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }} component="span">
               Loading saved addresses…
             </Typography>
           </Paper>
         ) : savedAddresses.length > 0 && (
           <Paper
             elevation={0}
-            sx={{
-              border: "1px solid #f0e8e2",
-              borderRadius: 3,
-              mb: 3,
-              overflow: "hidden",
-              boxShadow: "0 2px 12px rgba(139,26,74,0.07)",
-            }}
+            sx={{ border: `0.5px solid ${BORDER}`, borderRadius: "12px", mb: 2.5, overflow: "hidden", bgcolor: "#fff" }}
           >
-            <CardHeader
-              icon={CheckCircleOutlineIcon}
-              title="Saved Addresses"
-              subtitle="Select a delivery address below"
-              iconColor="linear-gradient(135deg, #16a34a, #15803d)"
-            />
-            <Box sx={{ p: 2.5 }}>
+            <Box sx={{ px: 2.5, py: 2, borderBottom: `0.5px solid ${BORDER}`, display: "flex", alignItems: "center", gap: 1.5 }}>
+              <CheckCircleOutlineIcon sx={{ fontSize: 18, color: "#16a34a" }} />
+              <Box>
+                <Typography sx={{ fontSize: "1rem", fontWeight: 500 }}>Saved Addresses</Typography>
+                <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>Select a delivery address below</Typography>
+              </Box>
+            </Box>
+            <Box sx={{ p: 2 }}>
               <Grid container spacing={1.5}>
                 {savedAddresses.map((addr) => {
                   const selected = selectedAddressId === addr._id;
@@ -549,12 +534,12 @@ export const ShippingStep = ({
                         onClick={() => selectSavedAddress(addr)}
                         sx={{
                           p: 2,
-                          border: "2px solid",
-                          borderColor: selected ? "#8B1A4A" : "#e7e5e4",
-                          borderRadius: 2.5,
+                          border: "1.5px solid",
+                          borderColor: selected ? P : "#e5e7eb",
+                          borderRadius: "10px",
                           cursor: "pointer",
-                          bgcolor: selected ? "#fdf2f6" : "#fff",
-                          "&:hover": { borderColor: "#8B1A4A" },
+                          bgcolor: selected ? P_LIGHT : "#fff",
+                          "&:hover": { borderColor: P },
                           transition: "all 0.15s ease",
                           position: "relative",
                         }}
@@ -564,55 +549,33 @@ export const ShippingStep = ({
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectSavedAddress(addr); } }}
                       >
                         {selected && (
-                          <Box
-                            sx={{
-                              position: "absolute",
-                              top: 10,
-                              left: 10,
-                              width: 18,
-                              height: 18,
-                              borderRadius: "50%",
-                              bgcolor: "#8B1A4A",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                            }}
-                          >
-                            <CheckCircleOutlineIcon sx={{ color: "white", fontSize: 14 }} />
+                          <Box sx={{ position: "absolute", top: 10, right: 10, width: 18, height: 18, borderRadius: "50%", bgcolor: P, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <CheckIcon sx={{ color: "#fff", fontSize: 12 }} />
                           </Box>
                         )}
-                        <Box sx={{ pl: selected ? 3 : 0 }}>
-                          {addr.label && (
-                            <Chip
-                              label={addr.label}
-                              size="small"
-                              sx={{
-                                mb: 0.75,
-                                bgcolor: "rgba(139,26,74,0.08)",
-                                color: "#8B1A4A",
-                                fontWeight: 700,
-                                height: 20,
-                                fontSize: "0.68rem",
-                              }}
-                            />
-                          )}
-                          <Typography variant="body2" fontWeight={600}>{addr.street}</Typography>
-                          <Typography variant="caption" color="text.secondary" display="block">
-                            {addr.city}, {addr.state} – {addr.zipCode}
+                        {addr.label && (
+                          <Chip
+                            label={addr.label}
+                            size="small"
+                            sx={{ mb: 0.75, bgcolor: P_LIGHT, color: P, fontWeight: 600, height: 18, fontSize: "0.68rem" }}
+                          />
+                        )}
+                        <Typography sx={{ fontSize: "0.875rem", fontWeight: 500 }}>{addr.street}</Typography>
+                        <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", display: "block" }}>
+                          {addr.city}, {addr.state} – {addr.zipCode}
+                        </Typography>
+                        {addr.phone && (
+                          <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", display: "block" }}>
+                            📞 {addr.phone}
                           </Typography>
-                          {addr.phone && (
-                            <Typography variant="caption" color="text.secondary" display="block">
-                              📞 {addr.phone}
-                            </Typography>
-                          )}
-                          {addr.isDefault && (
-                            <Chip
-                              label="Default"
-                              size="small"
-                              sx={{ mt: 0.5, bgcolor: "#fdf2f6", color: "#8B1A4A", border: "1px solid rgba(139,26,74,0.3)", height: 18, fontSize: "0.65rem" }}
-                            />
-                          )}
-                        </Box>
+                        )}
+                        {addr.isDefault && (
+                          <Chip
+                            label="Default"
+                            size="small"
+                            sx={{ mt: 0.5, bgcolor: P_LIGHT, color: P, border: `1px solid ${P}40`, height: 18, fontSize: "0.65rem" }}
+                          />
+                        )}
                         <IconButton
                           size="small"
                           onClick={(e) => { e.stopPropagation(); handleDeleteAddress(addr._id); }}
@@ -625,8 +588,8 @@ export const ShippingStep = ({
                   );
                 })}
               </Grid>
-              <Divider sx={{ my: 2.5, borderColor: "#f0e8e2" }}>
-                <Typography variant="caption" color="text.secondary" sx={{ px: 1 }}>
+              <Divider sx={{ my: 2, borderColor: BORDER }}>
+                <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", px: 1 }}>
                   or enter a new address
                 </Typography>
               </Divider>
@@ -637,27 +600,29 @@ export const ShippingStep = ({
         {/* Address form */}
         <Paper
           elevation={0}
-          sx={{
-            border: "1px solid #f0e8e2",
-            borderRadius: 3,
-            overflow: "hidden",
-            boxShadow: "0 2px 12px rgba(139,26,74,0.07)",
-          }}
+          sx={{ border: `0.5px solid ${BORDER}`, borderRadius: "12px", overflow: "hidden", bgcolor: "#fff" }}
         >
-          <CardHeader
-            icon={LocationOnOutlinedIcon}
-            title="Delivery Address"
-            subtitle="Where should we deliver your order?"
-          />
+          {/* Card header */}
+          <Box sx={{ px: 2.5, py: 2, borderBottom: `0.5px solid ${BORDER}`, display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Box sx={{ width: 36, height: 36, borderRadius: "8px", bgcolor: P_LIGHT, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <LocationOnOutlinedIcon sx={{ fontSize: 20, color: P }} />
+            </Box>
+            <Box>
+              <Typography sx={{ fontSize: "1rem", fontWeight: 500 }}>Delivery Address</Typography>
+              <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>
+                Where should we deliver your order?
+              </Typography>
+            </Box>
+          </Box>
 
           <Box sx={{ p: 2.5 }}>
             <Box component="form" noValidate onSubmit={handleSubmit}>
 
               {/* Address label */}
               <Box sx={{ mb: 2.5 }}>
-                <Typography variant="body2" fontWeight={600} sx={{ mb: 1, color: "#44403c" }}>
+                <Typography sx={{ fontSize: "0.875rem", fontWeight: 500, mb: 1, color: "#374151" }}>
                   Address Label{" "}
-                  <Typography component="span" variant="caption" color="text.secondary">(optional)</Typography>
+                  <Typography component="span" sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>(optional)</Typography>
                 </Typography>
                 <AddressLabelChips
                   value={shippingAddress.label}
@@ -676,18 +641,17 @@ export const ShippingStep = ({
                 fullWidth
                 multiline
                 rows={2}
-                sx={{ mb: 2.5, ...fieldSx }}
+                sx={{ mb: 2.5, ...multilineSx }}
                 autoComplete="street-address"
               />
 
-              {/* Pincode / City / State / Country */}
+              {/* PIN / City / State */}
               <Grid container spacing={2} sx={{ mb: 2.5 }}>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={4}>
                   <TextField
                     label={
                       <span>
-                        PIN Code
-                        {pincodeLoading && <CircularProgress size={11} sx={{ ml: 0.75 }} />}
+                        PIN Code{pincodeLoading && <CircularProgress size={10} sx={{ ml: 0.75 }} />}
                       </span>
                     }
                     name="zipCode"
@@ -711,21 +675,14 @@ export const ShippingStep = ({
                         : undefined
                     }
                     FormHelperTextProps={{
-                      sx: { color: pincodeAutoFilled && !pincodeError ? "#16a34a" : undefined, fontWeight: 600 },
+                      sx: { color: pincodeAutoFilled && !pincodeError ? "#16a34a" : undefined, fontWeight: 500, fontSize: "0.7rem" },
                     }}
                     sx={fieldSx}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={4}>
                   <TextField
-                    label={
-                      <span>
-                        City
-                        {pincodeAutoFilled && (
-                          <Chip label="Auto" size="small" color="success" sx={{ ml: 0.5, height: 16, fontSize: "0.6rem" }} />
-                        )}
-                      </span>
-                    }
+                    label="City"
                     name="city"
                     value={shippingAddress.city}
                     onChange={(e) => { setPincodeAutoFilled(false); handleInputChange(e); }}
@@ -739,16 +696,9 @@ export const ShippingStep = ({
                     }}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={4}>
                   <TextField
-                    label={
-                      <span>
-                        State
-                        {pincodeAutoFilled && (
-                          <Chip label="Auto" size="small" color="success" sx={{ ml: 0.5, height: 16, fontSize: "0.6rem" }} />
-                        )}
-                      </span>
-                    }
+                    label="State"
                     name="state"
                     value={shippingAddress.state}
                     onChange={(e) => { setPincodeAutoFilled(false); handleInputChange(e); }}
@@ -762,23 +712,23 @@ export const ShippingStep = ({
                     }}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    label="Country"
-                    name="country"
-                    value={shippingAddress.country}
-                    fullWidth
-                    slotProps={{ input: { readOnly: true } }}
-                    sx={{ "& .MuiOutlinedInput-root": { bgcolor: "#f5f5f4", borderRadius: 2 } }}
-                  />
-                </Grid>
               </Grid>
+
+              {/* Country — full width, disabled */}
+              <TextField
+                label="Country"
+                name="country"
+                value="🇮🇳  India"
+                fullWidth
+                disabled
+                sx={{ mb: 2.5, "& .MuiOutlinedInput-root": { borderRadius: "8px", bgcolor: "#f9fafb", height: 40, fontSize: "0.875rem" } }}
+              />
 
               {/* Phone */}
               <Box sx={{ mb: 2.5 }}>
-                <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75, color: "#44403c" }}>
+                <Typography sx={{ fontSize: "0.875rem", fontWeight: 500, mb: 0.75, color: "#374151" }}>
                   Phone Number{" "}
-                  <Typography component="span" variant="caption" color="text.secondary">
+                  <Typography component="span" sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>
                     (India · 10 digits)
                   </Typography>
                 </Typography>
@@ -794,14 +744,24 @@ export const ShippingStep = ({
                   inputMode="numeric"
                   style={{
                     width: "100%",
-                    padding: "12px 14px",
-                    border: "1px solid #c4c4c4",
+                    height: 40,
+                    padding: "0 14px",
+                    border: "1px solid #d1d5db",
                     borderRadius: 8,
-                    fontSize: "1rem",
+                    fontSize: "0.875rem",
                     fontFamily: "inherit",
                     outline: "none",
                     boxSizing: "border-box",
-                    transition: "border-color 0.15s",
+                    transition: "border-color 0.15s, box-shadow 0.15s",
+                    color: "#1c1917",
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = P;
+                    e.target.style.boxShadow = "0 0 0 3px rgba(139,34,82,0.12)";
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = "#d1d5db";
+                    e.target.style.boxShadow = "none";
                   }}
                 />
               </Box>
@@ -821,9 +781,9 @@ export const ShippingStep = ({
                 sx={{
                   mb: 2.5,
                   p: 2,
-                  bgcolor: "#fafaf9",
-                  border: "1px solid #f0e8e2",
-                  borderRadius: 2,
+                  bgcolor: "#f9fafb",
+                  border: `0.5px solid ${BORDER}`,
+                  borderRadius: "10px",
                 }}
               >
                 <FormControlLabel
@@ -831,41 +791,54 @@ export const ShippingStep = ({
                     <Checkbox
                       checked={saveAddressToBook}
                       onChange={(e) => setSaveAddressToBook(e.target.checked)}
-                      sx={{ "&.Mui-checked": { color: "#8B1A4A" } }}
+                      size="small"
+                      sx={{ "&.Mui-checked": { color: P } }}
                     />
                   }
-                  label={<Typography variant="body2" fontWeight={500}>Save this address to my account</Typography>}
+                  label={
+                    <Typography sx={{ fontSize: "0.8125rem", color: "#374151" }}>
+                      Save this address to my account
+                    </Typography>
+                  }
                 />
                 <FormControlLabel
                   control={
                     <Checkbox
                       checked={shippingAddress.isDefault}
                       onChange={(e) => setShippingAddress((prev) => ({ ...prev, isDefault: e.target.checked }))}
-                      sx={{ "&.Mui-checked": { color: "#8B1A4A" } }}
+                      size="small"
+                      sx={{ "&.Mui-checked": { color: P } }}
                     />
                   }
-                  label={<Typography variant="body2" fontWeight={500}>Make this my default address</Typography>}
+                  label={
+                    <Typography sx={{ fontSize: "0.8125rem", color: "#374151" }}>
+                      Make this my default address
+                    </Typography>
+                  }
                 />
               </Box>
 
               {(error || localError) && (
-                <Alert severity="error" sx={{ mb: 2.5, borderRadius: 2 }}>
+                <Alert severity="error" sx={{ mb: 2.5, borderRadius: "10px" }}>
                   {localError || error}
                 </Alert>
               )}
 
-              <Stack direction="row" spacing={1.5}>
+              <Stack direction="row" spacing={1.5} justifyContent="space-between">
                 <Button
                   variant="outlined"
                   startIcon={<ArrowBackIcon />}
                   onClick={() => setCurrentStep(1)}
                   sx={{
-                    minWidth: 100,
-                    py: 1.25,
-                    borderColor: "#e7e5e4",
-                    color: "text.secondary",
-                    borderRadius: 2,
-                    "&:hover": { borderColor: "#8B1A4A", color: "#8B1A4A" },
+                    height: 48,
+                    px: 3,
+                    borderRadius: "10px",
+                    borderColor: P,
+                    color: P,
+                    fontWeight: 500,
+                    fontSize: "0.875rem",
+                    textTransform: "none",
+                    "&:hover": { bgcolor: P_LIGHT, borderColor: P },
                   }}
                 >
                   Back
@@ -878,13 +851,14 @@ export const ShippingStep = ({
                   disabled={loading}
                   sx={{
                     flex: 1,
-                    py: 1.5,
-                    fontSize: "0.95rem",
-                    fontWeight: 700,
-                    borderRadius: 2,
-                    background: "linear-gradient(135deg, #8B1A4A, #7a1640)",
-                    boxShadow: "0 4px 14px rgba(139,26,74,0.35)",
-                    "&:hover": { background: "linear-gradient(135deg, #7a1640, #6b1236)" },
+                    height: 48,
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    borderRadius: "10px",
+                    bgcolor: P,
+                    textTransform: "none",
+                    boxShadow: "0 2px 12px rgba(139,34,82,0.28)",
+                    "&:hover": { bgcolor: "#7a1d47", boxShadow: "0 4px 16px rgba(139,34,82,0.36)" },
                   }}
                 >
                   {loading ? "Saving…" : "Continue to Payment"}
@@ -895,105 +869,77 @@ export const ShippingStep = ({
         </Paper>
       </Grid>
 
-      {/* Sidebar: order summary */}
-      <Grid item xs={12} md={4}>
+      {/* ── Right: compact order summary ─────────────────────────────── */}
+      <Grid item xs={12} sm={5} lg={4}>
         <Paper
           elevation={0}
           sx={{
-            border: "1px solid #f0e8e2",
-            borderRadius: 3,
+            border: `0.5px solid ${BORDER}`,
+            borderRadius: "12px",
+            bgcolor: "#fff",
+            position: { sm: "sticky" },
+            top: { sm: "24px" },
             overflow: "hidden",
-            position: { md: "sticky" },
-            top: { md: 80 },
-            boxShadow: "0 4px 24px rgba(139,26,74,0.10)",
           }}
         >
-          {/* Rose gradient header */}
-          <Box
-            sx={{
-              px: 3,
-              py: 2.5,
-              background: "linear-gradient(135deg, #8B1A4A 0%, #7a1640 100%)",
-            }}
-          >
-            <Typography variant="subtitle1" fontWeight={700} sx={{ color: "white", mb: 0.25 }}>
-              Order Summary
-            </Typography>
-            <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.7)" }}>
+          <Box sx={{ px: 2.5, py: 2, borderBottom: `0.5px solid ${BORDER}` }}>
+            <Typography sx={{ fontSize: "1rem", fontWeight: 500, mb: 0.25 }}>Order Summary</Typography>
+            <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>
               {cartItems.length} item{cartItems.length !== 1 ? "s" : ""}
             </Typography>
           </Box>
 
           <Box sx={{ p: 2.5 }}>
-            <Stack spacing={1.5} sx={{ mb: 2.5 }}>
-              {cartItems.slice(0, 3).map((item) => (
+            <Stack spacing={1.5} sx={{ mb: 2 }}>
+              {cartItems.map((item) => (
                 <Stack key={item.product._id} direction="row" alignItems="center" spacing={1.25}>
                   <ProductThumb product={item.product} size="xs" />
                   <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography variant="caption" fontWeight={600} noWrap display="block">
+                    <Typography sx={{ fontSize: "0.8125rem", fontWeight: 500 }} noWrap>
                       {item.product.name}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary">Qty: {item.quantity}</Typography>
+                    <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", display: "block" }}>
+                      Qty {item.quantity} × ₹{item.product.price}
+                    </Typography>
                   </Box>
-                  <Typography variant="caption" fontWeight={700}>₹{item.totalPrice}</Typography>
+                  <Typography sx={{ fontSize: "0.8125rem", fontWeight: 500, flexShrink: 0 }}>
+                    ₹{item.totalPrice?.toLocaleString()}
+                  </Typography>
                 </Stack>
               ))}
-              {cartItems.length > 3 && (
-                <Typography variant="caption" color="text.secondary">
-                  +{cartItems.length - 3} more items
+            </Stack>
+
+            <Divider sx={{ borderColor: BORDER, mb: 2 }} />
+
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.25 }}>
+              <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>Subtotal</Typography>
+              <Typography sx={{ fontSize: "0.9375rem", fontWeight: 500 }}>₹{subtotal.toFixed(2)}</Typography>
+            </Stack>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: "100%" }}>
+              <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>Shipping</Typography>
+              {shippingRate ? (
+                <Typography sx={{ fontSize: "0.9375rem", fontWeight: 500 }}>
+                  {shippingRate.rate === 0 ? "FREE" : `₹${shippingRate.rate}`}
+                </Typography>
+              ) : (
+                <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", fontStyle: "italic" }}>
+                  Enter PIN to calculate
                 </Typography>
               )}
             </Stack>
 
-            <Divider sx={{ borderColor: "#f0e8e2", mb: 2 }} />
+            <Divider sx={{ borderColor: BORDER, my: 2 }} />
 
-            <Stack spacing={1.25}>
-              <Stack direction="row" justifyContent="space-between">
-                <Typography variant="body2" color="text.secondary">Subtotal</Typography>
-                <Typography variant="body2" fontWeight={600}>₹{subtotal.toFixed(2)}</Typography>
-              </Stack>
-              {shippingRate ? (
-                <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-                  <Box>
-                    <Typography variant="body2" color="text.secondary">Shipping</Typography>
-                    {zoneKey && (
-                      <Typography variant="caption" color="text.secondary">{ROAD_ZONES[zoneKey]?.label}</Typography>
-                    )}
-                  </Box>
-                  {shippingRate.rate === 0 ? (
-                    <Chip label="FREE" size="small" color="success" sx={{ height: 20 }} />
-                  ) : (
-                    <Typography variant="body2" fontWeight={600}>₹{shippingRate.rate}</Typography>
-                  )}
-                </Stack>
-              ) : (
-                <Stack direction="row" justifyContent="space-between">
-                  <Typography variant="body2" color="text.secondary">Shipping</Typography>
-                  <Typography variant="caption" sx={{ color: "#8B1A4A", fontStyle: "italic" }}>
-                    Enter PIN to calculate
-                  </Typography>
-                </Stack>
-              )}
-            </Stack>
-
-            <Divider sx={{ borderColor: "#f0e8e2", my: 2 }} />
-
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <Typography variant="subtitle1" fontWeight={700}>Total</Typography>
-              <Typography variant="h6" fontWeight={800} sx={{ color: "#8B1A4A" }}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: "100%" }}>
+              <Typography sx={{ fontSize: "1rem", fontWeight: 500 }}>Total</Typography>
+              <Typography sx={{ fontSize: "1.25rem", fontWeight: 600, color: P }}>
                 ₹{displayTotal.toFixed(2)}
               </Typography>
             </Stack>
-          </Box>
 
-          <Box sx={{ borderTop: "1px solid #f0e8e2", bgcolor: "#fafaf9", px: 2.5, py: 2 }}>
-            <Stack direction="row" justifyContent="space-around">
-              {["🔒 Secure", "🚚 Tracked", "↩ Returns"].map((t) => (
-                <Typography key={t} variant="caption" color="text.secondary" sx={{ fontSize: "0.72rem" }}>
-                  {t}
-                </Typography>
-              ))}
-            </Stack>
+            <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", mt: 1.5, fontStyle: "italic" }}>
+              Shipping calculated at next step
+            </Typography>
           </Box>
         </Paper>
       </Grid>

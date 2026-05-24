@@ -151,8 +151,10 @@ const muiTheme = createTheme({
         },
         a: { textDecoration: "none", color: "inherit" },
         ":focus-visible": {
-          outline: `2px solid ${BRAND.rose[800]}`,
-          outlineOffset: "2px",
+          outline: "none",
+        },
+        "input:focus, textarea:focus, select:focus": {
+          outline: "none",
         },
         "::selection": { background: alpha(BRAND.rose[800], 0.18) },
         "input[type=number]": { MozAppearance: "textfield" },
@@ -181,10 +183,6 @@ const muiTheme = createTheme({
           padding: "0.5rem 1.25rem",
           fontSize: "0.9rem",
           transition: "all 180ms cubic-bezier(0.4,0,0.2,1)",
-          "&:focus-visible": {
-            outline: `2px solid ${BRAND.rose[800]}`,
-            outlineOffset: "2px",
-          },
         },
         sizeSmall: { padding: "0.3rem 0.875rem", fontSize: "0.8125rem" },
         sizeLarge: { padding: "0.7rem 1.75rem", fontSize: "1rem" },
@@ -244,10 +242,6 @@ const muiTheme = createTheme({
           borderRadius: 10,
           transition: "all 180ms ease",
           "&:hover": { transform: "translateY(-1px)" },
-          "&:focus-visible": {
-            outline: `2px solid ${BRAND.rose[800]}`,
-            outlineOffset: "2px",
-          },
         },
         colorPrimary: {
           color: BRAND.rose[800],
@@ -273,9 +267,6 @@ const muiTheme = createTheme({
               borderColor: BRAND.rose[800],
               borderWidth: "1.5px",
             },
-            "&.Mui-focused": {
-              boxShadow: `0 0 0 3px ${alpha(BRAND.rose[800], 0.12)}`,
-            },
           },
           "& .MuiInputLabel-root.Mui-focused": { color: BRAND.rose[800] },
         },
@@ -291,9 +282,6 @@ const muiTheme = createTheme({
           "&.Mui-focused fieldset": {
             borderColor: BRAND.rose[800],
             borderWidth: "1.5px",
-          },
-          "&.Mui-focused": {
-            boxShadow: `0 0 0 3px ${alpha(BRAND.rose[800], 0.12)}`,
           },
         },
       },

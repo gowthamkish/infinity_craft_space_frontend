@@ -1,5 +1,4 @@
-import React, { useMemo, useCallback, memo } from 'react';
-import { FixedSizeGrid as Grid } from 'react-window';
+import { useMemo, useCallback, memo } from 'react';
 import Grid from "@mui/material/Grid";
 
 // Virtualized Product Grid for better performance with large datasets

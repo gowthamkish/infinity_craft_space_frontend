@@ -347,7 +347,7 @@ export default function Checkout() {
 
   if (cartItems.length === 0 && currentStep === 1) {
     return (
-      <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
+      <Box sx={{ minHeight: "100vh", bgcolor: "#fdf8f5" }}>
         <Header />
         <EmptyCart navigate={navigate} />
       </Box>
@@ -371,23 +371,24 @@ export default function Checkout() {
         noindex={true}
         canonical={`${SEO_CONFIG.SITE_URL}/checkout`}
       />
-      <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
+      <Box sx={{ minHeight: "100vh", bgcolor: "#fdf8f5" }}>
         <Header />
-        <Container maxWidth="lg" sx={{ py: { xs: 2, md: 4 } }}>
-          {/* Stepper */}
+        <Container maxWidth="lg" sx={{ py: { xs: 2, md: 4 }, px: { xs: 2, sm: 3 } }}>
+          {/* Stepper card */}
           <Box
             sx={{
-              mb: { xs: 3, md: 4 },
-              p: { xs: 2, md: 3 },
-              bgcolor: "background.paper",
-              borderRadius: 3,
-              border: "1px solid #f0e8e2",
-              boxShadow: "0 2px 12px rgba(139,26,74,0.07)",
+              mb: { xs: 2.5, md: 3 },
+              px: { xs: 2, md: 3 },
+              pt: 2,
+              pb: 2.5,
+              bgcolor: "#fff",
+              borderRadius: "12px",
+              border: "0.5px solid rgba(0,0,0,0.09)",
             }}
           >
-            <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.75} sx={{ mb: 2.5 }}>
-              <LockIcon sx={{ fontSize: 13, color: "#8B1A4A" }} />
-              <Typography variant="caption" sx={{ color: "#8B1A4A", fontWeight: 700, letterSpacing: "0.05em" }}>
+            <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 2 }}>
+              <LockIcon sx={{ fontSize: 12, color: "#9ca3af" }} />
+              <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>
                 Secure &amp; Encrypted Checkout
               </Typography>
             </Stack>
@@ -395,14 +396,19 @@ export default function Checkout() {
               activeStep={currentStep - 1}
               alternativeLabel
               sx={{
-                "& .MuiStepLabel-label": { fontWeight: 600, fontSize: "0.8rem" },
-                "& .MuiStepLabel-label.Mui-active": { color: "#8B1A4A", fontWeight: 700 },
-                "& .MuiStepLabel-label.Mui-completed": { color: "#8B1A4A" },
-                "& .MuiStepIcon-root.Mui-active": { color: "#8B1A4A" },
-                "& .MuiStepIcon-root.Mui-completed": { color: "#8B1A4A" },
-                "& .MuiStepConnector-line": { borderColor: "#f0e8e2" },
-                "& .MuiStepConnector-root.Mui-active .MuiStepConnector-line": { borderColor: "#8B1A4A" },
-                "& .MuiStepConnector-root.Mui-completed .MuiStepConnector-line": { borderColor: "#8B1A4A" },
+                "& .MuiStepLabel-label": { fontWeight: 400, fontSize: "0.75rem", mt: 0.5, color: "#9ca3af" },
+                "& .MuiStepLabel-label.Mui-active": { color: "#8b2252", fontWeight: 500 },
+                "& .MuiStepLabel-label.Mui-completed": { color: "#8b2252", fontWeight: 400 },
+                "& .MuiStepIcon-root": { width: 32, height: 32, color: "#e5e7eb" },
+                "& .MuiStepIcon-root.Mui-active": { color: "#8b2252" },
+                "& .MuiStepIcon-root.Mui-completed": { color: "#8b2252" },
+                "& .MuiStepIcon-text": { fontSize: "0.75rem", fontWeight: 600 },
+                "& .MuiStepConnector-line": {
+                  borderColor: "#e5e7eb",
+                  borderTopWidth: 2,
+                },
+                "& .MuiStepConnector-root.Mui-active .MuiStepConnector-line": { borderColor: "#8b2252" },
+                "& .MuiStepConnector-root.Mui-completed .MuiStepConnector-line": { borderColor: "#8b2252" },
               }}
             >
               {steps.map((step) => (
