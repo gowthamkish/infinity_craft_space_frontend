@@ -50,6 +50,7 @@ import Skeleton from "@mui/material/Skeleton";
 import Alert from "@mui/material/Alert";
 import Divider from "@mui/material/Divider";
 import Paper from "@mui/material/Paper";
+import Tooltip from "@mui/material/Tooltip";
 
 const ProductRecommendations = lazy(() => import("../components/ProductRecommendations"));
 const ProductQnA = lazy(() => import("../components/ProductQnA"));
@@ -250,6 +251,7 @@ const ProductDetail = () => {
   const [descExpanded, setDescExpanded] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
+  const [selectedColor, setSelectedColor] = useState(null);
   const thumbsRef = useRef(null);
 
   useEffect(() => {
@@ -297,6 +299,12 @@ const ProductDetail = () => {
     };
     checkWishlist();
   }, [isAuthenticated, product]);
+
+  useEffect(() => {
+    if (!product?.showColorPickerToUsers || !product?.colors?.length) return;
+    const first = product.colors.find((c) => c.visibleToUsers);
+    if (first) setSelectedColor(first);
+  }, [product]);
 
   useEffect(() => {
     if (!thumbsRef.current) return;
@@ -695,6 +703,59 @@ const ProductDetail = () => {
                       )}
                     </Box>
                   </Box>
+
+                  {/* Color selector */}
+                  {product.showColorPickerToUsers && (() => {
+                    const visibleColors = (product.colors || []).filter((c) => c.visibleToUsers);
+                    if (!visibleColors.length) return null;
+                    return (
+                      <Box>
+                        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+                          <SectionLabel>Available Colors</SectionLabel>
+                          {selectedColor && (
+                            <Stack direction="row" alignItems="center" spacing={0.75}>
+                              <Box sx={{ width: 12, height: 12, borderRadius: "50%", bgcolor: selectedColor.hex, border: "1px solid rgba(0,0,0,0.12)", flexShrink: 0 }} />
+                              <Typography sx={{ fontSize: "0.8125rem", fontWeight: 600, color: "text.primary" }}>
+                                {selectedColor.name}
+                              </Typography>
+                            </Stack>
+                          )}
+                        </Stack>
+                        <Stack direction="row" flexWrap="wrap" gap={1}>
+                          {visibleColors.map((c, i) => (
+                            <Tooltip key={c._id || c.id || i} title={c.name} arrow>
+                              <Box
+                                component="button"
+                                onClick={() => setSelectedColor(c)}
+                                aria-label={`Select color ${c.name}`}
+                                aria-pressed={selectedColor?.hex === c.hex}
+                                sx={{
+                                  width: 32, height: 32, borderRadius: "50%",
+                                  bgcolor: c.hex,
+                                  border: selectedColor?.hex === c.hex
+                                    ? `3px solid ${PRIMARY}`
+                                    : "2px solid rgba(0,0,0,0.12)",
+                                  boxShadow: selectedColor?.hex === c.hex
+                                    ? `0 0 0 2px rgba(139,26,74,0.2)`
+                                    : "0 1px 3px rgba(0,0,0,0.10)",
+                                  cursor: "pointer", p: 0, flexShrink: 0,
+                                  transition: "all 140ms",
+                                  "&:hover": { transform: "scale(1.18)", boxShadow: "0 2px 10px rgba(0,0,0,0.2)" },
+                                }}
+                              />
+                            </Tooltip>
+                          ))}
+                        </Stack>
+                        {selectedColor?.stock !== undefined && selectedColor?.stock !== "" && (
+                          <Typography sx={{ mt: 0.75, fontSize: "0.75rem", color: "text.disabled" }}>
+                            {Number(selectedColor.stock) > 0
+                              ? `${selectedColor.stock} available`
+                              : "Out of stock in this color"}
+                          </Typography>
+                        )}
+                      </Box>
+                    );
+                  })()}
 
                   {/* Bulk discounts */}
                   {product.bulkDiscounts?.length > 0 && (

@@ -240,6 +240,32 @@ const ProductCard = React.memo(({
           </Stack>
         )}
 
+        {/* Color swatches */}
+        {product.showColorPickerToUsers && (() => {
+          const visibleColors = (product.colors || []).filter((c) => c.visibleToUsers);
+          if (!visibleColors.length) return null;
+          const shown = visibleColors.slice(0, 7);
+          const overflow = visibleColors.length - 7;
+          return (
+            <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mt: 0.75 }}>
+              {shown.map((c, i) => (
+                <Tooltip key={c._id || c.id || i} title={c.name} arrow>
+                  <Box sx={{
+                    width: 14, height: 14, borderRadius: "50%", bgcolor: c.hex, flexShrink: 0,
+                    border: "1.5px solid rgba(0,0,0,0.14)",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+                  }} />
+                </Tooltip>
+              ))}
+              {overflow > 0 && (
+                <Typography sx={{ fontSize: "0.65rem", color: "#94a3b8", fontWeight: 700, lineHeight: 1 }}>
+                  +{overflow}
+                </Typography>
+              )}
+            </Stack>
+          );
+        })()}
+
         {/* Price row */}
         <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ mt: "auto", pt: 1.25 }}>
           <Typography component="div" sx={{ fontSize: "1.05rem", fontWeight: 800, color: "#1c1917", lineHeight: 1.4, display: "flex", alignItems: "center" }}>

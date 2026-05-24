@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Box from "@mui/material/Box";
@@ -18,11 +18,15 @@ import InputAdornment from "@mui/material/InputAdornment";
 import Alert from "@mui/material/Alert";
 import Divider from "@mui/material/Divider";
 import Tooltip from "@mui/material/Tooltip";
+import Collapse from "@mui/material/Collapse";
 import { DotsLoader } from "../Loader";
 import {
   FiArrowLeft, FiPackage, FiSave, FiCamera, FiX, FiHome,
-  FiDollarSign, FiTag, FiTruck, FiSettings, FiEdit3, FiInfo,
+  FiDollarSign, FiTruck, FiSettings, FiInfo,
+  FiChevronDown, FiChevronUp, FiPlus, FiTrash2,
+  FiEye, FiEyeOff, FiMove,
 } from "react-icons/fi";
+import { MdPalette } from "react-icons/md";
 import AdminLayout from "../admin/AdminLayout";
 import { addProduct, updateProduct } from "../../features/productsSlice";
 import { fetchPublicCategories } from "../../features/categoriesSlice";
@@ -42,6 +46,15 @@ const FIELD_SX = {
     "&.Mui-focused fieldset": { borderColor: P, boxShadow: `0 0 0 3px rgba(139,34,82,0.1)` },
   },
 };
+
+const SWITCH_SX = {
+  "& .MuiSwitch-switchBase.Mui-checked": { color: P },
+  "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": { bgcolor: P },
+};
+
+/* ── Helpers ────────────────────────────────────────────────────── */
+const isValidHex = (h) => /^#[0-9A-Fa-f]{6}$/.test(h);
+const genId      = () => Math.random().toString(36).slice(2);
 
 /* ── Section card ───────────────────────────────────────────────── */
 function SC({ children, sx }) {
@@ -123,6 +136,626 @@ function FmtBtn({ children, onClick, title }) {
 }
 
 /* ══════════════════════════════════════════════════════════════════
+   PRODUCT COLORS SECTION
+   ══════════════════════════════════════════════════════════════════ */
+function ProductColorsSection({ colors, setColors, showColorPicker, setShowColorPicker, stockErrors, setStockErrors }) {
+  const [collapsed,     setCollapsed]     = useState(false);
+  const [draftHex,      setDraftHex]      = useState("#8b2252");
+  const [draftHexInput, setDraftHexInput] = useState("#8b2252");
+  const [draftName,     setDraftName]     = useState("");
+  const [addError,      setAddError]      = useState("");
+  const [dragIdx,       setDragIdx]       = useState(null);
+  const [dropIdx,       setDropIdx]       = useState(null);
+  const [editingCell,   setEditingCell]   = useState(null); // { id, field }
+  const [editVal,       setEditVal]       = useState("");
+  const [confirmDel,    setConfirmDel]    = useState(null);
+  const [previewSel,    setPreviewSel]    = useState(null);
+  const nativePickerRef = useRef(null);
+
+  const MAX_COLORS = 12;
+  const atMax = colors.length >= MAX_COLORS;
+
+  /* ── Hex/swatch sync ──────────────────────────────────────────── */
+  const handleNativePick = (e) => {
+    const v = e.target.value;
+    setDraftHex(v);
+    setDraftHexInput(v);
+    setAddError("");
+  };
+
+  const handleHexInput = (e) => {
+    let v = e.target.value;
+    if (!v.startsWith("#")) v = "#" + v;
+    setDraftHexInput(v);
+    if (isValidHex(v)) { setDraftHex(v); setAddError(""); }
+  };
+
+  const handleHexBlur = () => {
+    if (!isValidHex(draftHexInput)) {
+      setDraftHexInput(draftHex); // revert to last valid
+    }
+  };
+
+  /* ── Add color ────────────────────────────────────────────────── */
+  const handleAddColor = () => {
+    const hex  = draftHex.trim();
+    const name = draftName.trim() || `Custom ${hex}`;
+    if (!isValidHex(hex)) { setAddError("Please enter a valid color name and hex code"); return; }
+    if (colors.some((c) => c.hex.toLowerCase() === hex.toLowerCase())) {
+      setAddError("This color already exists"); return;
+    }
+    if (atMax) return;
+    setColors((prev) => [
+      ...prev,
+      { id: genId(), name, hex, stock: "", visibleToUsers: true, sortOrder: prev.length },
+    ]);
+    setDraftName("");
+    setAddError("");
+  };
+
+  /* ── Remove color ─────────────────────────────────────────────── */
+  const handleRemove = (id) => {
+    setColors((prev) => prev.filter((c) => c.id !== id));
+    setConfirmDel(null);
+    if (previewSel !== null) setPreviewSel(null);
+  };
+
+  /* ── Update color field ───────────────────────────────────────── */
+  const updateColor = (id, key, val) =>
+    setColors((prev) => prev.map((c) => c.id === id ? { ...c, [key]: val } : c));
+
+  /* ── Inline editing ───────────────────────────────────────────── */
+  const startEdit = (id, field, current) => {
+    setEditingCell({ id, field });
+    setEditVal(current);
+  };
+  const commitEdit = (id, field) => {
+    let val = editVal.trim();
+    if (field === "hex") {
+      if (!isValidHex(val)) val = colors.find((c) => c.id === id)?.hex || val;
+    }
+    if (field === "name" && !val) val = `Custom ${colors.find((c) => c.id === id)?.hex}`;
+    updateColor(id, field, val);
+    setEditingCell(null);
+  };
+
+  /* ── Drag-to-reorder ──────────────────────────────────────────── */
+  const handleDragStart = (e, idx) => {
+    setDragIdx(idx);
+    e.dataTransfer.effectAllowed = "move";
+  };
+  const handleDragOver = (e, idx) => {
+    e.preventDefault();
+    setDropIdx(idx);
+  };
+  const handleDrop = (e, idx) => {
+    e.preventDefault();
+    if (dragIdx === null || dragIdx === idx) { setDragIdx(null); setDropIdx(null); return; }
+    setColors((prev) => {
+      const next = [...prev];
+      const [item] = next.splice(dragIdx, 1);
+      next.splice(idx, 0, item);
+      return next.map((c, i) => ({ ...c, sortOrder: i }));
+    });
+    setDragIdx(null);
+    setDropIdx(null);
+  };
+  const handleDragEnd = () => { setDragIdx(null); setDropIdx(null); };
+
+  /* ── Status chip helper ───────────────────────────────────────── */
+  const getStatusChip = (color) => {
+    if (!color.visibleToUsers) return { label: "Hidden", dot: "#94a3b8", bg: "#f8fafc", border: BORDER, text: "#6b7280" };
+    if (!showColorPicker)       return { label: "Hidden (master off)", dot: "#d97706", bg: "#fffbeb", border: "#fde68a", text: "#92400e" };
+    return { label: "Visible", dot: "#10b981", bg: "#f0fdf4", border: "#bbf7d0", text: "#059669" };
+  };
+
+  /* ── Visible colors for preview ───────────────────────────────── */
+  const visibleColors = colors.filter((c) => c.visibleToUsers);
+
+  return (
+    <Card elevation={0} sx={{ border: `1px solid ${BORDER}`, borderRadius: "16px", bgcolor: "#fff", overflow: "visible" }}>
+      <CardContent sx={{ p: 3, "&:last-child": { pb: collapsed ? 3 : 3 } }}>
+
+        {/* ── Section header row ─────────────────────────────────── */}
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: collapsed ? 0 : 0.75 }}>
+          <Stack direction="row" alignItems="center" spacing={1.25}>
+            <Box sx={{
+              width: 34, height: 34, borderRadius: "9px", flexShrink: 0,
+              bgcolor: "rgba(139,34,82,0.08)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <MdPalette size={17} style={{ color: P }} />
+            </Box>
+            <Box>
+              <Typography sx={{ fontWeight: 700, fontSize: "0.9375rem", color: "#0f172a", lineHeight: 1.1 }}>
+                Product Colors
+              </Typography>
+              {colors.length > 0 && (
+                <Typography sx={{ fontSize: "0.72rem", color: "#94a3b8" }}>
+                  {colors.length} color{colors.length !== 1 ? "s" : ""} · {visibleColors.length} visible
+                </Typography>
+              )}
+            </Box>
+          </Stack>
+
+          <Stack direction="row" alignItems="center" spacing={1.5}>
+            {/* Master visibility toggle */}
+            <Stack direction="row" alignItems="center" spacing={0.75}>
+              <Typography sx={{ fontSize: "0.8125rem", color: "#374151", fontWeight: 500 }}>
+                Show color picker to customers
+              </Typography>
+              <Switch
+                size="small"
+                checked={showColorPicker}
+                onChange={(e) => setShowColorPicker(e.target.checked)}
+                sx={SWITCH_SX}
+              />
+            </Stack>
+
+            {/* Collapse chevron */}
+            <Box
+              onClick={() => setCollapsed((v) => !v)}
+              sx={{
+                width: 30, height: 30, borderRadius: "8px", border: `1px solid ${BORDER}`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", color: "#64748b",
+                "&:hover": { bgcolor: "#f8fafc", color: P },
+                transition: "all 0.15s",
+              }}
+            >
+              {collapsed ? <FiChevronDown size={15} /> : <FiChevronUp size={15} />}
+            </Box>
+          </Stack>
+        </Stack>
+
+        <Collapse in={!collapsed}>
+          <Box>
+            <Typography sx={{ fontSize: "0.75rem", color: "#94a3b8", mb: 2.5, mt: 0.5 }}>
+              Add color variants customers can choose from. Toggle visibility per color.
+            </Typography>
+
+            {/* ── Add color row ───────────────────────────────────── */}
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25} alignItems="flex-start" sx={{ mb: 1.5 }}>
+
+              {/* Swatch + native picker */}
+              <Box sx={{ flexShrink: 0 }}>
+                <Tooltip title="Click to pick color" arrow>
+                  <Box
+                    onClick={() => nativePickerRef.current?.click()}
+                    sx={{
+                      width: 40, height: 40, borderRadius: "8px",
+                      bgcolor: draftHex, border: `2px solid ${BORDER}`,
+                      cursor: "pointer", flexShrink: 0,
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                      transition: "transform 0.15s, box-shadow 0.15s",
+                      "&:hover": { transform: "scale(1.08)", boxShadow: "0 4px 14px rgba(0,0,0,0.2)" },
+                    }}
+                  />
+                </Tooltip>
+                <input
+                  ref={nativePickerRef}
+                  type="color"
+                  value={draftHex}
+                  onChange={handleNativePick}
+                  style={{ position: "absolute", opacity: 0, pointerEvents: "none", width: 0, height: 0 }}
+                />
+              </Box>
+
+              {/* Hex text input */}
+              <TextField
+                size="small"
+                value={draftHexInput}
+                onChange={handleHexInput}
+                onBlur={handleHexBlur}
+                placeholder="#8b2252"
+                sx={{
+                  width: 116,
+                  ...FIELD_SX,
+                  "& input": { fontFamily: "monospace", fontSize: "0.875rem", height: "auto" },
+                  "& .MuiOutlinedInput-root": {
+                    ...FIELD_SX["& .MuiOutlinedInput-root"],
+                    height: 40,
+                  },
+                }}
+              />
+
+              {/* Color name input */}
+              <Box sx={{ flex: 1, minWidth: 0, position: "relative" }}>
+                <TextField
+                  fullWidth size="small"
+                  value={draftName}
+                  onChange={(e) => {
+                    if (e.target.value.length <= 30) setDraftName(e.target.value);
+                    setAddError("");
+                  }}
+                  placeholder="Color name (e.g. Midnight Black)"
+                  sx={{
+                    ...FIELD_SX,
+                    "& .MuiOutlinedInput-root": {
+                      ...FIELD_SX["& .MuiOutlinedInput-root"],
+                      height: 40,
+                    },
+                  }}
+                  slotProps={{ htmlInput: { maxLength: 30 } }}
+                />
+                {draftName.length >= 25 && (
+                  <Typography sx={{
+                    position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+                    fontSize: "0.68rem", color: draftName.length >= 30 ? "#ef4444" : "#94a3b8",
+                    pointerEvents: "none",
+                  }}>
+                    {draftName.length}/30
+                  </Typography>
+                )}
+              </Box>
+
+              {/* Add button */}
+              <Tooltip title={atMax ? "Maximum 12 colors reached" : ""} arrow>
+                <span>
+                  <Button
+                    type="button"
+                    onClick={handleAddColor}
+                    disabled={atMax}
+                    startIcon={<FiPlus size={14} />}
+                    sx={{
+                      height: 40, borderRadius: "8px", textTransform: "none",
+                      fontWeight: 600, fontSize: "0.8125rem", flexShrink: 0,
+                      border: `1.5px solid ${P}`, color: P, bgcolor: "transparent",
+                      "&:hover": { bgcolor: P_LIGHT },
+                      "&:disabled": { borderColor: BORDER, color: "#94a3b8" },
+                      transition: "all 0.15s",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Add Color
+                  </Button>
+                </span>
+              </Tooltip>
+            </Stack>
+
+            {/* Add error */}
+            {addError && (
+              <Typography sx={{ fontSize: "0.75rem", color: "#ef4444", mb: 1.5, ml: 0.25 }}>
+                {addError}
+              </Typography>
+            )}
+
+            {/* ── Color list + preview ────────────────────────────── */}
+            <Grid container spacing={2.5} alignItems="flex-start">
+
+              {/* List */}
+              <Grid size={{ xs: 12, md: colors.length > 0 ? 8 : 12 }}>
+                <Box sx={{
+                  border: `1px solid ${BORDER}`, borderRadius: "12px",
+                  bgcolor: "#fafbfc", overflow: "hidden",
+                  minHeight: 80,
+                }}>
+                  {colors.length === 0 ? (
+                    /* Empty state */
+                    <Stack alignItems="center" justifyContent="center" spacing={0.75} sx={{ py: 4 }}>
+                      <MdPalette size={32} style={{ color: "#d1d5db" }} />
+                      <Typography sx={{ fontSize: "0.875rem", color: "#94a3b8", fontWeight: 500 }}>
+                        No colors added yet
+                      </Typography>
+                      <Typography sx={{ fontSize: "0.75rem", color: "#b0b7c3" }}>
+                        Add your first color variant above
+                      </Typography>
+                    </Stack>
+                  ) : (
+                    <Box>
+                      {colors.map((color, idx) => {
+                        const chip       = getStatusChip(color);
+                        const isDragging = dragIdx === idx;
+                        const isDropTarget = dropIdx === idx && dragIdx !== null && dragIdx !== idx;
+                        const isEditing  = (field) => editingCell?.id === color.id && editingCell?.field === field;
+                        const hasStockError = stockErrors[color.id];
+
+                        return (
+                          <Box
+                            key={color.id}
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, idx)}
+                            onDragOver={(e) => handleDragOver(e, idx)}
+                            onDrop={(e) => handleDrop(e, idx)}
+                            onDragEnd={handleDragEnd}
+                            sx={{
+                              px: 1.75, py: 1.5,
+                              borderBottom: idx < colors.length - 1 ? `1px solid ${BORDER}` : "none",
+                              borderTop: isDropTarget ? `2px solid ${P}` : "2px solid transparent",
+                              opacity: isDragging ? 0.45 : 1,
+                              bgcolor: isDragging ? `${P}08` : "transparent",
+                              transition: "opacity 0.15s, background 0.15s",
+                              /* Animate in */
+                              animation: "colorRowIn 0.2s ease both",
+                              "@keyframes colorRowIn": {
+                                from: { opacity: 0, transform: "translateY(-6px)" },
+                                to:   { opacity: 1, transform: "translateY(0)" },
+                              },
+                            }}
+                          >
+                            <Stack direction="row" alignItems="center" spacing={1.25} flexWrap="wrap" gap={1}>
+
+                              {/* Drag handle */}
+                              <Box sx={{ color: "#d1d5db", cursor: "grab", display: "flex", "&:active": { cursor: "grabbing" } }}>
+                                <FiMove size={15} />
+                              </Box>
+
+                              {/* Color swatch */}
+                              <Box sx={{
+                                width: 32, height: 32, borderRadius: "7px", flexShrink: 0,
+                                bgcolor: color.hex,
+                                border: `1.5px solid rgba(0,0,0,0.12)`,
+                                boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+                              }} />
+
+                              {/* Name + hex */}
+                              <Box sx={{ flex: 1, minWidth: 100 }}>
+                                {isEditing("name") ? (
+                                  <input
+                                    autoFocus
+                                    value={editVal}
+                                    maxLength={30}
+                                    onChange={(e) => setEditVal(e.target.value)}
+                                    onBlur={() => commitEdit(color.id, "name")}
+                                    onKeyDown={(e) => { if (e.key === "Enter") commitEdit(color.id, "name"); if (e.key === "Escape") setEditingCell(null); }}
+                                    style={{
+                                      width: "100%", border: `1px solid ${P}`, borderRadius: 6,
+                                      outline: "none", padding: "2px 6px", fontSize: "0.875rem",
+                                      fontWeight: 500, color: "#0f172a", background: "#fff",
+                                      boxShadow: `0 0 0 2px rgba(139,34,82,0.1)`,
+                                    }}
+                                  />
+                                ) : (
+                                  <Typography
+                                    onClick={() => startEdit(color.id, "name", color.name)}
+                                    sx={{
+                                      fontSize: "0.875rem", fontWeight: 600, color: "#0f172a",
+                                      cursor: "text", lineHeight: 1.3,
+                                      "&:hover": { color: P },
+                                      transition: "color 0.15s",
+                                    }}
+                                    title="Click to edit name"
+                                  >
+                                    {color.name}
+                                  </Typography>
+                                )}
+
+                                {isEditing("hex") ? (
+                                  <input
+                                    autoFocus
+                                    value={editVal}
+                                    onChange={(e) => setEditVal(e.target.value)}
+                                    onBlur={() => commitEdit(color.id, "hex")}
+                                    onKeyDown={(e) => { if (e.key === "Enter") commitEdit(color.id, "hex"); if (e.key === "Escape") setEditingCell(null); }}
+                                    style={{
+                                      width: 90, border: `1px solid ${P}`, borderRadius: 5,
+                                      outline: "none", padding: "1px 5px", fontSize: "0.72rem",
+                                      fontFamily: "monospace", color: "#475569", background: "#fff",
+                                    }}
+                                  />
+                                ) : (
+                                  <Typography
+                                    onClick={() => startEdit(color.id, "hex", color.hex)}
+                                    sx={{
+                                      fontSize: "0.72rem", color: "#94a3b8", fontFamily: "monospace",
+                                      cursor: "text", "&:hover": { color: P }, transition: "color 0.15s",
+                                    }}
+                                    title="Click to edit hex"
+                                  >
+                                    {color.hex}
+                                  </Typography>
+                                )}
+                              </Box>
+
+                              {/* Stock input */}
+                              <Box sx={{ flexShrink: 0 }}>
+                                <Typography sx={{ fontSize: "0.68rem", fontWeight: 600, color: "#94a3b8", mb: 0.35, textAlign: "center" }}>
+                                  Stock
+                                </Typography>
+                                <Tooltip
+                                  title={hasStockError ? "Stock qty required per color" : ""}
+                                  arrow
+                                  open={!!hasStockError}
+                                  placement="top"
+                                >
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    placeholder="Qty"
+                                    value={color.stock}
+                                    onChange={(e) => {
+                                      updateColor(color.id, "stock", e.target.value);
+                                      if (e.target.value) setStockErrors((prev) => { const n = { ...prev }; delete n[color.id]; return n; });
+                                    }}
+                                    style={{
+                                      width: 60, height: 32, borderRadius: 7, textAlign: "center",
+                                      border: `1.5px solid ${hasStockError ? "#f59e0b" : BORDER}`,
+                                      outline: "none", fontSize: "0.8125rem", fontWeight: 600,
+                                      color: "#0f172a", background: hasStockError ? "#fffbeb" : "#fff",
+                                      padding: "0 6px",
+                                      boxShadow: hasStockError ? "0 0 0 2px rgba(245,158,11,0.15)" : "none",
+                                    }}
+                                  />
+                                </Tooltip>
+                              </Box>
+
+                              {/* Visibility toggle */}
+                              <Stack alignItems="center" sx={{ flexShrink: 0 }}>
+                                <Typography sx={{ fontSize: "0.68rem", color: "#94a3b8", fontWeight: 600, mb: 0.25, whiteSpace: "nowrap" }}>
+                                  Visible
+                                </Typography>
+                                <Tooltip
+                                  title={!showColorPicker ? "Enable master color toggle first" : ""}
+                                  arrow
+                                >
+                                  <span>
+                                    <Switch
+                                      size="small"
+                                      checked={color.visibleToUsers}
+                                      disabled={!showColorPicker}
+                                      onChange={(e) => updateColor(color.id, "visibleToUsers", e.target.checked)}
+                                      sx={{
+                                        opacity: !showColorPicker ? 0.45 : 1,
+                                        ...SWITCH_SX,
+                                      }}
+                                    />
+                                  </span>
+                                </Tooltip>
+                              </Stack>
+
+                              {/* Status chip */}
+                              <Box sx={{
+                                px: 1.25, height: 22, display: "inline-flex", alignItems: "center", gap: 0.6,
+                                bgcolor: chip.bg, border: `1px solid ${chip.border}`, borderRadius: "20px",
+                                flexShrink: 0,
+                              }}>
+                                <Box sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: chip.dot, flexShrink: 0 }} />
+                                <Typography sx={{ fontSize: "0.68rem", fontWeight: 700, color: chip.text, whiteSpace: "nowrap" }}>
+                                  {chip.label}
+                                </Typography>
+                              </Box>
+
+                              {/* Delete button */}
+                              {confirmDel === color.id ? (
+                                <Stack direction="row" alignItems="center" spacing={0.5} sx={{ flexShrink: 0 }}>
+                                  <Typography sx={{ fontSize: "0.72rem", color: "#64748b", whiteSpace: "nowrap" }}>
+                                    Remove {color.name.slice(0, 10)}{color.name.length > 10 ? "…" : ""}?
+                                  </Typography>
+                                  <Button type="button" size="small" onClick={() => handleRemove(color.id)}
+                                    sx={{ minWidth: 0, px: 1, py: 0.25, fontSize: "0.72rem", fontWeight: 700, color: "#ef4444",
+                                      border: "1px solid rgba(239,68,68,0.3)", borderRadius: "6px", textTransform: "none",
+                                      "&:hover": { bgcolor: "rgba(239,68,68,0.06)" } }}>
+                                    Yes
+                                  </Button>
+                                  <Button type="button" size="small" onClick={() => setConfirmDel(null)}
+                                    sx={{ minWidth: 0, px: 1, py: 0.25, fontSize: "0.72rem", color: "#64748b",
+                                      border: `1px solid ${BORDER}`, borderRadius: "6px", textTransform: "none",
+                                      "&:hover": { bgcolor: "#f8fafc" } }}>
+                                    No
+                                  </Button>
+                                </Stack>
+                              ) : (
+                                <Box
+                                  onClick={() => setConfirmDel(color.id)}
+                                  sx={{
+                                    width: 30, height: 30, borderRadius: "7px", flexShrink: 0,
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                    color: "#d1d5db", cursor: "pointer",
+                                    border: `1px solid transparent`,
+                                    "&:hover": { color: "#ef4444", bgcolor: "rgba(239,68,68,0.06)", borderColor: "rgba(239,68,68,0.2)" },
+                                    transition: "all 0.15s",
+                                  }}
+                                >
+                                  <FiTrash2 size={14} />
+                                </Box>
+                              )}
+                            </Stack>
+                          </Box>
+                        );
+                      })}
+                    </Box>
+                  )}
+                </Box>
+              </Grid>
+
+              {/* ── Customer Preview panel ──────────────────────────── */}
+              {colors.length > 0 && (
+                <Grid size={{ xs: 12, md: 4 }}>
+                  <Box sx={{
+                    border: `1px solid ${BORDER}`, borderRadius: "12px",
+                    bgcolor: "#fff", p: 2, position: "relative", overflow: "hidden",
+                  }}>
+                    <Typography sx={{
+                      fontSize: "0.68rem", fontWeight: 700, color: "#94a3b8",
+                      textTransform: "uppercase", letterSpacing: "0.08em", mb: 1.5,
+                    }}>
+                      Customer Preview
+                    </Typography>
+
+                    {/* Muted overlay when master toggle off */}
+                    {!showColorPicker && (
+                      <Box sx={{
+                        position: "absolute", inset: 0, borderRadius: "12px",
+                        bgcolor: "rgba(248,250,252,0.88)", backdropFilter: "blur(2px)",
+                        display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2,
+                      }}>
+                        <Stack alignItems="center" spacing={0.5}>
+                          <FiEyeOff size={18} style={{ color: "#94a3b8" }} />
+                          <Typography sx={{ fontSize: "0.72rem", color: "#94a3b8", textAlign: "center", px: 2 }}>
+                            Color picker hidden from customers
+                          </Typography>
+                        </Stack>
+                      </Box>
+                    )}
+
+                    {visibleColors.length === 0 && showColorPicker ? (
+                      <Box sx={{ bgcolor: "#fffbeb", border: "1px solid #fde68a", borderRadius: "8px", p: 1.5 }}>
+                        <Typography sx={{ fontSize: "0.75rem", color: "#92400e", textAlign: "center" }}>
+                          No colors visible to customers
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <Box>
+                        {/* Swatch row */}
+                        <Stack direction="row" flexWrap="wrap" gap={0.875} sx={{ mb: 1.5 }}>
+                          {visibleColors.map((c, i) => {
+                            const selected = previewSel === c.id;
+                            return (
+                              <Tooltip key={c.id} title={c.name} arrow>
+                                <Box
+                                  onClick={() => setPreviewSel(selected ? null : c.id)}
+                                  sx={{
+                                    width: 28, height: 28, borderRadius: "50%",
+                                    bgcolor: c.hex, cursor: "pointer",
+                                    border: selected ? `2.5px solid ${P}` : "2px solid rgba(0,0,0,0.1)",
+                                    boxShadow: selected ? `0 0 0 3px rgba(139,34,82,0.18)` : "none",
+                                    transition: "all 0.18s",
+                                    "&:hover": { transform: "scale(1.15)", boxShadow: "0 2px 8px rgba(0,0,0,0.18)" },
+                                  }}
+                                />
+                              </Tooltip>
+                            );
+                          })}
+                        </Stack>
+
+                        {/* Selected color name */}
+                        {previewSel !== null && (() => {
+                          const sel = visibleColors.find((c) => c.id === previewSel);
+                          if (!sel) return null;
+                          return (
+                            <Stack direction="row" alignItems="center" spacing={0.75}>
+                              <Box sx={{ width: 14, height: 14, borderRadius: "3px", bgcolor: sel.hex, border: "1px solid rgba(0,0,0,0.1)", flexShrink: 0 }} />
+                              <Typography sx={{ fontSize: "0.78rem", color: "#374151", fontWeight: 500 }}>
+                                Selected: <strong>{sel.name}</strong>
+                              </Typography>
+                            </Stack>
+                          );
+                        })()}
+
+                        {previewSel === null && (
+                          <Typography sx={{ fontSize: "0.72rem", color: "#94a3b8" }}>
+                            Click a swatch to preview selection
+                          </Typography>
+                        )}
+                      </Box>
+                    )}
+
+                    {/* Preview caption */}
+                    <Typography sx={{ fontSize: "0.68rem", color: "#d1d5db", mt: 1.5 }}>
+                      {visibleColors.length} of {colors.length} color{colors.length !== 1 ? "s" : ""} visible
+                    </Typography>
+                  </Box>
+                </Grid>
+              )}
+            </Grid>
+          </Box>
+        </Collapse>
+      </CardContent>
+    </Card>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════
    MAIN COMPONENT
    ══════════════════════════════════════════════════════════════════ */
 const AddProduct = () => {
@@ -144,6 +777,11 @@ const AddProduct = () => {
     isCustomizable: false, processingDaysMin: "10", processingDaysMax: "12",
   });
   const set = (key, val) => setForm((f) => ({ ...f, [key]: val }));
+
+  /* ── Color section state ───────────────────────────────────────── */
+  const [colors,           setColors]           = useState([]);
+  const [showColorPicker,  setShowColorPicker]  = useState(false);
+  const [stockErrors,      setStockErrors]      = useState({});
 
   const [weightUnit,     setWeightUnit]     = useState("g");
   const [editingId]                         = useState(params?.id ?? null);
@@ -206,9 +844,36 @@ const AddProduct = () => {
     if (!form.name.trim() || !form.price || !form.category) {
       setAlert({ show: true, message: "Please fill in all required fields", variant: "warning" }); return;
     }
+
+    /* ── Color validations ──────────────────────────────────────── */
+    // Blocking: colors with empty stock
+    if (colors.length > 0) {
+      const errs = {};
+      colors.forEach((c) => { if (c.stock === "" || c.stock === undefined) errs[c.id] = true; });
+      if (Object.keys(errs).length > 0) {
+        setStockErrors(errs);
+        setAlert({ show: true, message: "Please enter stock quantity for all color variants.", variant: "warning" });
+        return;
+      }
+    }
+
+    // Non-blocking: master ON but 0 visible colors
+    if (showColorPicker && colors.length > 0 && !colors.some((c) => c.visibleToUsers)) {
+      setAlert({
+        show: true,
+        message: "Color picker is enabled but no colors are visible to customers. Either add visible colors or disable the color picker.",
+        variant: "warning",
+      });
+      // Non-blocking — do not return, allow submit
+    }
+
     setLoading(true); setAlert({ show: false, message: "", variant: "" });
     try {
-      let productData = { ...form };
+      let productData = {
+        ...form,
+        colors: colors.map(({ id, ...c }) => c),
+        showColorPickerToUsers: showColorPicker,
+      };
       if (imageFiles.length > 0) {
         setImageUploading(true);
         try {
@@ -232,6 +897,7 @@ const AddProduct = () => {
       }
       if (!editingId) {
         setForm({ name: "", sku: "", price: "", compareAtPrice: "", description: "", category: "", subCategory: "", stock: "", lowStockThreshold: "5", trackInventory: true, estimatedDelivery: "5", weightInGrams: "500", isCustomizable: false, processingDaysMin: "10", processingDaysMax: "12" });
+        setColors([]); setShowColorPicker(false); setStockErrors({});
         removeAllImages();
       }
       setTimeout(() => navigate("/admin/products"), 1500);
@@ -261,6 +927,10 @@ const AddProduct = () => {
         processingDaysMin: product.processingDaysMin !== undefined ? String(product.processingDaysMin) : "10",
         processingDaysMax: product.processingDaysMax !== undefined ? String(product.processingDaysMax) : "12",
       });
+      if (product.colors?.length > 0) {
+        setColors(product.colors.map((c, i) => ({ ...c, id: c.id || genId(), sortOrder: c.sortOrder ?? i })));
+        setShowColorPicker(product.showColorPickerToUsers ?? false);
+      }
       if (product.images?.length > 0) setExistingImages(product.images);
       else if (product.image?.url) setExistingImages([{ url: product.image.url, originalName: product.image.originalName || "image.jpg", isPrimary: true }]);
     }
@@ -399,6 +1069,16 @@ const AddProduct = () => {
                   </Box>
                 </SC>
 
+                {/* ── Product Colors ────────────────────────────────── */}
+                <ProductColorsSection
+                  colors={colors}
+                  setColors={setColors}
+                  showColorPicker={showColorPicker}
+                  setShowColorPicker={setShowColorPicker}
+                  stockErrors={stockErrors}
+                  setStockErrors={setStockErrors}
+                />
+
                 {/* ── Product Images ────────────────────────────────── */}
                 <SC>
                   <SH icon={FiCamera} badge={`${totalImages} / 10 uploaded`}>
@@ -447,11 +1127,9 @@ const AddProduct = () => {
                       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
                         <Typography sx={{ fontWeight: 600, fontSize: "0.875rem", color: "#374151" }}>
                           Selected ({totalImages})
-                          {totalImages > 0 && (
-                            <Box component="span" sx={{ ml: 1, fontSize: "0.72rem", color: "#94a3b8", fontWeight: 400 }}>
-                              First image is the primary listing photo
-                            </Box>
-                          )}
+                          <Box component="span" sx={{ ml: 1, fontSize: "0.72rem", color: "#94a3b8", fontWeight: 400 }}>
+                            First image is the primary listing photo
+                          </Box>
                         </Typography>
                         <Button type="button" size="small" startIcon={<FiX size={12} />} onClick={removeAllImages}
                           sx={{
@@ -586,11 +1264,7 @@ const AddProduct = () => {
                       <Typography sx={{ fontWeight: 700, fontSize: "0.875rem", color: "#0f172a" }}>Track inventory</Typography>
                       <Typography sx={{ fontSize: "0.75rem", color: "#94a3b8" }}>Auto-update stock on each sale</Typography>
                     </Box>
-                    <Switch checked={form.trackInventory} onChange={(e) => set("trackInventory", e.target.checked)}
-                      sx={{
-                        "& .MuiSwitch-switchBase.Mui-checked": { color: P },
-                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": { bgcolor: P },
-                      }} />
+                    <Switch checked={form.trackInventory} onChange={(e) => set("trackInventory", e.target.checked)} sx={SWITCH_SX} />
                   </Box>
                 </SC>
 
@@ -729,7 +1403,8 @@ const AddProduct = () => {
                       "Required: name, price, and category",
                       "First image becomes the primary listing photo",
                       "Use Compare price to show a discount badge",
-                    ].map((tip) => (
+                      colors.length > 0 ? `${colors.length} color variant${colors.length !== 1 ? "s" : ""} added` : null,
+                    ].filter(Boolean).map((tip) => (
                       <Stack key={tip} direction="row" spacing={1} alignItems="flex-start">
                         <Box sx={{ width: 4, height: 4, borderRadius: "50%", bgcolor: "#94a3b8", flexShrink: 0, mt: 0.875 }} />
                         <Typography sx={{ fontSize: "0.75rem", color: "#94a3b8", lineHeight: 1.5 }}>{tip}</Typography>
