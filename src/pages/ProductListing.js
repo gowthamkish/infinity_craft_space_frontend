@@ -8,11 +8,13 @@ import { useProducts } from "../hooks/useSmartFetch";
 import {
   Box, Typography, TextField, InputAdornment, IconButton, Button,
   Chip, Drawer, Skeleton, CircularProgress, Alert, Stack, Badge, Tooltip,
+  useMediaQuery, useTheme, Divider,
 } from "@mui/material";
 import { DotsLoader, BarsLoader } from "../components/Loader";
 import {
   FiGrid, FiSliders, FiShoppingCart, FiX, FiHeart, FiTrash2,
   FiSearch, FiPackage, FiCheck, FiAlertCircle, FiEye, FiStar,
+  FiFilter,
 } from "react-icons/fi";
 import api from "../api/axios";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
@@ -338,8 +340,10 @@ const ProductCard = React.memo(({
    PAGE
    ══════════════════════════════════════════════════════════════════════ */
 const ProductListing = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const dispatch   = useDispatch();
+  const navigate   = useNavigate();
+  const theme      = useTheme();
+  const isMobile   = useMediaQuery(theme.breakpoints.down("md"));
   const { data: products, loading, error, fetchPage, pagination } = useProducts();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -618,48 +622,173 @@ const ProductListing = () => {
       </Box>
 
       {/* ── Filter Drawer ─────────────────────────────────────────── */}
-      <Drawer open={showFilters} onClose={() => setShowFilters(false)} anchor="left"
-        PaperProps={{ sx: { width: 320, bgcolor: "#fff" } }}
-        aria-labelledby="filters-drawer-title">
-        {/* Drawer header */}
-        <Stack direction="row" alignItems="center" justifyContent="space-between"
-          sx={{ px: 2.5, py: 2, borderBottom: "1px solid #e7e5e4" }}>
-          <Stack direction="row" alignItems="center" spacing={1.25}>
-            <Box sx={{ width: 32, height: 32, borderRadius: 1.5, bgcolor: "rgba(139,26,74,0.08)", display: "flex", alignItems: "center", justifyContent: "center", color: ROSE }}>
-              <FiSliders size={15} />
-            </Box>
-            <Typography variant="subtitle1" fontWeight={700} id="filters-drawer-title">Filters</Typography>
-            {activeFilterCount > 0 && (
-              <Chip label={`${activeFilterCount} active`} size="small"
-                sx={{ fontSize: "0.7rem", height: 20, bgcolor: "rgba(139,26,74,0.08)", color: ROSE, fontWeight: 700 }} />
-            )}
-          </Stack>
-          <IconButton onClick={() => setShowFilters(false)} aria-label="Close filters" size="small"
-            sx={{ color: "#94a3b8", "&:hover": { color: "#1c1917" } }}>
-            <FiX size={18} />
-          </IconButton>
-        </Stack>
+      <Drawer
+        open={showFilters}
+        onClose={() => setShowFilters(false)}
+        anchor={isMobile ? "bottom" : "left"}
+        ModalProps={{ keepMounted: false }}
+        PaperProps={{
+          sx: isMobile
+            ? {
+                borderRadius: "20px 20px 0 0",
+                maxHeight: "88vh",
+                display: "flex",
+                flexDirection: "column",
+                bgcolor: "#fff",
+              }
+            : {
+                width: 340,
+                bgcolor: "#fff",
+                display: "flex",
+                flexDirection: "column",
+                boxShadow: "8px 0 40px rgba(0,0,0,0.12)",
+              },
+        }}
+        aria-labelledby="filters-drawer-title"
+      >
+        {/* ── Mobile drag handle ── */}
+        {isMobile && (
+          <Box sx={{ display: "flex", justifyContent: "center", pt: 1.25, pb: 0.5, flexShrink: 0 }}>
+            <Box sx={{ width: 36, height: 4, borderRadius: 2, bgcolor: "#e2e8f0" }} />
+          </Box>
+        )}
 
-        <Box sx={{ px: 2.5, py: 2, overflowY: "auto", flexGrow: 1 }}>
-          <Suspense fallback={<BarsLoader size="sm" />}>
-            <ProductFilters products={products} onFiltersChange={handleFiltersChange} activeFilters={filters} onClearFilters={handleClearFilters} />
+        {/* ── Header ── */}
+        <Box sx={{
+          px: 2.5, py: 2, flexShrink: 0,
+          borderBottom: "1px solid rgba(0,0,0,0.07)",
+          background: "linear-gradient(135deg, #fff 0%, rgba(139,26,74,0.03) 100%)",
+        }}>
+          <Stack direction="row" alignItems="center" justifyContent="space-between">
+            <Stack direction="row" alignItems="center" spacing={1.5}>
+              <Box sx={{
+                width: 38, height: 38, borderRadius: "12px",
+                background: `linear-gradient(135deg, ${ROSE} 0%, #7a1640 100%)`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                boxShadow: "0 4px 12px rgba(139,26,74,0.3)",
+              }}>
+                <FiFilter size={16} color="#fff" />
+              </Box>
+              <Box>
+                <Typography variant="subtitle1" fontWeight={800} id="filters-drawer-title" sx={{ lineHeight: 1.2, color: "#1c1917" }}>
+                  Filters
+                </Typography>
+                <Typography sx={{ fontSize: "0.72rem", color: "#94a3b8", fontWeight: 500 }}>
+                  {activeFilterCount > 0 ? `${activeFilterCount} filter${activeFilterCount !== 1 ? "s" : ""} applied` : "Refine your results"}
+                </Typography>
+              </Box>
+            </Stack>
+            <Stack direction="row" alignItems="center" spacing={0.75}>
+              {activeFilterCount > 0 && (
+                <Chip
+                  label={activeFilterCount}
+                  size="small"
+                  sx={{
+                    height: 22, fontSize: "0.7rem", fontWeight: 800,
+                    bgcolor: ROSE, color: "#fff",
+                    "& .MuiChip-label": { px: 1 },
+                  }}
+                />
+              )}
+              <IconButton
+                onClick={() => setShowFilters(false)}
+                size="small"
+                aria-label="Close filters"
+                sx={{
+                  bgcolor: "#f8fafc", border: "1px solid #e2e8f0",
+                  color: "#64748b", width: 34, height: 34,
+                  "&:hover": { bgcolor: "#f1f5f9", color: "#1c1917", borderColor: "#cbd5e1" },
+                }}
+              >
+                <FiX size={16} />
+              </IconButton>
+            </Stack>
+          </Stack>
+
+          {/* Active filter chips */}
+          {activeChips.length > 0 && (
+            <Stack direction="row" flexWrap="wrap" gap={0.625} sx={{ mt: 1.5 }}>
+              {activeChips.map((chip) => (
+                <Chip
+                  key={chip.key}
+                  label={chip.label}
+                  size="small"
+                  onDelete={chip.onRemove}
+                  deleteIcon={<FiX size={10} />}
+                  sx={{
+                    height: 24, fontSize: "0.72rem", fontWeight: 600,
+                    bgcolor: "rgba(139,26,74,0.08)", color: ROSE,
+                    border: "1px solid rgba(139,26,74,0.2)",
+                    "& .MuiChip-deleteIcon": { color: ROSE, "&:hover": { color: "#7a1640" } },
+                  }}
+                />
+              ))}
+            </Stack>
+          )}
+        </Box>
+
+        {/* ── Scrollable filter body ── */}
+        <Box sx={{ overflowY: "auto", flexGrow: 1, px: 2.5, py: 2.5,
+          "&::-webkit-scrollbar": { width: 4 },
+          "&::-webkit-scrollbar-track": { bgcolor: "transparent" },
+          "&::-webkit-scrollbar-thumb": { bgcolor: "rgba(139,26,74,0.2)", borderRadius: 4 },
+        }}>
+          <Suspense fallback={
+            <Stack alignItems="center" py={5} spacing={1.5}>
+              <CircularProgress size={26} sx={{ color: ROSE }} />
+              <Typography sx={{ fontSize: "0.8125rem", color: "#94a3b8" }}>Loading filters…</Typography>
+            </Stack>
+          }>
+            <ProductFilters
+              products={products}
+              onFiltersChange={handleFiltersChange}
+              activeFilters={filters}
+              onClearFilters={handleClearFilters}
+            />
           </Suspense>
         </Box>
 
-        {/* Drawer footer */}
-        <Box sx={{ px: 2.5, py: 2, borderTop: "1px solid #e7e5e4" }}>
-          <Button variant="contained" fullWidth onClick={() => setShowFilters(false)}
+        {/* ── Sticky footer ── */}
+        <Box sx={{
+          px: 2.5, py: 2, flexShrink: 0,
+          borderTop: "1px solid rgba(0,0,0,0.07)",
+          bgcolor: "#fff",
+          boxShadow: "0 -4px 20px rgba(0,0,0,0.06)",
+          pb: isMobile ? "calc(16px + env(safe-area-inset-bottom))" : 2,
+        }}>
+          <Button
+            variant="contained"
+            fullWidth
+            size="large"
+            onClick={() => setShowFilters(false)}
             sx={{
-              textTransform: "none", borderRadius: 2, fontWeight: 700, py: 1.25,
-              background: `linear-gradient(135deg, ${ROSE}, #7a1640)`,
-              boxShadow: "0 4px 12px rgba(139,26,74,0.28)",
-              "&:hover": { background: "linear-gradient(135deg, #7a1640, #5e1232)" },
-            }}>
+              borderRadius: "12px", textTransform: "none", fontWeight: 700,
+              fontSize: "0.9375rem", py: 1.375,
+              background: `linear-gradient(135deg, ${ROSE} 0%, #7a1640 100%)`,
+              boxShadow: "0 4px 16px rgba(139,26,74,0.32)",
+              "&:hover": {
+                background: `linear-gradient(135deg, #7a1640 0%, #5e1232 100%)`,
+                boxShadow: "0 6px 20px rgba(139,26,74,0.4)",
+                transform: "translateY(-1px)",
+              },
+              transition: "all 180ms",
+            }}
+          >
             Show {filteredProducts.length} product{filteredProducts.length !== 1 ? "s" : ""}
           </Button>
+
           {activeFilterCount > 0 && (
-            <Button variant="text" fullWidth onClick={() => { handleClearFilters(); setShowFilters(false); }}
-              sx={{ textTransform: "none", mt: 1, color: "#94a3b8", fontWeight: 600, "&:hover": { color: ROSE } }}>
+            <Button
+              variant="text"
+              fullWidth
+              onClick={() => { handleClearFilters(); setShowFilters(false); }}
+              sx={{
+                mt: 1, textTransform: "none", fontWeight: 600,
+                fontSize: "0.875rem", color: "#94a3b8",
+                "&:hover": { color: ROSE, bgcolor: "rgba(139,26,74,0.05)" },
+                borderRadius: "10px",
+              }}
+            >
               Clear all filters
             </Button>
           )}

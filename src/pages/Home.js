@@ -4,7 +4,6 @@ import { useSelector, useDispatch } from "react-redux";
 import Header from "../components/Header";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 import { useProducts } from "../hooks/useSmartFetch";
-import RecentlyViewed from "../components/RecentlyViewed";
 import { buildCloudinaryUrl } from "../components/OptimizedImage";
 import { optimisticAddToCart } from "../features/cartSlice";
 import api from "../api/axios";
@@ -1270,11 +1269,6 @@ export default function Home() {
                 ))}
               </Stack>
             </Box>
-          </Box>
-
-          {/* ══ RECENTLY VIEWED ═══════════════════════════════════════════ */}
-          <Box sx={{ py: 4, bgcolor: "#fff" }}>
-            <RecentlyViewed />
           </Box>
 
           {/* ══ NEWSLETTER ════════════════════════════════════════════════ */}
