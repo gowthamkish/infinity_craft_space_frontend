@@ -13,8 +13,7 @@ import { v4 as uuid } from "uuid";
 // the _csrf cookie set by that origin is sent back correctly on this fetch.
 // VITE_API_URL points to the production Render URL; using it from a localhost
 // dev session puts the CSRF cookie on a different origin and causes 403s.
-const API_BASE =
-  import.meta.env.VITE_BASE_URL || import.meta.env.VITE_API_URL || "";
+const API_BASE = import.meta.env.VITE_API_URL || "";
 const CHAT_URL = `${API_BASE}/api/chat`;
 
 // Ensure the _csrf cookie is set on the same origin as CHAT_URL.
