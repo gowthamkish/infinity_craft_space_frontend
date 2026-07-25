@@ -14,7 +14,7 @@ import { v4 as uuid } from "uuid";
 // VITE_API_URL may point to a different host (e.g. production Render URL while
 // axios uses localhost), which would put the cookie and the request on different
 // origins and break the double-submit CSRF check.
-const API_BASE = import.meta.env.VITE_BASE_URL || import.meta.env.VITE_API_URL || "";
+const API_BASE = import.meta.env.VITE_API_URL || "";
 const CHAT_URL = `${API_BASE}/api/chat`;
 
 // Ensure the _csrf cookie is set on the same origin as CHAT_URL.
@@ -29,7 +29,9 @@ async function ensureCsrf() {
       const { csrfToken } = await res.json();
       if (csrfToken) sessionStorage.setItem("_csrf_token", csrfToken);
     }
-  } catch { /* proceed — backend will reject with 403 if truly broken */ }
+  } catch {
+    /* proceed — backend will reject with 403 if truly broken */
+  }
 }
 
 // POST to the chat endpoint, retrying once on CSRF 403.
@@ -78,7 +80,8 @@ export function useChat() {
     {
       id: uuid(),
       role: "assistant",
-      content: "Hi! I'm Aria, your Infinity Craft Space assistant 🌸 How can I help you today? You can ask me about our products, customization options, delivery, or anything else!",
+      content:
+        "Hi! I'm Aria, your Infinity Craft Space assistant 🌸 How can I help you today? You can ask me about our products, customization options, delivery, or anything else!",
       status: "done",
     },
   ]);
@@ -86,96 +89,120 @@ export function useChat() {
   const [activeTool, setActiveTool] = useState(null);
   const abortRef = useRef(null);
 
-  const sendMessage = useCallback(async (text) => {
-    if (isStreaming || !text.trim()) return;
+  const sendMessage = useCallback(
+    async (text) => {
+      if (isStreaming || !text.trim()) return;
 
-    await ensureCsrf();
+      await ensureCsrf();
 
-    const userMsg = { id: uuid(), role: "user", content: text.trim(), status: "done" };
-    const assistantId = uuid();
-    const assistantMsg = { id: assistantId, role: "assistant", content: "", status: "streaming" };
+      const userMsg = {
+        id: uuid(),
+        role: "user",
+        content: text.trim(),
+        status: "done",
+      };
+      const assistantId = uuid();
+      const assistantMsg = {
+        id: assistantId,
+        role: "assistant",
+        content: "",
+        status: "streaming",
+      };
 
-    setMessages((prev) => [...prev, userMsg, assistantMsg]);
-    setIsStreaming(true);
+      setMessages((prev) => [...prev, userMsg, assistantMsg]);
+      setIsStreaming(true);
 
-    // Build the history array Claude needs (only role + content)
-    const history = [...messages, userMsg]
-      .filter((m) => m.role === "user" || m.role === "assistant")
-      .map((m) => ({ role: m.role, content: m.content }));
+      // Build the history array Claude needs (only role + content)
+      const history = [...messages, userMsg]
+        .filter((m) => m.role === "user" || m.role === "assistant")
+        .map((m) => ({ role: m.role, content: m.content }));
 
-    const ctrl = new AbortController();
-    abortRef.current = ctrl;
+      const ctrl = new AbortController();
+      abortRef.current = ctrl;
 
-    try {
-      const res = await chatFetch(history, ctrl.signal);
+      try {
+        const res = await chatFetch(history, ctrl.signal);
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || `HTTP ${res.status}`);
-      }
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-
-        // Parse complete SSE lines
-        const lines = buffer.split("\n");
-        buffer = lines.pop(); // keep last incomplete line
-
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          try {
-            const event = JSON.parse(line.slice(6));
-            if (event.type === "text") {
-              setMessages((prev) =>
-                prev.map((m) =>
-                  m.id === assistantId
-                    ? { ...m, content: m.content + event.text }
-                    : m,
-                ),
-              );
-            } else if (event.type === "tool_start") {
-              setActiveTool(event.tool);
-            } else if (event.type === "tool_end") {
-              setActiveTool(null);
-            } else if (event.type === "done") {
-              setMessages((prev) =>
-                prev.map((m) =>
-                  m.id === assistantId ? { ...m, status: "done" } : m,
-                ),
-              );
-            } else if (event.type === "error") {
-              setMessages((prev) =>
-                prev.map((m) =>
-                  m.id === assistantId
-                    ? { ...m, content: event.message || "Something went wrong.", status: "error" }
-                    : m,
-                ),
-              );
-            }
-          } catch { /* malformed SSE line */ }
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || `HTTP ${res.status}`);
         }
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+
+          // Parse complete SSE lines
+          const lines = buffer.split("\n");
+          buffer = lines.pop(); // keep last incomplete line
+
+          for (const line of lines) {
+            if (!line.startsWith("data: ")) continue;
+            try {
+              const event = JSON.parse(line.slice(6));
+              if (event.type === "text") {
+                setMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === assistantId
+                      ? { ...m, content: m.content + event.text }
+                      : m,
+                  ),
+                );
+              } else if (event.type === "tool_start") {
+                setActiveTool(event.tool);
+              } else if (event.type === "tool_end") {
+                setActiveTool(null);
+              } else if (event.type === "done") {
+                setMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === assistantId ? { ...m, status: "done" } : m,
+                  ),
+                );
+              } else if (event.type === "error") {
+                setMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === assistantId
+                      ? {
+                          ...m,
+                          content: event.message || "Something went wrong.",
+                          status: "error",
+                        }
+                      : m,
+                  ),
+                );
+              }
+            } catch {
+              /* malformed SSE line */
+            }
+          }
+        }
+      } catch (err) {
+        if (err.name === "AbortError") return;
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId
+              ? {
+                  ...m,
+                  content:
+                    "Sorry, I couldn't connect right now. Please try again.",
+                  status: "error",
+                }
+              : m,
+          ),
+        );
+      } finally {
+        setIsStreaming(false);
+        setActiveTool(null);
+        abortRef.current = null;
       }
-    } catch (err) {
-      if (err.name === "AbortError") return;
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === assistantId
-            ? { ...m, content: "Sorry, I couldn't connect right now. Please try again.", status: "error" }
-            : m,
-        ),
-      );
-    } finally {
-      setIsStreaming(false);
-      setActiveTool(null);
-      abortRef.current = null;
-    }
-  }, [isStreaming, messages]);
+    },
+    [isStreaming, messages],
+  );
 
   const clearHistory = useCallback(() => {
     setMessages([
@@ -192,5 +219,12 @@ export function useChat() {
     abortRef.current?.abort();
   }, []);
 
-  return { messages, isStreaming, activeTool, sendMessage, clearHistory, abort };
+  return {
+    messages,
+    isStreaming,
+    activeTool,
+    sendMessage,
+    clearHistory,
+    abort,
+  };
 }
