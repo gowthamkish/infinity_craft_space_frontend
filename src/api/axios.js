@@ -23,15 +23,24 @@ async function ensureCsrfToken() {
   // Restore from sessionStorage across iOS soft-reloads (in-memory state lost)
   try {
     const cached = sessionStorage.getItem("_csrf_token");
-    if (cached) { csrfToken = cached; return csrfToken; }
-  } catch { /* sessionStorage unavailable — proceed */ }
+    if (cached) {
+      csrfToken = cached;
+      return csrfToken;
+    }
+  } catch {
+    /* sessionStorage unavailable — proceed */
+  }
   try {
     const res = await axios.get(
       `${import.meta.env.VITE_API_URL}/api/auth/csrf-token`,
       { withCredentials: true },
     );
     csrfToken = res.data.csrfToken;
-    try { sessionStorage.setItem("_csrf_token", csrfToken); } catch { /* ignore */ }
+    try {
+      sessionStorage.setItem("_csrf_token", csrfToken);
+    } catch {
+      /* ignore */
+    }
   } catch {
     // Non-fatal: if CSRF fetch fails, proceed without it (will 403 on state-changing calls)
   }
@@ -59,7 +68,9 @@ api.interceptors.request.use(
       if (storedToken && !config.headers["Authorization"]) {
         config.headers["Authorization"] = `Bearer ${storedToken}`;
       }
-    } catch { /* sessionStorage unavailable */ }
+    } catch {
+      /* sessionStorage unavailable */
+    }
 
     // Attach CSRF token to all state-changing requests
     if (!["get", "head", "options"].includes(config.method?.toLowerCase())) {
@@ -112,7 +123,11 @@ api.interceptors.response.use(
     ) {
       originalRequest._csrfRetry = true;
       csrfToken = null; // force re-fetch
-      try { sessionStorage.removeItem("_csrf_token"); } catch { /* ignore */ }
+      try {
+        sessionStorage.removeItem("_csrf_token");
+      } catch {
+        /* ignore */
+      }
       const token = await ensureCsrfToken();
       if (token) originalRequest.headers["X-CSRF-Token"] = token;
       return api(originalRequest);
@@ -142,7 +157,14 @@ api.interceptors.response.use(
         );
         // Update sessionStorage with the new access token for iOS Safari ITP fallback
         if (refreshRes.data?.accessToken) {
-          try { sessionStorage.setItem("_access_token", refreshRes.data.accessToken); } catch { /* ignore */ }
+          try {
+            sessionStorage.setItem(
+              "_access_token",
+              refreshRes.data.accessToken,
+            );
+          } catch {
+            /* ignore */
+          }
         }
         processQueue(null, null);
         return api(originalRequest);

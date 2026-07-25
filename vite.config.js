@@ -81,7 +81,6 @@ export default defineConfig({
         manualChunks: {
           vendor: ["react", "react-dom", "react-router-dom"],
           redux: ["@reduxjs/toolkit", "react-redux"],
-          bootstrap: ["react-bootstrap", "bootstrap"],
           charts: ["recharts"],
         },
       },

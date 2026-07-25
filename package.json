@@ -27,6 +27,7 @@
     "react-window": "^2.2.1",
     "react-window-infinite-loader": "^2.0.0",
     "recharts": "^3.8.1",
+    "uuid": "^14.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

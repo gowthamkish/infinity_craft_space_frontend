@@ -22,6 +22,7 @@ import ErrorBoundary, { RouteErrorBoundary } from "./components/ErrorBoundary";
 import ToastContainer from "./components/ToastContainer";
 import { ToastContext } from "./context/ToastContext";
 import RecentlyViewed from "./components/RecentlyViewed";
+import ChatWidget from "./features/chat/ChatWidget";
 import api from "./api/axios";
 
 // Lazy load components for better performance
@@ -726,6 +727,8 @@ function App() {
               </Routes>
 
               <Footer />
+              {/* AI chat assistant — available on all pages */}
+              <ChatWidget />
             </Suspense>
           </Router>
         </HelmetProvider>
