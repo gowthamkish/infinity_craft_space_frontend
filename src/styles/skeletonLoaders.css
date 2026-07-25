@@ -1,7 +1,7 @@
 /* Skeleton Loader Patterns */
 
 .skeleton-loader {
-  background: linear-gradient(90deg, var(--neutral-200) 25%, var(--neutral-100) 50%, var(--neutral-200) 75%);
+  background: linear-gradient(90deg, var(--charcoal-200, #EAD9C5) 25%, var(--charcoal-100, #F5EDE0) 50%, var(--charcoal-200, #EAD9C5) 75%);
   background-size: 200% 100%;
   animation: skeleton-loading 2s infinite;
   border-radius: var(--radius-md);

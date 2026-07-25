@@ -88,16 +88,16 @@
 
 .loader-orbit__ring--2 {
   inset: 10px;
-  border-top-color: var(--success, #10b981);
-  border-right-color: rgba(16, 185, 129, 0.15);
+  border-top-color: var(--gold-500, #C9A84C);
+  border-right-color: rgba(201, 168, 76, 0.15);
   animation-duration: 1.15s;
   animation-direction: reverse;
 }
 
 .loader-orbit__ring--3 {
   inset: 20px;
-  border-top-color: var(--accent, #f59e0b);
-  border-right-color: rgba(245, 158, 11, 0.15);
+  border-top-color: var(--blush-400, #F4A7B9);
+  border-right-color: rgba(244, 167, 185, 0.15);
   animation-duration: 1.45s;
 }
 
@@ -159,16 +159,16 @@
 .loader-bars--sm .loader-bars__bar { width: 3px; }
 
 .loader-bars__bar:nth-child(1) { animation-delay: 0s;    height: 100%; }
-.loader-bars__bar:nth-child(2) { animation-delay: 0.12s; height: 75%;  background: var(--success, #10b981); }
-.loader-bars__bar:nth-child(3) { animation-delay: 0.24s; height: 55%;  background: var(--accent, #f59e0b); }
-.loader-bars__bar:nth-child(4) { animation-delay: 0.36s; height: 75%;  background: var(--success, #10b981); }
+.loader-bars__bar:nth-child(2) { animation-delay: 0.12s; height: 75%;  background: var(--gold-500, #C9A84C); }
+.loader-bars__bar:nth-child(3) { animation-delay: 0.24s; height: 55%;  background: var(--blush-400, #F4A7B9); }
+.loader-bars__bar:nth-child(4) { animation-delay: 0.36s; height: 75%;  background: var(--gold-500, #C9A84C); }
 .loader-bars__bar:nth-child(5) { animation-delay: 0.48s; height: 100%; }
 
 /* ── Page loader text ───────────────────────────────────────── */
 .loader-label {
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary, #2C2C2C);
   margin: 0;
   letter-spacing: -0.01em;
 }
@@ -202,20 +202,4 @@
   }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   LOADER BRAND ALIGNMENT — Brand purple for ring 1
-   ══════════════════════════════════════════════════════════════ */
-@keyframes pulse-ring {
-  0%   { box-shadow: 0 0 0 0   rgba(124, 58, 237, 0.5); }
-  70%  { box-shadow: 0 0 0 18px rgba(124, 58, 237, 0);  }
-  100% { box-shadow: 0 0 0 0   rgba(124, 58, 237, 0);   }
-}
-.loader-orbit__ring--1 {
-  border-top-color: #7c3aed !important;
-  border-right-color: rgba(124, 58, 237, 0.15) !important;
-}
-.loader-bars__bar { background: #7c3aed !important; }
-.loader-bars__bar:nth-child(2) { background: #f59e0b !important; }
-.loader-bars__bar:nth-child(3) { background: #9333ea !important; }
-.loader-bars__bar:nth-child(4) { background: #f59e0b !important; }
-.loader-page { background: #fafaf9 !important; }
+/* ── End of Loader.css ──────────────────────────────────────── */

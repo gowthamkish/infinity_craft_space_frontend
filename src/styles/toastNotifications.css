@@ -76,23 +76,23 @@
 
 /* ── Variants ───────────────────────────────────────────────── */
 .toast.success {
-  border-left-color: var(--success, #10b981);
-  background: linear-gradient(135deg, #f0fdf4, #fff);
+  border-left-color: var(--success, #2e7d32);
+  background: linear-gradient(135deg, var(--success-subtle, rgba(46,125,50,0.08)), var(--bg-primary, #FFFDF9));
 }
 
 .toast.error {
-  border-left-color: var(--danger, #dc2626);
-  background: linear-gradient(135deg, #fff5f5, #fff);
+  border-left-color: var(--error, #c62828);
+  background: linear-gradient(135deg, var(--error-subtle, rgba(198,40,40,0.08)), var(--bg-primary, #FFFDF9));
 }
 
 .toast.warning {
-  border-left-color: var(--accent, #f59e0b);
-  background: linear-gradient(135deg, #fffbeb, #fff);
+  border-left-color: var(--secondary, #C9A84C);
+  background: linear-gradient(135deg, var(--secondary-subtle, rgba(201,168,76,0.10)), var(--bg-primary, #FFFDF9));
 }
 
 .toast.info {
   border-left-color: var(--primary, #8B1A4A);
-  background: linear-gradient(135deg, #eff6ff, #fff);
+  background: linear-gradient(135deg, var(--primary-subtle, rgba(139,26,74,0.08)), var(--bg-primary, #FFFDF9));
 }
 
 /* ── Icon ───────────────────────────────────────────────────── */
@@ -109,18 +109,18 @@
 }
 
 .toast.success .toast-icon {
-  background: rgba(16, 185, 129, 0.12);
-  color: var(--success, #10b981);
+  background: rgba(46, 125, 50, 0.12);
+  color: var(--success, #2e7d32);
 }
 
 .toast.error .toast-icon {
-  background: rgba(220, 38, 38, 0.1);
-  color: var(--danger, #dc2626);
+  background: rgba(198, 40, 40, 0.1);
+  color: var(--error, #c62828);
 }
 
 .toast.warning .toast-icon {
-  background: rgba(245, 158, 11, 0.12);
-  color: var(--accent-dark, #d97706);
+  background: rgba(201, 168, 76, 0.12);
+  color: var(--gold-700, #8e6a24);
 }
 
 .toast.info .toast-icon {
@@ -137,14 +137,14 @@
 .toast-title {
   font-weight: 700;
   font-size: 0.9rem;
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary, #2C2C2C);
   margin: 0 0 0.1875rem;
   line-height: 1.4;
 }
 
 .toast-message {
   font-size: var(--font-size-sm, 0.8125rem);
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary, #7A5E42);
   margin: 0;
   line-height: 1.5;
 }
@@ -159,7 +159,7 @@
   height: 1.75rem;
   background: none;
   border: none;
-  color: var(--text-muted, #78909c);
+  color: var(--text-muted, #A08060);
   cursor: pointer;
   border-radius: var(--radius-sm, 6px);
   transition: background var(--transition-fast, 120ms), color var(--transition-fast, 120ms);
@@ -168,8 +168,8 @@
 }
 
 .toast-close:hover {
-  background: var(--bg-secondary, #f8fafc);
-  color: var(--text-primary, #0f172a);
+  background: var(--bg-secondary, #FDF6EC);
+  color: var(--text-primary, #2C2C2C);
 }
 
 /* ── Progress bar ───────────────────────────────────────────── */
@@ -181,9 +181,9 @@
   border-radius: 0 0 0 var(--radius-lg, 12px);
 }
 
-.toast.success .toast-progress { background: var(--success, #10b981); }
-.toast.error   .toast-progress { background: var(--danger, #dc2626); }
-.toast.warning .toast-progress { background: var(--accent, #f59e0b); }
+.toast.success .toast-progress { background: var(--success, #2e7d32); }
+.toast.error   .toast-progress { background: var(--error, #c62828); }
+.toast.warning .toast-progress { background: var(--secondary, #C9A84C); }
 .toast.info    .toast-progress { background: var(--primary, #8B1A4A); }
 
 /* ── Mobile ─────────────────────────────────────────────────── */
@@ -232,30 +232,4 @@
   }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   TOAST BRAND ALIGNMENT — info toast uses brand purple
-   ══════════════════════════════════════════════════════════════ */
-.toast {
-  border-left-color: #7c3aed !important;
-}
-.toast.info {
-  border-left-color: #7c3aed !important;
-  background: linear-gradient(135deg, #faf5ff, #fff) !important;
-}
-.toast.info .toast-icon {
-  background: rgba(124, 58, 237, 0.1) !important;
-  color: #7c3aed !important;
-}
-.toast.info .toast-progress { background: #7c3aed !important; }
-
-/* App.css toast variants — info/primary */
-.toast--info,
-.toast--primary {
-  background: linear-gradient(135deg, #faf5ff, #f3e8ff) !important;
-  border-left-color: #7c3aed !important;
-  color: #4c1d95 !important;
-}
-.toast--info .toast-header,
-.toast--primary .toast-header {
-  color: #6d28d9 !important;
-}
+/* ── End of toastNotifications.css ─────────────────────────── */

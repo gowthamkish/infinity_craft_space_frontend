@@ -32,9 +32,9 @@
 }
 
 .pf-clear-btn:hover {
-  border-color: #dc2626;
-  color: #dc2626;
-  background: #fef2f2;
+  border-color: var(--error, #c62828);
+  color: var(--error, #c62828);
+  background: var(--error-subtle, rgba(198,40,40,0.08));
 }
 
 .pf-clear-btn:focus-visible {
@@ -174,7 +174,7 @@
 
 .pf-cat-item:hover {
   border-color: var(--primary);
-  background: #f8fafc;
+  background: var(--bg-tertiary, #F5EDE0);
 }
 
 .pf-cat-row {
@@ -291,9 +291,9 @@
 }
 
 .pf-state--error {
-  color: #991b1b;
-  background: #fee2e2;
-  border: 1px solid #fecaca;
+  color: var(--error-dark, #8e0000);
+  background: var(--error-subtle, rgba(198,40,40,0.08));
+  border: 1px solid rgba(198, 40, 40, 0.2);
 }
 
 .pf-state--empty {
@@ -344,15 +344,15 @@
 }
 
 .pf-chip--price {
-  background: linear-gradient(135deg, var(--success), #10b981);
+  background: linear-gradient(135deg, var(--success, #2e7d32), var(--success-light, #60ad5e));
 }
 
 .pf-chip--search {
-  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  background: linear-gradient(135deg, var(--gold-500, #C9A84C), var(--gold-300, #edcc59));
 }
 
 .pf-chip--sort {
-  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  background: linear-gradient(135deg, var(--rose-700, #a51e50), var(--rose-500, #de4a7e));
 }
 
 /* ── RESPONSIVE ────────────────────────────────────────────────– */

@@ -518,29 +518,15 @@ export const PaymentStep = ({
             <Divider sx={{ borderColor: BORDER, my: 2 }} />
 
             <Stack spacing={1.25} sx={{ width: "100%" }}>
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                sx={{ width: "100%" }}
-              >
-                <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>
-                  Subtotal
-                </Typography>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>Subtotal</Typography>
                 <Typography sx={{ fontSize: "0.9375rem", fontWeight: 500 }}>
                   ₹{subtotal.toFixed(2)}
                 </Typography>
               </Stack>
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                sx={{ width: "100%" }}
-              >
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>
-                    Shipping
-                  </Typography>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Stack direction="row" alignItems="center" spacing={0.75}>
+                  <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>Shipping</Typography>
                   {shipping === 0 && (
                     <Chip
                       label="FREE"
@@ -561,15 +547,8 @@ export const PaymentStep = ({
                 </Typography>
               </Stack>
               {tax > 0 && (
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  sx={{ width: "100%" }}
-                >
-                  <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>
-                    Tax (18% GST)
-                  </Typography>
+                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                  <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>Tax (18% GST)</Typography>
                   <Typography sx={{ fontSize: "0.9375rem", fontWeight: 500 }}>
                     ₹{tax.toFixed(2)}
                   </Typography>
@@ -579,18 +558,9 @@ export const PaymentStep = ({
 
             <Divider sx={{ borderColor: BORDER, my: 2 }} />
 
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-              sx={{ width: "100%" }}
-            >
-              <Typography sx={{ fontSize: "1rem", fontWeight: 500 }}>
-                Total to Pay
-              </Typography>
-              <Typography
-                sx={{ fontSize: "1.25rem", fontWeight: 600, color: P }}
-              >
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: "100%" }}>
+              <Typography sx={{ fontSize: "1rem", fontWeight: 500 }}>Total to Pay</Typography>
+              <Typography sx={{ fontSize: "1.25rem", fontWeight: 600, color: P }}>
                 ₹{total.toFixed(2)}
               </Typography>
             </Stack>

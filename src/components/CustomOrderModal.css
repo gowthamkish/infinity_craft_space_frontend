@@ -6,7 +6,7 @@
   position: fixed;
   inset: 0;
   z-index: 1100;
-  background: rgba(15, 23, 42, 0.65);
+  background: var(--bg-overlay, rgba(44, 20, 30, 0.55));
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   display: flex;
@@ -22,7 +22,7 @@
 }
 
 .com-card {
-  background: #fff;
+  background: var(--bg-primary, #FFFDF9);
   border-radius: 20px;
   max-width: 480px;
   width: 100%;
@@ -42,12 +42,12 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #fde68a 0%, #f59e0b 100%);
+  background: linear-gradient(135deg, var(--gold-200, #f4e28b) 0%, var(--gold-500, #C9A84C) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.25rem;
-  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+  box-shadow: 0 4px 14px rgba(201, 168, 76, 0.35);
 }
 
 .com-icon {
@@ -59,7 +59,7 @@
 .com-title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--charcoal-900, #2C2C2C);
   text-align: center;
   margin: 0 0 0.4rem;
   letter-spacing: -0.01em;
@@ -67,7 +67,7 @@
 
 .com-subtitle {
   font-size: 0.92rem;
-  color: #475569;
+  color: var(--charcoal-600, #7A5E42);
   text-align: center;
   margin: 0 0 1.25rem;
   line-height: 1.55;
@@ -78,8 +78,8 @@
   list-style: none;
   padding: 0;
   margin: 0 0 1.25rem;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-secondary, #FDF6EC);
+  border: 1px solid var(--border-color, #EAD9C5);
   border-radius: 12px;
   overflow: hidden;
 }
@@ -90,8 +90,8 @@
   gap: 0.5rem;
   padding: 0.6rem 1rem;
   font-size: 0.88rem;
-  color: #334155;
-  border-bottom: 1px solid #e2e8f0;
+  color: var(--charcoal-700, #5C4330);
+  border-bottom: 1px solid var(--border-color, #EAD9C5);
 }
 
 .com-item:last-child {
@@ -99,7 +99,7 @@
 }
 
 .com-item-dot {
-  color: #f59e0b;
+  color: var(--gold-500, #C9A84C);
   font-size: 0.7rem;
   flex-shrink: 0;
 }
@@ -110,7 +110,7 @@
 }
 
 .com-item-qty {
-  color: #94a3b8;
+  color: var(--charcoal-400, #C0A882);
   font-size: 0.82rem;
 }
 
@@ -119,8 +119,8 @@
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border: 1px solid #fcd34d;
+  background: linear-gradient(135deg, var(--gold-100, #faf2cc) 0%, var(--gold-200, #f4e28b) 100%);
+  border: 1px solid var(--gold-300, #edcc59);
   border-radius: 12px;
   padding: 0.9rem 1rem;
   margin-bottom: 1.5rem;
@@ -135,13 +135,13 @@
 .com-notice strong {
   display: block;
   font-size: 0.92rem;
-  color: #92400e;
+  color: var(--gold-800, #745422);
   margin-bottom: 0.25rem;
 }
 
 .com-notice-sub {
   font-size: 0.83rem;
-  color: #a16207;
+  color: var(--gold-700, #8e6a24);
   margin: 0;
   line-height: 1.5;
 }
@@ -169,43 +169,41 @@
 }
 
 .com-btn--back {
-  background: #f1f5f9;
-  color: #475569;
-  border: 1.5px solid #e2e8f0;
+  background: var(--bg-secondary, #FDF6EC);
+  color: var(--charcoal-600, #7A5E42);
+  border: 1.5px solid var(--border-color, #EAD9C5);
 }
 
 .com-btn--back:hover {
-  background: #e2e8f0;
+  background: var(--border-color, #EAD9C5);
 }
 
 .com-btn--confirm {
-  background: var(--btn-brand-grad, linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%));
+  background: var(--btn-brand-grad);
   color: #fff;
-  box-shadow: 0 4px 14px var(--btn-brand-glow, rgba(124,58,237,0.35));
+  box-shadow: 0 4px 14px var(--btn-brand-glow);
 }
 
 .com-btn--confirm:hover {
-  background: var(--btn-brand-grad-h, linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%));
-  box-shadow: 0 6px 20px var(--btn-brand-glow, rgba(124,58,237,0.45));
+  background: var(--btn-brand-grad-h);
+  box-shadow: 0 6px 20px var(--btn-brand-glow);
   transform: translateY(-1px);
 }
 
 .com-btn--confirm:focus-visible {
-  outline: 2px solid var(--btn-brand, #7c3aed);
+  outline: 2px solid var(--btn-brand);
   outline-offset: 3px;
 }
 
 /* ── Dark mode ──────────────────────────────────── */
 @media (prefers-color-scheme: dark) {
-  .com-card {
-    background: #1e293b;
-  }
-  .com-title { color: #f1f5f9; }
-  .com-subtitle { color: #94a3b8; }
-  .com-item-list { background: #0f172a; border-color: #334155; }
-  .com-item { color: #cbd5e1; border-color: #334155; }
-  .com-btn--back { background: #334155; color: #cbd5e1; border-color: #475569; }
-  .com-btn--back:hover { background: #475569; }
+  .com-card { background: var(--charcoal-800, #3D2C20); }
+  .com-title { color: var(--charcoal-50, #FDF6EC); }
+  .com-subtitle { color: var(--charcoal-400, #C0A882); }
+  .com-item-list { background: var(--charcoal-900, #2C2C2C); border-color: var(--charcoal-700, #5C4330); }
+  .com-item { color: var(--charcoal-200, #EAD9C5); border-color: var(--charcoal-700, #5C4330); }
+  .com-btn--back { background: var(--charcoal-700, #5C4330); color: var(--charcoal-200, #EAD9C5); border-color: var(--charcoal-600, #7A5E42); }
+  .com-btn--back:hover { background: var(--charcoal-600, #7A5E42); }
 }
 
 /* ── Mobile ─────────────────────────────────────── */
@@ -214,12 +212,4 @@
   .com-actions { flex-direction: column-reverse; }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   CUSTOM ORDER MODAL BRAND ALIGNMENT
-   ══════════════════════════════════════════════════════════════ */
-.com-modal .modal-header,
-.custom-order-modal .modal-header,
-[class*="com-header"] {
-  background: linear-gradient(135deg, #4c1d95, #6d28d9) !important;
-}
-/* Dark item list in modal stays dark — just soften the dark navy */
+/* ── End of CustomOrderModal.css ────────────────────────────── */

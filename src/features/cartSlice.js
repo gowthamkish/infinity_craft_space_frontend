@@ -11,7 +11,7 @@ export const fetchUserCart = createAsyncThunk(
         return { items: [] };
       }
 
-      const response = await api.get(`/api/cart/${auth.user._id}`);
+      const response = await api.get("/api/cart/me");
 
       return response.data;
     } catch (error) {
@@ -33,7 +33,6 @@ export const syncCartToBackend = createAsyncThunk(
       if (!auth.user?._id) return;
 
       const res = await api.post("/api/cart/sync", {
-        userId: auth.user._id,
         items: cart.items,
         clientUpdatedAt: cart.lastSyncedAt || null,
       });
@@ -71,7 +70,7 @@ export const clearCartOnBackend = createAsyncThunk(
         return;
       }
 
-      await api.delete(`/api/cart/${auth.user._id}`);
+      await api.delete("/api/cart/me");
 
       return { success: true };
     } catch (error) {

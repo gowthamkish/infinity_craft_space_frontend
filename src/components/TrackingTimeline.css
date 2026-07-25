@@ -19,13 +19,13 @@
   left: 5%;
   right: 5%;
   height: 3px;
-  background: #e2e8f0;
+  background: var(--border-color, #EAD9C5);
   z-index: 0;
 }
 
 .tt-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #10b981, #059669);
+  background: linear-gradient(90deg, var(--success, #2e7d32), var(--success-dark, #1b5e20));
   transition: width 0.6s ease;
   border-radius: 2px;
 }
@@ -48,56 +48,56 @@
   align-items: center;
   justify-content: center;
   font-size: 1.1rem;
-  border: 3px solid #e2e8f0;
+  border: 3px solid var(--border-color, #EAD9C5);
   background: white;
   transition: all 0.3s ease;
   position: relative;
 }
 
 .tt-step-dot--done {
-  border-color: #10b981;
-  background: #10b981;
+  border-color: var(--success, #2e7d32);
+  background: var(--success, #2e7d32);
   color: white;
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+  box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.15);
 }
 
 .tt-step-dot--active {
   border-color: #C9A84C;
   background: white;
   color: #C9A84C;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+  box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.25);
   animation: ttPulse 2s infinite;
 }
 
 .tt-step-dot--pending {
-  border-color: #e2e8f0;
-  background: #f8fafc;
-  color: #94a3b8;
+  border-color: var(--border-color, #EAD9C5);
+  background: var(--bg-secondary, #FDF6EC);
+  color: var(--charcoal-400, #C0A882);
 }
 
 .tt-step-dot--cancelled {
-  border-color: #ef4444;
-  background: #fee2e2;
-  color: #ef4444;
+  border-color: var(--error, #c62828);
+  background: var(--error-subtle, rgba(198,40,40,0.08));
+  color: var(--error, #c62828);
 }
 
 @keyframes ttPulse {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
-  50%       { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.08); }
+  0%, 100% { box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.25); }
+  50%       { box-shadow: 0 0 0 8px rgba(201, 168, 76, 0.12); }
 }
 
 .tt-step-label {
   font-size: 0.7rem;
   font-weight: 600;
   text-align: center;
-  color: #64748b;
+  color: var(--charcoal-500, #A08060);
   line-height: 1.2;
   max-width: 80px;
 }
 
-.tt-step-label--done   { color: #059669; }
+.tt-step-label--done   { color: var(--success, #2e7d32); }
 .tt-step-label--active { color: #8B1A4A; }
-.tt-step-label--cancelled { color: #ef4444; }
+.tt-step-label--cancelled { color: var(--error, #c62828); }
 
 /* ── Microcopy ───────────────────────────────────────────────── */
 .tt-microcopy {
@@ -105,9 +105,9 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #374151;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  color: var(--charcoal-700, #5C4330);
+  background: var(--bg-secondary, #FDF6EC);
+  border: 1px solid var(--border-color, #EAD9C5);
   border-radius: 10px;
   padding: 0.65rem 1rem;
   margin-bottom: 1rem;
@@ -117,7 +117,7 @@
 .tt-microcopy-icon { font-size: 1.1rem; flex-shrink: 0; }
 
 .tt-microcopy-eta {
-  color: #059669;
+  color: var(--success, #2e7d32);
   font-size: 0.82rem;
 }
 
@@ -130,8 +130,8 @@
   margin-bottom: 1rem;
   font-size: 0.9rem;
 }
-.tt-alert--cancelled { background: #fee2e2; color: #b91c1c; }
-.tt-alert--returned  { background: #fef3c7; color: #92400e; }
+.tt-alert--cancelled { background: var(--error-subtle, rgba(198,40,40,0.08)); color: var(--error-dark, #8e0000); }
+.tt-alert--returned  { background: var(--secondary-subtle, rgba(201,168,76,0.10)); color: var(--gold-800, #745422); }
 
 /* ── Info Bar (AWB, courier, ETA) ────────────────────────────── */
 .tt-info-bar {
@@ -139,30 +139,30 @@
   flex-wrap: wrap;
   gap: 1rem;
   padding: 1rem 1.25rem;
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  background: linear-gradient(135deg, var(--success-subtle, rgba(46,125,50,0.08)) 0%, rgba(46,125,50,0.05) 100%);
   border-radius: 12px;
-  border: 1px solid #bbf7d0;
+  border: 1px solid rgba(46, 125, 50, 0.2);
   margin-bottom: 1.25rem;
 }
 
 .tt-info-bar--shipped {
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  border-color: #bfdbfe;
+  background: linear-gradient(135deg, var(--primary-subtle, rgba(139,26,74,0.08)) 0%, rgba(139,26,74,0.04) 100%);
+  border-color: rgba(139, 26, 74, 0.2);
 }
 
 .tt-info-bar--delivered {
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  border-color: #bbf7d0;
+  background: linear-gradient(135deg, var(--success-subtle, rgba(46,125,50,0.08)) 0%, rgba(46,125,50,0.04) 100%);
+  border-color: rgba(46, 125, 50, 0.2);
 }
 
 .tt-info-bar--ofd {
-  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-  border-color: #fde68a;
+  background: linear-gradient(135deg, var(--secondary-subtle, rgba(201,168,76,0.10)) 0%, rgba(201,168,76,0.06) 100%);
+  border-color: rgba(201, 168, 76, 0.3);
 }
 
 .tt-info-bar--cancelled {
-  background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
-  border-color: #fecdd3;
+  background: linear-gradient(135deg, var(--error-subtle, rgba(198,40,40,0.08)) 0%, rgba(198,40,40,0.04) 100%);
+  border-color: rgba(198, 40, 40, 0.2);
 }
 
 .tt-info-item {
@@ -176,13 +176,13 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #64748b;
+  color: var(--charcoal-500, #A08060);
 }
 
 .tt-info-value {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--charcoal-800, #3D2C20);
 }
 
 .tt-info-value a {
@@ -206,7 +206,7 @@
 
 .tt-info-eta {
   font-size: 0.78rem;
-  color: #059669;
+  color: var(--success, #2e7d32);
   margin-left: 0.25rem;
 }
 
@@ -238,9 +238,9 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: #10b981;
+  background: var(--success, #2e7d32);
   border: 2px solid white;
-  box-shadow: 0 0 0 2px #10b981;
+  box-shadow: 0 0 0 2px var(--success, #2e7d32);
   flex-shrink: 0;
   margin-top: 3px;
 }
@@ -248,19 +248,19 @@
 .tt-activity-dot--first {
   width: 16px;
   height: 16px;
-  background: #059669;
-  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.25);
+  background: var(--success-dark, #1b5e20);
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.25);
 }
 
 .tt-activity-dot--muted {
-  background: #94a3b8;
-  box-shadow: 0 0 0 2px #94a3b8;
+  background: var(--charcoal-400, #C0A882);
+  box-shadow: 0 0 0 2px var(--charcoal-400, #C0A882);
 }
 
 .tt-activity-line {
   flex: 1;
   width: 2px;
-  background: #e2e8f0;
+  background: var(--border-color, #EAD9C5);
   margin-top: 2px;
 }
 
@@ -272,26 +272,26 @@
 .tt-activity-status {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--charcoal-800, #3D2C20);
   margin-bottom: 0.2rem;
 }
 
 .tt-activity-location {
   font-size: 0.8rem;
-  color: #64748b;
+  color: var(--charcoal-500, #A08060);
   margin-bottom: 0.15rem;
 }
 
 .tt-activity-date {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--charcoal-400, #C0A882);
 }
 
 /* ── Empty / Loading States ──────────────────────────────────── */
 .tt-empty {
   text-align: center;
   padding: 2rem;
-  color: #94a3b8;
+  color: var(--charcoal-400, #C0A882);
 }
 
 .tt-empty-icon {
@@ -322,16 +322,4 @@
   }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   TRACKING TIMELINE BRAND ALIGNMENT
-   ══════════════════════════════════════════════════════════════ */
-.tt-step--active,
-.tt-step--active .tt-step-dot,
-[class*="tt-step"].active [class*="dot"] {
-  border-color: #7c3aed !important;
-  color: #7c3aed !important;
-  background-color: #7c3aed !important;
-}
-.tt-step-label--active { color: #7c3aed !important; }
-[class*="tt-track-link"],
-[class*="tt-courier-link"] { color: #7c3aed !important; }
+/* ── End of TrackingTimeline.css ────────────────────────────── */

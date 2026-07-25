@@ -108,44 +108,6 @@ self.addEventListener("fetch", (event) => {
   }
 });
 
-// Background sync for offline actions
-self.addEventListener("sync", (event) => {
-  if (event.tag === "cart-sync") {
-    event.waitUntil(syncCart());
-  }
-});
-
-// Sync cart data when back online
-async function syncCart() {
-  try {
-    const cartData = await getStoredCartData();
-    if (cartData && cartData.length > 0) {
-      // Send cart data to server
-      await fetch("/api/cart/sync", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(cartData),
-      });
-      // Clear stored cart data after successful sync
-      await clearStoredCartData();
-    }
-  } catch (error) {
-    console.error("Cart sync failed:", error);
-  }
-}
-
-// Helper functions for cart sync
-async function getStoredCartData() {
-  // Implementation depends on your storage strategy
-  return null;
-}
-
-async function clearStoredCartData() {
-  // Implementation depends on your storage strategy
-}
-
 // Push notification handling
 self.addEventListener("push", (event) => {
   if (event.data) {

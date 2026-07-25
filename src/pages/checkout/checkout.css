@@ -5,36 +5,36 @@
 
 .co-page {
   /* ── Color tokens ─────────────────────────────────────────────────── */
-  --co-bg:          #f2f4fb;
-  --co-surface:     #ffffff;
-  --co-surface-2:   #f8f9fd;
-  --co-surface-3:   #eef0f8;
-  --co-border:      #e4e6f0;
-  --co-border-2:    #ced1e8;
+  --co-bg:          var(--bg-default, #FDF6EC);
+  --co-surface:     var(--bg-primary, #FFFDF9);
+  --co-surface-2:   var(--bg-secondary, #FDF6EC);
+  --co-surface-3:   var(--bg-tertiary, #F5EDE0);
+  --co-border:      var(--border-color, #EAD9C5);
+  --co-border-2:    var(--charcoal-300, #C8A87A);
 
-  --co-ink:         #0d0e1a;
-  --co-ink-2:       #363a50;
-  --co-ink-3:       #6b7280;
-  --co-ink-4:       #9ca3af;
+  --co-ink:         var(--charcoal-900, #2C2C2C);
+  --co-ink-2:       var(--charcoal-700, #5C4330);
+  --co-ink-3:       var(--charcoal-500, #A08060);
+  --co-ink-4:       var(--charcoal-400, #C0A882);
 
-  --co-primary:     #6d28d9;
-  --co-primary-lt:  #7c3aed;
-  --co-primary-glow: rgba(109, 40, 217, 0.16);
-  --co-primary-sub: #f3eeff;
+  --co-primary:     var(--primary, #8B1A4A);
+  --co-primary-lt:  var(--primary-light, #a51e50);
+  --co-primary-glow: rgba(139, 26, 74, 0.16);
+  --co-primary-sub: var(--primary-subtle, rgba(139,26,74,0.08));
 
-  --co-green:       #059669;
-  --co-green-lt:    #10b981;
-  --co-green-glow:  rgba(5, 150, 105, 0.16);
-  --co-green-sub:   #ecfdf5;
-  --co-green-bd:    #6ee7b7;
+  --co-green:       var(--success, #2e7d32);
+  --co-green-lt:    var(--success-light, #60ad5e);
+  --co-green-glow:  rgba(46, 125, 50, 0.16);
+  --co-green-sub:   var(--success-subtle, rgba(46,125,50,0.08));
+  --co-green-bd:    rgba(46, 125, 50, 0.3);
 
-  --co-danger:      #dc2626;
-  --co-danger-bg:   #fef2f2;
-  --co-danger-bd:   #fecaca;
+  --co-danger:      var(--error, #c62828);
+  --co-danger-bg:   var(--error-subtle, rgba(198,40,40,0.06));
+  --co-danger-bd:   rgba(198, 40, 40, 0.2);
 
-  --co-warn:        #d97706;
-  --co-warn-bg:     #fffbeb;
-  --co-warn-bd:     #fcd34d;
+  --co-warn:        var(--gold-600, #a07a30);
+  --co-warn-bg:     var(--gold-100, #faf2cc);
+  --co-warn-bd:     var(--gold-300, #edcc59);
 
   /* ── Border radius ───────────────────────────────────────────────── */
   --co-r-xs:  6px;
@@ -141,8 +141,8 @@
 }
 .co-section-icon--purple { background: var(--co-primary-sub); color: var(--co-primary); }
 .co-section-icon--green  { background: var(--co-green-sub);   color: var(--co-green);   }
-.co-section-icon--blue   { background: #eff6ff; color: #8B1A4A; }
-.co-section-icon--amber  { background: #fffbeb; color: #d97706; }
+.co-section-icon--blue   { background: var(--primary-subtle, rgba(139,26,74,0.06)); color: #8B1A4A; }
+.co-section-icon--amber  { background: var(--gold-100, #fef9e7); color: var(--gold-600, #a07a30); }
 
 .co-section-title {
   font-size: 1rem;
@@ -190,14 +190,14 @@
 .co-handcraft-title {
   font-size: 0.83rem;
   font-weight: 700;
-  color: #78350f;
+  color: var(--gold-900, #5a3f0f);
   display: block;
   margin-bottom: 3px;
 }
 
 .co-handcraft-text {
   font-size: 0.78rem;
-  color: #92400e;
+  color: var(--gold-800, #745422);
   line-height: 1.55;
   margin: 0;
 }
@@ -271,7 +271,7 @@
 .co-item-tag--custom {
   background: var(--co-warn-bg);
   border: 1px solid var(--co-warn-bd);
-  color: #92400e;
+  color: var(--gold-800, #745422);
   margin-bottom: 6px;
 }
 
@@ -419,7 +419,7 @@
    ════════════════════════════════════════════════════════════════════════ */
 
 .co-ship-bar {
-  background: linear-gradient(135deg, var(--co-green-sub), #d1fae5);
+  background: linear-gradient(135deg, var(--co-green-sub), var(--success-subtle, rgba(46,125,50,0.08)));
   border: 1.5px solid var(--co-green-bd);
   border-radius: var(--co-r-md);
   padding: 13px 15px;
@@ -427,15 +427,15 @@
 }
 
 .co-ship-bar--done {
-  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-  border-color: #34d399;
+  background: linear-gradient(135deg, var(--success-subtle, rgba(46,125,50,0.08)), rgba(46, 125, 50, 0.15));
+  border-color: rgba(46, 125, 50, 0.3);
 }
 
 .co-ship-bar-text {
   margin: 0 0 7px;
   font-size: 0.78rem;
   font-weight: 600;
-  color: #065f46;
+  color: var(--success-dark, #1b5e20);
 }
 
 .co-ship-bar-track {
@@ -465,7 +465,7 @@
 }
 
 .co-summary-head {
-  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+  background: linear-gradient(135deg, var(--rose-900, #4a0d25) 0%, var(--charcoal-900, #2C2C2C) 100%);
   padding: 16px 20px;
 }
 
@@ -688,8 +688,8 @@
 
 .co-coupon-applied-info { flex: 1; }
 
-.co-coupon-applied-code { font-size: 0.8rem; font-weight: 700; color: #065f46; margin: 0; }
-.co-coupon-applied-amt  { font-size: 0.7rem; color: #047857; margin: 1px 0 0; }
+.co-coupon-applied-code { font-size: 0.8rem; font-weight: 700; color: var(--success-dark, #1b5e20); margin: 0; }
+.co-coupon-applied-amt  { font-size: 0.7rem; color: var(--success, #2e7d32); margin: 1px 0 0; }
 
 .co-coupon-rm {
   background: none;
@@ -1026,8 +1026,8 @@
    ════════════════════════════════════════════════════════════════════════ */
 
 .co-rate-card {
-  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-  border: 1.5px solid #86efac;
+  background: linear-gradient(135deg, var(--success-subtle, rgba(46,125,50,0.06)), rgba(46,125,50,0.10));
+  border: 1.5px solid rgba(46,125,50,0.25);
   border-radius: var(--co-r-lg);
   padding: 15px 17px;
   display: flex;
@@ -1049,9 +1049,9 @@
 }
 
 .co-rate-info { flex: 1; }
-.co-rate-method { font-size: 0.86rem; font-weight: 700; color: #166534; margin: 0; }
-.co-rate-eta    { font-size: 0.73rem; color: #16a34a; margin: 2px 0 0; }
-.co-rate-price  { font-size: 1.05rem; font-weight: 800; color: #15803d; flex-shrink: 0; }
+.co-rate-method { font-size: 0.86rem; font-weight: 700; color: var(--success-dark, #1b5e20); margin: 0; }
+.co-rate-eta    { font-size: 0.73rem; color: var(--success, #2e7d32); margin: 2px 0 0; }
+.co-rate-price  { font-size: 1.05rem; font-weight: 800; color: var(--success-dark, #1b5e20); flex-shrink: 0; }
 
 /* ════════════════════════════════════════════════════════════════════════
    PAYMENT METHOD CARDS
@@ -1073,9 +1073,9 @@
 }
 
 .co-method-card:hover {
-  border-color: #a78bfa;
-  background: #faf5ff;
-  box-shadow: 0 4px 16px rgba(124,58,237,0.09);
+  border-color: var(--primary, #8B1A4A);
+  background: var(--primary-subtle, rgba(139,26,74,0.06));
+  box-shadow: 0 4px 16px rgba(139,26,74,0.09);
 }
 
 .co-method-card.selected {
@@ -1129,8 +1129,8 @@
    ════════════════════════════════════════════════════════════════════════ */
 
 .co-security {
-  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
-  border: 1.5px solid #86efac;
+  background: linear-gradient(135deg, var(--success-subtle, rgba(46,125,50,0.06)), rgba(46,125,50,0.10));
+  border: 1.5px solid rgba(46,125,50,0.25);
   border-radius: var(--co-r-lg);
   padding: 15px 17px;
   margin: 14px 0;
@@ -1139,7 +1139,7 @@
 .co-security-title {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #166534;
+  color: var(--success-dark, #1b5e20);
   margin: 0 0 11px;
   display: flex;
   align-items: center;
@@ -1159,7 +1159,7 @@
   align-items: center;
   gap: 7px;
   font-size: 0.77rem;
-  color: #166534;
+  color: var(--success-dark, #1b5e20);
   font-weight: 500;
 }
 
@@ -1332,7 +1332,7 @@
 }
 
 .co-confirm-hero {
-  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 60%, #6ee7b7 100%);
+  background: linear-gradient(135deg, var(--success-subtle, rgba(46,125,50,0.08)) 0%, rgba(46, 125, 50, 0.15) 60%, #6ee7b7 100%);
   padding: 48px 28px 40px;
   text-align: center;
 }
@@ -1358,14 +1358,14 @@
 .co-confirm-title {
   font-size: clamp(1.7rem, 5vw, 2.4rem);
   font-weight: 900;
-  color: #064e3b;
+  color: var(--success-dark, #1b5e20);
   letter-spacing: -0.03em;
   margin: 0 0 10px;
 }
 
 .co-confirm-subtitle {
   font-size: clamp(0.85rem, 2.5vw, 0.98rem);
-  color: #047857;
+  color: var(--success, #2e7d32);
   margin: 0 auto;
   line-height: 1.6;
   max-width: 460px;
@@ -1407,8 +1407,8 @@
 .co-confirm-info-val { font-weight: 600; color: var(--co-ink); display: block; }
 
 .co-confirm-delivery {
-  background: #f0fdf4;
-  border: 1.5px solid #bbf7d0;
+  background: var(--success-subtle, rgba(46,125,50,0.06));
+  border: 1.5px solid rgba(46,125,50,0.20);
   border-radius: var(--co-r-lg);
   padding: 15px 17px;
   margin-bottom: 18px;
@@ -1418,9 +1418,9 @@
 }
 
 .co-confirm-delivery-icon { font-size: 1.4rem; }
-.co-confirm-delivery-lbl  { font-size: 0.72rem; color: #166534; font-weight: 700; margin: 0 0 2px; }
-.co-confirm-delivery-date { font-size: 1rem; font-weight: 800; color: #15803d; margin: 0; }
-.co-confirm-delivery-note { font-size: 0.68rem; color: #16a34a; margin: 2px 0 0; }
+.co-confirm-delivery-lbl  { font-size: 0.72rem; color: var(--success-dark, #1b5e20); font-weight: 700; margin: 0 0 2px; }
+.co-confirm-delivery-date { font-size: 1rem; font-weight: 800; color: var(--success-dark, #1b5e20); margin: 0; }
+.co-confirm-delivery-note { font-size: 0.68rem; color: var(--success, #2e7d32); margin: 2px 0 0; }
 
 .co-confirm-actions {
   display: flex;
@@ -1446,9 +1446,9 @@
 }
 
 .co-confirm-btn--track {
-  background: linear-gradient(135deg, #C9A84C, #7a1640);
+  background: var(--btn-brand-grad, linear-gradient(135deg, var(--secondary, #C9A84C), var(--primary, #8B1A4A)));
   color: white;
-  box-shadow: 0 6px 16px rgba(59,130,246,0.3);
+  box-shadow: 0 6px 16px rgba(139,26,74,0.25);
 }
 
 .co-confirm-btn--track:hover  { box-shadow: 0 10px 22px rgba(59,130,246,0.4); transform: translateY(-1px); }
@@ -1617,7 +1617,7 @@
 /* Confirmation step */
 .co-confirm-sub {
   font-size: clamp(0.85rem, 2.5vw, 0.98rem);
-  color: #047857;
+  color: var(--success, #2e7d32);
   margin: 0 auto;
   line-height: 1.6;
   max-width: 460px;
@@ -1626,7 +1626,7 @@
 .co-confirm-card-icon { flex-shrink: 0; }
 .co-confirm-card-icon--green  { color: var(--co-green); }
 .co-confirm-card-icon--purple { color: var(--co-primary-lt); }
-.co-confirm-card-icon--amber  { color: #d97706; }
+.co-confirm-card-icon--amber  { color: var(--gold-600, #a07a30); }
 
 .co-confirm-kv {
   display: flex;
@@ -1663,9 +1663,9 @@
   padding: 2px 0;
 }
 
-.co-confirm-delivery-label { font-size: 0.72rem; color: #166534; font-weight: 700; margin: 0 0 2px; }
-.co-confirm-delivery-range { font-size: 1rem; font-weight: 800; color: #15803d; margin: 0; }
-.co-confirm-delivery-note  { font-size: 0.68rem; color: #16a34a; margin: 2px 0 0; }
+.co-confirm-delivery-label { font-size: 0.72rem; color: var(--success-dark, #1b5e20); font-weight: 700; margin: 0 0 2px; }
+.co-confirm-delivery-range { font-size: 1rem; font-weight: 800; color: var(--success-dark, #1b5e20); margin: 0; }
+.co-confirm-delivery-note  { font-size: 0.68rem; color: var(--success, #2e7d32); margin: 2px 0 0; }
 
 .co-confirm-ctas {
   display: flex;
@@ -1676,8 +1676,8 @@
 }
 
 .co-cta--blue {
-  background: linear-gradient(135deg, #C9A84C, #7a1640);
-  box-shadow: 0 6px 20px rgba(59,130,246,0.3);
+  background: var(--btn-brand-grad, linear-gradient(135deg, var(--secondary, #C9A84C), var(--primary, #8B1A4A)));
+  box-shadow: 0 6px 20px rgba(139,26,74,0.25);
 }
 
 .co-cta--blue:hover:not(:disabled) { box-shadow: 0 12px 28px rgba(59,130,246,0.4); }
@@ -1704,7 +1704,7 @@
 
 .co-coupon-form { display: flex; flex-direction: column; gap: 0; }
 
-.co-coupon-applied-discount { font-size: 0.7rem; color: #047857; margin: 1px 0 0; }
+.co-coupon-applied-discount { font-size: 0.7rem; color: var(--success, #2e7d32); margin: 1px 0 0; }
 
 .co-coupon-remove {
   display: inline-flex;

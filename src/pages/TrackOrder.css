@@ -10,7 +10,7 @@
 }
 
 .to-hero {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
+  background: linear-gradient(135deg, var(--rose-900, #4a0d26) 0%, var(--primary, #8B1A4A) 60%, var(--rose-900, #4a0d26) 100%);
   padding: 2.5rem 1.5rem;
   text-align: center;
   color: white;
@@ -28,7 +28,7 @@
 }
 
 .to-hero p {
-  color: #94a3b8;
+  color: var(--charcoal-400, #C0A882);
   margin: 0;
   font-size: 0.95rem;
 }
@@ -72,13 +72,13 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #94a3b8;
+  color: var(--charcoal-400, #C0A882);
 }
 
 .to-meta-value {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--charcoal-800, #3D2C20);
 }
 
 .to-status-badge {
@@ -92,23 +92,23 @@
   text-transform: capitalize;
 }
 
-.to-status-badge--confirmed  { background: #dbeafe; color: #7a1640; }
-.to-status-badge--processing { background: #fef3c7; color: #b45309; }
-.to-status-badge--shipped         { background: #e0f2fe; color: #0369a1; }
-.to-status-badge--out_for_delivery{ background: #fef3c7; color: #92400e; }
-.to-status-badge--delivered       { background: #dcfce7; color: #166534; }
-.to-status-badge--cancelled  { background: #fee2e2; color: #b91c1c; }
-.to-status-badge--returned   { background: #f3e8ff; color: #7c3aed; }
+.to-status-badge--confirmed  { background: var(--primary-subtle, rgba(139,26,74,0.08)); color: var(--primary, #8B1A4A); }
+.to-status-badge--processing { background: var(--secondary-subtle, rgba(201,168,76,0.10)); color: var(--gold-700, #8e6a24); }
+.to-status-badge--shipped         { background: var(--primary-subtle, rgba(139,26,74,0.08)); color: var(--primary-dark, #6b1238); }
+.to-status-badge--out_for_delivery{ background: var(--secondary-subtle, rgba(201,168,76,0.10)); color: var(--gold-800, #745422); }
+.to-status-badge--delivered       { background: var(--success-subtle, rgba(46,125,50,0.08)); color: var(--success-dark, #1b5e20); }
+.to-status-badge--cancelled  { background: var(--error-subtle, rgba(198,40,40,0.08)); color: var(--error-dark, #8e0000); }
+.to-status-badge--returned   { background: var(--secondary-subtle, rgba(201,168,76,0.10)); color: var(--gold-700, #8e6a24); }
 
 .to-refresh-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
   padding: 0.5rem 1rem;
-  border: 1.5px solid #e2e8f0;
+  border: 1.5px solid var(--border-color, #EAD9C5);
   border-radius: 8px;
   background: white;
-  color: #475569;
+  color: var(--charcoal-600, #7A5E42);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -116,8 +116,8 @@
 }
 
 .to-refresh-btn:hover {
-  border-color: #94a3b8;
-  color: #1e293b;
+  border-color: var(--charcoal-400, #C0A882);
+  color: var(--charcoal-800, #3D2C20);
 }
 
 .to-refresh-btn--loading {
@@ -130,7 +130,7 @@
 }
 
 .to-skeleton {
-  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background: linear-gradient(90deg, var(--bg-tertiary, #F5EDE0) 25%, var(--border-color, #EAD9C5) 50%, var(--bg-tertiary, #F5EDE0) 75%);
   background-size: 200% 100%;
   animation: toShimmer 1.5s infinite;
   border-radius: 8px;
@@ -151,27 +151,3 @@
   }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   TRACK ORDER BRAND ALIGNMENT
-   ══════════════════════════════════════════════════════════════ */
-/* Hero header → brand purple gradient */
-.track-order-hero,
-.to-hero,
-[class*="track-hero"],
-[class*="to-page"] > *:first-child {
-  background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 60%, #7c3aed 100%) !important;
-}
-
-/* Confirmed badge → brand purple */
-.to-status-badge--confirmed {
-  background: #f3e8ff !important;
-  color: #6d28d9 !important;
-}
-
-/* Text color adjustments */
-.to-section-title,
-.to-label,
-[class*="to-info"] h4,
-[class*="to-info"] h5 {
-  color: #1c1917 !important;
-}

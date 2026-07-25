@@ -38,37 +38,37 @@
 /* ── DESIGN TOKENS ────────────────────────────────────────────────────────── */
 :root {
   /* Brand — Deep Rose */
-  --btn-brand:          #8B1A4A;
-  --btn-brand-dark:     #7a1640;
-  --btn-brand-darker:   #5e1232;
+  --btn-brand:          var(--primary, #8B1A4A);
+  --btn-brand-dark:     var(--primary-dark, #6b1238);
+  --btn-brand-darker:   var(--rose-900, #4a0d25);
   --btn-brand-glow:     rgba(139, 26, 74, 0.28);
-  --btn-brand-subtle:   rgba(139, 26, 74, 0.08);
-  --btn-brand-grad:     linear-gradient(135deg, #8B1A4A 0%, #7a1640 100%);
-  --btn-brand-grad-h:   linear-gradient(135deg, #7a1640 0%, #5e1232 100%);
+  --btn-brand-subtle:   var(--primary-subtle, rgba(139, 26, 74, 0.08));
+  --btn-brand-grad:     linear-gradient(135deg, var(--primary, #8B1A4A) 0%, var(--primary-dark, #6b1238) 100%);
+  --btn-brand-grad-h:   linear-gradient(135deg, var(--primary-dark, #6b1238) 0%, var(--rose-900, #4a0d25) 100%);
 
   /* Success — Green */
-  --btn-success:        #059669;
-  --btn-success-lt:     #10b981;
-  --btn-success-dark:   #047857;
-  --btn-success-glow:   rgba(5, 150, 105, 0.28);
-  --btn-success-subtle: rgba(5, 150, 105, 0.08);
-  --btn-success-grad:   linear-gradient(135deg, #10b981 0%, #059669 100%);
-  --btn-success-grad-h: linear-gradient(135deg, #059669 0%, #047857 100%);
+  --btn-success:        var(--success, #2e7d32);
+  --btn-success-lt:     var(--success-light, #60ad5e);
+  --btn-success-dark:   var(--success-dark, #1b5e20);
+  --btn-success-glow:   rgba(46, 125, 50, 0.28);
+  --btn-success-subtle: var(--success-subtle, rgba(46, 125, 50, 0.08));
+  --btn-success-grad:   linear-gradient(135deg, var(--success-light, #60ad5e) 0%, var(--success, #2e7d32) 100%);
+  --btn-success-grad-h: linear-gradient(135deg, var(--success, #2e7d32) 0%, var(--success-dark, #1b5e20) 100%);
 
   /* Danger — Red */
-  --btn-danger:         #dc2626;
-  --btn-danger-dark:    #b91c1c;
-  --btn-danger-glow:    rgba(220, 38, 38, 0.24);
-  --btn-danger-subtle:  rgba(220, 38, 38, 0.08);
-  --btn-danger-bd:      #fca5a5;
+  --btn-danger:         var(--error, #c62828);
+  --btn-danger-dark:    var(--error-dark, #8e0000);
+  --btn-danger-glow:    rgba(198, 40, 40, 0.24);
+  --btn-danger-subtle:  var(--error-subtle, rgba(198, 40, 40, 0.08));
+  --btn-danger-bd:      rgba(198, 40, 40, 0.30);
 
   /* Neutral */
-  --btn-neutral-bg:     #f8fafc;
-  --btn-neutral-bg-h:   #f1f5f9;
-  --btn-neutral-bd:     #e2e8f0;
-  --btn-neutral-bd-h:   #cbd5e1;
-  --btn-neutral-text:   #475569;
-  --btn-neutral-text-h: #1e293b;
+  --btn-neutral-bg:     var(--bg-secondary, #FDF6EC);
+  --btn-neutral-bg-h:   var(--bg-tertiary, #F5EDE0);
+  --btn-neutral-bd:     var(--border-color, #EAD9C5);
+  --btn-neutral-bd-h:   var(--charcoal-300, #D5BC9A);
+  --btn-neutral-text:   var(--text-secondary, #5C4330);
+  --btn-neutral-text-h: var(--text-primary, #2C2C2C);
 
   /* Geometry */
   --btn-radius:         12px;   /* standard */

@@ -104,7 +104,7 @@ function CartItemRow({ item, handleQuantityChange, handleRemoveItem, isLast }) {
 
   return (
     <>
-      <Box sx={{ display: "flex", gap: 1.5, alignItems: "flex-start", py: 2 }}>
+      <Box sx={{ display: "flex", gap: 1.5, alignItems: "center", py: 2 }}>
         <ProductThumb product={item.product} />
 
         <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -136,7 +136,7 @@ function CartItemRow({ item, handleQuantityChange, handleRemoveItem, isLast }) {
           {/* Pill stepper */}
           <Stack
             direction="row"
-            alignItems="center"
+            alignItems="stretch"
             sx={{
               border: `1.5px solid ${P}`,
               borderRadius: "20px",
@@ -149,8 +149,8 @@ function CartItemRow({ item, handleQuantityChange, handleRemoveItem, isLast }) {
               onClick={() => handleQuantityChange(item.product._id, item.quantity - 1)}
               disabled={item.quantity <= 1}
               sx={{
-                width: 28,
-                height: 28,
+                width: 32,
+                height: "100%",
                 borderRadius: 0,
                 color: P,
                 "&:hover": { bgcolor: P_LIGHT },
@@ -160,7 +160,18 @@ function CartItemRow({ item, handleQuantityChange, handleRemoveItem, isLast }) {
               <RemoveIcon sx={{ fontSize: 13 }} />
             </IconButton>
             <Typography
-              sx={{ minWidth: 28, textAlign: "center", fontSize: "0.8125rem", fontWeight: 600, color: "#1c1917" }}
+              sx={{
+                minWidth: 32,
+                textAlign: "center",
+                fontSize: "0.8125rem",
+                fontWeight: 600,
+                color: "#1c1917",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderLeft: `1px solid ${P}20`,
+                borderRight: `1px solid ${P}20`,
+              }}
             >
               {item.quantity}
             </Typography>
@@ -169,8 +180,8 @@ function CartItemRow({ item, handleQuantityChange, handleRemoveItem, isLast }) {
               onClick={() => handleQuantityChange(item.product._id, item.quantity + 1)}
               disabled={atMax}
               sx={{
-                width: 28,
-                height: 28,
+                width: 32,
+                height: "100%",
                 borderRadius: 0,
                 color: P,
                 "&:hover": { bgcolor: P_LIGHT },
@@ -441,15 +452,15 @@ export const CartReviewStep = ({
             <Divider sx={{ borderColor: BORDER, mb: 2 }} />
 
             {/* Price breakdown */}
-            <Stack spacing={1.25} sx={{ mb: 2 }}>
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: "100%" }}>
+            <Stack spacing={1.25} sx={{ mb: 2, width: "100%" }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>Subtotal</Typography>
                 <Typography sx={{ fontSize: "0.9375rem", fontWeight: 500 }}>
                   ₹{subtotal.toFixed(2)}
                 </Typography>
               </Stack>
               {discount > 0 && (
-                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: "100%" }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center">
                   <Typography sx={{ fontSize: "0.875rem", color: "#16a34a" }}>
                     Coupon ({appliedCoupon.code})
                   </Typography>
@@ -458,7 +469,7 @@ export const CartReviewStep = ({
                   </Typography>
                 </Stack>
               )}
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: "100%" }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>Shipping</Typography>
                 <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", fontStyle: "italic" }}>
                   Calculated next
@@ -469,7 +480,7 @@ export const CartReviewStep = ({
             <Divider sx={{ borderColor: BORDER, mb: 2 }} />
 
             {/* Total */}
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2.5 }}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2.5, width: "100%" }}>
               <Typography sx={{ fontSize: "1rem", fontWeight: 500 }}>Total</Typography>
               <Typography sx={{ fontSize: "1.25rem", fontWeight: 600, color: P }}>
                 ₹{discountedTotal.toFixed(2)}

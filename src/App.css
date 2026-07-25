@@ -519,12 +519,12 @@ pre {
 }
 
 .btn-warning {
-  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  background: linear-gradient(135deg, var(--gold-400, #e2b535), var(--gold-600, #b08930)) !important;
   border-color: transparent !important;
   color: white !important;
 }
 .btn-warning:hover:not(:disabled):not(.disabled) {
-  background: linear-gradient(135deg, #d97706, #b45309) !important;
+  background: linear-gradient(135deg, var(--gold-500, #C9A84C), var(--gold-700, #8e6a24)) !important;
   transform: translateY(-1px);
 }
 
@@ -671,7 +671,7 @@ pre {
   background: linear-gradient(
     135deg,
     var(--bg-dark) 0%,
-    #374151 100%
+    var(--charcoal-800, #3D2C20) 100%
   ) !important;
   box-shadow: var(--shadow-lg);
   backdrop-filter: blur(10px);
@@ -682,7 +682,7 @@ pre {
 .navbar-brand {
   font-weight: 700;
   font-size: clamp(1rem, 2vw, 1.25rem);
-  background: linear-gradient(45deg, var(--primary-light), var(--success));
+  background: linear-gradient(45deg, var(--gold-300, #edcc59), var(--blush-400, #F4A7B9));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -725,23 +725,23 @@ pre {
 }
 
 .alert-info {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  color: #1e40af;
-  border-left: 3px solid var(--info);
+  background: linear-gradient(135deg, var(--blush-100, #ffe4ed) 0%, var(--blush-50, #fff5f8) 100%);
+  color: var(--blush-800, #93334f);
+  border-left: 3px solid var(--accent);
 }
 .alert-success {
-  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-  color: #065f46;
+  background: linear-gradient(135deg, var(--success-subtle, rgba(46,125,50,0.08)) 0%, rgba(46,125,50,0.14) 100%);
+  color: var(--success-dark, #1b5e20);
   border-left: 3px solid var(--success);
 }
 .alert-warning {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  color: #92400e;
+  background: linear-gradient(135deg, var(--gold-100, #fef9e7) 0%, var(--gold-200, #fef0c4) 100%);
+  color: var(--gold-800, #5a3e10);
   border-left: 3px solid var(--accent);
 }
 .alert-danger {
-  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-  color: #991b1b;
+  background: linear-gradient(135deg, var(--error-subtle, rgba(198,40,40,0.08)) 0%, rgba(198,40,40,0.14) 100%);
+  color: var(--error-dark, #8e0000);
   border-left: 3px solid var(--danger);
 }
 
@@ -798,11 +798,11 @@ pre {
   background: var(--bg-tertiary);
 }
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: var(--rose-300, #f5a8c6);
   border-radius: var(--radius-full);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: var(--rose-600, #c42b61);
 }
 
 /* ── 14. Animations (used by components) ──────────────────── */
@@ -879,7 +879,7 @@ pre {
 
 /* Loading shimmer */
 .loading-shimmer {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--charcoal-100, #F5EDE0) 25%, var(--charcoal-200, #EAD9C5) 50%, var(--charcoal-100, #F5EDE0) 75%);
   background-size: 400px 100%;
   animation: shimmer 1.5s infinite;
 }
@@ -925,7 +925,7 @@ pre {
   background: linear-gradient(
     90deg,
     rgba(139, 26, 74, 0.06),
-    rgba(16, 185, 129, 0.03)
+    rgba(201, 168, 76, 0.04)
   );
   border-radius: var(--radius-lg);
   margin-bottom: 0.75rem;
@@ -938,7 +938,7 @@ pre {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--primary-light), var(--success));
+  background: linear-gradient(135deg, var(--rose-700, #a51e50), var(--rose-900, #6b1238));
   color: white;
   font-weight: 700;
   font-size: 1.1rem;
@@ -1000,16 +1000,16 @@ pre {
 .account-grid .compact-card.address-gradient {
   background: linear-gradient(
     135deg,
-    rgba(16, 185, 129, 0.08) 0%,
-    rgba(59, 130, 246, 0.04) 100%
+    rgba(201, 168, 76, 0.08) 0%,
+    rgba(244, 167, 185, 0.04) 100%
   );
-  border: 1px solid rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(201, 168, 76, 0.12);
 }
 .account-grid .compact-card.wishlist-gradient {
   background: linear-gradient(
     135deg,
     rgba(139, 26, 74, 0.06) 0%,
-    rgba(245, 158, 11, 0.04) 100%
+    rgba(201, 168, 76, 0.04) 100%
   );
   border: 1px solid rgba(139, 26, 74, 0.08);
 }
@@ -1068,7 +1068,7 @@ pre {
   background: linear-gradient(135deg, var(--primary), var(--primary-light));
 }
 .bg-gradient-secondary {
-  background: linear-gradient(135deg, var(--success), #34d399);
+  background: linear-gradient(135deg, var(--gold-500, #C9A84C), var(--gold-300, #edcc59));
 }
 
 /* Breadcrumbs */
@@ -1146,46 +1146,46 @@ pre {
 
 /* Variant: success */
 .toast--success {
-  background: linear-gradient(135deg, #f0fdf4, #dcfce7) !important;
+  background: linear-gradient(135deg, var(--success-subtle, rgba(46,125,50,0.08)), rgba(46,125,50,0.14)) !important;
   border-left: 4px solid var(--success) !important;
-  color: #14532d !important;
+  color: var(--success-dark, #1b5e20) !important;
 }
 .toast--success .toast-header {
-  color: #166534 !important;
+  color: var(--success-dark, #1b5e20) !important;
 }
 
 /* Variant: danger / error */
 .toast--danger,
 .toast--error {
-  background: linear-gradient(135deg, #fff5f5, #fee2e2) !important;
+  background: linear-gradient(135deg, var(--error-subtle, rgba(198,40,40,0.08)), rgba(198,40,40,0.14)) !important;
   border-left: 4px solid var(--danger) !important;
-  color: #7f1d1d !important;
+  color: var(--error-dark, #8e0000) !important;
 }
 .toast--danger .toast-header,
 .toast--error .toast-header {
-  color: #991b1b !important;
+  color: var(--error-dark, #8e0000) !important;
 }
 
 /* Variant: warning */
 .toast--warning {
-  background: linear-gradient(135deg, #fffbeb, #fef3c7) !important;
+  background: linear-gradient(135deg, var(--gold-100, #fef9e7), var(--gold-200, #fef0c4)) !important;
   border-left: 4px solid var(--accent) !important;
-  color: #78350f !important;
+  color: var(--gold-800, #5a3e10) !important;
 }
 .toast--warning .toast-header {
-  color: #92400e !important;
+  color: var(--gold-700, #8e6a24) !important;
 }
 
 /* Variant: info / primary */
 .toast--info,
 .toast--primary {
-  background: linear-gradient(135deg, #eff6ff, #dbeafe) !important;
+  background: linear-gradient(135deg, var(--blush-50, #fff5f8), var(--blush-100, #ffe4ed)) !important;
   border-left: 4px solid var(--primary) !important;
-  color: #1e3a5f !important;
+  color: var(--rose-900, #6b1238) !important;
 }
 .toast--info .toast-header,
 .toast--primary .toast-header {
-  color: #1e40af !important;
+  color: var(--rose-800, #8B1A4A) !important;
 }
 
 /* Toast close button */
@@ -1208,7 +1208,7 @@ pre {
 }
 
 .modal-header {
-  background: linear-gradient(135deg, #0f172a, #1e293b);
+  background: linear-gradient(135deg, var(--rose-900, #6b1238), var(--rose-800, #8B1A4A));
   color: white;
   border-bottom: none !important;
   padding: 1.125rem 1.5rem !important;
@@ -1247,108 +1247,4 @@ pre {
   }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   BRAND ALIGNMENT LAYER — Purple × Amber · Overrides blue system
-   ══════════════════════════════════════════════════════════════ */
-:root {
-  /* Reroute --primary to brand purple (replaces #8B1A4A) */
-  --primary:        #7c3aed;
-  --primary-dark:   #6d28d9;
-  --primary-light:  #9333ea;
-  --primary-subtle: rgba(124, 58, 237, 0.08);
-
-  /* Focus & border alignment */
-  --border-focus: var(--primary);
-
-  /* Text: warm neutrals (replaces cold slate) */
-  --text-primary:   #1c1917;
-  --text-secondary: #57534e;
-  --text-muted:     #a8a29e;
-  --text-disabled:  #d6d3d1;
-
-  /* Backgrounds: warm off-white */
-  --bg-secondary: #fafaf9;
-  --bg-tertiary:  #f5f5f4;
-  --border-color: #e7e5e4;
-  --border-light: #f5f5f4;
-}
-
-/* Link color → brand purple */
-a { color: var(--primary); }
-a:hover { color: var(--primary-dark); }
-a:focus-visible { outline-color: var(--primary); }
-
-/* Global focus ring → brand purple */
-:focus-visible { outline-color: var(--primary) !important; }
-
-/* Form focus → brand purple */
-.form-control:focus,
-.form-select:focus {
-  border-color: var(--primary) !important;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15) !important;
-}
-
-/* Bootstrap .btn-primary → brand purple gradient (overrides simpler rule above) */
-.btn-primary {
-  background: var(--btn-brand-grad) !important;
-  border-color: transparent !important;
-  box-shadow: 0 2px 10px var(--btn-brand-glow) !important;
-}
-.btn-primary:hover:not(:disabled):not(.disabled) {
-  background: var(--btn-brand-grad-h) !important;
-  border-color: transparent !important;
-  box-shadow: 0 6px 20px var(--btn-brand-glow) !important;
-  transform: translateY(-2px);
-}
-
-/* Modal header → brand purple (replaces dark slate) */
-.modal-header {
-  background: linear-gradient(135deg, var(--brand-900, #4c1d95), var(--brand-800, #6d28d9)) !important;
-}
-
-/* Account avatar → brand purple (replaces blue/green) */
-.account-avatar {
-  background: linear-gradient(135deg, var(--brand-700, #7c3aed), var(--brand-800, #6d28d9)) !important;
-  box-shadow: 0 8px 24px rgba(109, 40, 217, 0.25) !important;
-}
-
-/* Account header strip → brand purple */
-.account-header {
-  background: linear-gradient(90deg, rgba(124, 58, 237, 0.06), rgba(245, 158, 11, 0.03)) !important;
-}
-
-/* Gradient card variants → brand purple */
-.account-grid .compact-card.address-gradient {
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.06) 0%, rgba(245, 158, 11, 0.03) 100%) !important;
-  border: 1px solid rgba(124, 58, 237, 0.1) !important;
-}
-.account-grid .compact-card.wishlist-gradient {
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, rgba(245, 158, 11, 0.04) 100%) !important;
-  border: 1px solid rgba(124, 58, 237, 0.08) !important;
-}
-
-/* Account avatar in App.css compact sidebar widget */
-.account-avatar.account-avatar--sm {
-  background: linear-gradient(135deg, var(--brand-700, #7c3aed), var(--brand-800, #6d28d9)) !important;
-}
-
-/* cartPulse → brand purple */
-@keyframes cartPulse {
-  0%   { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4); }
-  70%  { box-shadow: 0 0 0 8px rgba(124, 58, 237, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0); }
-}
-
-/* Info alert → brand purple */
-.alert-info {
-  background: linear-gradient(135deg, var(--brand-50, #faf5ff) 0%, var(--brand-100, #f3e8ff) 100%) !important;
-  color: var(--brand-900, #4c1d95) !important;
-  border-left-color: var(--brand-600, #9333ea) !important;
-}
-
-/* Badge primary → brand purple */
-.badge.bg-primary { background-color: var(--brand-700, #7c3aed) !important; }
-
-/* Scrollbar thumb → brand purple */
-::-webkit-scrollbar-thumb { background: var(--neutral-300, #d6d3d1); }
-::-webkit-scrollbar-thumb:hover { background: var(--brand-400, #c084fc); }
+/* ── End of App.css ─────────────────────────────────────────── */

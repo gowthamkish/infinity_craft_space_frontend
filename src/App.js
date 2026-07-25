@@ -33,8 +33,8 @@ const Register = lazy(() => import("./pages/Register"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const Orders = lazy(() => import("./pages/Orders"));
 const Account = lazy(() => import("./pages/Account"));
-const ProtectedRoute = lazy(() => import("./components/ProtectedRoute"));
-const AdminRoute = lazy(() => import("./components/AdminRoute"));
+import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 const AdminDashboard = lazy(() => import("./components/admin/Dashboard"));
 const UsersList = lazy(() => import("./components/users/users"));
 const ProductList = lazy(() => import("./components/products/products"));
@@ -106,7 +106,7 @@ function App() {
 
   const loadSnapshot = (uid) => {
     try {
-      const raw = localStorage.getItem(lsKey(uid));
+      const raw = sessionStorage.getItem(lsKey(uid));
       return raw ? JSON.parse(raw) : null;
     } catch {
       return null;
@@ -115,7 +115,7 @@ function App() {
 
   const saveSnapshot = (uid, map) => {
     try {
-      localStorage.setItem(lsKey(uid), JSON.stringify(map));
+      sessionStorage.setItem(lsKey(uid), JSON.stringify(map));
     } catch {}
   };
 
@@ -173,45 +173,56 @@ function App() {
 
     const baseURL = import.meta.env.VITE_API_URL || "";
     let es;
-    try {
-      es = new EventSource(`${baseURL}/api/sse/stream`, {
-        withCredentials: true,
-      });
+    let retryTimeout;
+    let retryDelay = 2000;
+    let cancelled = false;
 
-      es.addEventListener("ORDER_UPDATE", (e) => {
-        try {
-          const payload = JSON.parse(e.data);
-          const { order, previousStatus } = payload;
-          if (!order || !order.status) return;
+    function connect() {
+      if (cancelled) return;
+      try {
+        es = new EventSource(`${baseURL}/api/sse/stream`, { withCredentials: true });
 
-          const key = String(order._id);
-          const notifKey = `${key}:${order.status}`;
+        es.addEventListener("ORDER_UPDATE", (e) => {
+          try {
+            const payload = JSON.parse(e.data);
+            const { order, previousStatus } = payload;
+            if (!order || !order.status) return;
 
-          // Update in-memory status map
-          if (liveMapRef.current) {
-            liveMapRef.current[key] = order.status;
+            const key = String(order._id);
+            const notifKey = `${key}:${order.status}`;
+
+            if (liveMapRef.current) {
+              liveMapRef.current[key] = order.status;
+            }
+
+            if (order.status !== previousStatus && !shownRef.current.has(notifKey)) {
+              shownRef.current.add(notifKey);
+              setOrderStatusEventRef.current({ order, previousStatus: previousStatus || null });
+            }
+          } catch {}
+        });
+
+        es.addEventListener("open", () => {
+          retryDelay = 2000; // reset backoff on successful connect
+        });
+
+        es.onerror = () => {
+          es.close();
+          if (!cancelled) {
+            retryTimeout = setTimeout(() => {
+              retryDelay = Math.min(retryDelay * 2, 30000); // cap at 30s
+              connect();
+            }, retryDelay);
           }
+        };
+      } catch {}
+    }
 
-          // Show modal — SSE is the real-time path; deduplicate with shownRef
-          if (
-            order.status !== previousStatus &&
-            !shownRef.current.has(notifKey)
-          ) {
-            shownRef.current.add(notifKey);
-            setOrderStatusEventRef.current({
-              order,
-              previousStatus: previousStatus || null,
-            });
-          }
-        } catch {}
-      });
-
-      es.onerror = () => {
-        // SSE will auto-reconnect; silent failure is fine
-      };
-    } catch {}
+    connect();
 
     return () => {
+      cancelled = true;
+      clearTimeout(retryTimeout);
       if (es) es.close();
     };
   }, [userId]);

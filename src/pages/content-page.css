@@ -144,6 +144,6 @@
 [class*="highlight"],
 [class*="callout"],
 [class*="tip"] {
-  background: rgba(124, 58, 237, 0.06) !important;
-  border-left-color: #7c3aed !important;
+  background: var(--primary-subtle, rgba(139, 26, 74, 0.06)) !important;
+  border-left-color: var(--primary, #8B1A4A) !important;
 }

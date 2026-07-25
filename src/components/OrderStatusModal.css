@@ -21,7 +21,7 @@
   position: relative;
   width: 100%;
   max-width: 440px;
-  background: #fff;
+  background: var(--bg-primary, #FFFDF9);
   border-radius: 20px;
   box-shadow:
     0 25px 60px rgba(0, 0, 0, 0.18),
@@ -64,7 +64,7 @@
   height: 28px;
   border: none;
   background: rgba(0, 0, 0, 0.07);
-  color: #64748b;
+  color: var(--charcoal-500, #A08060);
   border-radius: 50%;
   font-size: 1.1rem;
   line-height: 1;
@@ -113,14 +113,14 @@
 .osm-title {
   font-size: 1.4rem;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--charcoal-900, #2C2C2C);
   margin: 0 0 0.5rem;
   line-height: 1.2;
 }
 
 .osm-desc {
   font-size: 0.9rem;
-  color: #64748b;
+  color: var(--charcoal-500, #A08060);
   margin: 0 0 1rem;
   line-height: 1.5;
 }
@@ -145,9 +145,9 @@
 }
 
 .osm-status--prev {
-  background: #f1f5f9;
-  color: #64748b;
-  border-color: #cbd5e1;
+  background: var(--bg-tertiary, #F5EDE0);
+  color: var(--charcoal-500, #A08060);
+  border-color: var(--border-color, #EAD9C5);
   text-decoration: line-through;
   opacity: 0.7;
 }
@@ -158,14 +158,14 @@
 
 .osm-arrow {
   font-size: 1rem;
-  color: #94a3b8;
+  color: var(--charcoal-400, #C0A882);
   flex-shrink: 0;
 }
 
 /* Order ID */
 .osm-order-id {
   font-size: 0.78rem;
-  color: #94a3b8;
+  color: var(--charcoal-400, #C0A882);
   margin: 0 0 1.25rem;
   font-family: monospace;
   letter-spacing: 0.06em;
@@ -193,14 +193,14 @@
 .osm-btn:active { transform: translateY(0); }
 
 .osm-btn--primary {
-  background: var(--btn-brand-grad, linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%));
+  background: var(--btn-brand-grad);
   color: #fff;
-  box-shadow: 0 4px 12px var(--btn-brand-glow, rgba(124,58,237,0.28));
+  box-shadow: 0 4px 12px var(--btn-brand-glow);
 }
 
 .osm-btn--ghost {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--bg-tertiary, #F5EDE0);
+  color: var(--charcoal-600, #7A5E42);
 }
 
 /* Responsive — center on desktop */

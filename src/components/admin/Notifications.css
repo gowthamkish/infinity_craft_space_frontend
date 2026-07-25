@@ -105,18 +105,18 @@
 
 .ntf-action-btn--ghost:hover:not(:disabled) {
   background: var(--btn-brand-subtle, rgba(124,58,237,0.08));
-  border-color: var(--btn-brand, #7c3aed);
-  color: var(--btn-brand, #7c3aed);
+  border-color: var(--btn-brand, #8B1A4A);
+  color: var(--btn-brand, #8B1A4A);
 }
 
 .ntf-action-btn--primary {
-  background: var(--btn-brand-grad, linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%));
+  background: var(--btn-brand-grad, linear-gradient(135deg, #8B1A4A 0%, #6b1238 100%));
   color: #fff;
   box-shadow: 0 2px 8px var(--btn-brand-glow, rgba(124,58,237,0.28));
 }
 
 .ntf-action-btn--primary:hover:not(:disabled) {
-  background: var(--btn-brand-grad-h, linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%));
+  background: var(--btn-brand-grad-h, linear-gradient(135deg, #6b1238 0%, #4a0d25 100%));
   transform: translateY(-1px);
 }
 
@@ -219,11 +219,11 @@
 }
 
 .ntf-row--unread {
-  background: #fafbff;
+  background: var(--primary-subtle, rgba(139,26,74,0.04));
 }
 
 .ntf-row--unread:hover {
-  background: #f4f6fe;
+  background: var(--primary-subtle, rgba(139,26,74,0.08));
 }
 
 .ntf-row__icon-wrap {
@@ -302,11 +302,11 @@
 
 .ntf-btn--view {
   background: var(--btn-brand-subtle, rgba(124,58,237,0.08));
-  color: var(--btn-brand, #7c3aed);
+  color: var(--btn-brand, #8B1A4A);
 }
 
 .ntf-btn--view:hover {
-  background: var(--btn-brand-grad, linear-gradient(135deg,#7c3aed,#6d28d9));
+  background: var(--btn-brand-grad, linear-gradient(135deg,#8B1A4A,#6b1238));
   color: #fff;
 }
 

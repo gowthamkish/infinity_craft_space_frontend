@@ -911,24 +911,26 @@ export const ShippingStep = ({
 
             <Divider sx={{ borderColor: BORDER, mb: 2 }} />
 
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.25 }}>
-              <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>Subtotal</Typography>
-              <Typography sx={{ fontSize: "0.9375rem", fontWeight: 500 }}>₹{subtotal.toFixed(2)}</Typography>
-            </Stack>
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: "100%" }}>
-              <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>Shipping</Typography>
-              {shippingRate ? (
-                <Typography sx={{ fontSize: "0.9375rem", fontWeight: 500 }}>
-                  {shippingRate.rate === 0 ? "FREE" : `₹${shippingRate.rate}`}
-                </Typography>
-              ) : (
-                <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", fontStyle: "italic" }}>
-                  Enter PIN to calculate
-                </Typography>
-              )}
+            <Stack spacing={1.25} sx={{ width: "100%", mb: 2 }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>Subtotal</Typography>
+                <Typography sx={{ fontSize: "0.9375rem", fontWeight: 500 }}>₹{subtotal.toFixed(2)}</Typography>
+              </Stack>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>Shipping</Typography>
+                {shippingRate ? (
+                  <Typography sx={{ fontSize: "0.9375rem", fontWeight: 500 }}>
+                    {shippingRate.rate === 0 ? "FREE" : `₹${shippingRate.rate}`}
+                  </Typography>
+                ) : (
+                  <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", fontStyle: "italic" }}>
+                    Enter PIN to calculate
+                  </Typography>
+                )}
+              </Stack>
             </Stack>
 
-            <Divider sx={{ borderColor: BORDER, my: 2 }} />
+            <Divider sx={{ borderColor: BORDER, mb: 2 }} />
 
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: "100%" }}>
               <Typography sx={{ fontSize: "1rem", fontWeight: 500 }}>Total</Typography>
@@ -937,9 +939,11 @@ export const ShippingStep = ({
               </Typography>
             </Stack>
 
-            <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", mt: 1.5, fontStyle: "italic" }}>
-              Shipping calculated at next step
-            </Typography>
+            {!shippingRate && (
+              <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", mt: 1.5, fontStyle: "italic" }}>
+                Shipping calculated at next step
+              </Typography>
+            )}
           </Box>
         </Paper>
       </Grid>

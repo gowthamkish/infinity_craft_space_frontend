@@ -1,6 +1,6 @@
-/* ════════════════════════════════════════════════════════════════════════
+/* ═══════════════════════════���════════════════════════════════════════════
    CHECKOUT PROGRESS BAR — Premium 2026 Design
-   ════════════════════════════════════════════════════════════════════════ */
+   ═══════���════════════════════════════════════���═══════════════════════════ */
 
 .cpb-root { margin-bottom: 28px; }
 
@@ -10,14 +10,14 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
-  background: #f0fdf4;
-  border: 1px solid #86efac;
+  background: var(--success-subtle, rgba(46,125,50,0.08));
+  border: 1px solid rgba(46, 125, 50, 0.25);
   border-radius: 99px;
   padding: 7px 18px;
   margin: 0 auto 24px;
   font-size: 0.76rem;
   font-weight: 600;
-  color: #166534;
+  color: var(--success-dark, #1b5e20);
   width: fit-content;
 }
 
@@ -49,9 +49,9 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 2.5px solid #d1d5e8;
+  border: 2.5px solid var(--border-color, #EAD9C5);
   background: white;
-  color: #9ca3af;
+  color: var(--charcoal-400, #C0A882);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -62,37 +62,37 @@
 }
 
 .cpb-circle--active {
-  border-color: #6d28d9;
-  color: #6d28d9;
-  box-shadow: 0 0 0 4px rgba(109, 40, 217, 0.12), 0 4px 10px rgba(109, 40, 217, 0.2);
+  border-color: var(--primary, #8B1A4A);
+  color: var(--primary, #8B1A4A);
+  box-shadow: 0 0 0 4px rgba(139, 26, 74, 0.12), 0 4px 10px rgba(139, 26, 74, 0.2);
 }
 
 .cpb-circle--done {
-  border-color: #059669;
-  background: linear-gradient(135deg, #10b981, #059669);
+  border-color: var(--success, #2e7d32);
+  background: linear-gradient(135deg, var(--success-light, #60ad5e), var(--success, #2e7d32));
   color: white;
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
 }
 
 /* Labels */
 .cpb-label {
   font-size: 0.72rem;
   font-weight: 600;
-  color: #9ca3af;
+  color: var(--charcoal-400, #C0A882);
   transition: color 0.2s ease;
   text-align: center;
   white-space: nowrap;
   line-height: 1.2;
 }
 
-.cpb-label--active { color: #6d28d9; font-weight: 700; }
-.cpb-label--done   { color: #059669; }
+.cpb-label--active { color: var(--primary, #8B1A4A); font-weight: 700; }
+.cpb-label--done   { color: var(--success, #2e7d32); }
 
 /* Connector line */
 .cpb-connector {
   flex: 1;
   height: 2px;
-  background: #e4e6f0;
+  background: var(--border-color, #EAD9C5);
   margin: 20px 4px 0;
   border-radius: 99px;
   position: relative;
@@ -105,7 +105,7 @@
   top: 0;
   height: 100%;
   border-radius: 99px;
-  background: linear-gradient(90deg, #10b981, #059669);
+  background: linear-gradient(90deg, var(--success-light, #60ad5e), var(--success, #2e7d32));
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
