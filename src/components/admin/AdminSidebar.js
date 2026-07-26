@@ -28,6 +28,7 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiLogOut,
+  FiUploadCloud,
 } from "react-icons/fi";
 
 const PRIMARY = "#8B1A4A";
@@ -45,8 +46,9 @@ const NAV_ITEMS = [
     section: "Catalog",
     links: [
       { label: "Products",    icon: FiPackage,     to: "/admin/products"    },
-      { label: "Add Product", icon: FiPlusSquare,  to: "/admin/addProduct"  },
-      { label: "Categories",  icon: FiTag,         to: "/admin/categories"  },
+      { label: "Add Product", icon: FiPlusSquare,   to: "/admin/addProduct"  },
+      { label: "Bulk Import", icon: FiUploadCloud,  to: "/admin/bulkImport"  },
+      { label: "Categories",  icon: FiTag,          to: "/admin/categories"  },
     ],
   },
   {

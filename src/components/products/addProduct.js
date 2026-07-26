@@ -19,17 +19,24 @@ import Alert from "@mui/material/Alert";
 import Divider from "@mui/material/Divider";
 import Tooltip from "@mui/material/Tooltip";
 import Collapse from "@mui/material/Collapse";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import CircularProgress from "@mui/material/CircularProgress";
+import Chip from "@mui/material/Chip";
 import { DotsLoader } from "../Loader";
 import {
   FiArrowLeft, FiPackage, FiSave, FiCamera, FiX, FiHome,
   FiDollarSign, FiTruck, FiSettings, FiInfo,
   FiChevronDown, FiChevronUp, FiPlus, FiTrash2,
-  FiEye, FiEyeOff, FiMove,
+  FiEye, FiEyeOff, FiMove, FiZap,
 } from "react-icons/fi";
 import { MdPalette } from "react-icons/md";
 import AdminLayout from "../admin/AdminLayout";
 import { addProduct, updateProduct } from "../../features/productsSlice";
 import { fetchPublicCategories } from "../../features/categoriesSlice";
+import api from "../../api/axios";
 
 /* ── Design tokens ─────────────────────────────────────────────── */
 const P       = "#8b2252";
@@ -756,6 +763,160 @@ function ProductColorsSection({ colors, setColors, showColorPicker, setShowColor
 }
 
 /* ══════════════════════════════════════════════════════════════════
+   AI AUTOFILL DIALOG
+   ══════════════════════════════════════════════════════════════════ */
+function AiAutofillDialog({ open, onClose, productName, categories, onApply }) {
+  const [keywords, setKeywords]   = useState("");
+  const [catHint,  setCatHint]    = useState("");
+  const [loading,  setLoading]    = useState(false);
+  const [error,    setError]      = useState("");
+  const [result,   setResult]     = useState(null);
+
+  const handleGenerate = async () => {
+    if (!productName?.trim()) { setError("Enter a product name in the form first"); return; }
+    setLoading(true); setError(""); setResult(null);
+    try {
+      const res = await api.post("/api/admin/products/ai-autofill", {
+        name: productName, keywords, category: catHint,
+      });
+      setResult(res.data);
+    } catch (err) {
+      setError(err.response?.data?.error || "Generation failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleApply = () => {
+    if (!result) return;
+    onApply(result);
+    onClose();
+    setResult(null); setKeywords(""); setCatHint(""); setError("");
+  };
+
+  const handleClose = () => {
+    onClose();
+    setResult(null); setKeywords(""); setCatHint(""); setError("");
+  };
+
+  return (
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth
+      PaperProps={{ sx: { borderRadius: "20px", maxHeight: "90vh" } }}>
+      <DialogTitle sx={{ pb: 1 }}>
+        <Stack direction="row" alignItems="center" spacing={1.5}>
+          <Box sx={{ width: 34, height: 34, borderRadius: "9px", bgcolor: `${P}12`,
+            display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <FiZap size={15} style={{ color: P }} />
+          </Box>
+          <Box>
+            <Typography sx={{ fontWeight: 700, fontSize: "1rem", color: "#0f172a", lineHeight: 1 }}>
+              AI Product Fill
+            </Typography>
+            <Typography sx={{ fontSize: "0.75rem", color: "#6b7280", mt: 0.25 }}>
+              Generate description, tags & SEO using Claude AI
+            </Typography>
+          </Box>
+        </Stack>
+      </DialogTitle>
+
+      <DialogContent sx={{ pt: 1 }}>
+        <Stack spacing={2}>
+          <Box sx={{ p: 1.5, bgcolor: "#fafafa", borderRadius: "10px", border: `1px solid ${BORDER}` }}>
+            <Typography sx={{ fontSize: "0.75rem", color: "#6b7280", mb: 0.25 }}>Generating for</Typography>
+            <Typography sx={{ fontWeight: 700, color: "#0f172a", fontSize: "0.9rem" }}>
+              {productName || <span style={{ color: "#94a3b8", fontStyle: "italic" }}>No product name yet</span>}
+            </Typography>
+          </Box>
+
+          <Box>
+            <Typography sx={{ fontWeight: 600, fontSize: "0.8rem", color: "#374151", mb: 0.75 }}>
+              Materials / keywords <span style={{ color: "#94a3b8", fontWeight: 400 }}>(optional)</span>
+            </Typography>
+            <TextField fullWidth size="small" multiline rows={2}
+              placeholder="e.g. handmade, silk thread, Rajasthani, meenakari, gold plated"
+              value={keywords} onChange={(e) => setKeywords(e.target.value)}
+              sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px" } }} />
+          </Box>
+
+          <Box>
+            <Typography sx={{ fontWeight: 600, fontSize: "0.8rem", color: "#374151", mb: 0.75 }}>
+              Category hint <span style={{ color: "#94a3b8", fontWeight: 400 }}>(optional)</span>
+            </Typography>
+            <FormControl fullWidth size="small">
+              <Select value={catHint} onChange={(e) => setCatHint(e.target.value)} displayEmpty
+                sx={{ borderRadius: "10px" }}>
+                <MenuItem value=""><em style={{ color: "#94a3b8" }}>Let AI decide</em></MenuItem>
+                {categories.map(c => (
+                  <MenuItem key={c._id || c.name} value={c.name}>{c.name}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+
+          {error && <Alert severity="error" sx={{ borderRadius: "10px", fontSize: "0.82rem" }}>{error}</Alert>}
+
+          {result && (
+            <Box sx={{ p: 2, bgcolor: "#f0fdf4", borderRadius: "12px", border: "1px solid #bbf7d0" }}>
+              <Typography sx={{ fontWeight: 700, fontSize: "0.8rem", color: "#15803d", mb: 1.5 }}>
+                ✓ Generated successfully — preview
+              </Typography>
+              <Stack spacing={1.5}>
+                <Box>
+                  <Typography sx={{ fontSize: "0.72rem", fontWeight: 700, color: "#6b7280", mb: 0.25, textTransform: "uppercase", letterSpacing: "0.05em" }}>Description</Typography>
+                  <Typography sx={{ fontSize: "0.8rem", color: "#374151", lineHeight: 1.5 }}>{result.description}</Typography>
+                </Box>
+                {result.tags?.length > 0 && (
+                  <Box>
+                    <Typography sx={{ fontSize: "0.72rem", fontWeight: 700, color: "#6b7280", mb: 0.5, textTransform: "uppercase", letterSpacing: "0.05em" }}>Tags</Typography>
+                    <Stack direction="row" flexWrap="wrap" gap={0.5}>
+                      {result.tags.map(t => <Chip key={t} label={t} size="small" sx={{ fontSize: "0.72rem", height: 22 }} />)}
+                    </Stack>
+                  </Box>
+                )}
+                {result.suggestedCategory && (
+                  <Box>
+                    <Typography sx={{ fontSize: "0.72rem", fontWeight: 700, color: "#6b7280", mb: 0.25, textTransform: "uppercase", letterSpacing: "0.05em" }}>Suggested category</Typography>
+                    <Typography sx={{ fontSize: "0.8rem", color: "#374151" }}>
+                      {result.suggestedCategory}{result.suggestedSubCategory ? ` › ${result.suggestedSubCategory}` : ""}
+                    </Typography>
+                  </Box>
+                )}
+                {result.seoTitle && (
+                  <Box>
+                    <Typography sx={{ fontSize: "0.72rem", fontWeight: 700, color: "#6b7280", mb: 0.25, textTransform: "uppercase", letterSpacing: "0.05em" }}>SEO title</Typography>
+                    <Typography sx={{ fontSize: "0.8rem", color: "#374151" }}>{result.seoTitle}</Typography>
+                  </Box>
+                )}
+              </Stack>
+            </Box>
+          )}
+        </Stack>
+      </DialogContent>
+
+      <DialogActions sx={{ p: 2.5, pt: 1.5, gap: 1 }}>
+        <Button onClick={handleClose} sx={{ color: "#6b7280", textTransform: "none", fontWeight: 600 }}>
+          Cancel
+        </Button>
+        {!result ? (
+          <Button variant="contained" onClick={handleGenerate} disabled={loading || !productName?.trim()}
+            startIcon={loading ? <CircularProgress size={14} color="inherit" /> : <FiZap size={14} />}
+            sx={{ bgcolor: P, textTransform: "none", fontWeight: 700, borderRadius: "10px",
+              "&:hover": { bgcolor: P_DARK }, "&:disabled": { bgcolor: "#e5e7eb" } }}>
+            {loading ? "Generating…" : "Generate"}
+          </Button>
+        ) : (
+          <Button variant="contained" onClick={handleApply}
+            sx={{ bgcolor: "#16a34a", textTransform: "none", fontWeight: 700, borderRadius: "10px",
+              "&:hover": { bgcolor: "#15803d" } }}>
+            Apply to Form
+          </Button>
+        )}
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════
    MAIN COMPONENT
    ══════════════════════════════════════════════════════════════════ */
 const AddProduct = () => {
@@ -787,6 +948,7 @@ const AddProduct = () => {
   const [editingId]                         = useState(params?.id ?? null);
   const [loading,        setLoading]        = useState(false);
   const [alert,          setAlert]          = useState({ show: false, message: "", variant: "" });
+  const [aiDialogOpen,   setAiDialogOpen]   = useState(false);
   const [imageFiles,     setImageFiles]     = useState([]);
   const [imagePreviews,  setImagePreviews]  = useState([]);
   const [imageUploading, setImageUploading] = useState(false);
@@ -963,26 +1125,56 @@ const AddProduct = () => {
           </Box>
         </Stack>
 
-        <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
-          <Button variant="outlined" size="small" startIcon={<FiArrowLeft size={13} />}
-            onClick={() => navigate("/admin/products")}
-            sx={{
-              borderRadius: "10px", textTransform: "none", fontWeight: 600,
-              borderColor: BORDER, color: "#64748b", height: 36,
-              "&:hover": { borderColor: P, color: P, bgcolor: P_LIGHT },
-            }}>
-            Products
-          </Button>
-          <Box sx={{ height: 24, width: 1, bgcolor: BORDER }} />
-          <Box>
-            <Typography sx={{ fontWeight: 800, fontSize: "1.25rem", color: "#0f172a", lineHeight: 1.2 }}>
-              {editingId ? "Edit Product" : "Add New Product"}
-            </Typography>
-            <Typography sx={{ fontSize: "0.8125rem", color: "#94a3b8", mt: 0.25 }}>
-              {editingId ? "Update product details and save changes" : "Fill in the details to create a new listing"}
-            </Typography>
-          </Box>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3, gap: 2 }}>
+          <Stack direction="row" alignItems="center" spacing={2} sx={{ minWidth: 0 }}>
+            <Button variant="outlined" size="small" startIcon={<FiArrowLeft size={13} />}
+              onClick={() => navigate("/admin/products")}
+              sx={{
+                borderRadius: "10px", textTransform: "none", fontWeight: 600, flexShrink: 0,
+                borderColor: BORDER, color: "#64748b", height: 36,
+                "&:hover": { borderColor: P, color: P, bgcolor: P_LIGHT },
+              }}>
+              Products
+            </Button>
+            <Box sx={{ height: 24, width: "1px", bgcolor: BORDER, flexShrink: 0 }} />
+            <Box sx={{ minWidth: 0 }}>
+              <Typography sx={{ fontWeight: 800, fontSize: "1.25rem", color: "#0f172a", lineHeight: 1.2 }}>
+                {editingId ? "Edit Product" : "Add New Product"}
+              </Typography>
+              <Typography sx={{ fontSize: "0.8125rem", color: "#94a3b8", mt: 0.25 }}>
+                {editingId ? "Update product details and save changes" : "Fill in the details to create a new listing"}
+              </Typography>
+            </Box>
+          </Stack>
+          {!editingId && (
+            <Button variant="outlined" size="small" startIcon={<FiZap size={13} />}
+              onClick={() => setAiDialogOpen(true)}
+              sx={{
+                borderRadius: "10px", textTransform: "none", fontWeight: 700, flexShrink: 0,
+                borderColor: P, color: P, height: 36,
+                "&:hover": { bgcolor: P_LIGHT, borderColor: P_DARK },
+              }}>
+              AI Fill
+            </Button>
+          )}
         </Stack>
+
+        <AiAutofillDialog
+          open={aiDialogOpen}
+          onClose={() => setAiDialogOpen(false)}
+          productName={form.name}
+          categories={categories}
+          onApply={(data) => {
+            if (data.description) set("description", data.description);
+            if (data.suggestedCategory && !form.category) set("category", data.suggestedCategory);
+            if (data.suggestedSubCategory && !form.subCategory) set("subCategory", data.suggestedSubCategory);
+            setAlert({
+              show: true,
+              message: "AI content applied! Review and adjust the description, tags, and SEO fields below.",
+              variant: "success",
+            });
+          }}
+        />
 
         {alert.show && (
           <Alert severity={alertSeverity} onClose={() => setAlert({ show: false, message: "", variant: "" })}
