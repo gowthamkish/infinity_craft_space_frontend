@@ -7,7 +7,9 @@
  */
 
 import { useState, useCallback, useRef } from "react";
+import { useDispatch } from "react-redux";
 import { v4 as uuid } from "uuid";
+import { fetchUserCart } from "../cartSlice";
 
 // Must use VITE_BASE_URL (same origin the axios instance targets locally) so
 // the _csrf cookie set by that origin is sent back correctly on this fetch.
@@ -75,6 +77,7 @@ function getCsrfToken() {
 }
 
 export function useChat() {
+  const dispatch = useDispatch();
   const [messages, setMessages] = useState([
     {
       id: uuid(),
@@ -156,6 +159,8 @@ export function useChat() {
                 setActiveTool(event.tool);
               } else if (event.type === "tool_end") {
                 setActiveTool(null);
+              } else if (event.type === "action_done") {
+                if (event.action === "cart_updated") dispatch(fetchUserCart());
               } else if (event.type === "done") {
                 setMessages((prev) =>
                   prev.map((m) =>

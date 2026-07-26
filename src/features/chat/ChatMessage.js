@@ -150,11 +150,16 @@ export default function ChatMessage({ message, activeTool }) {
 
 function toolLabel(tool) {
   const labels = {
-    search_products: "Searching products…",
-    get_product_details: "Getting product details…",
+    search_products:        "Searching products…",
+    get_product_details:    "Getting product details…",
     answer_policy_question: "Looking up policy…",
-    check_order_status: "Checking order…",
-    get_delivery_estimate: "Estimating delivery…",
+    check_order_status:     "Checking order…",
+    get_delivery_estimate:  "Estimating delivery…",
+    add_to_cart:            "Adding to cart…",
+    validate_coupon:        "Validating coupon…",
+    get_wishlist:           "Fetching wishlist…",
+    add_to_wishlist:        "Saving to wishlist…",
+    initiate_return:        "Submitting return request…",
   };
   return labels[tool] || "Thinking…";
 }
