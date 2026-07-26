@@ -25,6 +25,7 @@ import {
   FiTag,
   FiBarChart2,
   FiBell,
+  FiShield,
   FiChevronLeft,
   FiChevronRight,
   FiLogOut,
@@ -57,6 +58,7 @@ const NAV_ITEMS = [
       { label: "Orders",        icon: FiShoppingBag, to: "/admin/orders"       },
       { label: "Users",         icon: FiUsers,       to: "/admin/users"        },
       { label: "Notifications", icon: FiBell,        to: "/admin/notifications"},
+      { label: "Moderation",    icon: FiShield,      to: "/admin/moderation"   },
     ],
   },
 ];

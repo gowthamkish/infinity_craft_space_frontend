@@ -53,6 +53,9 @@ const AdminNotifications = lazy(
 const AnalyticsDashboard = lazy(
   () => import("./components/admin/AnalyticsDashboard"),
 );
+const ModerationQueue = lazy(
+  () => import("./components/admin/ModerationQueue"),
+);
 // const IdleTimeoutManager = lazy(
 //   () => import("./components/IdleTimeoutManager"),
 // );
@@ -741,6 +744,23 @@ function App() {
                         >
                           <AdminRoute>
                             <AnalyticsDashboard />
+                          </AdminRoute>
+                        </Suspense>
+                      </RouteErrorBoundary>
+                    }
+                  />
+
+                  <Route
+                    path="/admin/moderation"
+                    element={
+                      <RouteErrorBoundary>
+                        <Suspense
+                          fallback={
+                            <LoadingFallback message="Loading moderation queue..." />
+                          }
+                        >
+                          <AdminRoute>
+                            <ModerationQueue />
                           </AdminRoute>
                         </Suspense>
                       </RouteErrorBoundary>
