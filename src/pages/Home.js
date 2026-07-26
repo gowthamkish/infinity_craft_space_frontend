@@ -517,6 +517,8 @@ export default function Home() {
         description="Discover premium handcrafted products at InfinityCraftSpace. Custom resin art, personalized gifts, craft supplies and more — delivered across India."
         url={SEO_CONFIG.SITE_URL}
         canonical={SEO_CONFIG.SITE_URL}
+        type="website"
+        image={SEO_CONFIG.DEFAULT_IMAGE}
       />
       <Box className="App">
         <Header />

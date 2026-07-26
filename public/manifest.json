@@ -9,7 +9,7 @@
       "type": "image/x-icon"
     },
     {
-      "src": "ICS_Logo.jpeg.png",
+      "src": "favicon.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any maskable"
@@ -22,8 +22,8 @@
   ],
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#3b82f6",
-  "background_color": "#f8fafc",
+  "theme_color": "#8B1A4A",
+  "background_color": "#fdf8f5",
   "orientation": "portrait-primary",
   "scope": "/",
   "categories": ["shopping", "business", "lifestyle"],

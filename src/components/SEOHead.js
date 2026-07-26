@@ -179,7 +179,7 @@ const SEOHead = ({
       {canonical && <link rel="canonical" href={canonical} />}
 
       {/* Robots Meta */}
-      {noindex && <meta name="robots" content="noindex, nofollow" />}
+      <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"} />
 
       {/* Open Graph Meta Tags */}
       <meta property="og:title" content={optimizedTitle} />
@@ -300,7 +300,7 @@ export const generateProductStructuredData = (product, reviews = []) => {
         product.image?.url ||
         `${baseUrl}/ICS_Logo.jpeg`,
     ],
-    sku: product._id,
+    sku: product.sku || product._id,
     brand: {
       "@type": "Brand",
       name: "Infinity Craft Space",
@@ -311,7 +311,11 @@ export const generateProductStructuredData = (product, reviews = []) => {
       price: product.price,
       priceCurrency: "INR",
       availability: "https://schema.org/InStock",
-      url: `${baseUrl}/product/${product._id}`,
+      url: `${baseUrl}/product/${product.slug || product._id}`,
+      priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+      ...(product.compareAtPrice && product.compareAtPrice > product.price
+        ? { highPrice: product.compareAtPrice, "@type": "AggregateOffer" }
+        : {}),
       seller: {
         "@type": "Organization",
         name: "Infinity Craft Space",

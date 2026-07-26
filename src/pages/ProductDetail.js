@@ -451,11 +451,20 @@ const ProductDetail = () => {
         structuredData={{
           "@context": "https://schema.org",
           "@graph": [
-            generateProductStructuredData(product, []),
+            {
+              ...generateProductStructuredData(product, []),
+              aggregateRating: ratingStats?.reviewCount > 0 ? {
+                "@type": "AggregateRating",
+                ratingValue: ratingStats.averageRating,
+                reviewCount: ratingStats.reviewCount,
+                bestRating: 5,
+                worstRating: 1,
+              } : undefined,
+            },
             generateBreadcrumbStructuredData([
               { name: "Home", url: getBaseUrl() },
-              { name: "Products", url: `${getBaseUrl()}/` },
-              ...(product.category ? [{ name: product.category, url: `${getBaseUrl()}/?category=${encodeURIComponent(product.category)}` }] : []),
+              { name: "Products", url: `${getBaseUrl()}/products` },
+              ...(product.category ? [{ name: product.category, url: `${getBaseUrl()}/products?category=${encodeURIComponent(product.category)}` }] : []),
               { name: product.name, url: `${getBaseUrl()}/product/${product.slug || product._id}` },
             ]),
           ],

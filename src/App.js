@@ -14,18 +14,20 @@ import {
   useCallback,
 } from "react";
 import { useSelector } from "react-redux";
-import OrderStatusModal from "./components/OrderStatusModal";
 import { PageLoader } from "./components/Loader";
 import { HelmetProvider } from "react-helmet-async";
-import OfflineIndicator from "./components/OfflineIndicator";
-import Footer from "./components/Footer";
 import ErrorBoundary, { RouteErrorBoundary } from "./components/ErrorBoundary";
-import ToastContainer from "./components/ToastContainer";
 import { ToastContext } from "./context/ToastContext";
-import RecentlyViewed from "./components/RecentlyViewed";
-import ChatWidget from "./features/chat/ChatWidget";
 import api from "./api/axios";
 import { Analytics } from "@vercel/analytics/react";
+
+// Lazy-load everything that is NOT needed to render the first visible frame.
+// Each of these defers JS parse cost until after the page is interactive.
+const ChatWidget      = lazy(() => import("./features/chat/ChatWidget"));
+const Footer          = lazy(() => import("./components/Footer"));
+const OrderStatusModal = lazy(() => import("./components/OrderStatusModal"));
+const OfflineIndicator = lazy(() => import("./components/OfflineIndicator"));
+const ToastContainer  = lazy(() => import("./components/ToastContainer"));
 
 // Lazy load components for better performance
 const ProductListing = lazy(() => import("./pages/ProductListing"));
@@ -320,22 +322,27 @@ function App() {
               <Suspense
                 fallback={<LoadingFallback message="Loading application..." />}
               >
-                {/* Offline Indicator - Shows connection status */}
-                <OfflineIndicator />
+                {/* Each global overlay gets its own null-fallback Suspense so
+                    a loading chunk never blocks the rest of the UI. */}
+                <Suspense fallback={null}>
+                  <OfflineIndicator />
+                </Suspense>
 
-                {/* Toast Notification Container - Global toast display */}
-                <ToastContainer
-                  toasts={toasts}
-                  onClose={removeToast}
-                  position="top-right"
-                />
-
-                {/* Order status modal — shown when admin updates order status in real-time */}
-                {orderStatusEvent && (
-                  <OrderStatusModal
-                    event={orderStatusEvent}
-                    onClose={closeOrderModal}
+                <Suspense fallback={null}>
+                  <ToastContainer
+                    toasts={toasts}
+                    onClose={removeToast}
+                    position="top-right"
                   />
+                </Suspense>
+
+                {orderStatusEvent && (
+                  <Suspense fallback={null}>
+                    <OrderStatusModal
+                      event={orderStatusEvent}
+                      onClose={closeOrderModal}
+                    />
+                  </Suspense>
                 )}
 
                 {/* Idle Timeout Manager - Active globally for all authenticated users */}
@@ -782,9 +789,13 @@ function App() {
                   />
                 </Routes>
 
-                <Footer />
-                {/* AI chat assistant — available on all pages */}
-                <ChatWidget />
+                <Suspense fallback={null}>
+                  <Footer />
+                </Suspense>
+                {/* AI chat assistant — loads after page is interactive */}
+                <Suspense fallback={null}>
+                  <ChatWidget />
+                </Suspense>
               </Suspense>
             </Router>
           </HelmetProvider>

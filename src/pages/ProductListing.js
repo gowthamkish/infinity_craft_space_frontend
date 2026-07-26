@@ -439,13 +439,55 @@ const ProductListing = () => {
     ...(filters.sortBy ? [{ key: "sort", label: filters.sortBy.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()), onRemove: () => handleFiltersChange({ ...filters, sortBy: "" }) }] : []),
   ];
 
+  const activeCategory = filters.categories?.[0] || null;
   const seoTitle = filters.searchTerm
-    ? `${filters.searchTerm} - Craft Supplies - ${SEO_CONFIG.SITE_NAME}`
-    : `Premium Craft Supplies & Materials - ${SEO_CONFIG.SITE_NAME}`;
+    ? `${filters.searchTerm} — Craft Supplies | ${SEO_CONFIG.SITE_NAME}`
+    : activeCategory
+    ? `${activeCategory} — Handcrafted Products | ${SEO_CONFIG.SITE_NAME}`
+    : `Premium Craft Supplies & Handmade Products | ${SEO_CONFIG.SITE_NAME}`;
+
+  const seoDescription = filters.searchTerm
+    ? `Shop ${filters.searchTerm} craft supplies at Infinity Craft Space. Handmade, artisan-crafted products delivered across India.`
+    : activeCategory
+    ? `Explore our ${activeCategory} collection — handcrafted, artisan-made products at Infinity Craft Space. Free delivery options across India.`
+    : "Browse 100+ handcrafted products at Infinity Craft Space — jewellery, resin art, custom gifts, pottery supplies and more. Delivered across India.";
+
+  const ogImage = filteredProducts[0]?.images?.[0]?.url
+    || filteredProducts[0]?.image?.url
+    || null;
+
+  const collectionStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: seoTitle,
+    description: seoDescription,
+    url: `${SEO_CONFIG.SITE_URL}/products`,
+    provider: { "@type": "Organization", name: "Infinity Craft Space", url: SEO_CONFIG.SITE_URL },
+    ...(filteredProducts.length > 0 && {
+      mainEntity: {
+        "@type": "ItemList",
+        numberOfItems: filteredProducts.length,
+        itemListElement: filteredProducts.slice(0, 10).map((p, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          url: `${SEO_CONFIG.SITE_URL}/product/${p.slug || p._id}`,
+          name: p.name,
+        })),
+      },
+    }),
+  };
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#fdf6ec" }}>
-      <SEOHead title={seoTitle} description={SEO_CONFIG.DEFAULT_DESCRIPTION} url={`${SEO_CONFIG.SITE_URL}/products`} canonical={`${SEO_CONFIG.SITE_URL}/products`} />
+      <SEOHead
+        title={seoTitle}
+        description={seoDescription}
+        url={`${SEO_CONFIG.SITE_URL}/products`}
+        canonical={`${SEO_CONFIG.SITE_URL}/products`}
+        image={ogImage}
+        type="website"
+        structuredData={collectionStructuredData}
+      />
       <Suspense fallback={<Box sx={{ height: 70 }} />}><Header /></Suspense>
 
       {/* ── Sticky command bar ─────────────────────────────────── */}

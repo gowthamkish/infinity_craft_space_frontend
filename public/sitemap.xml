@@ -1,51 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The live sitemap is generated dynamically by the backend and served at:
+  https://www.infinitycraftspace.com/sitemap.xml
+
+  It includes all active product pages with real lastmod timestamps
+  and is cached for 30 minutes. This static file is a fallback only.
+-->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 
-  <!-- Homepage / Product Listing - Highest priority -->
   <url>
-    <loc>https://infinitycraftspace.com/</loc>
-    <lastmod>2026-02-12</lastmod>
+    <loc>https://www.infinitycraftspace.com/</loc>
+    <lastmod>2026-07-26</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <!-- Static/Informational Pages -->
   <url>
-    <loc>https://infinitycraftspace.com/contact-us</loc>
-    <lastmod>2026-02-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <loc>https://www.infinitycraftspace.com/products</loc>
+    <lastmod>2026-07-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://infinitycraftspace.com/return-policy</loc>
-    <lastmod>2026-02-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-
-  <url>
-    <loc>https://infinitycraftspace.com/terms-and-conditions</loc>
-    <lastmod>2026-02-12</lastmod>
+    <loc>https://www.infinitycraftspace.com/contact-us</loc>
+    <lastmod>2026-07-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
 
-  <!-- 
-    Note: Dynamic product pages (/product/:id) should be added programmatically
-    as new products are created. Individual product URLs can be generated from
-    your backend product database.
-    
-    Example format:
-    <url>
-      <loc>https://infinitycraftspace.com/product/[product-id]</loc>
-      <lastmod>YYYY-MM-DD</lastmod>
-      <changefreq>weekly</changefreq>
-      <priority>0.8</priority>
-    </url>
-  -->
+  <url>
+    <loc>https://www.infinitycraftspace.com/return-policy</loc>
+    <lastmod>2026-07-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <url>
+    <loc>https://www.infinitycraftspace.com/terms-and-conditions</loc>
+    <lastmod>2026-07-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
 
 </urlset>
