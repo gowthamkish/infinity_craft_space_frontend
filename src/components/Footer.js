@@ -25,6 +25,7 @@ import {
   FiTwitter,
   FiLinkedin,
 } from "react-icons/fi";
+import { BRAND } from "../theme/muiTheme";
 
 const QUICK_LINKS = [
   { label: "Shop All Products",  to: "/",                    icon: FiShoppingBag  },
@@ -292,12 +293,12 @@ export default function Footer() {
                 fullWidth
                 aria-label="Subscribe"
                 sx={{
-                  bgcolor: "#8B1A4A",
+                  bgcolor: BRAND.rose[800],
                   color: "#fff",
                   borderRadius: 2,
                   fontWeight: 600,
                   textTransform: "none",
-                  "&:hover": { bgcolor: "#6b1238" },
+                  "&:hover": { bgcolor: BRAND.rose[900] },
                   mb: 1,
                 }}
               >
@@ -350,7 +351,7 @@ export default function Footer() {
                   color: "#475569",
                   textDecoration: "none",
                   fontSize: "0.75rem",
-                  "&:hover": { color: "#8B1A4A" },
+                  "&:hover": { color: BRAND.rose[800] },
                   transition: "color 150ms ease",
                 }}
               >

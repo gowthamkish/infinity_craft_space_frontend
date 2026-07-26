@@ -21,11 +21,12 @@ import {
 import AdminLayout from "./AdminLayout";
 import { useDashboardCounts } from "../../hooks/useSmartFetch";
 import SEOHead, { SEO_CONFIG } from "../SEOHead";
+import { BRAND } from "../../theme/muiTheme";
 
 const STAT_COLORS = {
-  blue:  { bg: "rgba(37,99,235,0.10)",  icon: "#8B1A4A", gradient: "linear-gradient(135deg,#C9A84C,#7a1640)" },
-  green: { bg: "rgba(16,185,129,0.10)", icon: "#10b981", gradient: "linear-gradient(135deg,#10b981,#059669)" },
-  amber: { bg: "rgba(245,158,11,0.10)", icon: "#f59e0b", gradient: "linear-gradient(135deg,#f59e0b,#d97706)" },
+  blue:  { bg: "rgba(37,99,235,0.10)",  icon: BRAND.rose[800], gradient: `linear-gradient(135deg,${BRAND.gold[500]},${BRAND.rose[900]})` },
+  green: { bg: "rgba(16,185,129,0.10)", icon: "#10b981",       gradient: "linear-gradient(135deg,#10b981,#059669)" },
+  amber: { bg: "rgba(245,158,11,0.10)", icon: "#f59e0b",       gradient: "linear-gradient(135deg,#f59e0b,#d97706)" },
 };
 
 const STAT_CARDS = [
@@ -68,7 +69,7 @@ export default function Dashboard() {
         >
           <Box>
             <Stack direction="row" alignItems="center" gap={1.5} sx={{ mb: 0.5 }}>
-              <FiBarChart2 size={22} color="#8B1A4A" />
+              <FiBarChart2 size={22} color={BRAND.rose[800]} />
               <Typography variant="h4" sx={{ fontWeight: 800, color: "#1c1917", letterSpacing: "-0.025em", lineHeight: 1.2 }}>
                 Dashboard
               </Typography>
@@ -87,7 +88,7 @@ export default function Dashboard() {
 
         {loading ? (
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 300, gap: 2 }}>
-            <CircularProgress sx={{ color: "#8B1A4A" }} />
+            <CircularProgress sx={{ color: BRAND.rose[800] }} />
             <Typography variant="body2" color="text.secondary">Loading dashboard data…</Typography>
           </Box>
         ) : (
@@ -116,7 +117,7 @@ export default function Dashboard() {
                           transform: "translateY(-2px)",
                         },
                         "&:focus-visible": {
-                          outline: "2px solid #8B1A4A",
+                          outline: `2px solid ${BRAND.rose[800]}`,
                           outlineOffset: 2,
                         },
                       }}
@@ -183,9 +184,9 @@ export default function Dashboard() {
                           textTransform: "none",
                           justifyContent: "flex-start",
                           "&:hover": {
-                            borderColor: "#8B1A4A",
-                            color: "#8B1A4A",
-                            bgcolor: "rgba(139,26,74,0.08)",
+                            borderColor: BRAND.rose[800],
+                            color: BRAND.rose[800],
+                            bgcolor: `rgba(139,26,74,0.08)`,
                             transform: "translateY(-1px)",
                           },
                           transition: "all 150ms ease",

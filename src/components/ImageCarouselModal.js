@@ -19,8 +19,9 @@ import {
   FiDownload,
   FiShare2,
 } from "react-icons/fi";
+import { BRAND } from "../theme/muiTheme";
 
-const BRAND_ROSE = "#8B1A4A";
+const BRAND_ROSE = BRAND.rose[800];
 
 const ImageCarouselModal = ({
   show,

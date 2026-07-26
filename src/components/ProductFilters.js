@@ -9,8 +9,9 @@ import {
   FiChevronDown, FiChevronRight, FiArrowUp, FiArrowDown,
   FiType, FiTag,
 } from "react-icons/fi";
+import { BRAND } from "../theme/muiTheme";
 
-const P    = "#8B1A4A";
+const P    = BRAND.rose[800];
 const P_BG = "rgba(139,26,74,0.07)";
 const BORDER = "rgba(0,0,0,0.08)";
 

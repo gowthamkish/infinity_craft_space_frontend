@@ -12,13 +12,7 @@ import { recommendationsAPI } from "../api/features";
 import { SkeletonProductGrid } from "./SkeletonLoaders";
 import OptimizedImage from "./OptimizedImage";
 import { StarRating } from "./reviews/StarRating";
-
-const BRAND = {
-  primary: "#8B1A4A",
-  secondary: "#C9A84C",
-  bg: "#FDF6EC",
-  text: "#2C2C2C",
-};
+import { BRAND } from "../theme/muiTheme";
 
 /**
  * ProductRecommendations Component
@@ -82,10 +76,10 @@ const ProductRecommendations = ({
 
   if (loading) {
     return (
-      <Box component="section" sx={{ py: 6, backgroundColor: BRAND.bg }}>
+      <Box component="section" sx={{ py: 6, backgroundColor: BRAND.charcoal[50] }}>
         <Typography
           variant="h5"
-          sx={{ fontWeight: 700, mb: 3, color: BRAND.text }}
+          sx={{ fontWeight: 700, mb: 3, color: BRAND.charcoal[900] }}
         >
           {title}
         </Typography>
@@ -99,7 +93,7 @@ const ProductRecommendations = ({
   }
 
   return (
-    <Box component="section" sx={{ py: 6, backgroundColor: BRAND.bg }}>
+    <Box component="section" sx={{ py: 6, backgroundColor: BRAND.charcoal[50] }}>
       <Box
         sx={{
           display: "flex",
@@ -110,7 +104,7 @@ const ProductRecommendations = ({
       >
         <Typography
           variant="h5"
-          sx={{ fontWeight: 700, color: BRAND.text }}
+          sx={{ fontWeight: 700, color: BRAND.charcoal[900] }}
         >
           {title}
         </Typography>
@@ -118,7 +112,7 @@ const ProductRecommendations = ({
           component="a"
           href="/products"
           sx={{
-            color: BRAND.primary,
+            color: BRAND.rose[800],
             textDecoration: "none",
             display: "flex",
             alignItems: "center",
@@ -223,7 +217,7 @@ const ProductRecommendationCard = ({ product }) => {
               position: "absolute",
               top: 8,
               right: 8,
-              backgroundColor: "#8B1A4A",
+              backgroundColor: BRAND.rose[800],
               color: "white",
               fontWeight: 700,
               fontSize: "0.7rem",
@@ -244,7 +238,7 @@ const ProductRecommendationCard = ({ product }) => {
           variant="body2"
           sx={{
             fontWeight: 600,
-            color: BRAND.text,
+            color: BRAND.charcoal[900],
             overflow: "hidden",
             textOverflow: "ellipsis",
             WebkitLineClamp: 2,
@@ -270,7 +264,7 @@ const ProductRecommendationCard = ({ product }) => {
           variant="body1"
           sx={{
             fontWeight: 700,
-            color: BRAND.primary,
+            color: BRAND.rose[800],
             mt: "auto",
             mb: 0,
           }}
@@ -285,7 +279,7 @@ const ProductRecommendationCard = ({ product }) => {
           fullWidth
           variant="contained"
           sx={{
-            background: `linear-gradient(135deg, ${BRAND.primary} 0%, ${BRAND.secondary} 100%)`,
+            background: `linear-gradient(135deg, ${BRAND.rose[800]} 0%, ${BRAND.gold[500]} 100%)`,
             color: "white",
             borderRadius: "10px",
             fontWeight: 600,

@@ -8,6 +8,7 @@ import Alert from "@mui/material/Alert";
 import Chip from "@mui/material/Chip";
 import InputAdornment from "@mui/material/InputAdornment";
 import CircularProgress from "@mui/material/CircularProgress";
+import { BRAND } from "../theme/muiTheme";
 import { FiTag, FiCheck, FiX } from "react-icons/fi";
 import { couponAPI } from "../api/features";
 
@@ -91,7 +92,7 @@ const CouponInput = ({ cartTotal, onCouponApplied, appliedCoupon = null, onRemov
                 input: {
                   startAdornment: (
                     <InputAdornment position="start">
-                      <FiTag size={15} color="#8B1A4A" />
+                      <FiTag size={15} color={BRAND.rose[800]} />
                     </InputAdornment>
                   ),
                   style: { letterSpacing: "0.08em", fontWeight: 600 },
