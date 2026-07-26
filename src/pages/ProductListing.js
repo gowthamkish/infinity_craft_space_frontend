@@ -68,6 +68,8 @@ const ProductCard = React.memo(({
 
   const isOutOfStock = product.trackInventory !== false && product.stock <= 0;
   const isLowStock   = product.trackInventory !== false && product.stock > 0 && product.stock <= (product.lowStockThreshold || 5);
+  const discountPct  = product.compareAtPrice && product.compareAtPrice > product.price
+    ? Math.round((1 - product.price / product.compareAtPrice) * 100) : 0;
   const rawImageUrl  = product.images?.[0]?.url || product.image?.url || product.image || null;
   const imgCount     = product.images?.length || 0;
   const { imgRef, src: imageUrl, loaded: imgLoaded, setLoaded: setImgLoaded } = useLazyImage(rawImageUrl);
@@ -175,22 +177,29 @@ const ProductCard = React.memo(({
           </IconButton>
         </Tooltip>
 
-        {/* Status badge — top left */}
-        {isOutOfStock && (
-          <Box sx={{ position: "absolute", top: 10, left: 10, bgcolor: "#dc2626", color: "#fff", fontSize: "0.68rem", fontWeight: 700, px: 1, py: 0.3, borderRadius: "6px", letterSpacing: "0.03em" }}>
-            Out of Stock
-          </Box>
-        )}
-        {!isOutOfStock && isLowStock && (
-          <Box sx={{ position: "absolute", top: 10, left: 10, bgcolor: "#f59e0b", color: "#fff", fontSize: "0.68rem", fontWeight: 700, px: 1, py: 0.3, borderRadius: "6px" }}>
-            Only {product.stock} left
-          </Box>
-        )}
-        {!isOutOfStock && product.isCustomizable && (
-          <Box sx={{ position: "absolute", top: 10, left: 10, bgcolor: ROSE, color: "#fff", fontSize: "0.68rem", fontWeight: 700, px: 1, py: 0.3, borderRadius: "6px" }}>
-            ✦ Custom
-          </Box>
-        )}
+        {/* Status / discount badges — top left */}
+        <Stack spacing={0.5} sx={{ position: "absolute", top: 10, left: 10, zIndex: 2 }}>
+          {discountPct > 0 && (
+            <Box sx={{ display: "inline-flex", alignItems: "center", bgcolor: "#dc2626", color: "#fff", fontSize: "0.68rem", fontWeight: 700, px: 1, py: 0.3, borderRadius: "6px", letterSpacing: "0.03em" }}>
+              {discountPct}% OFF
+            </Box>
+          )}
+          {isOutOfStock && (
+            <Box sx={{ display: "inline-flex", alignItems: "center", bgcolor: "#dc2626", color: "#fff", fontSize: "0.68rem", fontWeight: 700, px: 1, py: 0.3, borderRadius: "6px" }}>
+              Out of Stock
+            </Box>
+          )}
+          {!isOutOfStock && isLowStock && (
+            <Box sx={{ display: "inline-flex", alignItems: "center", bgcolor: "#f59e0b", color: "#fff", fontSize: "0.68rem", fontWeight: 700, px: 1, py: 0.3, borderRadius: "6px" }}>
+              Only {product.stock} left
+            </Box>
+          )}
+          {!isOutOfStock && product.isCustomizable && (
+            <Box sx={{ display: "inline-flex", alignItems: "center", bgcolor: ROSE, color: "#fff", fontSize: "0.68rem", fontWeight: 700, px: 1, py: 0.3, borderRadius: "6px" }}>
+              ✦ Custom
+            </Box>
+          )}
+        </Stack>
 
         {/* Photo count */}
         {imgCount > 1 && (
@@ -270,9 +279,16 @@ const ProductCard = React.memo(({
 
         {/* Price row */}
         <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ mt: "auto", pt: 1.25 }}>
-          <Typography component="div" sx={{ fontSize: "1.05rem", fontWeight: 800, color: "#1c1917", lineHeight: 1.4, display: "flex", alignItems: "center" }}>
-            ₹{product.price?.toLocaleString()}
-          </Typography>
+          <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.75 }}>
+            <Typography component="div" sx={{ fontSize: "1.05rem", fontWeight: 800, color: "#1c1917", lineHeight: 1.4 }}>
+              ₹{product.price?.toLocaleString()}
+            </Typography>
+            {discountPct > 0 && (
+              <Typography component="span" sx={{ fontSize: "0.8rem", fontWeight: 500, color: "#94a3b8", textDecoration: "line-through", lineHeight: 1.4 }}>
+                ₹{product.compareAtPrice?.toLocaleString()}
+              </Typography>
+            )}
+          </Box>
           {quantityInCart > 0 && (
             <Stack direction="row" alignItems="center" spacing={0.4}
               sx={{ bgcolor: "rgba(16,185,129,0.1)", border: "1px solid #86efac", borderRadius: "6px", px: 0.75, py: 0.375, flexShrink: 0 }}>

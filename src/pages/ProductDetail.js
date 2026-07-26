@@ -656,10 +656,20 @@ const ProductDetail = () => {
                   )}
 
                   {/* Price row */}
-                  <Stack direction="row" alignItems="baseline" spacing={1.5}>
+                  <Stack direction="row" alignItems="baseline" spacing={1.5} flexWrap="wrap">
                     <Typography sx={{ fontSize: "1.75rem", fontWeight: 600, color: PRIMARY, lineHeight: 1, letterSpacing: "-0.02em" }}>
                       ₹{product.price.toLocaleString("en-IN")}
                     </Typography>
+                    {product.compareAtPrice > product.price && (
+                      <Typography sx={{ fontSize: "1.1rem", fontWeight: 400, color: "#94a3b8", textDecoration: "line-through", lineHeight: 1 }}>
+                        ₹{product.compareAtPrice.toLocaleString("en-IN")}
+                      </Typography>
+                    )}
+                    {product.compareAtPrice > product.price && (
+                      <Box sx={{ display: "inline-flex", alignItems: "center", bgcolor: "#dc2626", color: "#fff", fontSize: "0.72rem", fontWeight: 700, px: 1, py: 0.25, borderRadius: "6px" }}>
+                        {Math.round((1 - product.price / product.compareAtPrice) * 100)}% OFF
+                      </Box>
+                    )}
                     <Typography sx={T.supporting}>Inclusive of all taxes</Typography>
                   </Stack>
 

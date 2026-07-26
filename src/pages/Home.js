@@ -256,8 +256,8 @@ function ProductCard({ product, index }) {
 
   const isLowStock   = product.trackInventory && product.stock > 0 && product.stock <= (product.lowStockThreshold || 5);
   const isOutOfStock = product.trackInventory && product.stock === 0;
-  const discountPct  = product.originalPrice && product.originalPrice > product.price
-    ? Math.round((1 - product.price / product.originalPrice) * 100) : 0;
+  const discountPct  = product.compareAtPrice && product.compareAtPrice > product.price
+    ? Math.round((1 - product.price / product.compareAtPrice) * 100) : 0;
 
   const handleAddToCart = useCallback(async (e) => {
     e.stopPropagation();
