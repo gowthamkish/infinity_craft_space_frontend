@@ -71,9 +71,9 @@ export default function Footer() {
         sx={{ bgcolor: "#FDF6EC", borderRadius: 0, borderTop: "1px solid #EAD9C5", borderBottom: "1px solid #EAD9C5" }}
       >
         <Box sx={{ px: { xs: 3, sm: 6, md: 10, lg: 14 }, py: { xs: 3, md: 4 } }}>
-          <Grid container spacing={3} justifyContent="center">
+          <Grid container spacing={3} sx={{ justifyContent: "center" }}>
             {TRUST_ITEMS.map(({ icon: Icon, label, sub, color }) => (
-              <Grid item xs={12} sm={4} key={label}>
+              <Grid key={label} size={{ xs: 12, sm: 4 }}>
                 <Stack
                   direction="row"
                   alignItems="center"
@@ -120,7 +120,7 @@ export default function Footer() {
           sx={{ px: { xs: 3, sm: 6, md: 10, lg: 14 }, pt: { xs: 5, md: 8 }, pb: { xs: 5, md: 7 } }}
         >
           {/* Brand column */}
-          <Grid item xs={12} md={4.5}>
+          <Grid size={{ xs: 12, md: 4.5 }}>
             <Stack direction="row" alignItems="center" gap={1.5} sx={{ mb: 2 }}>
               <Box sx={{ width: 40, height: 40, borderRadius: 2, overflow: "hidden", flexShrink: 0 }}>
                 <img
@@ -204,7 +204,7 @@ export default function Footer() {
           </Grid>
 
           {/* Quick Links column */}
-          <Grid item xs={12} sm={6} md={2}>
+          <Grid size={{ xs: 12, sm: 6, md: 2 }}>
             <Typography variant="overline" sx={{ color: "#fff", fontSize: "0.7rem", letterSpacing: "0.1em", fontWeight: 700, display: "block", mb: 2 }}>
               Quick Links
             </Typography>
@@ -230,7 +230,7 @@ export default function Footer() {
           </Grid>
 
           {/* Business Hours column */}
-          <Grid item xs={12} sm={6} md={2}>
+          <Grid size={{ xs: 12, sm: 6, md: 2 }}>
             <Typography variant="overline" sx={{ color: "#fff", fontSize: "0.7rem", letterSpacing: "0.1em", fontWeight: 700, display: "block", mb: 2 }}>
               Business Hours
             </Typography>
@@ -259,7 +259,7 @@ export default function Footer() {
           </Grid>
 
           {/* Newsletter column */}
-          <Grid item xs={12} md={3.5}>
+          <Grid size={{ xs: 12, md: 3.5 }}>
             <Typography variant="overline" sx={{ color: "#fff", fontSize: "0.7rem", letterSpacing: "0.1em", fontWeight: 700, display: "block", mb: 2 }}>
               Newsletter
             </Typography>

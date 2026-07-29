@@ -7,22 +7,29 @@ import { addToCart, removeFromCart } from "../features/cartSlice";
 import { useProducts } from "../hooks/useSmartFetch";
 import {
   Box, Typography, TextField, InputAdornment, IconButton, Button,
-  Chip, Drawer, Skeleton, CircularProgress, Alert, Stack, Badge, Tooltip,
-  useMediaQuery, useTheme, Divider,
+  Chip, Skeleton, CircularProgress, Alert, Stack, Popover, Tooltip,
 } from "@mui/material";
-import { DotsLoader, BarsLoader } from "../components/Loader";
+import { DotsLoader } from "../components/Loader";
 import {
-  FiGrid, FiSliders, FiShoppingCart, FiX, FiHeart, FiTrash2,
+  FiGrid, FiShoppingCart, FiX, FiHeart, FiTrash2,
   FiSearch, FiPackage, FiCheck, FiAlertCircle, FiEye, FiStar,
-  FiFilter,
+  FiChevronDown, FiArrowUp, FiArrowDown, FiType, FiTag,
 } from "react-icons/fi";
+import { fetchPublicCategories } from "../features/categoriesSlice";
 import api from "../api/axios";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 import { trackAddToCart, trackRemoveFromCart } from "../utils/analytics";
 
-const Header        = lazy(() => import("../components/Header"));
-const ProductFilters = lazy(() => import("../components/ProductFilters"));
+const Header             = lazy(() => import("../components/Header"));
 const ImageCarouselModal = lazy(() => import("../components/ImageCarouselModal"));
+
+const SORT_OPTIONS = [
+  { value: "",               label: "Relevance" },
+  { value: "price-low-high", label: "Price: Low → High", icon: FiArrowUp },
+  { value: "price-high-low", label: "Price: High → Low", icon: FiArrowDown },
+  { value: "name-asc",       label: "Name: A → Z",       icon: FiType },
+  { value: "name-desc",      label: "Name: Z → A",       icon: FiType },
+];
 
 const PAGE_SIZE = 16;
 const ROSE = "#8B1A4A";
@@ -358,16 +365,20 @@ const ProductCard = React.memo(({
 const ProductListing = () => {
   const dispatch   = useDispatch();
   const navigate   = useNavigate();
-  const theme      = useTheme();
-  const isMobile   = useMediaQuery(theme.breakpoints.down("md"));
   const { data: products, loading, error, fetchPage, pagination } = useProducts();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
   const sentinelRef = useRef(null);
 
-  const [showFilters, setShowFilters]   = useState(false);
   const [filters, setFilters] = useState({ categories: [], priceRange: null, searchTerm: "", sortBy: "" });
+
+  // Popovers for horizontal filter strip
+  const [sortAnchor,    setSortAnchor]   = useState(null);
+  const [priceAnchor,   setPriceAnchor]  = useState(null);
+  const [catPopover,    setCatPopover]   = useState({ anchor: null, cat: null }); // { anchor, cat: categoryObj }
+  const [priceMin,      setPriceMin]     = useState("");
+  const [priceMax,      setPriceMax]     = useState("");
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showToast, setShowToast] = useState(false);
@@ -375,8 +386,11 @@ const ProductListing = () => {
   const [toastType, setToastType] = useState("success");
   const [wishlistIds, setWishlistIds] = useState(new Set());
 
-  const cartItems      = useSelector((s) => s.cart.items);
+  const cartItems       = useSelector((s) => s.cart.items);
   const isAuthenticated = useSelector((s) => !!s.auth.user);
+  const publicCategories = useSelector((s) => s.categories.publicCategories || []);
+
+  useEffect(() => { dispatch(fetchPublicCategories()); }, [dispatch]);
 
   const totalCartItems = useMemo(() => cartItems.reduce((s, i) => s + i.quantity, 0), [cartItems]);
   const cartItemsMap   = useMemo(() => { const m = new Map(); cartItems.forEach((i) => m.set(i.product._id, i.quantity)); return m; }, [cartItems]);
@@ -390,6 +404,12 @@ const ProductListing = () => {
   }, [isAuthenticated]);
 
   useEffect(() => { setCurrentPage(1); }, [filters]);
+
+  useEffect(() => {
+    const pr = filters.priceRange;
+    setPriceMin(pr ? String(pr.min || "") : "");
+    setPriceMax(pr && pr.max !== Infinity ? String(pr.max) : "");
+  }, [filters.priceRange]);
 
   const hasMore = pagination ? currentPage < pagination.totalPages : false;
 
@@ -433,11 +453,6 @@ const ProductListing = () => {
   const handleWishlistToggle = useCallback((id, added) => { setWishlistIds((prev) => { const s = new Set(prev); added ? s.add(id) : s.delete(id); return s; }); }, []);
 
   const activeFilterCount = [filters.categories.length > 0, !!filters.priceRange, !!filters.sortBy].filter(Boolean).length;
-  const activeChips = [
-    ...filters.categories.map((c) => ({ key: `cat-${c}`, label: c, onRemove: () => handleFiltersChange({ ...filters, categories: filters.categories.filter((x) => x !== c) }) })),
-    ...(filters.priceRange ? [{ key: "price", label: `₹${filters.priceRange.min} – ${filters.priceRange.max === Infinity ? "Max" : `₹${filters.priceRange.max}`}`, onRemove: () => handleFiltersChange({ ...filters, priceRange: null }) }] : []),
-    ...(filters.sortBy ? [{ key: "sort", label: filters.sortBy.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()), onRemove: () => handleFiltersChange({ ...filters, sortBy: "" }) }] : []),
-  ];
 
   const activeCategory = filters.categories?.[0] || null;
   const seoTitle = filters.searchTerm
@@ -490,7 +505,7 @@ const ProductListing = () => {
       />
       <Suspense fallback={<Box sx={{ height: 70 }} />}><Header /></Suspense>
 
-      {/* ── Sticky command bar ─────────────────────────────────── */}
+      {/* ── Sticky search bar ───────────────────────────────────── */}
       <Box sx={{ position: "sticky", top: 0, zIndex: 100, bgcolor: "rgba(255,255,255,0.97)", backdropFilter: "blur(10px)", borderBottom: "1px solid #e7e5e4", boxShadow: "0 1px 8px rgba(0,0,0,0.06)", px: { xs: 2, md: 4 }, py: 1.25 }}>
         <Stack direction="row" alignItems="center" spacing={1.5}>
           <TextField
@@ -512,23 +527,6 @@ const ProductListing = () => {
               "& .MuiOutlinedInput-root": { borderRadius: "10px", bgcolor: "#f8fafc" },
             }}
           />
-
-          <Badge badgeContent={activeFilterCount || null} color="primary"
-            sx={{ "& .MuiBadge-badge": { fontSize: "0.65rem", minWidth: 16, height: 16, background: ROSE } }}>
-            <Button
-              variant={activeFilterCount > 0 ? "contained" : "outlined"}
-              size="small"
-              onClick={() => setShowFilters(true)}
-              startIcon={<FiSliders size={14} />}
-              sx={{
-                textTransform: "none", borderRadius: "10px", fontWeight: 600, px: 2, whiteSpace: "nowrap",
-                ...(activeFilterCount > 0 && { background: `linear-gradient(135deg, ${ROSE}, #7a1640)`, boxShadow: "0 3px 10px rgba(139,26,74,0.25)" }),
-              }}
-            >
-              Filters
-            </Button>
-          </Badge>
-
           {totalCartItems > 0 && (
             <Button
               variant="contained"
@@ -545,38 +543,344 @@ const ProductListing = () => {
               Cart ({totalCartItems}) · Checkout
             </Button>
           )}
-
           {!loading && products?.length > 0 && (
             <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: "nowrap", ml: "auto !important", display: { xs: "none", sm: "block" } }}>
               {filteredProducts.length}{filteredProducts.length !== (products?.length || 0) && ` of ${products?.length || 0}`} results
             </Typography>
           )}
         </Stack>
-
-        {/* Active filter chips */}
-        {activeChips.length > 0 && (
-          <Stack direction="row" flexWrap="wrap" gap={0.75} sx={{ mt: 1.25 }} role="list" aria-label="Active filters">
-            {activeChips.map((chip) => (
-              <Chip
-                key={chip.key}
-                label={chip.label}
-                size="small"
-                onDelete={chip.onRemove}
-                deleteIcon={<FiX size={11} />}
-                role="listitem"
-                sx={{ bgcolor: "rgba(139,26,74,0.07)", color: ROSE, fontWeight: 600, fontSize: "0.75rem", border: `1px solid rgba(139,26,74,0.2)`, "& .MuiChip-deleteIcon": { color: ROSE } }}
-              />
-            ))}
-            <Button size="small" variant="text" onClick={handleClearFilters}
-              sx={{ textTransform: "none", fontSize: "0.75rem", p: 0, color: "#94a3b8", minHeight: 0, "&:hover": { color: ROSE } }}>
-              Clear all
-            </Button>
-          </Stack>
-        )}
       </Box>
+
+      {/* ── Horizontal filter strip ─────────────────────────────── */}
+      <Box sx={{
+        position: "sticky", top: 56, zIndex: 99,
+        bgcolor: "rgba(253,246,236,0.97)", backdropFilter: "blur(8px)",
+        borderBottom: "1px solid #e7e5e4",
+        px: { xs: 2, md: 4 }, py: 1,
+      }}>
+        <Box sx={{
+          overflowX: "auto",
+          "&::-webkit-scrollbar": { display: "none" },
+          msOverflowStyle: "none", scrollbarWidth: "none",
+        }}>
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ width: "max-content", minWidth: "100%", py: 0.5 }}>
+
+            {/* ── Sort pill ── */}
+            {(() => {
+              const active = SORT_OPTIONS.find((o) => o.value === filters.sortBy);
+              const isActive = !!filters.sortBy;
+              return (
+                <Box
+                  component="button"
+                  onClick={(e) => setSortAnchor(e.currentTarget)}
+                  aria-label="Sort options"
+                  sx={{
+                    display: "inline-flex", alignItems: "center", gap: 0.625,
+                    px: 1.5, py: 0.625, borderRadius: "20px",
+                    border: `1.5px solid ${isActive ? ROSE : "rgba(0,0,0,0.15)"}`,
+                    bgcolor: isActive ? ROSE : "#fff",
+                    color: isActive ? "#fff" : "#44403c",
+                    cursor: "pointer", whiteSpace: "nowrap",
+                    fontSize: "0.8125rem", fontWeight: isActive ? 700 : 500,
+                    fontFamily: "inherit",
+                    transition: "all 140ms",
+                    "&:hover": { borderColor: ROSE, bgcolor: isActive ? "#7a1640" : "rgba(139,26,74,0.06)", color: isActive ? "#fff" : ROSE },
+                  }}
+                >
+                  <FiArrowUp size={12} />
+                  {isActive ? active?.label : "Sort"}
+                  <FiChevronDown size={11} style={{ opacity: 0.7 }} />
+                </Box>
+              );
+            })()}
+
+            {/* ── Divider ── */}
+            <Box sx={{ width: "1px", height: 24, bgcolor: "rgba(0,0,0,0.12)", flexShrink: 0 }} />
+
+            {/* ── Category pills ── */}
+            {publicCategories.filter((c) => c.isActive !== false).map((cat) => {
+              const allNames = [cat.name, ...(cat.subcategories?.filter((s) => s.isActive !== false).map((s) => s.name) || [])];
+              const selectedInCat = allNames.filter((n) => filters.categories.includes(n));
+              const isActive = selectedInCat.length > 0;
+              const hasSubs = cat.subcategories?.some((s) => s.isActive !== false);
+
+              const handleCatClick = (e) => {
+                if (hasSubs) {
+                  setCatPopover({ anchor: e.currentTarget, cat });
+                } else {
+                  // No subs — direct toggle
+                  const next = filters.categories.includes(cat.name)
+                    ? filters.categories.filter((c) => c !== cat.name)
+                    : [...filters.categories, cat.name];
+                  handleFiltersChange({ ...filters, categories: next });
+                }
+              };
+
+              return (
+                <Box
+                  key={cat._id}
+                  component="button"
+                  onClick={handleCatClick}
+                  sx={{
+                    display: "inline-flex", alignItems: "center", gap: 0.625,
+                    px: 1.5, py: 0.625, borderRadius: "20px",
+                    border: `1.5px solid ${isActive ? ROSE : "rgba(0,0,0,0.15)"}`,
+                    bgcolor: isActive ? ROSE : "#fff",
+                    color: isActive ? "#fff" : "#44403c",
+                    cursor: "pointer", whiteSpace: "nowrap",
+                    fontSize: "0.8125rem", fontWeight: isActive ? 700 : 500,
+                    fontFamily: "inherit",
+                    transition: "all 140ms",
+                    "&:hover": { borderColor: ROSE, bgcolor: isActive ? "#7a1640" : "rgba(139,26,74,0.06)", color: isActive ? "#fff" : ROSE },
+                  }}
+                >
+                  {cat.name}
+                  {isActive && selectedInCat.length > 0 && (
+                    <Box sx={{
+                      display: "inline-flex", alignItems: "center", justifyContent: "center",
+                      width: 16, height: 16, borderRadius: "50%",
+                      bgcolor: "rgba(255,255,255,0.3)", fontSize: "0.6rem", fontWeight: 800,
+                    }}>
+                      {selectedInCat.length}
+                    </Box>
+                  )}
+                  {hasSubs && <FiChevronDown size={11} style={{ opacity: 0.7 }} />}
+                </Box>
+              );
+            })}
+
+            {/* ── Divider ── */}
+            <Box sx={{ width: "1px", height: 24, bgcolor: "rgba(0,0,0,0.12)", flexShrink: 0 }} />
+
+            {/* ── Price pill ── */}
+            {(() => {
+              const isActive = !!filters.priceRange;
+              const label = isActive
+                ? `₹${filters.priceRange.min.toLocaleString()} – ${filters.priceRange.max === Infinity ? "Max" : `₹${filters.priceRange.max.toLocaleString()}`}`
+                : "Price";
+              return (
+                <Box
+                  component="button"
+                  onClick={(e) => setPriceAnchor(e.currentTarget)}
+                  sx={{
+                    display: "inline-flex", alignItems: "center", gap: 0.625,
+                    px: 1.5, py: 0.625, borderRadius: "20px",
+                    border: `1.5px solid ${isActive ? ROSE : "rgba(0,0,0,0.15)"}`,
+                    bgcolor: isActive ? ROSE : "#fff",
+                    color: isActive ? "#fff" : "#44403c",
+                    cursor: "pointer", whiteSpace: "nowrap",
+                    fontSize: "0.8125rem", fontWeight: isActive ? 700 : 500,
+                    fontFamily: "inherit",
+                    transition: "all 140ms",
+                    "&:hover": { borderColor: ROSE, bgcolor: isActive ? "#7a1640" : "rgba(139,26,74,0.06)", color: isActive ? "#fff" : ROSE },
+                  }}
+                >
+                  <FiTag size={12} />
+                  {label}
+                  <FiChevronDown size={11} style={{ opacity: 0.7 }} />
+                </Box>
+              );
+            })()}
+
+            {/* ── Clear all ── */}
+            {activeFilterCount > 0 && (
+              <>
+                <Box sx={{ width: 1, height: 24, bgcolor: "rgba(0,0,0,0.1)", flexShrink: 0 }} />
+                <Box
+                  component="button"
+                  onClick={handleClearFilters}
+                  sx={{
+                    display: "inline-flex", alignItems: "center", gap: 0.5,
+                    px: 1.5, py: 0.625, borderRadius: "20px",
+                    border: "1.5px solid rgba(0,0,0,0.12)",
+                    bgcolor: "transparent", color: "#78716c",
+                    cursor: "pointer", whiteSpace: "nowrap",
+                    fontSize: "0.8125rem", fontWeight: 500, fontFamily: "inherit",
+                    transition: "all 140ms",
+                    "&:hover": { borderColor: "#ef4444", color: "#ef4444", bgcolor: "rgba(239,68,68,0.05)" },
+                  }}
+                >
+                  <FiX size={11} />
+                  Clear all
+                </Box>
+              </>
+            )}
+          </Stack>
+        </Box>
+      </Box>
+
+      {/* ── Sort popover ──────────────────────────────────────────── */}
+      <Popover
+        open={Boolean(sortAnchor)}
+        anchorEl={sortAnchor}
+        onClose={() => setSortAnchor(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        PaperProps={{ sx: { mt: 0.75, borderRadius: 2.5, boxShadow: "0 8px 32px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.07)", p: 0.75, minWidth: 210 } }}
+      >
+        {SORT_OPTIONS.map((opt) => {
+          const active = filters.sortBy === opt.value;
+          const Icon = opt.icon;
+          return (
+            <Box
+              key={opt.value}
+              component="button"
+              onClick={() => { handleFiltersChange({ ...filters, sortBy: opt.value }); setSortAnchor(null); }}
+              sx={{
+                display: "flex", alignItems: "center", gap: 1.25,
+                width: "100%", px: 1.5, py: 1, borderRadius: "10px",
+                border: "none", cursor: "pointer", textAlign: "left",
+                bgcolor: active ? "rgba(139,26,74,0.08)" : "transparent",
+                color: active ? ROSE : "#44403c",
+                fontFamily: "inherit", fontSize: "0.875rem", fontWeight: active ? 700 : 400,
+                transition: "all 120ms",
+                "&:hover": { bgcolor: "rgba(139,26,74,0.06)", color: ROSE },
+              }}
+            >
+              {Icon && <Icon size={14} />}
+              {!Icon && <Box sx={{ width: 14 }} />}
+              {opt.label}
+              {active && <Box sx={{ ml: "auto", width: 7, height: 7, borderRadius: "50%", bgcolor: ROSE }} />}
+            </Box>
+          );
+        })}
+      </Popover>
+
+      {/* ── Category popover (subcategories) ─────────────────────── */}
+      <Popover
+        open={Boolean(catPopover.anchor)}
+        anchorEl={catPopover.anchor}
+        onClose={() => setCatPopover({ anchor: null, cat: null })}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        PaperProps={{ sx: { mt: 0.75, borderRadius: 2.5, boxShadow: "0 8px 32px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.07)", py: 1, px: 0.75, minWidth: 200, maxWidth: 280 } }}
+      >
+        {catPopover.cat && (() => {
+          const cat = catPopover.cat;
+          const activeSubs = cat.subcategories?.filter((s) => s.isActive !== false) || [];
+          const catSelected = filters.categories.includes(cat.name);
+
+          const toggleName = (name) => {
+            const next = filters.categories.includes(name)
+              ? filters.categories.filter((c) => c !== name)
+              : [...filters.categories, name];
+            handleFiltersChange({ ...filters, categories: next });
+          };
+
+          const rowSx = (active) => ({
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            width: "100%", px: 1.25, py: 0.75, borderRadius: "8px",
+            border: "none", cursor: "pointer", textAlign: "left", transition: "all 100ms",
+            fontFamily: "inherit",
+            bgcolor: active ? "rgba(139,26,74,0.08)" : "transparent",
+            color: active ? ROSE : "#44403c",
+            fontWeight: active ? 600 : 400,
+            "&:hover": { bgcolor: "rgba(139,26,74,0.06)", color: ROSE },
+          });
+
+          return (
+            <Box>
+              {/* Category label */}
+              <Typography sx={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "text.disabled", px: 1.25, mb: 0.5 }}>
+                {cat.name}
+              </Typography>
+
+              {/* Parent "All" row */}
+              <Box component="button" onClick={() => toggleName(cat.name)} sx={{ ...rowSx(catSelected), fontSize: "0.875rem" }}>
+                All {cat.name}
+                {catSelected && <FiCheck size={13} />}
+              </Box>
+
+              {/* Subcategories */}
+              {activeSubs.length > 0 && (
+                <>
+                  <Box sx={{ height: "1px", bgcolor: "rgba(0,0,0,0.07)", mx: 1.25, my: 0.625 }} />
+                  <Typography sx={{ fontSize: "0.6875rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "text.disabled", px: 1.25, mb: 0.375 }}>
+                    Subcategories
+                  </Typography>
+                  {activeSubs.map((sub) => {
+                    const subSelected = filters.categories.includes(sub.name);
+                    return (
+                      <Box
+                        key={sub._id}
+                        component="button"
+                        onClick={() => toggleName(sub.name)}
+                        sx={{ ...rowSx(subSelected), fontSize: "0.8125rem" }}
+                      >
+                        {sub.name}
+                        {subSelected && <FiCheck size={12} />}
+                      </Box>
+                    );
+                  })}
+                </>
+              )}
+            </Box>
+          );
+        })()}
+      </Popover>
+
+      {/* ── Price popover ─────────────────────────────────────────── */}
+      <Popover
+        open={Boolean(priceAnchor)}
+        anchorEl={priceAnchor}
+        onClose={() => setPriceAnchor(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        PaperProps={{ sx: { mt: 0.75, borderRadius: 2.5, boxShadow: "0 8px 32px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.07)", p: 2, minWidth: 240 } }}
+      >
+        <Typography sx={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "text.disabled", mb: 1.5 }}>
+          Price Range
+        </Typography>
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1.5 }}>
+          <TextField
+            size="small" type="number" placeholder="Min"
+            value={priceMin}
+            onChange={(e) => setPriceMin(e.target.value)}
+            slotProps={{ input: { startAdornment: <InputAdornment position="start"><Typography sx={{ fontSize: "0.8rem", color: "text.disabled" }}>₹</Typography></InputAdornment> } }}
+            sx={{ flex: 1, "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+          />
+          <Typography color="text.disabled">–</Typography>
+          <TextField
+            size="small" type="number" placeholder="Max"
+            value={priceMax}
+            onChange={(e) => setPriceMax(e.target.value)}
+            slotProps={{ input: { startAdornment: <InputAdornment position="start"><Typography sx={{ fontSize: "0.8rem", color: "text.disabled" }}>₹</Typography></InputAdornment> } }}
+            sx={{ flex: 1, "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+          />
+        </Stack>
+        <Stack direction="row" spacing={1}>
+          {filters.priceRange && (
+            <Button size="small" variant="outlined" fullWidth onClick={() => { handleFiltersChange({ ...filters, priceRange: null }); setPriceAnchor(null); }}
+              sx={{ textTransform: "none", borderRadius: "10px", fontWeight: 600, borderColor: "rgba(0,0,0,0.15)", color: "#78716c", "&:hover": { borderColor: "#ef4444", color: "#ef4444" } }}>
+              Clear
+            </Button>
+          )}
+          <Button
+            size="small" variant="contained" fullWidth
+            disabled={!priceMin && !priceMax}
+            onClick={() => {
+              const min = parseFloat(priceMin) || 0;
+              const max = parseFloat(priceMax) || Infinity;
+              handleFiltersChange({ ...filters, priceRange: { min, max } });
+              setPriceAnchor(null);
+            }}
+            sx={{
+              textTransform: "none", borderRadius: "10px", fontWeight: 700,
+              background: `linear-gradient(135deg, ${ROSE}, #7a1640)`,
+              boxShadow: "none",
+              "&:hover": { background: "linear-gradient(135deg, #7a1640, #5e1232)" },
+              "&.Mui-disabled": { opacity: 0.4 },
+            }}
+          >
+            Apply
+          </Button>
+        </Stack>
+      </Popover>
 
       {/* ── Main Content ─────────────────────────────────────────── */}
       <Box sx={{ px: { xs: 2, md: 4 }, py: 3 }}>
+        {/* ── products area ── */}
+        <Box sx={{ minWidth: 0 }}>
 
         {/* Page heading row */}
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2.5 }}>
@@ -585,7 +889,7 @@ const ProductListing = () => {
               <FiGrid size={17} />
             </Box>
             <Box>
-              <Typography variant="h5" component="h1" fontWeight={800} color="#1c1917" lineHeight={1}>
+              <Typography variant="h5" component="h1" fontWeight={800} color="#1c1917" sx={{ lineHeight: 1 }}>
                 Products
               </Typography>
               {!loading && products?.length > 0 && (
@@ -613,7 +917,7 @@ const ProductListing = () => {
 
         {/* ── Product Grid ── */}
         {loading ? (
-          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2,1fr)", sm: "repeat(3,1fr)", md: "repeat(4,1fr)", lg: "repeat(5,1fr)" }, gap: { xs: 1.5, md: 2 } }} aria-busy="true">
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(1,1fr)", sm: "repeat(2,1fr)", md: "repeat(3,1fr)", lg: "repeat(4,1fr)" }, gap: { xs: 1.5, md: 2 } }} aria-busy="true">
             {Array.from({ length: 10 }).map((_, i) => <SkeletonCard key={i} />)}
           </Box>
         ) : (
@@ -649,7 +953,7 @@ const ProductListing = () => {
             {/* Grid */}
             {filteredProducts.length > 0 && (
               <>
-                <Box sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2,1fr)", sm: "repeat(3,1fr)", md: "repeat(4,1fr)", lg: "repeat(5,1fr)" }, gap: { xs: 1.5, md: 2 } }}>
+                <Box sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(1,1fr)", sm: "repeat(2,1fr)", md: "repeat(3,1fr)", lg: "repeat(4,1fr)" }, gap: { xs: 1.5, md: 2 } }}>
                   {filteredProducts.map((product) => (
                     <ProductCard
                       key={product._id}
@@ -677,181 +981,8 @@ const ProductListing = () => {
             )}
           </>
         )}
+        </Box>
       </Box>
-
-      {/* ── Filter Drawer ─────────────────────────────────────────── */}
-      <Drawer
-        open={showFilters}
-        onClose={() => setShowFilters(false)}
-        anchor={isMobile ? "bottom" : "left"}
-        ModalProps={{ keepMounted: false }}
-        PaperProps={{
-          sx: isMobile
-            ? {
-                borderRadius: "20px 20px 0 0",
-                maxHeight: "88vh",
-                display: "flex",
-                flexDirection: "column",
-                bgcolor: "#fff",
-              }
-            : {
-                width: 340,
-                bgcolor: "#fff",
-                display: "flex",
-                flexDirection: "column",
-                boxShadow: "8px 0 40px rgba(0,0,0,0.12)",
-              },
-        }}
-        aria-labelledby="filters-drawer-title"
-      >
-        {/* ── Mobile drag handle ── */}
-        {isMobile && (
-          <Box sx={{ display: "flex", justifyContent: "center", pt: 1.25, pb: 0.5, flexShrink: 0 }}>
-            <Box sx={{ width: 36, height: 4, borderRadius: 2, bgcolor: "#e2e8f0" }} />
-          </Box>
-        )}
-
-        {/* ── Header ── */}
-        <Box sx={{
-          px: 2.5, py: 2, flexShrink: 0,
-          borderBottom: "1px solid rgba(0,0,0,0.07)",
-          background: "linear-gradient(135deg, #fff 0%, rgba(139,26,74,0.03) 100%)",
-        }}>
-          <Stack direction="row" alignItems="center" justifyContent="space-between">
-            <Stack direction="row" alignItems="center" spacing={1.5}>
-              <Box sx={{
-                width: 38, height: 38, borderRadius: "12px",
-                background: `linear-gradient(135deg, ${ROSE} 0%, #7a1640 100%)`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: "0 4px 12px rgba(139,26,74,0.3)",
-              }}>
-                <FiFilter size={16} color="#fff" />
-              </Box>
-              <Box>
-                <Typography variant="subtitle1" fontWeight={800} id="filters-drawer-title" sx={{ lineHeight: 1.2, color: "#1c1917" }}>
-                  Filters
-                </Typography>
-                <Typography sx={{ fontSize: "0.72rem", color: "#94a3b8", fontWeight: 500 }}>
-                  {activeFilterCount > 0 ? `${activeFilterCount} filter${activeFilterCount !== 1 ? "s" : ""} applied` : "Refine your results"}
-                </Typography>
-              </Box>
-            </Stack>
-            <Stack direction="row" alignItems="center" spacing={0.75}>
-              {activeFilterCount > 0 && (
-                <Chip
-                  label={activeFilterCount}
-                  size="small"
-                  sx={{
-                    height: 22, fontSize: "0.7rem", fontWeight: 800,
-                    bgcolor: ROSE, color: "#fff",
-                    "& .MuiChip-label": { px: 1 },
-                  }}
-                />
-              )}
-              <IconButton
-                onClick={() => setShowFilters(false)}
-                size="small"
-                aria-label="Close filters"
-                sx={{
-                  bgcolor: "#f8fafc", border: "1px solid #e2e8f0",
-                  color: "#64748b", width: 34, height: 34,
-                  "&:hover": { bgcolor: "#f1f5f9", color: "#1c1917", borderColor: "#cbd5e1" },
-                }}
-              >
-                <FiX size={16} />
-              </IconButton>
-            </Stack>
-          </Stack>
-
-          {/* Active filter chips */}
-          {activeChips.length > 0 && (
-            <Stack direction="row" flexWrap="wrap" gap={0.625} sx={{ mt: 1.5 }}>
-              {activeChips.map((chip) => (
-                <Chip
-                  key={chip.key}
-                  label={chip.label}
-                  size="small"
-                  onDelete={chip.onRemove}
-                  deleteIcon={<FiX size={10} />}
-                  sx={{
-                    height: 24, fontSize: "0.72rem", fontWeight: 600,
-                    bgcolor: "rgba(139,26,74,0.08)", color: ROSE,
-                    border: "1px solid rgba(139,26,74,0.2)",
-                    "& .MuiChip-deleteIcon": { color: ROSE, "&:hover": { color: "#7a1640" } },
-                  }}
-                />
-              ))}
-            </Stack>
-          )}
-        </Box>
-
-        {/* ── Scrollable filter body ── */}
-        <Box sx={{ overflowY: "auto", flexGrow: 1, px: 2.5, py: 2.5,
-          "&::-webkit-scrollbar": { width: 4 },
-          "&::-webkit-scrollbar-track": { bgcolor: "transparent" },
-          "&::-webkit-scrollbar-thumb": { bgcolor: "rgba(139,26,74,0.2)", borderRadius: 4 },
-        }}>
-          <Suspense fallback={
-            <Stack alignItems="center" py={5} spacing={1.5}>
-              <CircularProgress size={26} sx={{ color: ROSE }} />
-              <Typography sx={{ fontSize: "0.8125rem", color: "#94a3b8" }}>Loading filters…</Typography>
-            </Stack>
-          }>
-            <ProductFilters
-              products={products}
-              onFiltersChange={handleFiltersChange}
-              activeFilters={filters}
-              onClearFilters={handleClearFilters}
-            />
-          </Suspense>
-        </Box>
-
-        {/* ── Sticky footer ── */}
-        <Box sx={{
-          px: 2.5, py: 2, flexShrink: 0,
-          borderTop: "1px solid rgba(0,0,0,0.07)",
-          bgcolor: "#fff",
-          boxShadow: "0 -4px 20px rgba(0,0,0,0.06)",
-          pb: isMobile ? "calc(16px + env(safe-area-inset-bottom))" : 2,
-        }}>
-          <Button
-            variant="contained"
-            fullWidth
-            size="large"
-            onClick={() => setShowFilters(false)}
-            sx={{
-              borderRadius: "12px", textTransform: "none", fontWeight: 700,
-              fontSize: "0.9375rem", py: 1.375,
-              background: `linear-gradient(135deg, ${ROSE} 0%, #7a1640 100%)`,
-              boxShadow: "0 4px 16px rgba(139,26,74,0.32)",
-              "&:hover": {
-                background: `linear-gradient(135deg, #7a1640 0%, #5e1232 100%)`,
-                boxShadow: "0 6px 20px rgba(139,26,74,0.4)",
-                transform: "translateY(-1px)",
-              },
-              transition: "all 180ms",
-            }}
-          >
-            Show {filteredProducts.length} product{filteredProducts.length !== 1 ? "s" : ""}
-          </Button>
-
-          {activeFilterCount > 0 && (
-            <Button
-              variant="text"
-              fullWidth
-              onClick={() => { handleClearFilters(); setShowFilters(false); }}
-              sx={{
-                mt: 1, textTransform: "none", fontWeight: 600,
-                fontSize: "0.875rem", color: "#94a3b8",
-                "&:hover": { color: ROSE, bgcolor: "rgba(139,26,74,0.05)" },
-                borderRadius: "10px",
-              }}
-            >
-              Clear all filters
-            </Button>
-          )}
-        </Box>
-      </Drawer>
 
       {/* ── Image Modal ────────────────────────────────────────────── */}
       <Suspense fallback={null}>

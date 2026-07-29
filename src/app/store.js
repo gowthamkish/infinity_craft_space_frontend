@@ -112,21 +112,3 @@ export const store = configureStore({
   devTools: import.meta.env.DEV,
 });
 
-// Performance monitoring for store updates
-if (import.meta.env.DEV) {
-  let lastStateChange = performance.now();
-
-  store.subscribe(() => {
-    const now = performance.now();
-    const timeSinceLastChange = now - lastStateChange;
-
-    if (timeSinceLastChange < 16) {
-      // Less than one frame
-      console.warn(
-        "[Redux Performance] Frequent state changes detected - consider batching updates",
-      );
-    }
-
-    lastStateChange = now;
-  });
-}

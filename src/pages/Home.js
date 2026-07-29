@@ -582,7 +582,7 @@ export default function Home() {
             </Box>
 
             <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
-              <Grid container spacing={{ xs: 4, md: 8 }} alignItems="center">
+              <Grid container spacing={{ xs: 4, md: 8 }} sx={{ alignItems: "center" }}>
 
                 {/* Left — Copy */}
                 <Grid size={{ xs: 12, md: 6 }}>
