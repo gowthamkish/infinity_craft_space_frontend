@@ -22,99 +22,15 @@ function AriaAvatar({ size = 34, ring = false }) {
   return (
     <Box sx={{
       width: size, height: size, borderRadius: "50%", flexShrink: 0,
-      overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center",
+      overflow: "hidden",
       ...(ring ? { border: "2px solid rgba(255,255,255,0.6)", boxShadow: "0 0 0 2px rgba(201,168,76,0.5)" } : {}),
     }}>
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width={size} height={size}>
-        {/* Background circle */}
-        <circle cx="40" cy="40" r="40" fill="#F9E4D4"/>
-
-        {/* Hair — back layer */}
-        <ellipse cx="40" cy="30" rx="22" ry="24" fill="#1a0a00"/>
-        {/* Bun */}
-        <circle cx="40" cy="9" r="8" fill="#1a0a00"/>
-        <circle cx="40" cy="9" r="5" fill="#2d1100"/>
-
-        {/* Neck */}
-        <rect x="34" y="53" width="12" height="10" rx="4" fill="#D4956A"/>
-
-        {/* Face */}
-        <ellipse cx="40" cy="40" rx="16" ry="18" fill="#E8A87C"/>
-
-        {/* Forehead bindi */}
-        <circle cx="40" cy="25" r="2.2" fill="#8B1A4A"/>
-        <circle cx="40" cy="25" r="1" fill="#C9A84C"/>
-
-        {/* Maang tikka chain */}
-        <line x1="40" y1="9" x2="40" y2="25" stroke="#C9A84C" strokeWidth="0.8" strokeDasharray="1.5,1"/>
-
-        {/* Eyebrows */}
-        <path d="M30 33 Q34 31 38 33" stroke="#3d1f00" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
-        <path d="M42 33 Q46 31 50 33" stroke="#3d1f00" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
-
-        {/* Eyes */}
-        <ellipse cx="34" cy="36.5" rx="4" ry="3" fill="white"/>
-        <ellipse cx="46" cy="36.5" rx="4" ry="3" fill="white"/>
-        <circle cx="34.5" cy="37" r="2.2" fill="#2d1100"/>
-        <circle cx="46.5" cy="37" r="2.2" fill="#2d1100"/>
-        {/* Eye shine */}
-        <circle cx="35.4" cy="36.2" r="0.7" fill="white"/>
-        <circle cx="47.4" cy="36.2" r="0.7" fill="white"/>
-        {/* Eyeliner */}
-        <path d="M30 36.5 Q34 34 38 36.5" stroke="#1a0a00" strokeWidth="0.7" fill="none" strokeLinecap="round"/>
-        <path d="M42 36.5 Q46 34 50 36.5" stroke="#1a0a00" strokeWidth="0.7" fill="none" strokeLinecap="round"/>
-
-        {/* Nose */}
-        <ellipse cx="40" cy="43" rx="1.5" ry="1" fill="#C47A52"/>
-
-        {/* Lips */}
-        <path d="M35 48 Q40 51.5 45 48" stroke="#A0392B" strokeWidth="0.5" fill="#C0503E"/>
-        <path d="M35 48 Q40 46.5 45 48" stroke="#A0392B" strokeWidth="0.5" fill="#D4614F"/>
-        <line x1="35" y1="48" x2="45" y2="48" stroke="#8B1A4A" strokeWidth="0.5"/>
-
-        {/* Cheek blush */}
-        <ellipse cx="27" cy="43" rx="4" ry="2.5" fill="rgba(220,100,80,0.18)"/>
-        <ellipse cx="53" cy="43" rx="4" ry="2.5" fill="rgba(220,100,80,0.18)"/>
-
-        {/* Ears */}
-        <ellipse cx="24" cy="40" rx="3.5" ry="4" fill="#D4956A"/>
-        <ellipse cx="56" cy="40" rx="3.5" ry="4" fill="#D4956A"/>
-
-        {/* Jhumka earrings */}
-        <circle cx="24" cy="44" r="3" fill="#C9A84C"/>
-        <circle cx="24" cy="44" r="1.5" fill="#8B1A4A"/>
-        <line x1="22.5" y1="47" x2="22" y2="50" stroke="#C9A84C" strokeWidth="0.8"/>
-        <line x1="24" y1="47" x2="24" y2="51" stroke="#C9A84C" strokeWidth="0.8"/>
-        <line x1="25.5" y1="47" x2="26" y2="50" stroke="#C9A84C" strokeWidth="0.8"/>
-        <circle cx="22" cy="50.5" r="1" fill="#C9A84C"/>
-        <circle cx="24" cy="51.5" r="1" fill="#C9A84C"/>
-        <circle cx="26" cy="50.5" r="1" fill="#C9A84C"/>
-
-        <circle cx="56" cy="44" r="3" fill="#C9A84C"/>
-        <circle cx="56" cy="44" r="1.5" fill="#8B1A4A"/>
-        <line x1="54.5" y1="47" x2="54" y2="50" stroke="#C9A84C" strokeWidth="0.8"/>
-        <line x1="56" y1="47" x2="56" y2="51" stroke="#C9A84C" strokeWidth="0.8"/>
-        <line x1="57.5" y1="47" x2="58" y2="50" stroke="#C9A84C" strokeWidth="0.8"/>
-        <circle cx="54" cy="50.5" r="1" fill="#C9A84C"/>
-        <circle cx="56" cy="51.5" r="1" fill="#C9A84C"/>
-        <circle cx="58" cy="50.5" r="1" fill="#C9A84C"/>
-
-        {/* Saree / top — rose color */}
-        <path d="M18 80 Q20 62 28 58 Q34 56 40 57 Q46 56 52 58 Q60 62 62 80 Z" fill="#8B1A4A"/>
-        {/* Saree border — gold */}
-        <path d="M18 80 Q20 62 28 58" stroke="#C9A84C" strokeWidth="1.5" fill="none"/>
-        <path d="M62 80 Q60 62 52 58" stroke="#C9A84C" strokeWidth="1.5" fill="none"/>
-
-        {/* Necklace */}
-        <path d="M32 57 Q40 63 48 57" stroke="#C9A84C" strokeWidth="1.2" fill="none"/>
-        <circle cx="36" cy="60" r="1.2" fill="#C9A84C"/>
-        <circle cx="40" cy="62" r="1.5" fill="#C9A84C"/>
-        <circle cx="44" cy="60" r="1.2" fill="#C9A84C"/>
-        <circle cx="40" cy="62" r="0.8" fill="#8B1A4A"/>
-
-        {/* Hair highlight */}
-        <path d="M25 22 Q30 18 35 20" stroke="#3d1f00" strokeWidth="0.8" fill="none" strokeLinecap="round"/>
-      </svg>
+      <Box
+        component="img"
+        src="/assets/aria-avatar.jpg"
+        alt="Aria"
+        sx={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }}
+      />
     </Box>
   );
 }
