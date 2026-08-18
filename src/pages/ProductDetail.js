@@ -190,11 +190,6 @@ function QuantitySelector({ value, onChange, min = 1, max = 99 }) {
   );
 }
 
-// ─── Section label ───────────────────────────────────────────────────────────
-function SectionLabel({ children }) {
-  return <Typography sx={T.label}>{children}</Typography>;
-}
-
 // ─── Trust badge card ────────────────────────────────────────────────────────
 function TrustGrid() {
   return (
@@ -202,14 +197,14 @@ function TrustGrid() {
       <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
         {TRUST_ITEMS.map((item, i) => (
           <Box key={item.label} sx={{
-            p: 2,
-            display: "flex", flexDirection: "column", gap: 0.75,
+            p: 1.75,
+            display: "flex", alignItems: "flex-start", gap: 1.25,
             borderRight: i % 2 === 0 ? `0.5px solid ${BORDER}` : "none",
             borderBottom: i < 2 ? `0.5px solid ${BORDER}` : "none",
           }}>
-            <Box sx={{ color: PRIMARY }}>{item.icon}</Box>
+            <Box sx={{ color: PRIMARY, flexShrink: 0, mt: 0.125 }}>{item.icon}</Box>
             <Box>
-              <Typography sx={{ fontSize: "0.8125rem", fontWeight: 700, color: "text.primary", lineHeight: 1.2, mb: 0.25 }}>
+              <Typography sx={{ fontSize: "0.8125rem", fontWeight: 700, color: "text.primary", lineHeight: 1.3, mb: 0.25 }}>
                 {item.label}
               </Typography>
               <Typography sx={T.supporting}>{item.sub}</Typography>
@@ -337,7 +332,7 @@ const ProductDetail = () => {
         setIsWishlisted(false);
         addSuccess("Removed from wishlist", "Wishlist");
       } else {
-        await api.post(`/api/auth/wishlist/${product._id}`);
+        await api.post("/api/auth/wishlist", { productId: product._id });
         setIsWishlisted(true);
         addSuccess("Saved to wishlist!", "Wishlist");
       }
@@ -625,10 +620,11 @@ const ProductDetail = () => {
             {/* ── INFO PANEL (right ~45%, sticky) ─────────────────────────── */}
             <Grid size={{ xs: 12, md: 5 }}>
               <Box sx={{ position: { md: "sticky" }, top: { md: "24px" } }}>
-                <Stack spacing={2.5}>
+                <Stack spacing={0}>
 
-                  {/* Category tag pills */}
-                  <Stack direction="row" flexWrap="wrap" gap={0.75}>
+                  {/* ── GROUP 1: Identity ─────────────────────────────────── */}
+                  {/* Category pills */}
+                  <Stack direction="row" flexWrap="wrap" gap={0.75} sx={{ mb: 1.5 }}>
                     {product.category && (
                       <Chip label={product.category} size="small"
                         component={RouterLink} to={`/products?category=${encodeURIComponent(product.category)}`} clickable
@@ -650,41 +646,50 @@ const ProductDetail = () => {
 
                   {/* Product name */}
                   <Typography component="h1"
-                    sx={{ fontSize: "1.5rem", fontWeight: 500, color: "text.primary", lineHeight: 1.3 }}>
+                    sx={{ fontSize: { xs: "1.4rem", md: "1.5rem" }, fontWeight: 600, color: "text.primary",
+                      lineHeight: 1.3, mb: 1.25 }}>
                     {product.name}
                   </Typography>
 
-                  {/* Rating inline (only when reviews exist) */}
+                  {/* Rating */}
                   {ratingStats?.reviewCount > 0 && (
-                    <Stack direction="row" alignItems="center" flexWrap="wrap" gap={1}>
-                      <StarRating rating={ratingStats.averageRating} size="0.9rem" showValue />
-                      <Typography sx={T.supporting}>
-                        {ratingStats.reviewCount} {ratingStats.reviewCount === 1 ? "review" : "reviews"}
+                    <Stack direction="row" alignItems="center" gap={0.75} sx={{ mb: 1.75 }}>
+                      <StarRating rating={ratingStats.averageRating} size="0.875rem" showValue />
+                      <Typography sx={{ ...T.supporting, color: "text.secondary" }}>
+                        · {ratingStats.reviewCount} {ratingStats.reviewCount === 1 ? "review" : "reviews"}
                       </Typography>
                     </Stack>
                   )}
 
-                  {/* Price row */}
-                  <Stack direction="row" alignItems="baseline" spacing={1.5} flexWrap="wrap">
-                    <Typography sx={{ fontSize: "1.75rem", fontWeight: 600, color: PRIMARY, lineHeight: 1, letterSpacing: "-0.02em" }}>
-                      ₹{product.price.toLocaleString("en-IN")}
-                    </Typography>
-                    {product.compareAtPrice > product.price && (
-                      <Typography sx={{ fontSize: "1.1rem", fontWeight: 400, color: "#94a3b8", textDecoration: "line-through", lineHeight: 1 }}>
-                        ₹{product.compareAtPrice.toLocaleString("en-IN")}
+                  {/* Price block */}
+                  <Box sx={{ mb: 2 }}>
+                    <Stack direction="row" alignItems="center" flexWrap="wrap" gap={1.25} sx={{ mb: 0.5 }}>
+                      <Typography sx={{ fontSize: "1.875rem", fontWeight: 700, color: PRIMARY,
+                        lineHeight: 1, letterSpacing: "-0.02em" }}>
+                        ₹{product.price.toLocaleString("en-IN")}
                       </Typography>
-                    )}
-                    {product.compareAtPrice > product.price && (
-                      <Box sx={{ display: "inline-flex", alignItems: "center", bgcolor: "#dc2626", color: "#fff", fontSize: "0.72rem", fontWeight: 700, px: 1, py: 0.25, borderRadius: "6px" }}>
-                        {Math.round((1 - product.price / product.compareAtPrice) * 100)}% OFF
-                      </Box>
-                    )}
-                    <Typography sx={T.supporting}>Inclusive of all taxes</Typography>
-                  </Stack>
+                      {product.compareAtPrice > product.price && (
+                        <>
+                          <Typography sx={{ fontSize: "1.0625rem", fontWeight: 400, color: "#94a3b8",
+                            textDecoration: "line-through", lineHeight: 1 }}>
+                            ₹{product.compareAtPrice.toLocaleString("en-IN")}
+                          </Typography>
+                          <Box sx={{ display: "inline-flex", alignItems: "center", bgcolor: DANGER,
+                            color: "#fff", fontSize: "0.72rem", fontWeight: 700,
+                            px: 0.875, py: 0.25, borderRadius: "6px", lineHeight: 1.4 }}>
+                            {Math.round((1 - product.price / product.compareAtPrice) * 100)}% OFF
+                          </Box>
+                        </>
+                      )}
+                    </Stack>
+                    <Typography sx={{ ...T.supporting, color: "text.disabled" }}>
+                      Inclusive of all taxes
+                    </Typography>
+                  </Box>
 
                   {/* Stock badge */}
                   {product.trackInventory !== false && (
-                    <Box>
+                    <Box sx={{ mb: 2.5 }}>
                       {isOutOfStock ? (
                         <Chip icon={<FiPackage size={12} />} label="Out of Stock" size="small"
                           sx={{ bgcolor: DANGER_BG, color: DANGER, fontWeight: 600, ...T.badge, borderRadius: 9999 }} />
@@ -698,78 +703,69 @@ const ProductDetail = () => {
                     </Box>
                   )}
 
-                  <Divider sx={{ borderColor: BORDER }} />
+                  <Divider sx={{ borderColor: BORDER, mb: 2.5 }} />
 
-                  {/* Description (always visible) */}
-                  <Box>
-                    <SectionLabel>Description</SectionLabel>
-                    <Box sx={{ mt: 1 }}>
-                      <Typography sx={{
-                        ...T.body,
-                        ...(isLongDesc && !descExpanded
-                          ? { display: "-webkit-box", WebkitLineClamp: 5, WebkitBoxOrient: "vertical", overflow: "hidden" }
-                          : {}),
-                      }}>
-                        {product.description}
-                      </Typography>
-                      {isLongDesc && (
-                        <Box component="button" onClick={() => setDescExpanded((v) => !v)}
-                          sx={{ mt: 0.75, background: "none", border: "none", cursor: "pointer",
-                            color: PRIMARY, fontSize: "0.8125rem", fontWeight: 600, p: 0,
-                            "&:hover": { color: PRIMARY_DARK } }}>
-                          {descExpanded ? "Show less ↑" : "Read more ↓"}
-                        </Box>
-                      )}
-                    </Box>
+                  {/* ── GROUP 2: Description ──────────────────────────────── */}
+                  <Box sx={{ mb: 2.5 }}>
+                    <Typography sx={{
+                      ...T.body,
+                      ...(isLongDesc && !descExpanded
+                        ? { display: "-webkit-box", WebkitLineClamp: 5, WebkitBoxOrient: "vertical", overflow: "hidden" }
+                        : {}),
+                    }}>
+                      {product.description}
+                    </Typography>
+                    {isLongDesc && (
+                      <Box component="button" onClick={() => setDescExpanded((v) => !v)}
+                        sx={{ mt: 0.75, background: "none", border: "none", cursor: "pointer",
+                          color: PRIMARY, fontSize: "0.8125rem", fontWeight: 600, p: 0,
+                          "&:hover": { color: PRIMARY_DARK } }}>
+                        {descExpanded ? "Show less ↑" : "Read more ↓"}
+                      </Box>
+                    )}
                   </Box>
+
+                  {/* ── GROUP 3: Options (colors, customization, bulk) ────── */}
 
                   {/* Color selector */}
                   {product.showColorPickerToUsers && (() => {
                     const visibleColors = (product.colors || []).filter((c) => c.visibleToUsers);
                     if (!visibleColors.length) return null;
                     return (
-                      <Box>
-                        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
-                          <SectionLabel>Available Colors</SectionLabel>
+                      <Box sx={{ mb: 2.5 }}>
+                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
+                          <Typography sx={{ fontSize: "0.8125rem", fontWeight: 600, color: "text.secondary" }}>
+                            Colour
+                          </Typography>
                           {selectedColor && (
                             <Stack direction="row" alignItems="center" spacing={0.75}>
-                              <Box sx={{ width: 12, height: 12, borderRadius: "50%", bgcolor: selectedColor.hex, border: "1px solid rgba(0,0,0,0.12)", flexShrink: 0 }} />
+                              <Box sx={{ width: 10, height: 10, borderRadius: "50%", bgcolor: selectedColor.hex,
+                                border: "1px solid rgba(0,0,0,0.12)", flexShrink: 0 }} />
                               <Typography sx={{ fontSize: "0.8125rem", fontWeight: 600, color: "text.primary" }}>
                                 {selectedColor.name}
                               </Typography>
                             </Stack>
                           )}
-                        </Stack>
+                        </Box>
                         <Stack direction="row" flexWrap="wrap" gap={1}>
                           {visibleColors.map((c, i) => (
                             <Tooltip key={c._id || c.id || i} title={c.name} arrow>
-                              <Box
-                                component="button"
-                                onClick={() => setSelectedColor(c)}
-                                aria-label={`Select color ${c.name}`}
-                                aria-pressed={selectedColor?.hex === c.hex}
+                              <Box component="button" onClick={() => setSelectedColor(c)}
+                                aria-label={`Select color ${c.name}`} aria-pressed={selectedColor?.hex === c.hex}
                                 sx={{
-                                  width: 32, height: 32, borderRadius: "50%",
-                                  bgcolor: c.hex,
-                                  border: selectedColor?.hex === c.hex
-                                    ? `3px solid ${PRIMARY}`
-                                    : "2px solid rgba(0,0,0,0.12)",
-                                  boxShadow: selectedColor?.hex === c.hex
-                                    ? `0 0 0 2px rgba(139,26,74,0.2)`
-                                    : "0 1px 3px rgba(0,0,0,0.10)",
-                                  cursor: "pointer", p: 0, flexShrink: 0,
-                                  transition: "all 140ms",
-                                  "&:hover": { transform: "scale(1.18)", boxShadow: "0 2px 10px rgba(0,0,0,0.2)" },
-                                }}
-                              />
+                                  width: 32, height: 32, borderRadius: "50%", bgcolor: c.hex,
+                                  border: selectedColor?.hex === c.hex ? `3px solid ${PRIMARY}` : "2px solid rgba(0,0,0,0.12)",
+                                  boxShadow: selectedColor?.hex === c.hex ? `0 0 0 2px rgba(139,26,74,0.2)` : "0 1px 3px rgba(0,0,0,0.10)",
+                                  cursor: "pointer", p: 0, flexShrink: 0, transition: "all 140ms",
+                                  "&:hover": { transform: "scale(1.15)", boxShadow: "0 2px 10px rgba(0,0,0,0.2)" },
+                                }} />
                             </Tooltip>
                           ))}
                         </Stack>
                         {selectedColor?.stock !== undefined && selectedColor?.stock !== "" && (
                           <Typography sx={{ mt: 0.75, fontSize: "0.75rem", color: "text.disabled" }}>
                             {Number(selectedColor.stock) > 0
-                              ? `${selectedColor.stock} available`
-                              : "Out of stock in this color"}
+                              ? `${selectedColor.stock} available` : "Out of stock in this color"}
                           </Typography>
                         )}
                       </Box>
@@ -778,27 +774,31 @@ const ProductDetail = () => {
 
                   {/* Bulk discounts */}
                   {product.bulkDiscounts?.length > 0 && (
-                    <Paper elevation={0} sx={{ bgcolor: "#f0fdf4", border: "0.5px solid #a7f3d0", borderRadius: "12px", p: 2 }}>
+                    <Paper elevation={0} sx={{ bgcolor: "#f0fdf4", border: "0.5px solid #a7f3d0",
+                      borderRadius: "12px", p: 2, mb: 2.5 }}>
                       <Stack direction="row" alignItems="center" spacing={0.75} mb={1.25}>
                         <FiStar size={13} color="#065f46" />
-                        <Typography sx={{ fontSize: "0.875rem", fontWeight: 600, color: "#065f46" }}>Buy more, save more</Typography>
+                        <Typography sx={{ fontSize: "0.875rem", fontWeight: 600, color: "#065f46" }}>
+                          Buy more, save more
+                        </Typography>
                       </Stack>
                       <Stack divider={<Divider sx={{ borderColor: "#d1fae5" }} />}>
                         {product.bulkDiscounts.map((bd) => (
-                          <Stack key={bd.minQuantity} direction="row" justifyContent="space-between" alignItems="center" py={0.75}>
+                          <Box key={bd.minQuantity}
+                            sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", py: 0.75 }}>
                             <Typography sx={T.body}>Buy {bd.minQuantity}{bd.maxQuantity ? `–${bd.maxQuantity}` : "+"} units</Typography>
                             <Chip label={`Save ${bd.discount}%`} size="small"
                               sx={{ bgcolor: "#d1fae5", color: "#059669", fontWeight: 700, ...T.badge }} />
-                          </Stack>
+                          </Box>
                         ))}
                       </Stack>
                     </Paper>
                   )}
 
-                  {/* Customization */}
+                  {/* Customization textarea */}
                   {product.isCustomizable && (
-                    <Paper elevation={0}
-                      sx={{ bgcolor: "#fdf8f2", border: "0.5px solid #EAD9C5", borderRadius: "12px", p: 2 }}>
+                    <Paper elevation={0} sx={{ bgcolor: "#fdf8f2", border: "0.5px solid #EAD9C5",
+                      borderRadius: "12px", p: 2, mb: 2.5 }}>
                       <Stack direction="row" alignItems="flex-start" spacing={1.25} mb={1.5}>
                         <Typography sx={{ fontSize: "1rem", color: PRIMARY, lineHeight: 1.4, flexShrink: 0 }}>✦</Typography>
                         <Box>
@@ -827,11 +827,10 @@ const ProductDetail = () => {
                     </Paper>
                   )}
 
-                  <Divider sx={{ borderColor: BORDER }} />
+                  <Divider sx={{ borderColor: BORDER, mb: 2.5 }} />
 
-                  {/* CTA section */}
+                  {/* ── GROUP 4: Purchase actions ─────────────────────────── */}
                   {isOutOfStock ? (
-                    /* Notify me */
                     <Box>
                       {notifyStatus === "success" ? (
                         <Alert severity="success" icon={<FiCheck size={16} />} sx={{ borderRadius: "12px" }}>
@@ -868,43 +867,46 @@ const ProductDetail = () => {
                       )}
                     </Box>
                   ) : (
-                    <Stack spacing={2}>
+                    <Stack spacing={1.75}>
                       {/* Quantity row */}
-                      <Stack direction="row" alignItems="center" gap={1.5}>
-                        <Typography sx={{ fontSize: "0.8125rem", fontWeight: 600, color: "text.secondary", lineHeight: 1, flexShrink: 0 }}>
-                          QTY
+                      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <Typography sx={{ fontSize: "0.875rem", fontWeight: 600, color: "text.secondary" }}>
+                          Quantity
                         </Typography>
-                        <QuantitySelector
-                          value={quantity} onChange={setQuantity}
-                          max={product.trackInventory !== false ? product.stock : 99} />
-                        {quantityInCart > 0 && (
-                          <Chip icon={<FiShoppingCart size={11} />}
-                            label={`${quantityInCart} in cart`} size="small"
-                            sx={{ bgcolor: PRIMARY_BG, color: PRIMARY, border: `1px solid rgba(139,26,74,0.18)`,
-                              fontWeight: 600, ...T.badge }} />
-                        )}
-                      </Stack>
+                        <Stack direction="row" alignItems="center" gap={1.25}>
+                          <QuantitySelector
+                            value={quantity} onChange={setQuantity}
+                            max={product.trackInventory !== false ? product.stock : 99} />
+                          {quantityInCart > 0 && (
+                            <Chip icon={<FiShoppingCart size={11} />}
+                              label={`${quantityInCart} in cart`} size="small"
+                              sx={{ bgcolor: PRIMARY_BG, color: PRIMARY, border: `1px solid rgba(139,26,74,0.18)`,
+                                fontWeight: 600, flexShrink: 0, ...T.badge }} />
+                          )}
+                        </Stack>
+                      </Box>
 
-                      {/* Primary CTAs — stacked, equal width */}
+                      {/* Primary CTAs */}
                       <Stack spacing={1.25}>
                         <Button variant="contained" fullWidth size="large"
                           startIcon={addingToCart ? null : <FiShoppingCart size={17} />}
                           onClick={handleAddToCart} disabled={addingToCart}
                           sx={{
-                            bgcolor: PRIMARY,
+                            height: 50, bgcolor: PRIMARY,
                             background: `linear-gradient(135deg, ${PRIMARY} 0%, ${PRIMARY_DARK} 100%)`,
                             "&:hover": { background: `linear-gradient(135deg, ${PRIMARY_DARK} 0%, #4c0d28 100%)`,
                               transform: "translateY(-1px)", boxShadow: "0 6px 20px rgba(139,26,74,0.32)" },
-                            boxShadow: "0 4px 14px rgba(139,26,74,0.26)",
-                            borderRadius: "10px", fontWeight: 600, fontSize: "0.9375rem", transition: "all 180ms",
+                            boxShadow: "0 4px 14px rgba(139,26,74,0.22)",
+                            borderRadius: "12px", fontWeight: 600, fontSize: "0.9375rem",
+                            textTransform: "none", transition: "all 180ms",
                           }}>
-                          {addingToCart ? <DotsLoader size="sm" /> : (quantityInCart > 0 ? "Add More" : "Add to Cart")}
+                          {addingToCart ? <DotsLoader size="sm" /> : (quantityInCart > 0 ? "Add More to Cart" : "Add to Cart")}
                         </Button>
                         <Button variant="outlined" fullWidth size="large"
                           onClick={handleBuyNow} disabled={addingToCart}
                           sx={{
-                            color: PRIMARY, borderColor: PRIMARY, borderRadius: "10px",
-                            fontWeight: 600, fontSize: "0.9375rem",
+                            height: 50, color: PRIMARY, borderColor: PRIMARY, borderRadius: "12px",
+                            fontWeight: 600, fontSize: "0.9375rem", textTransform: "none",
                             "&:hover": { bgcolor: PRIMARY_BG, borderColor: PRIMARY_DARK, transform: "translateY(-1px)" },
                             transition: "all 180ms",
                           }}>
@@ -912,60 +914,69 @@ const ProductDetail = () => {
                         </Button>
                       </Stack>
 
-                      {/* Ghost action buttons: Save + Share */}
-                      <Stack direction="row" spacing={0.5}>
-                        <Button variant="text" size="small"
+                      {/* Save + Share */}
+                      <Stack direction="row" spacing={0.75}>
+                        <Button variant="text" size="small" fullWidth
                           startIcon={<FiHeart size={14} style={{ fill: isWishlisted ? "currentColor" : "none" }} />}
                           onClick={handleWishlistToggle} disabled={wishlistLoading}
                           aria-label={isWishlisted ? "Remove from wishlist" : "Save to wishlist"}
                           sx={{
-                            flex: 1, color: isWishlisted ? DANGER : "text.secondary",
-                            fontSize: "0.8125rem", fontWeight: 500, borderRadius: "8px",
+                            color: isWishlisted ? DANGER : "text.secondary",
+                            fontSize: "0.8125rem", fontWeight: 500, borderRadius: "8px", textTransform: "none",
+                            border: `1px solid ${BORDER}`,
                             "&:hover": { bgcolor: isWishlisted ? DANGER_BG : PRIMARY_BG,
-                              color: isWishlisted ? DANGER : PRIMARY },
+                              color: isWishlisted ? DANGER : PRIMARY, borderColor: "transparent" },
                           }}>
                           {wishlistLoading ? <DotsLoader size="sm" /> : (isWishlisted ? "Saved" : "Save")}
                         </Button>
-                        <Button variant="text" size="small"
+                        <Button variant="text" size="small" fullWidth
                           startIcon={<FiShare2 size={14} />}
                           onClick={handleShare} aria-label="Share product"
-                          sx={{ flex: 1, color: "text.secondary", fontSize: "0.8125rem", fontWeight: 500,
-                            borderRadius: "8px", "&:hover": { bgcolor: PRIMARY_BG, color: PRIMARY } }}>
+                          sx={{
+                            color: "text.secondary", fontSize: "0.8125rem", fontWeight: 500,
+                            borderRadius: "8px", textTransform: "none", border: `1px solid ${BORDER}`,
+                            "&:hover": { bgcolor: PRIMARY_BG, color: PRIMARY, borderColor: "transparent" },
+                          }}>
                           {linkCopied ? "Copied!" : "Share"}
                         </Button>
                       </Stack>
                     </Stack>
                   )}
 
-                  {/* Delivery estimator */}
-                  <Paper elevation={0}
-                    sx={{ border: `0.5px solid ${BORDER}`, borderRadius: "12px", p: 2, bgcolor: "#fff" }}>
-                    <DeliveryEstimator
-                      productId={product._id}
-                      isCustomizable={product.isCustomizable}
-                      processingDaysMin={product.processingDaysMin}
-                      processingDaysMax={product.processingDaysMax}
-                    />
-                  </Paper>
+                  <Box sx={{ mt: 2.5 }}>
+                    <Divider sx={{ borderColor: BORDER, mb: 2.5 }} />
+                  </Box>
 
-                  {/* Trust badges 2×2 with dividers */}
-                  <TrustGrid />
+                  {/* ── GROUP 5: Delivery + Trust ─────────────────────────── */}
+                  <Stack spacing={2}>
+                    <Paper elevation={0}
+                      sx={{ border: `0.5px solid ${BORDER}`, borderRadius: "12px", p: 2, bgcolor: "#fff" }}>
+                      <DeliveryEstimator
+                        productId={product._id}
+                        isCustomizable={product.isCustomizable}
+                        processingDaysMin={product.processingDaysMin}
+                        processingDaysMax={product.processingDaysMax}
+                      />
+                    </Paper>
 
-                  {/* Product meta */}
-                  {(product.sku || product.category) && (
-                    <Stack direction="row" flexWrap="wrap" gap={1.5}>
-                      {product.sku && (
-                        <Typography sx={T.supporting}>
-                          <Box component="span" sx={{ fontWeight: 600, color: "text.secondary" }}>SKU:</Box> {product.sku}
-                        </Typography>
-                      )}
-                      {product.category && (
-                        <Typography sx={T.supporting}>
-                          <Box component="span" sx={{ fontWeight: 600, color: "text.secondary" }}>Category:</Box> {product.category}
-                        </Typography>
-                      )}
-                    </Stack>
-                  )}
+                    <TrustGrid />
+
+                    {/* Product meta */}
+                    {(product.sku || product.category) && (
+                      <Stack direction="row" flexWrap="wrap" gap={2} sx={{ pt: 0.5 }}>
+                        {product.sku && (
+                          <Typography sx={T.supporting}>
+                            <Box component="span" sx={{ fontWeight: 600, color: "text.secondary" }}>SKU:</Box>{" "}{product.sku}
+                          </Typography>
+                        )}
+                        {product.category && (
+                          <Typography sx={T.supporting}>
+                            <Box component="span" sx={{ fontWeight: 600, color: "text.secondary" }}>Category:</Box>{" "}{product.category}
+                          </Typography>
+                        )}
+                      </Stack>
+                    )}
+                  </Stack>
 
                 </Stack>
               </Box>

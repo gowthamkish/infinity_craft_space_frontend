@@ -104,7 +104,7 @@ function Header() {
     px: 1.5,
     py: 1,
     borderRadius: "8px",
-    background: isActive(path) ? "rgba(34,211,238,0.12)" : "transparent",
+    background: isActive(path) ? "rgba(201,168,76,0.18)" : "transparent",
     textTransform: "none",
     minWidth: 0,
     "&:hover": {
@@ -298,7 +298,7 @@ function Header() {
               onClick={() => { navigate(path); setDrawerOpen(false); }}
               sx={{
                 display: "flex", alignItems: "center", gap: 1.5,
-                background: isActive(path) ? "rgba(34,211,238,0.12)" : "transparent",
+                background: isActive(path) ? "rgba(201,168,76,0.18)" : "transparent",
                 color: isActive(path) ? ACCENT : "#e2e8f0",
                 border: "none", borderRadius: "8px", px: 2, py: 1.5,
                 cursor: "pointer", fontWeight: isActive(path) ? 600 : 500,

@@ -506,7 +506,7 @@ const ProductListing = () => {
       <Suspense fallback={<Box sx={{ height: 70 }} />}><Header /></Suspense>
 
       {/* ── Sticky search bar ───────────────────────────────────── */}
-      <Box sx={{ position: "sticky", top: 0, zIndex: 100, bgcolor: "rgba(255,255,255,0.97)", backdropFilter: "blur(10px)", borderBottom: "1px solid #e7e5e4", boxShadow: "0 1px 8px rgba(0,0,0,0.06)", px: { xs: 2, md: 4 }, py: 1.25 }}>
+      <Box sx={{ position: "sticky", top: 0, zIndex: 100, bgcolor: "rgba(255,255,255,0.97)", backdropFilter: "blur(10px)", borderBottom: "1px solid #e7e5e4", boxShadow: "0 1px 8px rgba(0,0,0,0.06)", px: { xs: 2, sm: 3, md: 4, lg: 5 }, py: 1.25 }}>
         <Stack direction="row" alignItems="center" spacing={1.5}>
           <TextField
             size="small"
@@ -556,7 +556,7 @@ const ProductListing = () => {
         position: "sticky", top: 56, zIndex: 99,
         bgcolor: "rgba(253,246,236,0.97)", backdropFilter: "blur(8px)",
         borderBottom: "1px solid #e7e5e4",
-        px: { xs: 2, md: 4 }, py: 1,
+        px: { xs: 2, sm: 3, md: 4, lg: 5 }, py: 1,
       }}>
         <Box sx={{
           overflowX: "auto",
@@ -878,7 +878,7 @@ const ProductListing = () => {
       </Popover>
 
       {/* ── Main Content ─────────────────────────────────────────── */}
-      <Box sx={{ px: { xs: 2, md: 4 }, py: 3 }}>
+      <Box sx={{ px: { xs: 2, sm: 3, md: 4, lg: 5 }, py: 3 }}>
         {/* ── products area ── */}
         <Box sx={{ minWidth: 0 }}>
 

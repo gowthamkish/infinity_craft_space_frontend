@@ -871,77 +871,77 @@ export const ShippingStep = ({
 
       {/* ── Right: compact order summary ─────────────────────────────── */}
       <Grid item xs={12} sm={5} lg={4}>
-        <Paper
-          elevation={0}
-          sx={{
-            border: `0.5px solid ${BORDER}`,
-            borderRadius: "12px",
-            bgcolor: "#fff",
-            position: { sm: "sticky" },
-            top: { sm: "24px" },
-            overflow: "hidden",
-          }}
-        >
-          <Box sx={{ px: 2.5, py: 2, borderBottom: `0.5px solid ${BORDER}` }}>
-            <Typography sx={{ fontSize: "1rem", fontWeight: 500, mb: 0.25 }}>Order Summary</Typography>
-            <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>
+        <Paper elevation={0} sx={{
+          border: `0.5px solid ${BORDER}`, borderRadius: "14px", bgcolor: "#fff",
+          position: { sm: "sticky" }, top: { sm: "24px" }, overflow: "hidden",
+        }}>
+          {/* Header */}
+          <Box sx={{ px: 2.5, pt: 2.25, pb: 2, borderBottom: `0.5px solid ${BORDER}` }}>
+            <Typography sx={{ fontSize: "1rem", fontWeight: 600, color: "#1c1917" }}>
+              Order Summary
+            </Typography>
+            <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", mt: 0.25 }}>
               {cartItems.length} item{cartItems.length !== 1 ? "s" : ""}
             </Typography>
           </Box>
 
-          <Box sx={{ p: 2.5 }}>
-            <Stack spacing={1.5} sx={{ mb: 2 }}>
+          <Box sx={{ px: 2.5, pt: 2.25, pb: 2.5 }}>
+            {/* Mini item list */}
+            <Stack spacing={1.5} sx={{ mb: 2.25 }}>
               {cartItems.map((item) => (
-                <Stack key={item.product._id} direction="row" alignItems="center" spacing={1.25}>
+                <Box key={item.product._id} sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
                   <ProductThumb product={item.product} size="xs" />
                   <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography sx={{ fontSize: "0.8125rem", fontWeight: 500 }} noWrap>
+                    <Typography sx={{ fontSize: "0.8125rem", fontWeight: 500, color: "#1c1917" }} noWrap>
                       {item.product.name}
                     </Typography>
-                    <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", display: "block" }}>
+                    <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>
                       Qty {item.quantity} × ₹{item.product.price}
                     </Typography>
                   </Box>
-                  <Typography sx={{ fontSize: "0.8125rem", fontWeight: 500, flexShrink: 0 }}>
+                  <Typography sx={{ fontSize: "0.8125rem", fontWeight: 600, color: "#1c1917", flexShrink: 0 }}>
                     ₹{item.totalPrice?.toLocaleString()}
                   </Typography>
-                </Stack>
+                </Box>
               ))}
             </Stack>
 
-            <Divider sx={{ borderColor: BORDER, mb: 2 }} />
+            <Divider sx={{ borderColor: BORDER, mb: 2.25 }} />
 
-            <Stack spacing={1.25} sx={{ width: "100%", mb: 2 }}>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
+            {/* Price breakdown */}
+            <Stack spacing={1.5} sx={{ mb: 2.25 }}>
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
                 <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>Subtotal</Typography>
                 <Typography sx={{ fontSize: "0.9375rem", fontWeight: 500 }}>₹{subtotal.toFixed(2)}</Typography>
-              </Stack>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
                 <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>Shipping</Typography>
                 {shippingRate ? (
-                  <Typography sx={{ fontSize: "0.9375rem", fontWeight: 500 }}>
+                  <Typography sx={{ fontSize: "0.9375rem", fontWeight: 500,
+                    color: shippingRate.rate === 0 ? "#16a34a" : "#1c1917" }}>
                     {shippingRate.rate === 0 ? "FREE" : `₹${shippingRate.rate}`}
                   </Typography>
                 ) : (
-                  <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", fontStyle: "italic" }}>
+                  <Typography sx={{ fontSize: "0.775rem", color: "#9ca3af", fontStyle: "italic" }}>
                     Enter PIN to calculate
                   </Typography>
                 )}
-              </Stack>
+              </Box>
             </Stack>
 
-            <Divider sx={{ borderColor: BORDER, mb: 2 }} />
+            <Divider sx={{ borderColor: BORDER, mb: 2.25 }} />
 
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: "100%" }}>
-              <Typography sx={{ fontSize: "1rem", fontWeight: 500 }}>Total</Typography>
-              <Typography sx={{ fontSize: "1.25rem", fontWeight: 600, color: P }}>
+            {/* Total */}
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+              <Typography sx={{ fontSize: "1rem", fontWeight: 600, color: "#1c1917" }}>Total</Typography>
+              <Typography sx={{ fontSize: "1.3125rem", fontWeight: 700, color: P }}>
                 ₹{displayTotal.toFixed(2)}
               </Typography>
-            </Stack>
+            </Box>
 
             {!shippingRate && (
-              <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", mt: 1.5, fontStyle: "italic" }}>
-                Shipping calculated at next step
+              <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", mt: 1.25, fontStyle: "italic" }}>
+                Final total shown after PIN entry
               </Typography>
             )}
           </Box>

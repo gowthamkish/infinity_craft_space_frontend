@@ -70,7 +70,7 @@ export default function Footer() {
         elevation={0}
         sx={{ bgcolor: "#FDF6EC", borderRadius: 0, borderTop: "1px solid #EAD9C5", borderBottom: "1px solid #EAD9C5" }}
       >
-        <Box sx={{ px: { xs: 3, sm: 6, md: 10, lg: 14 }, py: { xs: 3, md: 4 } }}>
+        <Box sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, sm: 4, md: 6 }, py: { xs: 3, md: 4 } }}>
           <Grid container spacing={3} sx={{ justifyContent: "center" }}>
             {TRUST_ITEMS.map(({ icon: Icon, label, sub, color }) => (
               <Grid key={label} size={{ xs: 12, sm: 4 }}>
@@ -117,7 +117,7 @@ export default function Footer() {
         <Grid
           container
           spacing={{ xs: 5, md: 6 }}
-          sx={{ px: { xs: 3, sm: 6, md: 10, lg: 14 }, pt: { xs: 5, md: 8 }, pb: { xs: 5, md: 7 } }}
+          sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, sm: 4, md: 6 }, pt: { xs: 5, md: 8 }, pb: { xs: 5, md: 7 } }}
         >
           {/* Brand column */}
           <Grid size={{ xs: 12, md: 4.5 }}>
@@ -319,7 +319,7 @@ export default function Footer() {
           alignItems="center"
           justifyContent="space-between"
           gap={1.5}
-          sx={{ px: { xs: 3, sm: 6, md: 10, lg: 14 }, py: 2.5 }}
+          sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, sm: 4, md: 6 }, py: 2.5 }}
         >
           <Typography variant="caption" sx={{ color: "#475569", fontSize: "0.8rem" }}>
             © {new Date().getFullYear()}{" "}
