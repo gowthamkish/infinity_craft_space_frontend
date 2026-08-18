@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
 import {
   Box,
   Grid,
@@ -11,6 +12,8 @@ import {
   Avatar,
   Chip,
   Alert,
+  Collapse,
+  TextField,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -23,6 +26,8 @@ import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined
 import ReplayOutlinedIcon from "@mui/icons-material/ReplayOutlined";
 import CouponInput from "../../components/CouponInput";
 import { isCustomItem } from "../../components/CheckoutDeliveryPanel";
+import { updateCartItemNote } from "../../features/cartSlice";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import api from "../../api/axios";
 
 const P = "#8b2252";
@@ -82,11 +87,21 @@ function FreeShippingBar({ subtotal }) {
 
 /* ── Cart item row ─────────────────────────────────────────────────── */
 function CartItemRow({ item, handleQuantityChange, handleRemoveItem, isLast }) {
+  const dispatch = useDispatch();
   const atMax = item.product.trackInventory !== false && item.quantity >= item.product.stock;
   const lowStock =
     item.product.trackInventory !== false &&
     item.product.stock <= (item.product.lowStockThreshold || 5) &&
     item.product.stock > 0;
+
+  const isCustom = isCustomItem(item);
+  const [noteOpen, setNoteOpen] = useState(isCustom && !item.customNote);
+  const [noteValue, setNoteValue] = useState(item.customNote || "");
+
+  const handleNoteSave = () => {
+    dispatch(updateCartItemNote({ productId: item.product._id, customNote: noteValue.trim() }));
+    setNoteOpen(false);
+  };
 
   return (
     <>
@@ -102,7 +117,7 @@ function CartItemRow({ item, handleQuantityChange, handleRemoveItem, isLast }) {
               <Typography sx={{ fontSize: "0.9rem", fontWeight: 600, lineHeight: 1.35, color: "#1c1917" }}>
                 {item.product.name}
               </Typography>
-              {isCustomItem(item) && (
+              {isCustom && (
                 <Chip label="Handcrafted · 10–12 days" size="small"
                   sx={{ mt: 0.5, bgcolor: "#fff7ed", color: "#c2410c",
                     border: "1px solid #fed7aa", height: 18, fontSize: "0.68rem" }} />
@@ -122,6 +137,76 @@ function CartItemRow({ item, handleQuantityChange, handleRemoveItem, isLast }) {
             <Typography sx={{ fontSize: "0.75rem", color: "#d97706", fontWeight: 500, mb: 0.5 }}>
               Only {item.product.stock} left
             </Typography>
+          )}
+
+          {/* Personalization section for customizable items */}
+          {isCustom && (
+            <Box sx={{ mt: 1 }}>
+              {!noteOpen && (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  {item.customNote ? (
+                    <Box sx={{ flex: 1, bgcolor: "#fff7ed", border: "1px solid #fed7aa",
+                      borderRadius: "8px", px: 1.25, py: 0.75 }}>
+                      <Typography sx={{ fontSize: "0.75rem", color: "#92400e", lineHeight: 1.5 }}>
+                        {item.customNote}
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", fontStyle: "italic" }}>
+                      No personalization added
+                    </Typography>
+                  )}
+                  <Button size="small" onClick={() => { setNoteValue(item.customNote || ""); setNoteOpen(true); }}
+                    startIcon={<EditOutlinedIcon sx={{ fontSize: "13px !important" }} />}
+                    sx={{ fontSize: "0.75rem", color: P, textTransform: "none", fontWeight: 500,
+                      p: "2px 8px", borderRadius: "8px", flexShrink: 0,
+                      "&:hover": { bgcolor: P_LIGHT } }}>
+                    {item.customNote ? "Edit" : "Personalize"}
+                  </Button>
+                </Box>
+              )}
+              <Collapse in={noteOpen}>
+                <Box sx={{ mt: 0.75, p: 1.5, bgcolor: "#fffbf5", border: `1px solid #fed7aa`,
+                  borderRadius: "10px" }}>
+                  <Typography sx={{ fontSize: "0.75rem", fontWeight: 600, color: "#92400e", mb: 0.75 }}>
+                    ✦ Personalize This Item
+                  </Typography>
+                  <TextField
+                    fullWidth multiline minRows={2} maxRows={4}
+                    placeholder="Add your personalization instructions (e.g. name, colour, message…)"
+                    value={noteValue}
+                    onChange={(e) => setNoteValue(e.target.value.slice(0, 300))}
+                    size="small"
+                    sx={{
+                      mb: 1,
+                      "& .MuiOutlinedInput-root": { borderRadius: "8px", fontSize: "0.8125rem",
+                        bgcolor: "#fff", "& fieldset": { borderColor: "#fed7aa" },
+                        "&:hover fieldset": { borderColor: "#f97316" },
+                        "&.Mui-focused fieldset": { borderColor: "#f97316" } },
+                    }}
+                  />
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <Typography sx={{ fontSize: "0.7rem", color: "#9ca3af" }}>
+                      {noteValue.length}/300
+                    </Typography>
+                    <Stack direction="row" spacing={1}>
+                      <Button size="small" onClick={() => setNoteOpen(false)}
+                        sx={{ fontSize: "0.75rem", color: "#6b7280", textTransform: "none",
+                          p: "2px 10px", borderRadius: "8px" }}>
+                        Cancel
+                      </Button>
+                      <Button size="small" variant="contained" onClick={handleNoteSave}
+                        sx={{ fontSize: "0.75rem", textTransform: "none", fontWeight: 600,
+                          p: "2px 12px", borderRadius: "8px",
+                          bgcolor: "#f97316", "&:hover": { bgcolor: "#ea6c0a" },
+                          boxShadow: "none" }}>
+                        Save
+                      </Button>
+                    </Stack>
+                  </Box>
+                </Box>
+              </Collapse>
+            </Box>
           )}
 
           {/* Bottom row: stepper + remove */}
@@ -287,6 +372,9 @@ export const CartReviewStep = ({
                 <Typography sx={{ fontSize: "0.8125rem" }}>
                   <strong>Handcrafted Items:</strong> Made-to-order items take{" "}
                   <strong>10–12 business days</strong> to prepare before dispatch.
+                  {cartItems.some((i) => isCustomItem(i) && !i.customNote) && (
+                    <> Add your personalization details below for each item.</>
+                  )}
                 </Typography>
               </Alert>
             </Box>

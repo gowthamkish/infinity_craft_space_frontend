@@ -127,6 +127,14 @@ const cartSlice = createSlice({
       }
     },
 
+    updateCartItemNote: (state, action) => {
+      const { productId, customNote } = action.payload;
+      const existing = state.items.find((item) => item.product._id === productId);
+      if (existing) {
+        existing.customNote = customNote || undefined;
+      }
+    },
+
     updateCartItemQuantity: (state, action) => {
       const { productId, quantity } = action.payload;
       const existing = state.items.find(
@@ -228,6 +236,7 @@ export const {
   addToCart,
   removeFromCart,
   updateCartItemQuantity,
+  updateCartItemNote,
   removeItemCompletely,
   revertCartItem,
   clearCart,
