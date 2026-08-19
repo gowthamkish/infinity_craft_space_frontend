@@ -1,62 +1,99 @@
 import { useState, useEffect } from "react";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import MuiAlert from "@mui/material/Alert";
-import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
-import { FiSmartphone, FiDownload } from "react-icons/fi";
+import {
+  Dialog, DialogTitle, DialogContent, DialogActions,
+  Alert, Button, Box, Typography, Stack,
+} from "@mui/material";
+import { FiSmartphone, FiDownload, FiShare2, FiPlus } from "react-icons/fi";
+
+const P = "#8B1A4A";
+
+const IOSInstallModal = ({ open, onClose }) => (
+  <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+    <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
+      <FiSmartphone size={18} color={P} />
+      Install Infinity Craft App
+    </DialogTitle>
+    <DialogContent>
+      <Box sx={{ textAlign: "center", mb: 2.5 }}>
+        <Box
+          component="img"
+          src="/ICS_Logo.jpeg"
+          alt="App Icon"
+          sx={{ width: 80, height: 80, borderRadius: "16px", objectFit: "cover", mb: 1.5 }}
+        />
+        <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
+          Get the full app experience!
+        </Typography>
+        <Typography variant="body2" sx={{ color: "#6b7280" }}>
+          Install Infinity Craft Space on your iPhone for faster access and a better shopping experience.
+        </Typography>
+      </Box>
+
+      <Stack gap={1.5}>
+        {[
+          { step: 1, icon: FiShare2, text: <>Tap the <strong>Share</strong> button</> },
+          { step: 2, icon: FiPlus,   text: <>Select <strong>"Add to Home Screen"</strong></> },
+        ].map(({ step, icon: Icon, text }) => (
+          <Stack key={step} direction="row" alignItems="center" gap={1.5}>
+            <Box sx={{
+              width: 28, height: 28, borderRadius: "50%", bgcolor: P, color: "#fff",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "0.75rem", fontWeight: 700, flexShrink: 0,
+            }}>
+              {step}
+            </Box>
+            <Stack direction="row" alignItems="center" gap={0.75}>
+              <Typography variant="body2">{text}</Typography>
+              <Icon size={16} color="#64748b" />
+            </Stack>
+          </Stack>
+        ))}
+      </Stack>
+    </DialogContent>
+    <DialogActions sx={{ px: 3, pb: 2.5 }}>
+      <Button
+        fullWidth variant="outlined" onClick={onClose}
+        sx={{ textTransform: "none", fontWeight: 600, borderRadius: "10px", borderColor: "#d4d4d4", color: "#57534e" }}
+      >
+        Maybe Later
+      </Button>
+    </DialogActions>
+  </Dialog>
+);
 
 const PWAInstallPrompt = () => {
-  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [deferredPrompt,    setDeferredPrompt]    = useState(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [isIOS,             setIsIOS]             = useState(false);
+  const [showModal,         setShowModal]         = useState(false);
 
   useEffect(() => {
-    // Detect iOS
     const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     setIsIOS(iOS);
 
-    // Check if already installed
-    if (window.matchMedia("(display-mode: standalone)").matches) {
-      return; // Already installed
-    }
+    if (window.matchMedia("(display-mode: standalone)").matches) return;
 
-    // Listen for beforeinstallprompt event (Android/Chrome)
-    const handleBeforeInstallPrompt = (e) => {
+    const dismissed = localStorage.getItem("pwa-install-dismissed");
+    if (dismissed && Date.now() < parseInt(dismissed)) return;
+
+    const handleBeforeInstall = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
-
-      // Show prompt after 30 seconds or on user interaction
-      setTimeout(() => {
-        setShowInstallPrompt(true);
-      }, 30000);
+      setTimeout(() => setShowInstallPrompt(true), 30000);
     };
 
-    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-
-    // For iOS, show prompt after some time
+    window.addEventListener("beforeinstallprompt", handleBeforeInstall);
     if (iOS && !window.navigator.standalone) {
-      setTimeout(() => {
-        setShowInstallPrompt(true);
-      }, 45000);
+      setTimeout(() => setShowInstallPrompt(true), 45000);
     }
 
-    return () => {
-      window.removeEventListener(
-        "beforeinstallprompt",
-        handleBeforeInstallPrompt,
-      );
-    };
+    return () => window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
   }, []);
 
-  const handleInstallClick = async () => {
+  const handleInstall = async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-
       if (outcome === "accepted") {
         setDeferredPrompt(null);
         setShowInstallPrompt(false);
@@ -69,136 +106,60 @@ const PWAInstallPrompt = () => {
 
   const handleDismiss = () => {
     setShowInstallPrompt(false);
-    // Don't show again for 7 days
-    localStorage.setItem(
-      "pwa-install-dismissed",
-      Date.now() + 7 * 24 * 60 * 60 * 1000,
-    );
+    localStorage.setItem("pwa-install-dismissed", Date.now() + 7 * 24 * 60 * 60 * 1000);
   };
-
-  // Check if user previously dismissed
-  useEffect(() => {
-    const dismissed = localStorage.getItem("pwa-install-dismissed");
-    if (dismissed && Date.now() < parseInt(dismissed)) {
-      setShowInstallPrompt(false);
-    }
-  }, []);
-
-  // iOS Install Modal
-  const IOSInstallModal = () => (
-    <Dialog open={showModal} onClose={() => setShowModal(false)} maxWidth="xs" fullWidth>
-      <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        
-          <FiSmartphone className="me-2" />
-          Install Infinity Craft App
-        </DialogTitle>
-      <DialogContent>
-        <div className="text-center">
-          <div className="mb-3">
-            <img
-              src="/ICS_Logo.jpeg.png"
-              alt="App Icon"
-              width="80"
-              height="80"
-              style={{ borderRadius: "16px" }}
-            />
-          </div>
-          <h5>Get the full app experience!</h5>
-          <p className="text-muted mb-4">
-            Install Infinity Craft Space on your iPhone for faster access and a
-            better shopping experience.
-          </p>
-
-          <div className="d-flex flex-column gap-2 text-start">
-            <div className="d-flex align-items-center">
-              <span className="badge bg-primary me-3">1</span>
-              Tap the <strong>Share</strong> button
-              <svg
-                width="20"
-                height="20"
-                className="ms-2"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.50-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z" />
-              </svg>
-            </div>
-            <div className="d-flex align-items-center">
-              <span className="badge bg-primary me-3">2</span>
-              Select <strong>"Add to Home Screen"</strong>
-              <svg
-                width="20"
-                height="20"
-                className="ms-2"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </DialogContent>
-      <DialogActions sx={{ p: 2 }}>
-        <button className="ics-btn ics-btn--secondary" onClick={() => setShowModal(false)}>
-          Maybe Later
-        </button>
-      </DialogActions>
-    </Dialog>
-  );
 
   if (!showInstallPrompt) return null;
 
   return (
     <>
-      <MuiAlert
+      <Alert
         severity="info"
         onClose={handleDismiss}
-        sx={{ m: 1.5, borderRadius: "12px",
-          background: "linear-gradient(135deg, #8B1A4A 0%, #6b1238 100%)",
-          color: "white", "& .MuiAlert-icon": { color: "white" },
-          "& .MuiAlert-action": { color: "white" },
-          top: "5rem" }}
+        icon={false}
+        sx={{
+          m: 1.5, borderRadius: "12px",
+          background: `linear-gradient(135deg, ${P} 0%, #6b1238 100%)`,
+          color: "#fff",
+          "& .MuiAlert-action": { color: "rgba(255,255,255,0.7)", alignItems: "center" },
+        }}
       >
-        <div className="d-flex justify-content-between align-items-center">
-          <div className="d-flex align-items-center">
-            <div
-              className="me-3"
-              style={{
-                width: "48px",
-                height: "48px",
-                background: "rgba(255,255,255,0.2)",
-                borderRadius: "12px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <FiSmartphone size={24} />
-            </div>
-            <div>
-              <strong style={{ fontSize: "1.1rem" }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" gap={2}>
+          <Stack direction="row" alignItems="center" gap={1.75}>
+            <Box sx={{
+              width: 44, height: 44, bgcolor: "rgba(255,255,255,0.18)",
+              borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center",
+              flexShrink: 0,
+            }}>
+              <FiSmartphone size={22} />
+            </Box>
+            <Box>
+              <Typography sx={{ fontWeight: 700, fontSize: "0.9375rem", lineHeight: 1.3 }}>
                 Install Infinity Craft App
-              </strong>
-              <p className="mb-0 small opacity-90">
-                Get the full app experience with offline access and faster
-                loading!
-              </p>
-            </div>
-          </div>
-          <div className="d-flex align-items-center gap-2">
-            <button
-              className="ics-btn ics-btn--white ics-btn--sm"
-              onClick={handleInstallClick}
-            >
-              <FiDownload className="me-1" />
-              Install
-            </button>
-          </div>
-        </div>
-      </MuiAlert>
+              </Typography>
+              <Typography sx={{ fontSize: "0.8125rem", opacity: 0.85, lineHeight: 1.4, mt: 0.25 }}>
+                Get the full app experience with offline access and faster loading!
+              </Typography>
+            </Box>
+          </Stack>
+          <Button
+            size="small"
+            startIcon={<FiDownload size={14} />}
+            onClick={handleInstall}
+            sx={{
+              flexShrink: 0, textTransform: "none", fontWeight: 700,
+              bgcolor: "#fff", color: P, borderRadius: "8px",
+              px: 1.75, py: 0.625, fontSize: "0.8125rem",
+              "&:hover": { bgcolor: "rgba(255,255,255,0.9)" },
+              boxShadow: "none",
+            }}
+          >
+            Install
+          </Button>
+        </Stack>
+      </Alert>
 
-      {isIOS && <IOSInstallModal />}
+      {isIOS && <IOSInstallModal open={showModal} onClose={() => setShowModal(false)} />}
     </>
   );
 };
