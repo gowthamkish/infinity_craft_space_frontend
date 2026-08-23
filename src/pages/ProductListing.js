@@ -77,6 +77,12 @@ const ProductCard = React.memo(({
   const isLowStock   = product.trackInventory !== false && product.stock > 0 && product.stock <= (product.lowStockThreshold || 5);
   const discountPct  = product.compareAtPrice && product.compareAtPrice > product.price
     ? Math.round((1 - product.price / product.compareAtPrice) * 100) : 0;
+
+  // Products that need the detail page to make a selection before buying
+  const requiresOptionSelection =
+    (product.showHoopSizePicker && product.hoopSizes?.length > 0) ||
+    (product.showColorPickerToUsers && (product.colors || []).some((c) => c.visibleToUsers)) ||
+    product.isCustomizable;
   const rawImageUrl  = product.images?.[0]?.url || product.image?.url || product.image || null;
   const imgCount     = product.images?.length || 0;
   const { imgRef, src: imageUrl, loaded: imgLoaded, setLoaded: setImgLoaded } = useLazyImage(rawImageUrl);
@@ -99,6 +105,10 @@ const ProductCard = React.memo(({
   };
 
   const handleCart = async (fn) => {
+    if (requiresOptionSelection) {
+      navigate(`/product/${product._id}`);
+      return;
+    }
     setCartLoading(true);
     try { await Promise.resolve(fn(product)); } catch { /* ignore */ }
     finally { setCartLoading(false); }
@@ -321,7 +331,7 @@ const ProductCard = React.memo(({
               fullWidth
               onClick={() => handleCart(onAddToCart)}
               disabled={cartLoading}
-              startIcon={cartLoading ? null : <FiShoppingCart size={13} />}
+              startIcon={cartLoading ? null : requiresOptionSelection ? <FiEye size={13} /> : <FiShoppingCart size={13} />}
               sx={{
                 borderRadius: "8px", textTransform: "none", fontSize: "0.8rem", fontWeight: 700, py: 0.875,
                 background: `linear-gradient(135deg, ${ROSE} 0%, #7a1640 100%)`,
@@ -329,7 +339,7 @@ const ProductCard = React.memo(({
                 "&:hover": { background: "linear-gradient(135deg, #7a1640 0%, #5e1232 100%)" },
               }}
             >
-              {cartLoading ? <CircularProgress size={14} color="inherit" /> : "Add to Cart"}
+              {cartLoading ? <CircularProgress size={14} color="inherit" /> : requiresOptionSelection ? "Select Options" : "Add to Cart"}
             </Button>
           )}
 

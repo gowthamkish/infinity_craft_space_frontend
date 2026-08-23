@@ -800,7 +800,7 @@ const ProductDetail = () => {
                           </Typography>
                         )}
                       </Box>
-                      <Stack direction="row" flexWrap="wrap" gap={1}>
+                      <Stack direction="row" flexWrap="wrap" spacing={1.5} useFlexGap>
                         {[...product.hoopSizes].sort((a, b) => a - b).map((size) => (
                           <Box
                             key={size}
@@ -809,20 +809,21 @@ const ProductDetail = () => {
                             aria-pressed={selectedHoopSize === size}
                             aria-label={`Select ${size} inch hoop`}
                             sx={{
-                              width: 56, height: 56, borderRadius: "10px", cursor: "pointer",
+                              width: 64, height: 64, borderRadius: "12px", cursor: "pointer",
                               display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                              gap: "2px",
                               border: `2px solid ${selectedHoopSize === size ? PRIMARY : "rgba(0,0,0,0.12)"}`,
-                              bgcolor: selectedHoopSize === size ? PRIMARY_BG : "#fff",
-                              boxShadow: selectedHoopSize === size ? `0 0 0 2px rgba(139,26,74,0.18)` : "0 1px 3px rgba(0,0,0,0.08)",
-                              transition: "all 140ms",
+                              bgcolor: selectedHoopSize === size ? PRIMARY_BG : "#fafafa",
+                              boxShadow: selectedHoopSize === size ? `0 0 0 3px rgba(139,26,74,0.15)` : "0 1px 4px rgba(0,0,0,0.07)",
+                              transition: "all 150ms ease",
                               p: 0,
-                              "&:hover": { borderColor: PRIMARY, bgcolor: PRIMARY_BG },
+                              "&:hover": { borderColor: PRIMARY, bgcolor: PRIMARY_BG, transform: "translateY(-1px)", boxShadow: "0 4px 12px rgba(139,26,74,0.15)" },
                             }}
                           >
-                            <Typography sx={{ fontWeight: 800, fontSize: "1rem", color: selectedHoopSize === size ? PRIMARY : "text.primary", lineHeight: 1 }}>
+                            <Typography sx={{ fontWeight: 800, fontSize: "1.0625rem", color: selectedHoopSize === size ? PRIMARY : "text.primary", lineHeight: 1 }}>
                               {size}"
                             </Typography>
-                            <Typography sx={{ fontSize: "0.6rem", color: selectedHoopSize === size ? PRIMARY : "text.disabled", fontWeight: 500, mt: 0.25 }}>
+                            <Typography sx={{ fontSize: "0.62rem", color: selectedHoopSize === size ? PRIMARY : "text.disabled", fontWeight: 600, letterSpacing: "0.03em" }}>
                               inch
                             </Typography>
                           </Box>
