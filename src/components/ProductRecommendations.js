@@ -93,13 +93,13 @@ const ProductRecommendations = ({
   }
 
   return (
-    <Box component="section" sx={{ py: 6, backgroundColor: BRAND.charcoal[50] }}>
+    <Box component="section" sx={{ py: 6, px: { xs: 2, sm: 3, md: 4 }, backgroundColor: BRAND.charcoal[50] }}>
       <Box
         sx={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          mb: 3,
+          mb: 4,
         }}
       >
         <Typography
@@ -125,9 +125,9 @@ const ProductRecommendations = ({
         </Box>
       </Box>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={{ xs: 2, sm: 3 }}>
         {products.map((product) => (
-          <Grid item key={product._id} xs={12} sm={6} lg={3}>
+          <Grid item key={product._id} xs={12} sm={6} md={4} lg={3}>
             <ProductRecommendationCard product={product} />
           </Grid>
         ))}

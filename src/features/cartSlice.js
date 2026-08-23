@@ -92,9 +92,11 @@ const cartSlice = createSlice({
   },
   reducers: {
     addToCart: (state, action) => {
-      const { product, quantity, customNote } = action.payload;
+      const { product, quantity, customNote, selectedHoopSize } = action.payload;
       const existing = state.items.find(
-        (item) => item.product._id === product._id,
+        (item) =>
+          item.product._id === product._id &&
+          (item.selectedHoopSize ?? null) === (selectedHoopSize ?? null),
       );
       if (existing) {
         existing.quantity += quantity;
@@ -106,6 +108,7 @@ const cartSlice = createSlice({
           quantity,
           totalPrice: product.price * quantity,
           ...(customNote ? { customNote } : {}),
+          ...(selectedHoopSize != null ? { selectedHoopSize } : {}),
         });
       }
     },

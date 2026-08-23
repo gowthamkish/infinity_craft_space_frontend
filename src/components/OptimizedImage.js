@@ -72,7 +72,7 @@ const OptimizedImage = memo(
 
     const imageStyle = {
       ...style,
-      display: imageLoading ? "none" : "block",
+      opacity: imageLoading ? 0 : 1,
       transition: "opacity 0.3s ease",
     };
 

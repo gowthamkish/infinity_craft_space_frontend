@@ -943,6 +943,11 @@ const AddProduct = () => {
   const [colors,           setColors]           = useState([]);
   const [showColorPicker,  setShowColorPicker]  = useState(false);
   const [stockErrors,      setStockErrors]      = useState({});
+  const [hoopSizes,        setHoopSizes]        = useState([]);
+  const [showHoopPicker,   setShowHoopPicker]   = useState(false);
+
+  const HOOP_SIZE_OPTIONS = [6, 8, 10, 12];
+  const isHoopCategory = /hoop/i.test(form.category);
 
   const [weightUnit,     setWeightUnit]     = useState("g");
   const [editingId]                         = useState(params?.id ?? null);
@@ -1035,6 +1040,8 @@ const AddProduct = () => {
         ...form,
         colors: colors.map(({ id, ...c }) => c),
         showColorPickerToUsers: showColorPicker,
+        hoopSizes: isHoopCategory ? hoopSizes : [],
+        showHoopSizePicker: isHoopCategory ? showHoopPicker : false,
       };
       if (imageFiles.length > 0) {
         setImageUploading(true);
@@ -1060,6 +1067,7 @@ const AddProduct = () => {
       if (!editingId) {
         setForm({ name: "", sku: "", price: "", compareAtPrice: "", description: "", category: "", subCategory: "", stock: "", lowStockThreshold: "5", trackInventory: true, estimatedDelivery: "5", weightInGrams: "500", isCustomizable: false, processingDaysMin: "10", processingDaysMax: "12" });
         setColors([]); setShowColorPicker(false); setStockErrors({});
+        setHoopSizes([]); setShowHoopPicker(false);
         removeAllImages();
       }
       setTimeout(() => navigate("/admin/products"), 1500);
@@ -1092,6 +1100,10 @@ const AddProduct = () => {
       if (product.colors?.length > 0) {
         setColors(product.colors.map((c, i) => ({ ...c, id: c.id || genId(), sortOrder: c.sortOrder ?? i })));
         setShowColorPicker(product.showColorPickerToUsers ?? false);
+      }
+      if (product.hoopSizes?.length > 0) {
+        setHoopSizes(product.hoopSizes);
+        setShowHoopPicker(product.showHoopSizePicker ?? false);
       }
       if (product.images?.length > 0) setExistingImages(product.images);
       else if (product.image?.url) setExistingImages([{ url: product.image.url, originalName: product.image.originalName || "image.jpg", isPrimary: true }]);
@@ -1270,6 +1282,85 @@ const AddProduct = () => {
                   stockErrors={stockErrors}
                   setStockErrors={setStockErrors}
                 />
+
+                {/* ── Hoop Size Options (Embroidery Hoop category only) ── */}
+                {isHoopCategory && (
+                  <Card elevation={0} sx={{ border: `1px solid ${BORDER}`, borderRadius: "16px", bgcolor: "#fff", overflow: "visible" }}>
+                    <CardContent sx={{ p: 3, "&:last-child": { pb: 3 } }}>
+                      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+                        <Stack direction="row" alignItems="center" spacing={1.25}>
+                          <Box sx={{
+                            width: 34, height: 34, borderRadius: "9px", bgcolor: `${P}12`,
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                          }}>
+                            <FiSettings size={15} style={{ color: P }} />
+                          </Box>
+                          <Box>
+                            <Typography sx={{ fontWeight: 700, fontSize: "0.9375rem", color: "#0f172a", lineHeight: 1.1 }}>
+                              Hoop Sizes
+                            </Typography>
+                            <Typography sx={{ fontSize: "0.72rem", color: "#94a3b8" }}>
+                              Select which inch sizes are available for this product
+                            </Typography>
+                          </Box>
+                        </Stack>
+                        <Stack direction="row" alignItems="center" spacing={0.75}>
+                          <Typography sx={{ fontSize: "0.8125rem", color: "#374151", fontWeight: 500 }}>
+                            Show size picker to customers
+                          </Typography>
+                          <Switch
+                            size="small"
+                            checked={showHoopPicker}
+                            onChange={(e) => setShowHoopPicker(e.target.checked)}
+                            sx={SWITCH_SX}
+                          />
+                        </Stack>
+                      </Stack>
+
+                      <Stack direction="row" flexWrap="wrap" gap={1.5}>
+                        {HOOP_SIZE_OPTIONS.map((size) => {
+                          const selected = hoopSizes.includes(size);
+                          return (
+                            <Box
+                              key={size}
+                              onClick={() => setHoopSizes((prev) =>
+                                selected ? prev.filter((s) => s !== size) : [...prev, size]
+                              )}
+                              sx={{
+                                width: 64, height: 64, borderRadius: "12px", cursor: "pointer",
+                                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                                border: `2px solid ${selected ? P : BORDER}`,
+                                bgcolor: selected ? P_LIGHT : "#fafbfc",
+                                transition: "all 0.15s",
+                                "&:hover": { borderColor: P, bgcolor: P_LIGHT },
+                              }}
+                            >
+                              <Typography sx={{ fontWeight: 800, fontSize: "1.125rem", color: selected ? P : "#374151", lineHeight: 1 }}>
+                                {size}"
+                              </Typography>
+                              <Typography sx={{ fontSize: "0.65rem", color: selected ? P : "#94a3b8", fontWeight: 500, mt: 0.25 }}>
+                                inch
+                              </Typography>
+                            </Box>
+                          );
+                        })}
+                      </Stack>
+
+                      {hoopSizes.length === 0 && (
+                        <Typography sx={{ mt: 1.5, fontSize: "0.75rem", color: "#94a3b8" }}>
+                          No sizes selected — size picker will not appear to customers
+                        </Typography>
+                      )}
+                      {hoopSizes.length > 0 && !showHoopPicker && (
+                        <Box sx={{ mt: 1.5, p: 1.25, bgcolor: "#fffbeb", border: "1px solid #fde68a", borderRadius: "8px" }}>
+                          <Typography sx={{ fontSize: "0.75rem", color: "#92400e" }}>
+                            Sizes saved but size picker is hidden from customers. Enable the toggle above to show it.
+                          </Typography>
+                        </Box>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
 
                 {/* ── Product Images ────────────────────────────────── */}
                 <SC>

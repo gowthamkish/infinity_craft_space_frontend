@@ -247,6 +247,7 @@ const ProductDetail = () => {
   const [linkCopied, setLinkCopied] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [selectedColor, setSelectedColor] = useState(null);
+  const [selectedHoopSize, setSelectedHoopSize] = useState(null);
   const thumbsRef = useRef(null);
 
   useEffect(() => {
@@ -302,6 +303,11 @@ const ProductDetail = () => {
   }, [product]);
 
   useEffect(() => {
+    if (!product?.showHoopSizePicker || !product?.hoopSizes?.length) return;
+    setSelectedHoopSize(product.hoopSizes[0]);
+  }, [product]);
+
+  useEffect(() => {
     if (!thumbsRef.current) return;
     const active = thumbsRef.current.querySelector("[data-active='true']");
     active?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
@@ -309,9 +315,18 @@ const ProductDetail = () => {
 
   const handleAddToCart = async () => {
     if (!product) return;
+    if (product.showHoopSizePicker && product.hoopSizes?.length > 0 && !selectedHoopSize) {
+      addSuccess("Please select a hoop size before adding to cart.", "Select size");
+      return;
+    }
     setAddingToCart(true);
     try {
-      dispatch(addToCart({ product, quantity, customNote: customNote.trim() || undefined }));
+      dispatch(addToCart({
+        product,
+        quantity,
+        customNote: customNote.trim() || undefined,
+        selectedHoopSize: product.showHoopSizePicker ? selectedHoopSize : undefined,
+      }));
       addSuccess(`${product.name} added to cart!`, "Added to Cart");
     } finally {
       setAddingToCart(false);
@@ -771,6 +786,50 @@ const ProductDetail = () => {
                       </Box>
                     );
                   })()}
+
+                  {/* Hoop size selector */}
+                  {product.showHoopSizePicker && product.hoopSizes?.length > 0 && (
+                    <Box sx={{ mb: 2.5 }}>
+                      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
+                        <Typography sx={{ fontSize: "0.8125rem", fontWeight: 600, color: "text.secondary" }}>
+                          Hoop Size
+                        </Typography>
+                        {selectedHoopSize && (
+                          <Typography sx={{ fontSize: "0.8125rem", fontWeight: 600, color: "text.primary" }}>
+                            {selectedHoopSize}" inch
+                          </Typography>
+                        )}
+                      </Box>
+                      <Stack direction="row" flexWrap="wrap" gap={1}>
+                        {[...product.hoopSizes].sort((a, b) => a - b).map((size) => (
+                          <Box
+                            key={size}
+                            component="button"
+                            onClick={() => setSelectedHoopSize(size)}
+                            aria-pressed={selectedHoopSize === size}
+                            aria-label={`Select ${size} inch hoop`}
+                            sx={{
+                              width: 56, height: 56, borderRadius: "10px", cursor: "pointer",
+                              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                              border: `2px solid ${selectedHoopSize === size ? PRIMARY : "rgba(0,0,0,0.12)"}`,
+                              bgcolor: selectedHoopSize === size ? PRIMARY_BG : "#fff",
+                              boxShadow: selectedHoopSize === size ? `0 0 0 2px rgba(139,26,74,0.18)` : "0 1px 3px rgba(0,0,0,0.08)",
+                              transition: "all 140ms",
+                              p: 0,
+                              "&:hover": { borderColor: PRIMARY, bgcolor: PRIMARY_BG },
+                            }}
+                          >
+                            <Typography sx={{ fontWeight: 800, fontSize: "1rem", color: selectedHoopSize === size ? PRIMARY : "text.primary", lineHeight: 1 }}>
+                              {size}"
+                            </Typography>
+                            <Typography sx={{ fontSize: "0.6rem", color: selectedHoopSize === size ? PRIMARY : "text.disabled", fontWeight: 500, mt: 0.25 }}>
+                              inch
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Stack>
+                    </Box>
+                  )}
 
                   {/* Bulk discounts */}
                   {product.bulkDiscounts?.length > 0 && (
