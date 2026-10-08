@@ -1,38 +1,57 @@
 {
+  "id": "/",
   "short_name": "Infinity Craft",
   "name": "Infinity Craft Space",
   "description": "Your one-stop craft marketplace - Browse, shop and manage your craft supplies",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "favicon.png",
+      "src": "/icons/icon-192.png",
       "type": "image/png",
       "sizes": "192x192",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "ICS_Logo.jpeg",
-      "type": "image/jpeg",
-      "sizes": "512x512"
+      "src": "/icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/maskable-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
     }
   ],
-  "start_url": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
   "theme_color": "#8B1A4A",
   "background_color": "#fdf8f5",
-  "orientation": "portrait-primary",
-  "scope": "/",
-  "categories": ["shopping", "business", "lifestyle"],
-  "screenshots": [
+  "lang": "en-IN",
+  "dir": "ltr",
+  "categories": ["shopping", "lifestyle"],
+  "prefer_related_applications": false,
+  "shortcuts": [
     {
-      "src": "ICS_Logo.jpeg",
-      "sizes": "512x512",
-      "type": "image/png",
-      "form_factor": "wide"
+      "name": "Shop Products",
+      "short_name": "Shop",
+      "url": "/products?source=pwa",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "My Orders",
+      "short_name": "Orders",
+      "url": "/orders?source=pwa",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

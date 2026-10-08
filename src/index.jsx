@@ -38,10 +38,20 @@ root.render(
 );
 
 // Register service worker only in production builds to avoid caching during development
-if (import.meta.env.VITE_ENV === "production" && "serviceWorker" in navigator) {
+// Chrome fires beforeinstallprompt once, possibly before the lazy-loaded
+// PWAInstallPrompt mounts — stash it so the banner can still use it.
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  window.__pwaInstallEvent = e;
+});
+
+// (Required for the app to be installable as a PWA on Android/iOS.)
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
-      const registration = await navigator.serviceWorker.register("/sw.js");
+      const registration = await navigator.serviceWorker.register("/sw.js", {
+        updateViaCache: "none",
+      });
       console.log(
         "Service Worker registered successfully:",
         registration.scope,

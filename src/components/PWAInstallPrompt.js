@@ -68,31 +68,52 @@ const PWAInstallPrompt = () => {
   const [showModal,         setShowModal]         = useState(false);
 
   useEffect(() => {
-    const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    // iPadOS 13+ reports itself as "Macintosh", so also check for touch support
+    const iOS =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
     setIsIOS(iOS);
 
-    if (window.matchMedia("(display-mode: standalone)").matches) return;
+    const standalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.navigator.standalone === true;
+    if (standalone) return;
 
-    const dismissed = localStorage.getItem("pwa-install-dismissed");
-    if (dismissed && Date.now() < parseInt(dismissed)) return;
+    try {
+      const dismissed = localStorage.getItem("pwa-install-dismissed");
+      if (dismissed && Date.now() < parseInt(dismissed)) return;
+    } catch {
+      /* storage unavailable — show the prompt anyway */
+    }
 
+    let timer;
     const handleBeforeInstall = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      setTimeout(() => setShowInstallPrompt(true), 30000);
+      timer = setTimeout(() => setShowInstallPrompt(true), 15000);
+    };
+    const handleInstalled = () => {
+      setDeferredPrompt(null);
+      setShowInstallPrompt(false);
     };
 
+    if (window.__pwaInstallEvent) handleBeforeInstall(window.__pwaInstallEvent);
     window.addEventListener("beforeinstallprompt", handleBeforeInstall);
-    if (iOS && !window.navigator.standalone) {
-      setTimeout(() => setShowInstallPrompt(true), 45000);
-    }
+    window.addEventListener("appinstalled", handleInstalled);
+    // iOS has no install event — Safari users add it via Share → Add to Home Screen
+    if (iOS) timer = setTimeout(() => setShowInstallPrompt(true), 20000);
 
-    return () => window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
+      window.removeEventListener("appinstalled", handleInstalled);
+    };
   }, []);
 
   const handleInstall = async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
+      window.__pwaInstallEvent = null; // a prompt event can only be used once
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === "accepted") {
         setDeferredPrompt(null);
@@ -106,7 +127,11 @@ const PWAInstallPrompt = () => {
 
   const handleDismiss = () => {
     setShowInstallPrompt(false);
-    localStorage.setItem("pwa-install-dismissed", Date.now() + 7 * 24 * 60 * 60 * 1000);
+    try {
+      localStorage.setItem("pwa-install-dismissed", Date.now() + 7 * 24 * 60 * 60 * 1000);
+    } catch {
+      /* ignore */
+    }
   };
 
   if (!showInstallPrompt) return null;
@@ -118,7 +143,10 @@ const PWAInstallPrompt = () => {
         onClose={handleDismiss}
         icon={false}
         sx={{
-          m: 1.5, borderRadius: "12px",
+          position: "fixed", left: 12, right: 12, bottom: 16, zIndex: 1400,
+          maxWidth: 520, mx: "auto",
+          boxShadow: "0 8px 28px rgba(0,0,0,0.25)",
+          borderRadius: "12px",
           background: `linear-gradient(135deg, ${P} 0%, #6b1238 100%)`,
           color: "#fff",
           "& .MuiAlert-action": { color: "rgba(255,255,255,0.7)", alignItems: "center" },
@@ -138,7 +166,7 @@ const PWAInstallPrompt = () => {
                 Install Infinity Craft App
               </Typography>
               <Typography sx={{ fontSize: "0.8125rem", opacity: 0.85, lineHeight: 1.4, mt: 0.25 }}>
-                Get the full app experience with offline access and faster loading!
+                Add it to your home screen for faster, app-like shopping.
               </Typography>
             </Box>
           </Stack>

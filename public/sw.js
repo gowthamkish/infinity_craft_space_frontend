@@ -1,108 +1,112 @@
-// Service Worker for performance optimization
-const CACHE_NAME = "infinity-craft-v1";
-const API_CACHE_NAME = "infinity-craft-api-v1";
-const DEVELOPMENT_MODE =
-  !location.hostname.includes("production") &&
-  (location.hostname === "localhost" || location.hostname === "127.0.0.1");
+// Service Worker — makes Infinity Craft Space installable and resilient offline.
+//
+// Strategy:
+//  - Page navigations: network-first, falling back to the cached app shell,
+//    then to /offline.html. Users always get the latest deploy when online.
+//  - Vite hashed assets (/assets/*-[hash].*): cache-first (filenames change per build).
+//  - Icons / images / fonts on our origin: stale-while-revalidate.
+//  - API calls (cross-origin backend) and non-GET requests are never touched,
+//    so auth, cart and payment always hit the network.
+//
+// Bump VERSION to force old caches to be cleared.
+const VERSION = "v2";
+const SHELL_CACHE = `ics-shell-${VERSION}`;
+const RUNTIME_CACHE = `ics-runtime-${VERSION}`;
+const OFFLINE_URL = "/offline.html";
 
-// Assets to cache immediately
-const STATIC_ASSETS = [
+const PRECACHE = [
   "/",
-  "/static/js/bundle.js",
-  "/static/css/main.css",
+  OFFLINE_URL,
   "/manifest.json",
-  "/favicon.ico",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
 ];
 
-// API endpoints to cache
-const API_ENDPOINTS = ["/api/products", "/api/categories/public"];
-
-// Install event - cache static assets
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
-      .open(CACHE_NAME)
-      .then((cache) => cache.addAll(STATIC_ASSETS))
+      .open(SHELL_CACHE)
+      .then((cache) => cache.addAll(PRECACHE))
       .then(() => self.skipWaiting()),
   );
 });
 
-// Activate event - clean up old caches
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => {
-            if (cacheName !== CACHE_NAME && cacheName !== API_CACHE_NAME) {
-              return caches.delete(cacheName);
-            }
-          }),
-        );
-      })
+      .then((names) =>
+        Promise.all(
+          names
+            .filter((n) => n !== SHELL_CACHE && n !== RUNTIME_CACHE)
+            .map((n) => caches.delete(n)),
+        ),
+      )
       .then(() => self.clients.claim()),
   );
 });
 
-// Fetch event - implement caching strategies
+const isCacheable = (response) =>
+  response && response.status === 200 && response.type === "basic";
+
 self.addEventListener("fetch", (event) => {
   const { request } = event;
+  if (request.method !== "GET") return;
+
   const url = new URL(request.url);
+  // Leave cross-origin requests (backend API, Razorpay, analytics, Cloudinary) alone
+  if (url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith("/api/")) return;
 
-  // Skip caching HTML files and use network-first approach in development
-  if (
-    DEVELOPMENT_MODE ||
-    request.url.endsWith(".html") ||
-    url.pathname === "/"
-  ) {
-    event.respondWith(
-      fetch(request)
-        .then((response) => response)
-        .catch(() => caches.match(request)),
-    );
-    return;
-  }
-
-  // Handle API requests with network-first strategy
-  if (url.pathname.startsWith("/api/")) {
+  // SPA navigations
+  if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          // Only cache GET requests with successful responses
-          if (request.method === "GET" && response.status === 200) {
-            const responseClone = response.clone();
-            caches.open(API_CACHE_NAME).then((cache) => {
-              cache.put(request, responseClone);
-            });
+          if (isCacheable(response)) {
+            const copy = response.clone();
+            caches.open(SHELL_CACHE).then((c) => c.put("/", copy));
           }
           return response;
         })
-        .catch(() => {
-          // Fallback to cache on network failure
-          return caches.match(request);
+        .catch(async () => {
+          const cache = await caches.open(SHELL_CACHE);
+          return (await cache.match("/")) || (await cache.match(OFFLINE_URL));
         }),
     );
     return;
   }
 
-  // Handle static assets with cache-first strategy (production only)
-  if (request.method === "GET" && !DEVELOPMENT_MODE) {
+  // Hashed build assets — immutable, cache-first
+  if (url.pathname.startsWith("/assets/")) {
     event.respondWith(
-      caches.match(request).then((response) => {
-        if (response) {
-          return response;
-        }
-        return fetch(request).then((response) => {
-          // Cache non-API GET requests
-          if (response.status === 200) {
-            const responseClone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, responseClone);
-            });
-          }
-          return response;
-        });
+      caches.match(request).then(
+        (cached) =>
+          cached ||
+          fetch(request).then((response) => {
+            if (isCacheable(response)) {
+              const copy = response.clone();
+              caches.open(RUNTIME_CACHE).then((c) => c.put(request, copy));
+            }
+            return response;
+          }),
+      ),
+    );
+    return;
+  }
+
+  // Other static files (icons, images, fonts) — stale-while-revalidate
+  if (/\.(png|jpe?g|webp|svg|gif|ico|woff2?|ttf)$/i.test(url.pathname)) {
+    event.respondWith(
+      caches.open(RUNTIME_CACHE).then(async (cache) => {
+        const cached = await cache.match(request);
+        const network = fetch(request)
+          .then((response) => {
+            if (isCacheable(response)) cache.put(request, response.clone());
+            return response;
+          })
+          .catch(() => cached);
+        return cached || network;
       }),
     );
   }
@@ -110,21 +114,38 @@ self.addEventListener("fetch", (event) => {
 
 // Push notification handling
 self.addEventListener("push", (event) => {
-  if (event.data) {
-    const data = event.data.json();
-    event.waitUntil(
-      self.registration.showNotification(data.title, {
-        body: data.body,
-        icon: "/favicon.png",
-        badge: "/favicon.png",
-        tag: "infinity-craft-notification",
-      }),
-    );
+  if (!event.data) return;
+  let data;
+  try {
+    data = event.data.json();
+  } catch {
+    data = { title: "Infinity Craft Space", body: event.data.text() };
   }
+  event.waitUntil(
+    self.registration.showNotification(data.title || "Infinity Craft Space", {
+      body: data.body,
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      tag: "infinity-craft-notification",
+      data: { url: data.url || "/" },
+    }),
+  );
 });
 
-// Notification click handling
+// Focus an open app window if there is one, otherwise open a new one
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  event.waitUntil(clients.openWindow("/"));
+  const target = event.notification.data?.url || "/";
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((wins) => {
+        const win = wins.find((w) => w.url.startsWith(self.location.origin));
+        if (win) {
+          win.navigate(target);
+          return win.focus();
+        }
+        return self.clients.openWindow(target);
+      }),
+  );
 });

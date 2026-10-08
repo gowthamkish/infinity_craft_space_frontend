@@ -345,6 +345,11 @@ function App() {
                   </Suspense>
                 )}
 
+                {/* "Install app" banner (Android prompt / iOS Add to Home Screen guide) */}
+                <Suspense fallback={null}>
+                  <PWAInstallPrompt />
+                </Suspense>
+
                 {/* Idle Timeout Manager - Active globally for all authenticated users */}
                 {/* <IdleTimeoutManager /> */}
 
@@ -359,8 +364,6 @@ function App() {
                             <LoadingFallback message="Loading products..." />
                           }
                         >
-                          {/* PWA Install Prompt - Shows on mobile devices */}
-                          {/* <PWAInstallPrompt /> */}
                           <Home />
                         </Suspense>
                       </RouteErrorBoundary>
@@ -376,8 +379,6 @@ function App() {
                             <LoadingFallback message="Loading products..." />
                           }
                         >
-                          {/* PWA Install Prompt - Shows on mobile devices */}
-                          {/* <PWAInstallPrompt /> */}
                           <ProductListing />
                         </Suspense>
                       </RouteErrorBoundary>

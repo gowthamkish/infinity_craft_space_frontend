@@ -68,3 +68,9 @@
   Cache-Control: public, max-age=86400
 /sitemap.xml
   Cache-Control: public, max-age=86400
+
+# PWA files must be revalidated so updates reach installed apps
+/offline.html
+  Cache-Control: no-cache
+/icons/*
+  Cache-Control: public, max-age=604800
