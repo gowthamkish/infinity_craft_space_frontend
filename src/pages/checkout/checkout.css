@@ -465,7 +465,7 @@
 }
 
 .co-summary-head {
-  background: linear-gradient(135deg, var(--rose-900, #4a0d25) 0%, var(--charcoal-900, #232420) 100%);
+  background: linear-gradient(135deg, var(--rose-900, #8a3322) 0%, var(--charcoal-900, #232420) 100%);
   padding: 16px 20px;
 }
 

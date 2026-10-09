@@ -624,7 +624,7 @@
 
 /* Card header strips → brand purple */
 .account-card-header--address {
-  background: linear-gradient(135deg, var(--rose-900, #4a0d26), var(--primary-dark, #b8412a)) !important;
+  background: linear-gradient(135deg, var(--rose-900, #8a3322), var(--primary-dark, #b8412a)) !important;
 }
 .account-card-header--wishlist {
   background: linear-gradient(135deg, var(--primary-dark, #b8412a), var(--primary, #d24e33)) !important;
@@ -654,7 +654,7 @@
 
 /* Modal header → brand purple */
 .acct-modal-header {
-  background: linear-gradient(135deg, var(--rose-900, #4a0d26), var(--primary-dark, #b8412a)) !important;
+  background: linear-gradient(135deg, var(--rose-900, #8a3322), var(--primary-dark, #b8412a)) !important;
 }
 
 /* Input focus → brand purple */
@@ -675,7 +675,7 @@
   box-shadow: 0 2px 8px rgba(109, 40, 217, 0.2) !important;
 }
 .acct-btn--cart:hover {
-  background: var(--rose-900, #4a0d26) !important;
+  background: var(--rose-900, #8a3322) !important;
   box-shadow: 0 4px 14px rgba(109, 40, 217, 0.28) !important;
 }
 

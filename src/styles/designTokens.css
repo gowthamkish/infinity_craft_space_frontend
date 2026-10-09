@@ -66,7 +66,7 @@
   --secondary:        var(--gold-500);
   --secondary-dark:   var(--gold-600);
   --secondary-light:  var(--gold-300);
-  --secondary-subtle: rgba(201, 168, 76, 0.10);
+  --secondary-subtle: rgba(15, 148, 136, 0.10);
 
   /* Accent / Blush */
   --accent:        var(--blush-400);

@@ -1,537 +1,259 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import {
-  Box,
-  Grid,
-  Paper,
-  Typography,
-  Button,
-  IconButton,
-  Stack,
-  Divider,
-  Avatar,
-  Chip,
-  Alert,
-  Collapse,
-  TextField,
-} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteForeverOutlined";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
-import VerifiedUserOutlinedIcon from "@mui/icons-material/VerifiedUserOutlined";
-import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
-import ReplayOutlinedIcon from "@mui/icons-material/ReplayOutlined";
+  FiShoppingBag, FiArrowRight, FiArrowLeft, FiPlus, FiMinus, FiTrash2, FiEdit2, FiTag,
+  FiLock, FiTruck, FiRefreshCw,
+} from "react-icons/fi";
 import CouponInput from "../../components/CouponInput";
 import { isCustomItem } from "../../components/CheckoutDeliveryPanel";
 import { updateCartItemNote } from "../../features/cartSlice";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { useGetRecommendationsQuery } from "../../services/productsApi";
-import { onImgError } from "../../utils/imageFallback";
+import { Thumb, Card, Alert, SummaryItems, Row, Total, MiniTrust, TRUST_MINI, HelpCard, inr, productImage } from "./ui";
+import { PLACEHOLDER_SRC, onImgError } from "../../utils/imageFallback";
 
-const P = "#d24e33";
-const P_LIGHT = "rgba(210, 78, 51,0.07)";
-const BORDER = "rgba(0,0,0,0.08)";
-
-const THUMB_COLORS = [
-  ["#10b981", "#059669"], ["#3b82f6", "#1d4ed8"], ["#f59e0b", "#d97706"],
-  ["#ef4444", "#dc2626"], ["#8b5cf6", "#7c3aed"], ["#e8623d", "#d24e33"],
-];
-
-/* ── ProductThumb ──────────────────────────────────────────────────── */
-export function ProductThumb({ product, size = "md" }) {
-  const imgUrl = product?.images?.[0]?.url || product?.image?.url || product?.image;
-  const letter = (product?.name || "?").charAt(0).toUpperCase();
-  const colors = THUMB_COLORS[letter.charCodeAt(0) % THUMB_COLORS.length];
-  const dim = size === "xs" ? 36 : size === "sm" ? 44 : 56;
-
-  return (
-    <Avatar
-      src={imgUrl || undefined}
-      alt={product?.name || ""}
-      variant="rounded"
-      sx={{
-        width: dim, height: dim, borderRadius: "10px", flexShrink: 0,
-        background: !imgUrl ? `linear-gradient(135deg, ${colors[0]}, ${colors[1]})` : undefined,
-        fontSize: dim * 0.38, fontWeight: 700,
-        border: `1px solid ${BORDER}`,
-      }}
-    >
-      {!imgUrl ? letter : undefined}
-    </Avatar>
-  );
-}
-
-/* ── Free shipping bar ─────────────────────────────────────────────── */
 const FREE_THRESHOLD = 999;
 
+/** Discount to show for an applied coupon: trust the amount the API calculated, else derive it. */
+function couponDiscount(coupon, subtotal) {
+  if (!coupon) return 0;
+  if (typeof coupon.discount === "number") return coupon.discount;
+  const isPercent = coupon.discountType === "percent" || coupon.discountType === "percentage";
+  return isPercent ? (subtotal * coupon.discountValue) / 100 : coupon.discountValue || 0;
+}
+
+/* ── Free-shipping progress ─────────────────────────────────────────────── */
 function FreeShippingBar({ subtotal }) {
   const remaining = Math.max(0, FREE_THRESHOLD - subtotal);
-  const pct = Math.min(100, (subtotal / FREE_THRESHOLD) * 100);
   const achieved = remaining === 0;
-
+  const pct = Math.min(100, (subtotal / FREE_THRESHOLD) * 100);
   return (
-    <Box sx={{ mb: 2.5 }}>
-      <Typography sx={{ fontSize: "0.75rem", mb: 0.75, fontWeight: 500,
-        color: achieved ? "#16a34a" : "#6b7280" }}>
-        {achieved ? "🎉 You've unlocked free shipping!" : `₹${Math.ceil(remaining)} away from free shipping`}
-      </Typography>
-      <Box sx={{ height: 4, borderRadius: 99, bgcolor: "#f3ede9", overflow: "hidden" }}>
-        <Box sx={{ height: "100%", width: `${pct}%`, borderRadius: 99,
-          bgcolor: achieved ? "#16a34a" : P, transition: "width 0.5s ease" }} />
-      </Box>
-    </Box>
+    <div style={{ marginBottom: 24 }}>
+      <div className="ck-ship-msg" style={{ color: achieved ? "#15803d" : "var(--ics-text)" }}>
+        {achieved ? "🎉 You've unlocked free shipping!" : `Add ${inr(remaining).replace(".00", "")} more for free shipping`}
+      </div>
+      <div className={`ck-bar ${achieved ? "ck-bar--ok" : ""}`} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)}>
+        <i style={{ width: `${pct}%` }} />
+      </div>
+    </div>
   );
 }
 
-/* ── Cart item row ─────────────────────────────────────────────────── */
-function CartItemRow({ item, handleQuantityChange, handleRemoveItem, isLast }) {
+/* ── One cart line ──────────────────────────────────────────────────────── */
+function CartItemRow({ item, handleQuantityChange, handleRemoveItem }) {
   const dispatch = useDispatch();
-  const atMax = item.product.trackInventory !== false && item.quantity >= item.product.stock;
-  const lowStock =
-    item.product.trackInventory !== false &&
-    item.product.stock <= (item.product.lowStockThreshold || 5) &&
-    item.product.stock > 0;
+  const { product } = item;
+  const tracked = product.trackInventory !== false;
+  const atMax = tracked && item.quantity >= product.stock;
+  const lowStock = tracked && product.stock <= (product.lowStockThreshold || 5) && product.stock > 0;
 
   const isCustom = isCustomItem(item);
-  const [noteOpen, setNoteOpen] = useState(isCustom && !item.customNote);
+  const [noteOpen, setNoteOpen] = useState(false);
   const [noteValue, setNoteValue] = useState(item.customNote || "");
 
-  const handleNoteSave = () => {
-    dispatch(updateCartItemNote({ productId: item.product._id, customNote: noteValue.trim() }));
+  const saveNote = () => {
+    dispatch(updateCartItemNote({ productId: product._id, customNote: noteValue.trim() }));
     setNoteOpen(false);
   };
 
   return (
-    <>
-      <Box sx={{ display: "flex", gap: 2, py: 2.25, alignItems: "flex-start" }}>
-        {/* Thumbnail */}
-        <ProductThumb product={item.product} />
+    <article className="ck-item">
+      <Thumb product={product} />
 
-        {/* Content — name + controls */}
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          {/* Top row: name + total price */}
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 1, mb: 0.5 }}>
-            <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Typography sx={{ fontSize: "0.9rem", fontWeight: 600, lineHeight: 1.35, color: "#1c1917" }}>
-                {item.product.name}
-              </Typography>
-              {isCustom && (
-                <Chip label="Handcrafted · 10–12 days" size="small"
-                  sx={{ mt: 0.5, bgcolor: "#fff7ed", color: "#c2410c",
-                    border: "1px solid #fed7aa", height: 18, fontSize: "0.68rem" }} />
-              )}
-            </Box>
-            <Typography sx={{ fontSize: "0.9375rem", fontWeight: 600, color: "#1c1917",
-              flexShrink: 0, lineHeight: 1.35 }}>
-              ₹{item.totalPrice?.toLocaleString()}
-            </Typography>
-          </Box>
+      <div style={{ minWidth: 0 }}>
+        <div className="ck-item-top">
+          <div style={{ minWidth: 0 }}>
+            <h3 className="ck-item-name">{product.name}</h3>
+            <div className="ck-meta">{inr(product.price)} per unit</div>
+          </div>
+          <div className="ck-item-price">{inr(item.totalPrice)}</div>
+        </div>
 
-          {/* Unit price */}
-          <Typography sx={{ fontSize: "0.775rem", color: "#9ca3af", mb: lowStock ? 0.25 : 0 }}>
-            ₹{item.product.price} per unit
-          </Typography>
-          {lowStock && (
-            <Typography sx={{ fontSize: "0.75rem", color: "#d97706", fontWeight: 500, mb: 0.5 }}>
-              Only {item.product.stock} left
-            </Typography>
-          )}
+        {(isCustom || lowStock) && (
+          <div className="ck-item-tags">
+            {isCustom && <span className="ck-pill ck-pill--soft">✦ Handcrafted · 10–12 days</span>}
+            {lowStock && <span className="ck-pill ck-pill--warn">Only {product.stock} left</span>}
+          </div>
+        )}
 
-          {/* Personalization section for customizable items */}
-          {isCustom && (
-            <Box sx={{ mt: 1 }}>
-              {!noteOpen && (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  {item.customNote ? (
-                    <Box sx={{ flex: 1, bgcolor: "#fff7ed", border: "1px solid #fed7aa",
-                      borderRadius: "8px", px: 1.25, py: 0.75 }}>
-                      <Typography sx={{ fontSize: "0.75rem", color: "#92400e", lineHeight: 1.5 }}>
-                        {item.customNote}
-                      </Typography>
-                    </Box>
-                  ) : (
-                    <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", fontStyle: "italic" }}>
-                      No personalization added
-                    </Typography>
-                  )}
-                  <Button size="small" onClick={() => { setNoteValue(item.customNote || ""); setNoteOpen(true); }}
-                    startIcon={<EditOutlinedIcon sx={{ fontSize: "13px !important" }} />}
-                    sx={{ fontSize: "0.75rem", color: P, textTransform: "none", fontWeight: 500,
-                      p: "2px 8px", borderRadius: "8px", flexShrink: 0,
-                      "&:hover": { bgcolor: P_LIGHT } }}>
-                    {item.customNote ? "Edit" : "Personalize"}
-                  </Button>
-                </Box>
-              )}
-              <Collapse in={noteOpen}>
-                <Box sx={{ mt: 0.75, p: 1.5, bgcolor: "#fffbf5", border: `1px solid #fed7aa`,
-                  borderRadius: "10px" }}>
-                  <Typography sx={{ fontSize: "0.75rem", fontWeight: 600, color: "#92400e", mb: 0.75 }}>
-                    ✦ Personalize This Item
-                  </Typography>
-                  <TextField
-                    fullWidth multiline minRows={2} maxRows={4}
-                    placeholder="Add your personalization instructions (e.g. name, colour, message…)"
-                    value={noteValue}
-                    onChange={(e) => setNoteValue(e.target.value.slice(0, 300))}
-                    size="small"
-                    sx={{
-                      mb: 1,
-                      "& .MuiOutlinedInput-root": { borderRadius: "8px", fontSize: "0.8125rem",
-                        bgcolor: "#fff", "& fieldset": { borderColor: "#fed7aa" },
-                        "&:hover fieldset": { borderColor: "#f97316" },
-                        "&.Mui-focused fieldset": { borderColor: "#f97316" } },
-                    }}
-                  />
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <Typography sx={{ fontSize: "0.7rem", color: "#9ca3af" }}>
-                      {noteValue.length}/300
-                    </Typography>
-                    <Stack direction="row" spacing={1}>
-                      <Button size="small" onClick={() => setNoteOpen(false)}
-                        sx={{ fontSize: "0.75rem", color: "#6b7280", textTransform: "none",
-                          p: "2px 10px", borderRadius: "8px" }}>
-                        Cancel
-                      </Button>
-                      <Button size="small" variant="contained" onClick={handleNoteSave}
-                        sx={{ fontSize: "0.75rem", textTransform: "none", fontWeight: 600,
-                          p: "2px 12px", borderRadius: "8px",
-                          bgcolor: "#f97316", "&:hover": { bgcolor: "#ea6c0a" },
-                          boxShadow: "none" }}>
-                        Save
-                      </Button>
-                    </Stack>
-                  </Box>
-                </Box>
-              </Collapse>
-            </Box>
-          )}
+        {isCustom && (
+          <>
+            {!noteOpen && (
+              <div className="ck-note-row" style={{ marginTop: 14 }}>
+                {item.customNote ? (
+                  <div className="ck-note" style={{ margin: 0, flex: 1 }}>
+                    <div className="ck-note-title">Your personalization</div>
+                    <div className="ck-note-text">{item.customNote}</div>
+                  </div>
+                ) : (
+                  <span className="ck-meta" style={{ margin: 0, fontStyle: "italic" }}>No personalization added yet</span>
+                )}
+                <button type="button" className="ck-link ck-link--ember" onClick={() => { setNoteValue(item.customNote || ""); setNoteOpen(true); }}>
+                  <FiEdit2 size={15} /> {item.customNote ? "Edit" : "Personalize"}
+                </button>
+              </div>
+            )}
+            {noteOpen && (
+              <div className="ck-note">
+                <div className="ck-note-title">✦ Personalize this item</div>
+                <textarea
+                  className="ck-textarea"
+                  rows={3}
+                  placeholder="Add your instructions — e.g. name, colour, date or a short message…"
+                  value={noteValue}
+                  onChange={(e) => setNoteValue(e.target.value.slice(0, 300))}
+                  aria-label={`Personalization for ${product.name}`}
+                />
+                <div className="ck-note-row">
+                  <span className="ck-note-count">{noteValue.length}/300</span>
+                  <span style={{ display: "flex", gap: 10 }}>
+                    <button type="button" className="ck-btn ck-btn--ghost" style={{ minHeight: 42, padding: "0 18px" }} onClick={() => setNoteOpen(false)}>Cancel</button>
+                    <button type="button" className="ck-btn ck-btn--primary" style={{ minHeight: 42, padding: "0 20px" }} onClick={saveNote}>Save</button>
+                  </span>
+                </div>
+              </div>
+            )}
+          </>
+        )}
 
-          {/* Bottom row: stepper + remove */}
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mt: 1.25 }}>
-            {/* Pill stepper */}
-            <Stack direction="row" sx={{ alignItems: "stretch",
-              border: `1.5px solid ${P}`, borderRadius: "20px", overflow: "hidden", height: 30,
-            }}>
-              <IconButton size="small"
-                onClick={() => handleQuantityChange(item.product._id, item.quantity - 1)}
-                disabled={item.quantity <= 1}
-                sx={{ width: 30, height: "100%", borderRadius: 0, color: P,
-                  "&:hover": { bgcolor: P_LIGHT }, "&.Mui-disabled": { color: "#d1d5db" } }}>
-                <RemoveIcon sx={{ fontSize: 12 }} />
-              </IconButton>
-              <Typography sx={{
-                minWidth: 30, textAlign: "center", fontSize: "0.8125rem", fontWeight: 600,
-                color: "#1c1917", display: "flex", alignItems: "center", justifyContent: "center",
-                borderLeft: `1px solid rgba(210, 78, 51,0.15)`, borderRight: `1px solid rgba(210, 78, 51,0.15)`,
-              }}>
-                {item.quantity}
-              </Typography>
-              <IconButton size="small"
-                onClick={() => handleQuantityChange(item.product._id, item.quantity + 1)}
-                disabled={atMax}
-                sx={{ width: 30, height: "100%", borderRadius: 0, color: P,
-                  "&:hover": { bgcolor: P_LIGHT }, "&.Mui-disabled": { color: "#d1d5db" } }}>
-                <AddIcon sx={{ fontSize: 12 }} />
-              </IconButton>
-            </Stack>
-
-            {/* Remove */}
-            <Button variant="text" size="small"
-              startIcon={<DeleteOutlineIcon sx={{ fontSize: "14px !important" }} />}
-              onClick={() => handleRemoveItem(item.product._id)}
-              sx={{ fontSize: "0.75rem", color: "#9ca3af", p: "2px 8px", borderRadius: "8px",
-                textTransform: "none", fontWeight: 400,
-                "&:hover": { color: "#ef4444", bgcolor: "#fef2f2" } }}>
-              Remove
-            </Button>
-          </Box>
-        </Box>
-      </Box>
-      {!isLast && <Divider sx={{ borderColor: BORDER }} />}
-    </>
+        <div className="ck-item-foot">
+          <div className="ck-qty" role="group" aria-label={`Quantity for ${product.name}`}>
+            <button type="button" aria-label="Decrease quantity" onClick={() => handleQuantityChange(product._id, item.quantity - 1)} disabled={item.quantity <= 1}>
+              <FiMinus size={16} />
+            </button>
+            <span aria-live="polite">{item.quantity}</span>
+            <button type="button" aria-label="Increase quantity" onClick={() => handleQuantityChange(product._id, item.quantity + 1)} disabled={atMax}>
+              <FiPlus size={16} />
+            </button>
+          </div>
+          <button type="button" className="ck-link" onClick={() => handleRemoveItem(product._id)}>
+            <FiTrash2 size={16} /> Remove
+          </button>
+        </div>
+      </div>
+    </article>
   );
 }
 
-/* ── Cross-sell strip ──────────────────────────────────────────────── */
-function CrossSellSection({ cartItems, navigate }) {
+/* ── "You might also like" ──────────────────────────────────────────────── */
+function CrossSell({ cartItems, navigate }) {
   // Cached per product id — editing quantities no longer re-requests the same recommendations.
   const firstId = cartItems[0]?.product?._id;
-  const { data: recsData } = useGetRecommendationsQuery({ productId: firstId, limit: 6 }, { skip: !firstId });
-  const recs = (recsData ?? []).slice(0, 3);
-
+  const { data } = useGetRecommendationsQuery({ productId: firstId, limit: 6 }, { skip: !firstId });
+  const recs = (data ?? []).slice(0, 3);
   if (!recs.length) return null;
 
   return (
-    <Paper elevation={0} sx={{
-      border: `0.5px solid ${BORDER}`, borderRadius: "12px", mt: 2, overflow: "hidden", bgcolor: "#fff",
-    }}>
-      <Box sx={{ px: 2.5, py: 1.75, borderBottom: `0.5px solid ${BORDER}` }}>
-        <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
-          <LocalOfferOutlinedIcon sx={{ fontSize: 15, color: P }} />
-          <Typography sx={{ fontSize: "0.875rem", fontWeight: 500 }}>You might also like</Typography>
-        </Stack>
-      </Box>
-      <Box sx={{ p: 2 }}>
-        <Grid container spacing={1.5}>
-          {recs.map((product) => {
-            const img = product.images?.[0]?.url || product.image?.url || product.image;
-            const slug = product.slug || product._id;
-            return (
-              <Grid item xs={12} sm={4} key={product._id}>
-                <Box onClick={() => navigate(`/product/${slug}`)} sx={{
-                  p: 1.5, border: `0.5px solid ${BORDER}`, borderRadius: "10px",
-                  cursor: "pointer", display: "flex", gap: 1.25, alignItems: "center",
-                  bgcolor: "#fff", "&:hover": { borderColor: P, bgcolor: P_LIGHT },
-                  transition: "all 0.15s ease",
-                }}>
-                  {img && (
-                    <Box component="img" src={img} alt={product.name} onError={onImgError}
-                      sx={{ width: 40, height: 40, borderRadius: "8px", objectFit: "cover", flexShrink: 0 }} />
-                  )}
-                  <Box sx={{ minWidth: 0 }}>
-                    <Typography sx={{ fontSize: "0.75rem", fontWeight: 500 }} noWrap>{product.name}</Typography>
-                    <Typography sx={{ fontSize: "0.75rem", color: P, fontWeight: 600 }}>₹{product.price}</Typography>
-                  </Box>
-                </Box>
-              </Grid>
-            );
-          })}
-        </Grid>
-      </Box>
-    </Paper>
+    <Card icon={FiTag} className="ck-after" title="You might also like" subtitle="Handpicked to go with your order">
+      <div className="ck-recs">
+        {recs.map((p) => (
+          <button key={p._id} type="button" className="ck-rec" onClick={() => navigate(`/product/${p.slug || p._id}`)}>
+            <div className="ck-thumb ck-thumb--sm">
+              <img src={productImage(p) || PLACEHOLDER_SRC} alt="" loading="lazy" onError={onImgError} />
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div className="ck-rec-name">{p.name}</div>
+              <div className="ck-rec-price">{inr(p.price).replace(".00", "")}</div>
+            </div>
+          </button>
+        ))}
+      </div>
+    </Card>
   );
 }
 
-/* ── Summary price row ─────────────────────────────────────────────── */
-function PriceRow({ label, value, labelSx = {}, valueSx = {} }) {
-  return (
-    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-      <Typography sx={{ fontSize: "0.875rem", color: "#6b7280", ...labelSx }}>{label}</Typography>
-      <Typography sx={{ fontSize: "0.9375rem", fontWeight: 500, ...valueSx }}>{value}</Typography>
-    </Box>
-  );
-}
-
-/* ── Trust badges ──────────────────────────────────────────────────── */
-const TRUST = [
-  { Icon: VerifiedUserOutlinedIcon, label: "Secure Checkout" },
-  { Icon: LocalShippingOutlinedIcon, label: "Fast Delivery" },
-  { Icon: ReplayOutlinedIcon, label: "Easy Returns" },
+const PROMISES = [
+  { Icon: FiLock, title: "Secure checkout", text: "Encrypted payments via Razorpay" },
+  { Icon: FiTruck, title: "Free shipping ₹999+", text: "Delivered across India" },
+  { Icon: FiRefreshCw, title: "Easy returns", text: "7-day hassle-free returns" },
 ];
 
-/* ══════════════════════════════════════════════════════════════════════
-   MAIN — CartReviewStep
-   ══════════════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════════════════
+   STEP 1 — Cart review
+   ══════════════════════════════════════════════════════════════════════════ */
 export const CartReviewStep = ({
   cartItems, subtotal, total, error,
   proceedToCheckout, navigate,
   handleQuantityChange, handleRemoveItem,
   onCouponApplied, onRemoveCoupon, appliedCoupon,
 }) => {
-  const discount = appliedCoupon
-    ? appliedCoupon.discountType === "percent"
-      ? (subtotal * appliedCoupon.discountValue) / 100
-      : appliedCoupon.discountValue
-    : 0;
+  const discount = couponDiscount(appliedCoupon, subtotal);
   const discountedTotal = Math.max(0, total - discount);
+  const hasCustom = cartItems.some(isCustomItem);
+  const missingNotes = cartItems.some((i) => isCustomItem(i) && !i.customNote);
+  const count = cartItems.length;
 
   return (
-    <Grid container spacing={3} sx={{ alignItems: "flex-start" }}>
-
-      {/* ── Left: cart items ─────────────────────────────────────────── */}
-      <Grid item xs={12} md={7}>
-        <Paper elevation={0} sx={{
-          border: `0.5px solid ${BORDER}`, borderRadius: "14px", bgcolor: "#fff", overflow: "hidden",
-        }}>
-          {/* Header */}
-          <Box sx={{ px: 2.5, py: 2, borderBottom: `0.5px solid ${BORDER}`,
-            display: "flex", alignItems: "center", gap: 1.5 }}>
-            <Typography sx={{ fontSize: "1rem", fontWeight: 600, flex: 1, color: "#1c1917" }}>
-              Your Cart
-            </Typography>
-            <Box sx={{ px: 1.25, py: 0.35, bgcolor: P, borderRadius: "20px",
-              display: "inline-flex", alignItems: "center" }}>
-              <Typography sx={{ fontSize: "0.6875rem", fontWeight: 600, color: "#fff" }}>
-                {cartItems.length} {cartItems.length === 1 ? "item" : "items"}
-              </Typography>
-            </Box>
-          </Box>
-
-          {/* Handcrafted warning */}
-          {cartItems.some(isCustomItem) && (
-            <Box sx={{ px: 2.5, pt: 2 }}>
-              <Alert severity="warning" sx={{ borderRadius: "10px", "& .MuiAlert-icon": { alignItems: "center" } }}>
-                <Typography sx={{ fontSize: "0.8125rem" }}>
-                  <strong>Handcrafted Items:</strong> Made-to-order items take{" "}
-                  <strong>10–12 business days</strong> to prepare before dispatch.
-                  {cartItems.some((i) => isCustomItem(i) && !i.customNote) && (
-                    <> Add your personalization details below for each item.</>
-                  )}
-                </Typography>
+    <div className="ck-grid">
+      <div className="ck-main">
+        <Card
+          icon={FiShoppingBag}
+          title="Your cart"
+          subtitle="Review your items before checkout"
+          badge={<span className="ck-pill">{count} {count === 1 ? "item" : "items"}</span>}
+          noBody
+          footer={
+            <button type="button" className="ck-link" onClick={() => navigate("/products")}>
+              <FiArrowLeft size={16} /> Continue shopping
+            </button>
+          }
+        >
+          {hasCustom && (
+            <div style={{ padding: "24px 28px 0" }}>
+              <Alert kind="warn">
+                <strong>Handcrafted items:</strong> made-to-order pieces take <strong>10–12 business days</strong> to prepare
+                before dispatch.{missingNotes && " Add your personalization details below for each item."}
               </Alert>
-            </Box>
+            </div>
           )}
-
-          {/* Items */}
-          <Box sx={{ px: 2.5 }}>
-            {cartItems.map((item, idx) => (
-              <CartItemRow
-                key={item.product._id}
-                item={item}
-                handleQuantityChange={handleQuantityChange}
-                handleRemoveItem={handleRemoveItem}
-                isLast={idx === cartItems.length - 1}
-              />
+          <div className="ck-items">
+            {cartItems.map((item) => (
+              <CartItemRow key={item.product._id} item={item} handleQuantityChange={handleQuantityChange} handleRemoveItem={handleRemoveItem} />
             ))}
-          </Box>
+          </div>
+        </Card>
 
-          {/* Footer */}
-          <Box sx={{ px: 2.5, py: 1.5, borderTop: `0.5px solid ${BORDER}`, bgcolor: "#fafaf9" }}>
-            <Button variant="text" size="small"
-              startIcon={<ArrowBackIcon sx={{ fontSize: "13px !important" }} />}
-              onClick={() => navigate("/products")}
-              sx={{ fontSize: "0.75rem", color: "#9ca3af", fontWeight: 400, p: 0,
-                textTransform: "none", "&:hover": { color: P, bgcolor: "transparent" } }}>
-              Continue Shopping
-            </Button>
-          </Box>
-        </Paper>
+        <CrossSell cartItems={cartItems} navigate={navigate} />
 
-        <CrossSellSection cartItems={cartItems} navigate={navigate} />
-      </Grid>
+        <div className="ck-trust ck-after">
+          {PROMISES.map(({ Icon, title, text }, i) => (
+            <div key={title} className="ck-trust-item">
+              <span className={`ck-ico ${i === 1 ? "ck-ico--teal" : ""}`} aria-hidden="true"><Icon /></span>
+              <div>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
-      {/* ── Right: order summary ─────────────────────────────────────── */}
-      <Grid item xs={12} md={5}>
-        <Paper elevation={0} sx={{
-          border: `0.5px solid ${BORDER}`, borderRadius: "14px", bgcolor: "#fff",
-          position: { md: "sticky" }, top: { md: "24px" }, overflow: "hidden",
-        }}>
-          {/* Header */}
-          <Box sx={{ px: 2.5, pt: 2.25, pb: 2, borderBottom: `0.5px solid ${BORDER}` }}>
-            <Typography sx={{ fontSize: "1rem", fontWeight: 600, color: "#1c1917" }}>
-              Order Summary
-            </Typography>
-            <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", mt: 0.25 }}>
-              Review your items before checkout
-            </Typography>
-          </Box>
-
-          <Box sx={{ px: 2.5, pt: 2.25, pb: 2.5 }}>
-
-            {/* Free shipping bar */}
+      <aside className="ck-aside" aria-label="Order summary">
+        <Card title="Order summary" subtitle={`${count} ${count === 1 ? "item" : "items"} in your cart`} noBody footer={<MiniTrust items={TRUST_MINI} />}>
+          <div className="ck-card-body">
             <FreeShippingBar subtotal={subtotal} />
+            <SummaryItems cartItems={cartItems} />
+            <hr className="ck-hr" />
+            <div className="ck-rows">
+              <Row label="Subtotal" value={inr(subtotal)} />
+              {discount > 0 && <Row label={`Coupon (${appliedCoupon.code})`} value={`−${inr(discount)}`} tone="ok" />}
+              <Row label="Shipping" hint="Calculated at the next step" />
+            </div>
+            <hr className="ck-hr" />
+            <Total value={inr(discountedTotal)} />
 
-            {/* Mini item list */}
-            <Stack spacing={1.5} sx={{ mb: 2.25 }}>
-              {cartItems.map((item) => (
-                <Box key={item.product._id}
-                  sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
-                  <ProductThumb product={item.product} size="xs" />
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography sx={{ fontSize: "0.8125rem", fontWeight: 500, color: "#1c1917" }} noWrap>
-                      {item.product.name}
-                    </Typography>
-                    <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                      Qty {item.quantity} × ₹{item.product.price}
-                    </Typography>
-                  </Box>
-                  <Typography sx={{ fontSize: "0.8125rem", fontWeight: 600, color: "#1c1917", flexShrink: 0 }}>
-                    ₹{item.totalPrice?.toLocaleString()}
-                  </Typography>
-                </Box>
-              ))}
-            </Stack>
+            {error && <div style={{ marginTop: 20 }}><Alert kind="error">{error}</Alert></div>}
 
-            <Divider sx={{ borderColor: BORDER, mb: 2.25 }} />
+            <div style={{ marginTop: 24 }}>
+              <CouponInput cartTotal={subtotal} onCouponApplied={onCouponApplied} appliedCoupon={appliedCoupon} onRemoveCoupon={onRemoveCoupon} />
+            </div>
 
-            {/* Price breakdown */}
-            <Stack spacing={1.5} sx={{ mb: 2.25 }}>
-              <PriceRow label="Subtotal" value={`₹${subtotal.toFixed(2)}`} />
-              {discount > 0 && (
-                <PriceRow
-                  label={`Coupon (${appliedCoupon.code})`}
-                  value={`−₹${discount.toFixed(2)}`}
-                  labelSx={{ color: "#16a34a" }}
-                  valueSx={{ color: "#16a34a" }}
-                />
-              )}
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-                <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>Shipping</Typography>
-                <Typography sx={{ fontSize: "0.775rem", color: "#9ca3af", fontStyle: "italic" }}>
-                  Calculated next
-                </Typography>
-              </Box>
-            </Stack>
-
-            <Divider sx={{ borderColor: BORDER, mb: 2.25 }} />
-
-            {/* Total */}
-            <Box sx={{
-              display: "flex", justifyContent: "space-between", alignItems: "center",
-              mb: 2.5, px: 0,
-            }}>
-              <Typography sx={{ fontSize: "1rem", fontWeight: 600, color: "#1c1917" }}>Total</Typography>
-              <Typography sx={{ fontSize: "1.3125rem", fontWeight: 700, color: P }}>
-                ₹{discountedTotal.toFixed(2)}
-              </Typography>
-            </Box>
-
-            {error && (
-              <Alert severity="error" sx={{ mb: 2.25, borderRadius: "10px" }}>
-                {error}
-              </Alert>
-            )}
-
-            {/* Coupon */}
-            <CouponInput
-              cartTotal={subtotal}
-              onCouponApplied={onCouponApplied}
-              appliedCoupon={appliedCoupon}
-              onRemoveCoupon={onRemoveCoupon}
-            />
-
-            {/* CTAs */}
-            <Stack spacing={1.25} sx={{ mt: 2.5 }}>
-              <Button variant="contained" size="large" fullWidth
-                endIcon={<ArrowForwardIcon sx={{ fontSize: "17px !important" }} />}
-                onClick={proceedToCheckout}
-                disabled={cartItems.length === 0}
-                sx={{
-                  height: 50, fontSize: "0.9375rem", fontWeight: 600, borderRadius: "12px",
-                  bgcolor: P, textTransform: "none",
-                  boxShadow: "0 2px 14px rgba(210, 78, 51,0.26)",
-                  "&:hover": { bgcolor: "#7a1d47", boxShadow: "0 4px 20px rgba(210, 78, 51,0.34)" },
-                  "&.Mui-disabled": { bgcolor: "#d1d5db", color: "#fff", boxShadow: "none" },
-                }}>
-                Proceed to Checkout
-              </Button>
-            </Stack>
-          </Box>
-
-          {/* Trust row */}
-          <Box sx={{
-            borderTop: `0.5px solid ${BORDER}`, px: 2.5, py: 1.75, bgcolor: "#fafaf9",
-            display: "flex", justifyContent: "center", alignItems: "center", gap: 2,
-          }}>
-            {TRUST.map(({ Icon, label }, i) => (
-              <Stack key={label} direction="row" spacing={0.5}
-                sx={{ alignItems: "center", "&:not(:last-child)::after": {
-                  content: '""', display: "block", width: 3, height: 3,
-                  borderRadius: "50%", bgcolor: "#d1d5db", ml: 2,
-                }}}>
-                <Icon sx={{ fontSize: 13, color: "#9ca3af" }} />
-                <Typography sx={{ fontSize: "0.6875rem", color: "#9ca3af", whiteSpace: "nowrap" }}>
-                  {label}
-                </Typography>
-              </Stack>
-            ))}
-          </Box>
-        </Paper>
-      </Grid>
-    </Grid>
+            <button type="button" className="ck-btn ck-btn--primary ck-btn--lg ck-btn--block" style={{ marginTop: 24 }} onClick={proceedToCheckout} disabled={count === 0}>
+              Proceed to checkout <FiArrowRight size={18} />
+            </button>
+          </div>
+        </Card>
+        <HelpCard />
+      </aside>
+    </div>
   );
 };

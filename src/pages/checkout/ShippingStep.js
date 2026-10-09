@@ -1,32 +1,8 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import {
-  Box,
-  Grid,
-  Paper,
-  Typography,
-  Button,
-  TextField,
-  Stack,
-  Divider,
-  Chip,
-  Alert,
-  CircularProgress,
-  FormControlLabel,
-  Checkbox,
-  IconButton,
-} from "@mui/material";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteForeverOutlined";
-import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlined";
-import CheckIcon from "@mui/icons-material/Check";
-import { ProductThumb } from "./CartReviewStep";
-
-const P = "#d24e33";
-const P_LIGHT = "rgba(210, 78, 51,0.08)";
-const BORDER = "rgba(0,0,0,0.09)";
+  FiMapPin, FiBookmark, FiArrowRight, FiArrowLeft, FiTruck, FiTrash2, FiCheck,
+} from "react-icons/fi";
+import { Card, Alert, SummaryItems, Row, Total, HelpCard, Spinner, inr } from "./ui";
 
 // ── Shipping zone data ────────────────────────────────────────────────
 const ROAD_ZONES = {
@@ -137,69 +113,33 @@ function expectedDeliveryRange(deliveryDays, dispatchBuffer = 0) {
   return `${fmt(from)} – ${fmt(to)}`;
 }
 
-/* ── Shipping widget ─────────────────────────────────────────────────── */
+/* ── Shipping rate widget ───────────────────────────────────────────────── */
 function ShippingWidget({ zoneKey, weightKg, rate, dispatchBuffer = 0 }) {
   if (!zoneKey) return null;
   const zone = ROAD_ZONES[zoneKey];
   if (!zone) return null;
   const deliveryRange = expectedDeliveryRange(zone.deliveryDays, dispatchBuffer);
-
   return (
-    <Box
-      sx={{
-        p: 2,
-        border: `1.5px solid ${zone.color}40`,
-        borderRadius: "10px",
-        display: "flex",
-        alignItems: "center",
-        gap: 1.5,
-        mb: 2,
-        bgcolor: zone.color + "0a",
-      }}
-    >
-      <Box
-        sx={{
-          width: 36,
-          height: 36,
-          borderRadius: "8px",
-          bgcolor: zone.color + "18",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-        }}
-      >
-        <LocalShippingOutlinedIcon sx={{ color: zone.color, fontSize: 20 }} />
-      </Box>
-      <Box sx={{ flex: 1 }}>
-        <Stack direction="row" spacing={0.75} sx={{ alignItems: "center", mb: 0.25, flexWrap: "wrap" }}>
-          <Typography sx={{ fontSize: "0.8125rem", fontWeight: 500 }}>Standard Road Delivery</Typography>
-          <Chip
-            label={zone.label}
-            size="small"
-            sx={{ bgcolor: zone.color + "18", color: zone.color, fontWeight: 600, height: 18, fontSize: "0.68rem" }}
-          />
-        </Stack>
-        <Typography sx={{ fontSize: "0.75rem", color: "#6b7280", display: "block" }}>
-          {deliveryRange}
-          {dispatchBuffer > 0 && (
-            <Box component="span" sx={{ ml: 1, color: "#d97706", fontWeight: 500 }}>
-              + 10–12 day handcraft
-            </Box>
-          )}
-        </Typography>
-        <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>
+    <div className="ck-ship" style={{ "--zone": zone.color }}>
+      <span className="ck-ship-ico" aria-hidden="true"><FiTruck /></span>
+      <div className="ck-ship-body">
+        <div className="ck-ship-title">
+          Standard road delivery <span className="ck-ship-tag">{zone.label}</span>
+        </div>
+        <div className="ck-ship-sub">
+          Arrives {deliveryRange}
+          {dispatchBuffer > 0 && <strong style={{ color: "#b45309", marginLeft: 6 }}>+ 10–12 days handcraft time</strong>}
+        </div>
+        <div className="ck-ship-sub">
           {zone.sublabel} · {weightKg < 1 ? `${Math.round(weightKg * 1000)} g` : `${weightKg.toFixed(2)} kg`}
-        </Typography>
-      </Box>
-      <Typography sx={{ fontSize: "1.125rem", fontWeight: 700, color: zone.color, flexShrink: 0 }}>
-        {rate === 0 ? "FREE" : `₹${rate}`}
-      </Typography>
-    </Box>
+        </div>
+      </div>
+      <div className="ck-ship-price">{rate === 0 ? "FREE" : `₹${rate}`}</div>
+    </div>
   );
 }
 
-/* ── Address label pills ─────────────────────────────────────────────── */
+/* ── Address label chips ────────────────────────────────────────────────── */
 const LABEL_PRESETS = ["Home", "Office", "Other"];
 const LABEL_ICONS = { Home: "🏠", Office: "🏢", Other: "✏️" };
 
@@ -209,104 +149,40 @@ function AddressLabelChips({ value, onChange }) {
   const isOther = !isPreset && value;
 
   const select = (label) => {
-    if (label === "Other") { onChange("Other"); }
+    if (label === "Other") onChange("Other");
     else { setCustom(""); onChange(label); }
   };
 
   return (
-    <Box>
-      <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+    <div>
+      <div className="ck-chips" role="group" aria-label="Address label">
         {LABEL_PRESETS.map((lbl) => {
           const active = lbl === "Other" ? (value === "Other" || isOther) : value === lbl;
           return (
-            <Box
-              key={lbl}
-              role="button"
-              tabIndex={0}
-              onClick={() => select(lbl)}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") select(lbl); }}
-              sx={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 0.5,
-                px: 1.5,
-                height: 32,
-                borderRadius: "20px",
-                border: "1.5px solid",
-                borderColor: active ? P : "#d1d5db",
-                bgcolor: active ? P : "#fff",
-                color: active ? "#fff" : "#6b7280",
-                fontSize: "0.8125rem",
-                fontWeight: active ? 500 : 400,
-                cursor: "pointer",
-                transition: "all 0.15s ease",
-                userSelect: "none",
-                "&:hover": {
-                  borderColor: P,
-                  color: active ? "#fff" : P,
-                },
-              }}
-            >
-              <span>{LABEL_ICONS[lbl]}</span>
-              <span>{lbl}</span>
-            </Box>
+            <button key={lbl} type="button" className={`ck-chip ${active ? "is-active" : ""}`} aria-pressed={active} onClick={() => select(lbl)}>
+              <span aria-hidden="true">{LABEL_ICONS[lbl]}</span> {lbl}
+            </button>
           );
         })}
-      </Stack>
+      </div>
       {(value === "Other" || (isOther && !isPreset)) && (
-        <TextField
-          size="small"
-          fullWidth
+        <input
+          className="ck-input"
+          style={{ marginTop: 12 }}
           placeholder="e.g. Parents' house, Gym…"
+          aria-label="Custom address label"
           value={isOther && value !== "Other" ? value : custom}
           onChange={(e) => { setCustom(e.target.value); onChange(e.target.value || "Other"); }}
           autoFocus
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              borderRadius: "8px",
-              height: 40,
-              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: P },
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: P, boxShadow: `0 0 0 3px rgba(210, 78, 51,0.12)` },
-            },
-          }}
         />
       )}
-    </Box>
+    </div>
   );
 }
 
-const fieldSx = {
-  "& .MuiOutlinedInput-root": {
-    borderRadius: "8px",
-    height: 40,
-    fontSize: "0.875rem",
-    "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: P },
-    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-      borderColor: P,
-      boxShadow: `0 0 0 3px rgba(210, 78, 51,0.12)`,
-    },
-  },
-  "& .MuiInputLabel-root.Mui-focused": { color: P },
-  "& .MuiInputLabel-root": { fontSize: "0.875rem" },
-};
-
-const multilineSx = {
-  "& .MuiOutlinedInput-root": {
-    borderRadius: "8px",
-    fontSize: "0.875rem",
-    "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: P },
-    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-      borderColor: P,
-      boxShadow: `0 0 0 3px rgba(210, 78, 51,0.12)`,
-    },
-  },
-  "& .MuiInputLabel-root.Mui-focused": { color: P },
-  "& .MuiInputLabel-root": { fontSize: "0.875rem" },
-};
-
-/* ══════════════════════════════════════════════════════════════════════
-   MAIN — ShippingStep
-   ══════════════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════════════════
+   STEP 2 — Shipping
+   ══════════════════════════════════════════════════════════════════════════ */
 export const ShippingStep = ({
   cartItems,
   subtotal,
@@ -436,6 +312,17 @@ export const ShippingStep = ({
 
     let mounted = true;
 
+    // Keep the phone number in form state whether or not the intl-tel-input script loads
+    // (it comes from a CDN — if that is blocked or slow the field must still work).
+    const handleChange = () => {
+      setShippingAddress((prev) => ({ ...prev, phone: input.value, country: "India", countryCode: "+91" }));
+    };
+    input.addEventListener("change", handleChange);
+    input.addEventListener("blur", handleChange);
+    input.addEventListener("keyup", handleChange);
+    input.addEventListener("input", handleChange);
+    input.__iti_handle_change = handleChange;
+
     ensureScript().then(() => {
       if (!mounted) return;
       const iti = window.intlTelInput(input, {
@@ -457,20 +344,12 @@ export const ShippingStep = ({
         if (phoneValue.startsWith("+91")) phoneValue = phoneValue.substring(3);
         input.value = phoneValue;
       }
-
-      const handleChange = () => {
-        setShippingAddress((prev) => ({ ...prev, phone: input.value, country: "India", countryCode: "+91" }));
-      };
-      input.addEventListener("change", handleChange);
-      input.addEventListener("blur", handleChange);
-      input.addEventListener("keyup", handleChange);
-      input.__iti_handle_change = handleChange;
     }).catch(() => {});
 
     return () => {
       mounted = false;
       const hc = input.__iti_handle_change;
-      if (hc) { input.removeEventListener("change", hc); input.removeEventListener("blur", hc); input.removeEventListener("keyup", hc); delete input.__iti_handle_change; }
+      if (hc) { input.removeEventListener("change", hc); input.removeEventListener("blur", hc); input.removeEventListener("keyup", hc); input.removeEventListener("input", hc); delete input.__iti_handle_change; }
       if (itiRef.current) { try { itiRef.current.destroy(); } catch (e) {} }
       itiRef.current = null;
     };
@@ -495,246 +374,146 @@ export const ShippingStep = ({
   };
 
   const displayTotal = subtotal + (shippingRate?.rate || 0);
+  const count = cartItems.length;
 
   return (
-    <Grid container spacing={3} sx={{ alignItems: "flex-start" }}>
-      {/* ── Left: form ───────────────────────────────────────────────── */}
-      <Grid item xs={12} sm={7} lg={8}>
-
-        {/* Saved addresses */}
+    <div className="ck-grid">
+      <div className="ck-main">
+        {/* ── Saved addresses ─────────────────────────────────────────── */}
         {loadingAddresses ? (
-          <Paper
-            elevation={0}
-            sx={{ p: 3, border: `0.5px solid ${BORDER}`, borderRadius: "12px", mb: 2.5, textAlign: "center" }}
-          >
-            <CircularProgress size={20} sx={{ color: P, mr: 1 }} />
-            <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }} component="span">
-              Loading saved addresses…
-            </Typography>
-          </Paper>
-        ) : savedAddresses.length > 0 && (
-          <Paper
-            elevation={0}
-            sx={{ border: `0.5px solid ${BORDER}`, borderRadius: "12px", mb: 2.5, overflow: "hidden", bgcolor: "#fff" }}
-          >
-            <Box sx={{ px: 2.5, py: 2, borderBottom: `0.5px solid ${BORDER}`, display: "flex", alignItems: "center", gap: 1.5 }}>
-              <CheckCircleOutlineIcon sx={{ fontSize: 18, color: "#16a34a" }} />
-              <Box>
-                <Typography sx={{ fontSize: "1rem", fontWeight: 500 }}>Saved Addresses</Typography>
-                <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>Select a delivery address below</Typography>
-              </Box>
-            </Box>
-            <Box sx={{ p: 2 }}>
-              <Grid container spacing={1.5}>
+          <Card icon={FiBookmark} title="Saved addresses" subtitle="Loading your saved addresses…">
+            <div style={{ display: "flex", justifyContent: "center", padding: "8px 0", color: "var(--ics-ember-deep)" }}><Spinner /></div>
+          </Card>
+        ) : (
+          savedAddresses.length > 0 && (
+            <Card icon={FiBookmark} tint="teal" title="Saved addresses" subtitle="Choose where to deliver this order">
+              <div className="ck-addrs">
                 {savedAddresses.map((addr) => {
                   const selected = selectedAddressId === addr._id;
                   return (
-                    <Grid item xs={12} sm={6} key={addr._id}>
-                      <Box
-                        onClick={() => selectSavedAddress(addr)}
-                        sx={{
-                          p: 2,
-                          border: "1.5px solid",
-                          borderColor: selected ? P : "#e5e7eb",
-                          borderRadius: "10px",
-                          cursor: "pointer",
-                          bgcolor: selected ? P_LIGHT : "#fff",
-                          "&:hover": { borderColor: P },
-                          transition: "all 0.15s ease",
-                          position: "relative",
-                        }}
-                        role="button"
-                        tabIndex={0}
-                        aria-pressed={selected}
-                        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectSavedAddress(addr); } }}
+                    <div
+                      key={addr._id}
+                      className={`ck-addr ${selected ? "is-selected" : ""}`}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={selected}
+                      onClick={() => selectSavedAddress(addr)}
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectSavedAddress(addr); } }}
+                    >
+                      {selected && <span className="ck-addr-tick" aria-hidden="true"><FiCheck size={14} /></span>}
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                        {addr.label && <span className="ck-pill ck-pill--soft">{addr.label}</span>}
+                        {addr.isDefault && <span className="ck-pill ck-pill--teal">Default</span>}
+                      </div>
+                      <div className="ck-addr-street">{addr.street}</div>
+                      <div className="ck-addr-line">{addr.city}, {addr.state} – {addr.zipCode}</div>
+                      {addr.phone && <div className="ck-addr-line">📞 {addr.phone}</div>}
+                      <button
+                        type="button"
+                        className="ck-icon-btn ck-addr-del"
+                        aria-label={`Delete address ${addr.street}`}
+                        onClick={(e) => { e.stopPropagation(); handleDeleteAddress(addr._id); }}
                       >
-                        {selected && (
-                          <Box sx={{ position: "absolute", top: 10, right: 10, width: 18, height: 18, borderRadius: "50%", bgcolor: P, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <CheckIcon sx={{ color: "#fff", fontSize: 12 }} />
-                          </Box>
-                        )}
-                        {addr.label && (
-                          <Chip
-                            label={addr.label}
-                            size="small"
-                            sx={{ mb: 0.75, bgcolor: P_LIGHT, color: P, fontWeight: 600, height: 18, fontSize: "0.68rem" }}
-                          />
-                        )}
-                        <Typography sx={{ fontSize: "0.875rem", fontWeight: 500 }}>{addr.street}</Typography>
-                        <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", display: "block" }}>
-                          {addr.city}, {addr.state} – {addr.zipCode}
-                        </Typography>
-                        {addr.phone && (
-                          <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", display: "block" }}>
-                            📞 {addr.phone}
-                          </Typography>
-                        )}
-                        {addr.isDefault && (
-                          <Chip
-                            label="Default"
-                            size="small"
-                            sx={{ mt: 0.5, bgcolor: P_LIGHT, color: P, border: `1px solid ${P}40`, height: 18, fontSize: "0.65rem" }}
-                          />
-                        )}
-                        <IconButton
-                          size="small"
-                          onClick={(e) => { e.stopPropagation(); handleDeleteAddress(addr._id); }}
-                          sx={{ position: "absolute", top: 8, right: 8, color: "#ef4444", "&:hover": { bgcolor: "#fef2f2" } }}
-                        >
-                          <DeleteOutlineIcon sx={{ fontSize: 16 }} />
-                        </IconButton>
-                      </Box>
-                    </Grid>
+                        <FiTrash2 size={17} />
+                      </button>
+                    </div>
                   );
                 })}
-              </Grid>
-              <Divider sx={{ my: 2, borderColor: BORDER }}>
-                <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", px: 1 }}>
-                  or enter a new address
-                </Typography>
-              </Divider>
-            </Box>
-          </Paper>
+              </div>
+              <div className="ck-divider">or enter a new address</div>
+            </Card>
+          )
         )}
 
-        {/* Address form */}
-        <Paper
-          elevation={0}
-          sx={{ border: `0.5px solid ${BORDER}`, borderRadius: "12px", overflow: "hidden", bgcolor: "#fff" }}
-        >
-          {/* Card header */}
-          <Box sx={{ px: 2.5, py: 2, borderBottom: `0.5px solid ${BORDER}`, display: "flex", alignItems: "center", gap: 1.5 }}>
-            <Box sx={{ width: 36, height: 36, borderRadius: "8px", bgcolor: P_LIGHT, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <LocationOnOutlinedIcon sx={{ fontSize: 20, color: P }} />
-            </Box>
-            <Box>
-              <Typography sx={{ fontSize: "1rem", fontWeight: 500 }}>Delivery Address</Typography>
-              <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                Where should we deliver your order?
-              </Typography>
-            </Box>
-          </Box>
+        {/* ── Address form ────────────────────────────────────────────── */}
+        <Card icon={FiMapPin} title="Delivery address" subtitle="Where should we deliver your order?">
+          <form className="ck-form" noValidate onSubmit={handleSubmit}>
+            <div className="ck-field">
+              <span className="ck-label">Address label <small>(optional)</small></span>
+              <AddressLabelChips value={shippingAddress.label} onChange={(val) => setShippingAddress((prev) => ({ ...prev, label: val }))} />
+            </div>
 
-          <Box sx={{ p: 2.5 }}>
-            <Box component="form" noValidate onSubmit={handleSubmit}>
-
-              {/* Address label */}
-              <Box sx={{ mb: 2.5 }}>
-                <Typography sx={{ fontSize: "0.875rem", fontWeight: 500, mb: 1, color: "#374151" }}>
-                  Address Label{" "}
-                  <Typography component="span" sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>(optional)</Typography>
-                </Typography>
-                <AddressLabelChips
-                  value={shippingAddress.label}
-                  onChange={(val) => setShippingAddress((prev) => ({ ...prev, label: val }))}
-                />
-              </Box>
-
-              {/* Street */}
-              <TextField
-                label="Street Address"
+            <div className="ck-field">
+              <label className="ck-label" htmlFor="co-street">Street address</label>
+              <textarea
+                id="co-street"
+                className="ck-textarea"
                 name="street"
+                rows={3}
                 value={shippingAddress.street}
                 onChange={handleInputChange}
-                placeholder="House/Flat no., Building name, Street, Area…"
+                placeholder="House / flat no., building name, street, area…"
                 required
-                fullWidth
-                multiline
-                rows={2}
-                sx={{ mb: 2.5, ...multilineSx }}
                 autoComplete="street-address"
               />
+            </div>
 
-              {/* PIN / City / State */}
-              <Grid container spacing={2} sx={{ mb: 2.5 }}>
-                <Grid item xs={12} sm={4}>
-                  <TextField
-                    label={
-                      <span>
-                        PIN Code{pincodeLoading && <CircularProgress size={10} sx={{ ml: 0.75 }} />}
-                      </span>
-                    }
-                    name="zipCode"
-                    value={shippingAddress.zipCode}
-                    onChange={(e) => {
-                      const val = e.target.value.replace(/\D/g, "").slice(0, 6);
-                      handleInputChange({ target: { name: "zipCode", value: val } });
-                      if (val.length < 6) { setPincodeAutoFilled(false); setPincodeError(null); }
-                    }}
-                    placeholder="6-digit PIN"
-                    required
-                    fullWidth
-                    slotProps={{ htmlInput: { maxLength: 6, inputMode: "numeric" } }}
-                    autoComplete="postal-code"
-                    error={!!pincodeError}
-                    helperText={
-                      pincodeError
-                        ? pincodeError
-                        : pincodeAutoFilled && !pincodeLoading
-                        ? "✓ City & state auto-filled"
-                        : undefined
-                    }
-                    FormHelperTextProps={{
-                      sx: { color: pincodeAutoFilled && !pincodeError ? "#16a34a" : undefined, fontWeight: 500, fontSize: "0.7rem" },
-                    }}
-                    sx={fieldSx}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <TextField
-                    label="City"
-                    name="city"
-                    value={shippingAddress.city}
-                    onChange={(e) => { setPincodeAutoFilled(false); handleInputChange(e); }}
-                    placeholder="City / District"
-                    required
-                    fullWidth
-                    autoComplete="address-level2"
-                    sx={{
-                      ...fieldSx,
-                      ...(pincodeAutoFilled ? { "& .MuiOutlinedInput-root": { bgcolor: "#f0fdf4" } } : {}),
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <TextField
-                    label="State"
-                    name="state"
-                    value={shippingAddress.state}
-                    onChange={(e) => { setPincodeAutoFilled(false); handleInputChange(e); }}
-                    placeholder="State"
-                    required
-                    fullWidth
-                    autoComplete="address-level1"
-                    sx={{
-                      ...fieldSx,
-                      ...(pincodeAutoFilled ? { "& .MuiOutlinedInput-root": { bgcolor: "#f0fdf4" } } : {}),
-                    }}
-                  />
-                </Grid>
-              </Grid>
+            <div className="ck-row" style={{ "--cols": 3 }}>
+              <div className="ck-field">
+                <label className="ck-label" htmlFor="co-zip">
+                  PIN code {pincodeLoading && <Spinner />}
+                </label>
+                <input
+                  id="co-zip"
+                  className={`ck-input ${pincodeError ? "is-error" : ""}`}
+                  name="zipCode"
+                  value={shippingAddress.zipCode}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "").slice(0, 6);
+                    handleInputChange({ target: { name: "zipCode", value: val } });
+                    if (val.length < 6) { setPincodeAutoFilled(false); setPincodeError(null); }
+                  }}
+                  placeholder="6-digit PIN"
+                  required
+                  maxLength={6}
+                  inputMode="numeric"
+                  autoComplete="postal-code"
+                />
+                {pincodeError ? (
+                  <span className="ck-help ck-help--err">{pincodeError}</span>
+                ) : pincodeAutoFilled && !pincodeLoading ? (
+                  <span className="ck-help ck-help--ok">✓ City &amp; state auto-filled</span>
+                ) : null}
+              </div>
+              <div className="ck-field">
+                <label className="ck-label" htmlFor="co-city">City</label>
+                <input
+                  id="co-city"
+                  className={`ck-input ${pincodeAutoFilled ? "is-filled" : ""}`}
+                  name="city"
+                  value={shippingAddress.city}
+                  onChange={(e) => { setPincodeAutoFilled(false); handleInputChange(e); }}
+                  placeholder="City / district"
+                  required
+                  autoComplete="address-level2"
+                />
+              </div>
+              <div className="ck-field">
+                <label className="ck-label" htmlFor="co-state">State</label>
+                <input
+                  id="co-state"
+                  className={`ck-input ${pincodeAutoFilled ? "is-filled" : ""}`}
+                  name="state"
+                  value={shippingAddress.state}
+                  onChange={(e) => { setPincodeAutoFilled(false); handleInputChange(e); }}
+                  placeholder="State"
+                  required
+                  autoComplete="address-level1"
+                />
+              </div>
+            </div>
 
-              {/* Country — full width, disabled */}
-              <TextField
-                label="Country"
-                name="country"
-                value="🇮🇳  India"
-                fullWidth
-                disabled
-                sx={{ mb: 2.5, "& .MuiOutlinedInput-root": { borderRadius: "8px", bgcolor: "#f9fafb", height: 40, fontSize: "0.875rem" } }}
-              />
-
-              {/* Phone */}
-              <Box sx={{ mb: 2.5 }}>
-                <Typography sx={{ fontSize: "0.875rem", fontWeight: 500, mb: 0.75, color: "#374151" }}>
-                  Phone Number{" "}
-                  <Typography component="span" sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                    (India · 10 digits)
-                  </Typography>
-                </Typography>
+            <div className="ck-row">
+              <div className="ck-field">
+                <label className="ck-label" htmlFor="co-country">Country</label>
+                <input id="co-country" className="ck-input" value="🇮🇳  India" disabled readOnly />
+              </div>
+              <div className="ck-field">
+                <label className="ck-label" htmlFor="co-phone">Phone number <small>(India · 10 digits)</small></label>
                 <input
                   ref={phoneInputRef}
                   id="co-phone"
+                  className="ck-input"
                   type="tel"
                   name="phone"
                   defaultValue={shippingAddress.phone}
@@ -742,211 +521,58 @@ export const ShippingStep = ({
                   required
                   autoComplete="tel-national"
                   inputMode="numeric"
-                  style={{
-                    width: "100%",
-                    height: 40,
-                    padding: "0 14px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: 8,
-                    fontSize: "0.875rem",
-                    fontFamily: "inherit",
-                    outline: "none",
-                    boxSizing: "border-box",
-                    transition: "border-color 0.15s, box-shadow 0.15s",
-                    color: "#1c1917",
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = P;
-                    e.target.style.boxShadow = "0 0 0 3px rgba(210, 78, 51,0.12)";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = "#d1d5db";
-                    e.target.style.boxShadow = "none";
-                  }}
                 />
-              </Box>
+              </div>
+            </div>
 
-              {/* Shipping rate */}
-              {zoneKey && shippingCharge !== null && (
-                <ShippingWidget
-                  zoneKey={zoneKey}
-                  weightKg={Math.max(cartWeight, 0.25)}
-                  rate={shippingCharge}
-                  dispatchBuffer={dispatchBuffer}
-                />
-              )}
-
-              {/* Save checkboxes */}
-              <Box
-                sx={{
-                  mb: 2.5,
-                  p: 2,
-                  bgcolor: "#f9fafb",
-                  border: `0.5px solid ${BORDER}`,
-                  borderRadius: "10px",
-                }}
-              >
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={saveAddressToBook}
-                      onChange={(e) => setSaveAddressToBook(e.target.checked)}
-                      size="small"
-                      sx={{ "&.Mui-checked": { color: P } }}
-                    />
-                  }
-                  label={
-                    <Typography sx={{ fontSize: "0.8125rem", color: "#374151" }}>
-                      Save this address to my account
-                    </Typography>
-                  }
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={shippingAddress.isDefault}
-                      onChange={(e) => setShippingAddress((prev) => ({ ...prev, isDefault: e.target.checked }))}
-                      size="small"
-                      sx={{ "&.Mui-checked": { color: P } }}
-                    />
-                  }
-                  label={
-                    <Typography sx={{ fontSize: "0.8125rem", color: "#374151" }}>
-                      Make this my default address
-                    </Typography>
-                  }
-                />
-              </Box>
-
-              {(error || localError) && (
-                <Alert severity="error" sx={{ mb: 2.5, borderRadius: "10px" }}>
-                  {localError || error}
-                </Alert>
-              )}
-
-              <Stack direction="row" spacing={1.5} sx={{ justifyContent: "space-between" }}>
-                <Button
-                  variant="outlined"
-                  startIcon={<ArrowBackIcon />}
-                  onClick={() => setCurrentStep(1)}
-                  sx={{
-                    height: 48,
-                    px: 3,
-                    borderRadius: "10px",
-                    borderColor: P,
-                    color: P,
-                    fontWeight: 500,
-                    fontSize: "0.875rem",
-                    textTransform: "none",
-                    "&:hover": { bgcolor: P_LIGHT, borderColor: P },
-                  }}
-                >
-                  Back
-                </Button>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  size="large"
-                  endIcon={loading ? <CircularProgress size={16} color="inherit" /> : <ArrowForwardIcon />}
-                  disabled={loading}
-                  sx={{
-                    flex: 1,
-                    height: 48,
-                    fontSize: "0.875rem",
-                    fontWeight: 500,
-                    borderRadius: "10px",
-                    bgcolor: P,
-                    textTransform: "none",
-                    boxShadow: "0 2px 12px rgba(210, 78, 51,0.28)",
-                    "&:hover": { bgcolor: "#7a1d47", boxShadow: "0 4px 16px rgba(210, 78, 51,0.36)" },
-                  }}
-                >
-                  {loading ? "Saving…" : "Continue to Payment"}
-                </Button>
-              </Stack>
-            </Box>
-          </Box>
-        </Paper>
-      </Grid>
-
-      {/* ── Right: compact order summary ─────────────────────────────── */}
-      <Grid item xs={12} sm={5} lg={4}>
-        <Paper elevation={0} sx={{
-          border: `0.5px solid ${BORDER}`, borderRadius: "14px", bgcolor: "#fff",
-          position: { sm: "sticky" }, top: { sm: "24px" }, overflow: "hidden",
-        }}>
-          {/* Header */}
-          <Box sx={{ px: 2.5, pt: 2.25, pb: 2, borderBottom: `0.5px solid ${BORDER}` }}>
-            <Typography sx={{ fontSize: "1rem", fontWeight: 600, color: "#1c1917" }}>
-              Order Summary
-            </Typography>
-            <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", mt: 0.25 }}>
-              {cartItems.length} item{cartItems.length !== 1 ? "s" : ""}
-            </Typography>
-          </Box>
-
-          <Box sx={{ px: 2.5, pt: 2.25, pb: 2.5 }}>
-            {/* Mini item list */}
-            <Stack spacing={1.5} sx={{ mb: 2.25 }}>
-              {cartItems.map((item) => (
-                <Box key={item.product._id} sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
-                  <ProductThumb product={item.product} size="xs" />
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography sx={{ fontSize: "0.8125rem", fontWeight: 500, color: "#1c1917" }} noWrap>
-                      {item.product.name}
-                    </Typography>
-                    <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                      Qty {item.quantity} × ₹{item.product.price}
-                    </Typography>
-                  </Box>
-                  <Typography sx={{ fontSize: "0.8125rem", fontWeight: 600, color: "#1c1917", flexShrink: 0 }}>
-                    ₹{item.totalPrice?.toLocaleString()}
-                  </Typography>
-                </Box>
-              ))}
-            </Stack>
-
-            <Divider sx={{ borderColor: BORDER, mb: 2.25 }} />
-
-            {/* Price breakdown */}
-            <Stack spacing={1.5} sx={{ mb: 2.25 }}>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-                <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>Subtotal</Typography>
-                <Typography sx={{ fontSize: "0.9375rem", fontWeight: 500 }}>₹{subtotal.toFixed(2)}</Typography>
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-                <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>Shipping</Typography>
-                {shippingRate ? (
-                  <Typography sx={{ fontSize: "0.9375rem", fontWeight: 500,
-                    color: shippingRate.rate === 0 ? "#16a34a" : "#1c1917" }}>
-                    {shippingRate.rate === 0 ? "FREE" : `₹${shippingRate.rate}`}
-                  </Typography>
-                ) : (
-                  <Typography sx={{ fontSize: "0.775rem", color: "#9ca3af", fontStyle: "italic" }}>
-                    Enter PIN to calculate
-                  </Typography>
-                )}
-              </Box>
-            </Stack>
-
-            <Divider sx={{ borderColor: BORDER, mb: 2.25 }} />
-
-            {/* Total */}
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-              <Typography sx={{ fontSize: "1rem", fontWeight: 600, color: "#1c1917" }}>Total</Typography>
-              <Typography sx={{ fontSize: "1.3125rem", fontWeight: 700, color: P }}>
-                ₹{displayTotal.toFixed(2)}
-              </Typography>
-            </Box>
-
-            {!shippingRate && (
-              <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", mt: 1.25, fontStyle: "italic" }}>
-                Final total shown after PIN entry
-              </Typography>
+            {zoneKey && shippingCharge !== null && (
+              <ShippingWidget zoneKey={zoneKey} weightKg={Math.max(cartWeight, 0.25)} rate={shippingCharge} dispatchBuffer={dispatchBuffer} />
             )}
-          </Box>
-        </Paper>
-      </Grid>
-    </Grid>
+
+            <div className="ck-checks">
+              <label className="ck-check">
+                <input type="checkbox" checked={saveAddressToBook} onChange={(e) => setSaveAddressToBook(e.target.checked)} />
+                Save this address to my account
+              </label>
+              <label className="ck-check">
+                <input type="checkbox" checked={!!shippingAddress.isDefault} onChange={(e) => setShippingAddress((prev) => ({ ...prev, isDefault: e.target.checked }))} />
+                Make this my default address
+              </label>
+            </div>
+
+            {(error || localError) && <Alert kind="error">{localError || error}</Alert>}
+
+            <div className="ck-actions">
+              <button type="button" className="ck-btn ck-btn--ghost" onClick={() => setCurrentStep(1)}>
+                <FiArrowLeft size={18} /> Back
+              </button>
+              <button type="submit" className="ck-btn ck-btn--primary ck-btn--lg" disabled={loading}>
+                {loading ? <><Spinner /> Saving…</> : <>Continue to payment <FiArrowRight size={18} /></>}
+              </button>
+            </div>
+          </form>
+        </Card>
+      </div>
+
+      {/* ── Summary ───────────────────────────────────────────────────── */}
+      <aside className="ck-aside" aria-label="Order summary">
+        <Card title="Order summary" subtitle={`${count} ${count === 1 ? "item" : "items"}`}>
+          <SummaryItems cartItems={cartItems} />
+          <hr className="ck-hr" />
+          <div className="ck-rows">
+            <Row label="Subtotal" value={inr(subtotal)} />
+            {shippingRate ? (
+              <Row label="Shipping" value={shippingRate.rate === 0 ? "FREE" : inr(shippingRate.rate)} tone={shippingRate.rate === 0 ? "ok" : undefined} />
+            ) : (
+              <Row label="Shipping" hint="Enter your PIN code" />
+            )}
+          </div>
+          <hr className="ck-hr" />
+          <Total value={inr(displayTotal)} />
+          {!shippingRate && <p className="ck-help" style={{ marginTop: 12 }}>Your final total appears once we know your delivery PIN.</p>}
+        </Card>
+        <HelpCard />
+      </aside>
+    </div>
   );
 };

@@ -40,11 +40,11 @@
   /* Brand — Deep Rose */
   --btn-brand:          var(--primary, #d24e33);
   --btn-brand-dark:     var(--primary-dark, #b8412a);
-  --btn-brand-darker:   var(--rose-900, #4a0d25);
+  --btn-brand-darker:   var(--rose-900, #8a3322);
   --btn-brand-glow:     rgba(210, 78, 51, 0.28);
   --btn-brand-subtle:   var(--primary-subtle, rgba(210, 78, 51, 0.08));
   --btn-brand-grad:     linear-gradient(135deg, var(--primary, #d24e33) 0%, var(--primary-dark, #b8412a) 100%);
-  --btn-brand-grad-h:   linear-gradient(135deg, var(--primary-dark, #b8412a) 0%, var(--rose-900, #4a0d25) 100%);
+  --btn-brand-grad-h:   linear-gradient(135deg, var(--primary-dark, #b8412a) 0%, var(--rose-900, #8a3322) 100%);
 
   /* Success — Green */
   --btn-success:        var(--success, #2e7d32);

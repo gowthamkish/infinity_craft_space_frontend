@@ -33,7 +33,7 @@ function BrandPanel({ title, subtitle, perks }) {
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(ellipse at 30% 80%, rgba(201,168,76,0.20) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(244,167,185,0.18) 0%, transparent 50%)",
+            "radial-gradient(ellipse at 30% 80%, rgba(15, 148, 136,0.20) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(244,167,185,0.18) 0%, transparent 50%)",
         },
       }}
     >

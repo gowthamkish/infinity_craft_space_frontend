@@ -208,7 +208,7 @@ const ImageCarouselModal = ({
             label={`${activeIndex + 1} of ${images.length}`}
             size="small"
             sx={{
-              bgcolor: "rgba(201,168,76,0.2)",
+              bgcolor: "rgba(15, 148, 136,0.2)",
               color: "#0f9488",
               fontWeight: 700,
               fontSize: "0.7rem",
@@ -431,7 +431,7 @@ const ImageCarouselModal = ({
                     borderColor: index === activeIndex ? BRAND_ROSE : "rgba(255,255,255,0.15)",
                     opacity: index === activeIndex ? 1 : 0.6,
                     transition: "all 0.15s ease",
-                    "&:hover": { opacity: 1, borderColor: "rgba(201,168,76,0.6)" },
+                    "&:hover": { opacity: 1, borderColor: "rgba(15, 148, 136,0.6)" },
                   }}
                 >
                   <Box

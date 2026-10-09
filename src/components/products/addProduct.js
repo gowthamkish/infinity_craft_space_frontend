@@ -1658,7 +1658,7 @@ const AddProduct = () => {
                       textTransform: "none", mb: 1.25,
                       background: `linear-gradient(135deg, ${P} 0%, ${P_DARK} 100%)`,
                       boxShadow: `0 4px 16px rgba(210, 78, 51,0.3)`,
-                      "&:hover": { background: `linear-gradient(135deg, ${P_DARK} 0%, #5e1232 100%)`, boxShadow: `0 6px 20px rgba(210, 78, 51,0.4)` },
+                      "&:hover": { background: `linear-gradient(135deg, ${P_DARK} 0%, #a63c27 100%)`, boxShadow: `0 6px 20px rgba(210, 78, 51,0.4)` },
                       "&:disabled": { opacity: 0.65 },
                     }}>
                     {loading || imageUploading ? (

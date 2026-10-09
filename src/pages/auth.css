@@ -272,7 +272,7 @@
   margin-bottom: 0.875rem;
 }
 .auth-btn--primary:hover:not(:disabled) {
-  background: var(--btn-brand-grad-h, linear-gradient(135deg, #b8412a, #4a0d25));
+  background: var(--btn-brand-grad-h, linear-gradient(135deg, #b8412a, #8a3322));
   box-shadow: 0 4px 16px var(--btn-brand-glow, rgba(124,58,237,0.4));
   transform: translateY(-1px);
 }

@@ -12,25 +12,25 @@
   display: flex;
   gap: 0.6rem;
   align-items: flex-start;
-  background: linear-gradient(135deg, var(--gold-100, #d5f3ee) 0%, var(--gold-200, #a9e6dd) 100%);
-  border: 1px solid var(--gold-300, #6fd3c5);
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #fcd34d;
   border-radius: 10px;
   padding: 0.7rem 0.9rem;
   margin-bottom: 0.85rem;
-  color: var(--gold-800, #094d47);
+  color: #92400e;
 }
 
 .de-custom-icon {
   flex-shrink: 0;
   margin-top: 2px;
-  color: var(--gold-600, #a07a30);
+  color: #d97706;
 }
 
 .de-custom-banner strong {
   display: block;
   font-size: 0.88rem;
   font-weight: 700;
-  color: var(--gold-900, #5a3f0f);
+  color: #78350f;
   margin-bottom: 0.15rem;
 }
 
@@ -38,7 +38,7 @@
   font-size: 0.82rem;
   margin: 0;
   line-height: 1.5;
-  color: var(--gold-800, #094d47);
+  color: #92400e;
 }
 
 /* ── Label ───────────────────────────────────────────────────── */
@@ -304,8 +304,8 @@
 .de-result-custom-note {
   margin: 0.4rem 0 0;
   font-size: 0.8rem;
-  color: var(--gold-700, #0a6159);
-  background: var(--gold-100, #d5f3ee);
+  color: #b45309;
+  background: #fef3c7;
   border-radius: 6px;
   padding: 0.3rem 0.5rem;
 }
@@ -338,13 +338,13 @@
   }
 
   .de-custom-banner {
-    background: linear-gradient(135deg, rgba(201,168,76,0.2) 0%, rgba(201,168,76,0.12) 100%);
-    border-color: rgba(201, 168, 76, 0.4);
-    color: var(--gold-200, #a9e6dd);
+    background: linear-gradient(135deg, rgba(245, 158, 11,0.2) 0%, rgba(245, 158, 11,0.12) 100%);
+    border-color: rgba(245, 158, 11, 0.4);
+    color: #fde68a;
   }
 
-  .de-custom-banner strong { color: var(--gold-200, #a9e6dd); }
-  .de-custom-sub { color: var(--gold-300, #6fd3c5); }
+  .de-custom-banner strong { color: #fde68a; }
+  .de-custom-sub { color: #fcd34d; }
 }
 
 /* ── Mobile ──────────────────────────────────────────────────── */

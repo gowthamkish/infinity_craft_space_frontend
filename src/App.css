@@ -563,8 +563,8 @@ pre {
   border-left: 3px solid var(--success);
 }
 .alert-warning {
-  background: linear-gradient(135deg, var(--gold-100, #fef9e7) 0%, var(--gold-200, #fef0c4) 100%);
-  color: var(--gold-800, #5a3e10);
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
   border-left: 3px solid var(--accent);
 }
 .alert-danger {
@@ -753,7 +753,7 @@ pre {
   background: linear-gradient(
     90deg,
     rgba(210, 78, 51, 0.06),
-    rgba(201, 168, 76, 0.04)
+    rgba(15, 148, 136, 0.04)
   );
   border-radius: var(--radius-lg);
   margin-bottom: 0.75rem;
@@ -828,16 +828,16 @@ pre {
 .account-grid .compact-card.address-gradient {
   background: linear-gradient(
     135deg,
-    rgba(201, 168, 76, 0.08) 0%,
+    rgba(15, 148, 136, 0.08) 0%,
     rgba(244, 167, 185, 0.04) 100%
   );
-  border: 1px solid rgba(201, 168, 76, 0.12);
+  border: 1px solid rgba(15, 148, 136, 0.12);
 }
 .account-grid .compact-card.wishlist-gradient {
   background: linear-gradient(
     135deg,
     rgba(210, 78, 51, 0.06) 0%,
-    rgba(201, 168, 76, 0.04) 100%
+    rgba(15, 148, 136, 0.04) 100%
   );
   border: 1px solid rgba(210, 78, 51, 0.08);
 }
@@ -996,12 +996,12 @@ pre {
 
 /* Variant: warning */
 .toast--warning {
-  background: linear-gradient(135deg, var(--gold-100, #fef9e7), var(--gold-200, #fef0c4)) !important;
+  background: linear-gradient(135deg, #fef3c7, #fde68a) !important;
   border-left: 4px solid var(--accent) !important;
-  color: var(--gold-800, #5a3e10) !important;
+  color: #92400e !important;
 }
 .toast--warning .toast-header {
-  color: var(--gold-700, #0a6159) !important;
+  color: #b45309 !important;
 }
 
 /* Variant: info / primary */

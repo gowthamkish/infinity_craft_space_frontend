@@ -10,7 +10,7 @@
 }
 
 .to-hero {
-  background: linear-gradient(135deg, var(--rose-900, #4a0d26) 0%, var(--primary, #d24e33) 60%, var(--rose-900, #4a0d26) 100%);
+  background: linear-gradient(135deg, var(--rose-900, #8a3322) 0%, var(--primary, #d24e33) 60%, var(--rose-900, #8a3322) 100%);
   padding: 2.5rem 1.5rem;
   text-align: center;
   color: white;
@@ -93,12 +93,12 @@
 }
 
 .to-status-badge--confirmed  { background: var(--primary-subtle, rgba(210, 78, 51,0.08)); color: var(--primary, #d24e33); }
-.to-status-badge--processing { background: var(--secondary-subtle, rgba(201,168,76,0.10)); color: var(--gold-700, #0a6159); }
+.to-status-badge--processing { background: var(--secondary-subtle, rgba(15, 148, 136,0.10)); color: var(--gold-700, #0a6159); }
 .to-status-badge--shipped         { background: var(--primary-subtle, rgba(210, 78, 51,0.08)); color: var(--primary-dark, #b8412a); }
-.to-status-badge--out_for_delivery{ background: var(--secondary-subtle, rgba(201,168,76,0.10)); color: var(--gold-800, #094d47); }
+.to-status-badge--out_for_delivery{ background: var(--secondary-subtle, rgba(15, 148, 136,0.10)); color: var(--gold-800, #094d47); }
 .to-status-badge--delivered       { background: var(--success-subtle, rgba(46,125,50,0.08)); color: var(--success-dark, #1b5e20); }
 .to-status-badge--cancelled  { background: var(--error-subtle, rgba(198,40,40,0.08)); color: var(--error-dark, #8e0000); }
-.to-status-badge--returned   { background: var(--secondary-subtle, rgba(201,168,76,0.10)); color: var(--gold-700, #0a6159); }
+.to-status-badge--returned   { background: var(--secondary-subtle, rgba(15, 148, 136,0.10)); color: var(--gold-700, #0a6159); }
 
 .to-refresh-btn {
   display: inline-flex;

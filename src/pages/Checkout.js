@@ -1,16 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Fragment } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Container,
-  Stepper,
-  Step,
-  StepLabel,
-  Typography,
-  Stack,
-} from "@mui/material";
-import LockIcon from "@mui/icons-material/Lock";
+import { FiLock, FiCheck } from "react-icons/fi";
+import "../styles/ember.css";
+import "../styles/checkout.css";
 import {
   clearCart,
   updateCartItemQuantity,
@@ -95,10 +88,10 @@ export default function Checkout() {
   const total = subtotal + shipping + tax;
 
   const steps = [
-    { number: 1, title: "Cart Review" },
-    { number: 2, title: "Shipping" },
-    { number: 3, title: "Payment" },
-    { number: 4, title: "Confirmation" },
+    { number: 1, title: "Cart", sub: "Review your items" },
+    { number: 2, title: "Shipping", sub: "Delivery details" },
+    { number: 3, title: "Payment", sub: "Secure checkout" },
+    { number: 4, title: "Confirmation", sub: "Order placed" },
   ];
 
   const handleInputChange = (e) => {
@@ -346,10 +339,10 @@ export default function Checkout() {
 
   if (cartItems.length === 0 && currentStep === 1) {
     return (
-      <Box sx={{ minHeight: "100vh", bgcolor: "#f7f4ee" }}>
+      <div className="ck">
         <Header />
         <EmptyCart navigate={navigate} />
-      </Box>
+      </div>
     );
   }
 
@@ -370,53 +363,37 @@ export default function Checkout() {
         noindex={true}
         canonical={`${SEO_CONFIG.SITE_URL}/checkout`}
       />
-      <Box sx={{ minHeight: "100vh", bgcolor: "#f7f4ee" }}>
+      <div className="ck">
         <Header />
-        <Container maxWidth="lg" sx={{ py: { xs: 2, md: 4 }, px: { xs: 2, sm: 3 } }}>
-          {/* Stepper card */}
-          <Box
-            sx={{
-              mb: { xs: 2.5, md: 3 },
-              px: { xs: 2, md: 3 },
-              pt: 2,
-              pb: 2.5,
-              bgcolor: "#fff",
-              borderRadius: "12px",
-              border: "0.5px solid rgba(0,0,0,0.09)",
-            }}
-          >
-            <Stack direction="row" spacing={0.75} sx={{ alignItems: "center", mb: 2 }}>
-              <LockIcon sx={{ fontSize: 12, color: "#9ca3af" }} />
-              <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                Secure &amp; Encrypted Checkout
-              </Typography>
-            </Stack>
-            <Stepper
-              activeStep={currentStep - 1}
-              alternativeLabel
-              sx={{
-                "& .MuiStepLabel-label": { fontWeight: 400, fontSize: "0.75rem", mt: 0.5, color: "#9ca3af" },
-                "& .MuiStepLabel-label.Mui-active": { color: "#d24e33", fontWeight: 500 },
-                "& .MuiStepLabel-label.Mui-completed": { color: "#d24e33", fontWeight: 400 },
-                "& .MuiStepIcon-root": { width: 32, height: 32, color: "#e5e7eb" },
-                "& .MuiStepIcon-root.Mui-active": { color: "#d24e33" },
-                "& .MuiStepIcon-root.Mui-completed": { color: "#d24e33" },
-                "& .MuiStepIcon-text": { fontSize: "0.75rem", fontWeight: 600 },
-                "& .MuiStepConnector-line": {
-                  borderColor: "#e5e7eb",
-                  borderTopWidth: 2,
-                },
-                "& .MuiStepConnector-root.Mui-active .MuiStepConnector-line": { borderColor: "#d24e33" },
-                "& .MuiStepConnector-root.Mui-completed .MuiStepConnector-line": { borderColor: "#d24e33" },
-              }}
-            >
-              {steps.map((step) => (
-                <Step key={step.number} completed={currentStep > step.number}>
-                  <StepLabel>{step.title}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
-          </Box>
+        <main className="ck-container">
+          <div className="ck-top">
+            <div>
+              <h1 className="ck-title">Checkout</h1>
+              <p className="ck-title-sub">
+                {currentStep === 4 ? "Your order is in — thank you!" : "Just a few steps to complete your order."}
+              </p>
+            </div>
+            <span className="ck-secure"><FiLock size={15} aria-hidden="true" /> Secure &amp; encrypted checkout</span>
+          </div>
+
+          <ol className="ck-steps" aria-label="Checkout progress">
+            {steps.map((step, i) => {
+              const done = currentStep > step.number;
+              const active = currentStep === step.number;
+              return (
+                <Fragment key={step.number}>
+                  <li className={`ck-step ${done ? "is-done" : ""} ${active ? "is-active" : ""}`} aria-current={active ? "step" : undefined}>
+                    <span className="ck-step-dot">{done ? <FiCheck size={18} aria-label="Completed" /> : step.number}</span>
+                    <span className="ck-step-text">
+                      <span className="ck-step-label">{step.title}</span>
+                      <span className="ck-step-sub">{step.sub}</span>
+                    </span>
+                  </li>
+                  {i < steps.length - 1 && <span className={`ck-line ${done ? "is-done" : ""}`} aria-hidden="true" />}
+                </Fragment>
+              );
+            })}
+          </ol>
 
           {currentStep === 1 && (
             <CartReviewStep
@@ -481,8 +458,8 @@ export default function Checkout() {
               backendOrder={backendOrder}
             />
           )}
-        </Container>
-      </Box>
+        </main>
+      </div>
     </>
   );
 }

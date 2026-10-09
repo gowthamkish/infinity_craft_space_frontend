@@ -251,10 +251,10 @@ const CategoryManagement = () => {
             onClick={handleAddCategory}
             sx={{
               borderRadius: 2, textTransform: "none", fontWeight: 700, px: 2.5, py: 1.125,
-              background: "linear-gradient(135deg, #d24e33 0%, #7a1640 100%)",
+              background: "linear-gradient(135deg, #d24e33 0%, #b8412a 100%)",
               boxShadow: "0 4px 12px rgba(210, 78, 51,0.28)",
               whiteSpace: "nowrap", flexShrink: 0,
-              "&:hover": { background: "linear-gradient(135deg, #7a1640 0%, #5e1232 100%)" },
+              "&:hover": { background: "linear-gradient(135deg, #b8412a 0%, #a63c27 100%)" },
             }}
           >
             Add Category
@@ -288,7 +288,7 @@ const CategoryManagement = () => {
               <Typography variant="h6" sx={{ color: "text.secondary", fontWeight: 600 }}>No categories found</Typography>
               <Typography variant="body2" sx={{ color: "text.secondary", mb: 2 }}>Start by adding your first category</Typography>
               <Button variant="contained" startIcon={<FiPlus size={15} />} onClick={handleAddCategory}
-                sx={{ borderRadius: 2, textTransform: "none", fontWeight: 700, background: "linear-gradient(135deg, #d24e33 0%, #7a1640 100%)" }}>
+                sx={{ borderRadius: 2, textTransform: "none", fontWeight: 700, background: "linear-gradient(135deg, #d24e33 0%, #b8412a 100%)" }}>
                 Add Category
               </Button>
             </Box>
@@ -310,7 +310,7 @@ const CategoryManagement = () => {
                       <TableRow style={{ borderLeft: "4px solid var(--primary-color)" }}>
                         <TableCell style={{ padding: "1rem", verticalAlign: "middle" }}>
                           <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <div style={{ width: 40, height: 40, borderRadius: 8, background: "linear-gradient(135deg, #d24e33 0%, #7a1640 100%)", display: "flex", alignItems: "center", justifyContent: "center", marginRight: 12 }}>
+                            <div style={{ width: 40, height: 40, borderRadius: 8, background: "linear-gradient(135deg, #d24e33 0%, #b8412a 100%)", display: "flex", alignItems: "center", justifyContent: "center", marginRight: 12 }}>
                               <FiTag size={18} style={{ color: "white" }} />
                             </div>
                             <div>
@@ -486,9 +486,9 @@ const CategoryManagement = () => {
             <Button type="submit" variant="contained" disabled={creating || updating || !categoryForm.name.trim()}
               sx={{
                 borderRadius: 2, textTransform: "none", fontWeight: 700,
-                background: "linear-gradient(135deg, #d24e33 0%, #7a1640 100%)",
+                background: "linear-gradient(135deg, #d24e33 0%, #b8412a 100%)",
                 boxShadow: "0 4px 12px rgba(210, 78, 51,0.28)",
-                "&:hover": { background: "linear-gradient(135deg, #7a1640 0%, #5e1232 100%)" },
+                "&:hover": { background: "linear-gradient(135deg, #b8412a 0%, #a63c27 100%)" },
                 minWidth: 140,
               }}>
               {creating || updating ? (
@@ -584,9 +584,9 @@ const CategoryManagement = () => {
             <Button type="submit" variant="contained" disabled={creating || updating || !subcategoryForm.name.trim()}
               sx={{
                 borderRadius: 2, textTransform: "none", fontWeight: 700,
-                background: "linear-gradient(135deg, #d24e33 0%, #7a1640 100%)",
+                background: "linear-gradient(135deg, #d24e33 0%, #b8412a 100%)",
                 boxShadow: "0 4px 12px rgba(210, 78, 51,0.28)",
-                "&:hover": { background: "linear-gradient(135deg, #7a1640 0%, #5e1232 100%)" },
+                "&:hover": { background: "linear-gradient(135deg, #b8412a 0%, #a63c27 100%)" },
                 minWidth: 140,
               }}>
               {creating || updating ? (

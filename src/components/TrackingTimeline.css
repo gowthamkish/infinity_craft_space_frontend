@@ -65,7 +65,7 @@
   border-color: #0f9488;
   background: white;
   color: #0f9488;
-  box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.25);
+  box-shadow: 0 0 0 4px rgba(15, 148, 136, 0.25);
   animation: ttPulse 2s infinite;
 }
 
@@ -82,8 +82,8 @@
 }
 
 @keyframes ttPulse {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.25); }
-  50%       { box-shadow: 0 0 0 8px rgba(201, 168, 76, 0.12); }
+  0%, 100% { box-shadow: 0 0 0 4px rgba(15, 148, 136, 0.25); }
+  50%       { box-shadow: 0 0 0 8px rgba(15, 148, 136, 0.12); }
 }
 
 .tt-step-label {
@@ -131,7 +131,7 @@
   font-size: 0.9rem;
 }
 .tt-alert--cancelled { background: var(--error-subtle, rgba(198,40,40,0.08)); color: var(--error-dark, #8e0000); }
-.tt-alert--returned  { background: var(--secondary-subtle, rgba(201,168,76,0.10)); color: var(--gold-800, #094d47); }
+.tt-alert--returned  { background: var(--secondary-subtle, rgba(15, 148, 136,0.10)); color: var(--gold-800, #094d47); }
 
 /* ── Info Bar (AWB, courier, ETA) ────────────────────────────── */
 .tt-info-bar {
@@ -156,8 +156,8 @@
 }
 
 .tt-info-bar--ofd {
-  background: linear-gradient(135deg, var(--secondary-subtle, rgba(201,168,76,0.10)) 0%, rgba(201,168,76,0.06) 100%);
-  border-color: rgba(201, 168, 76, 0.3);
+  background: linear-gradient(135deg, var(--secondary-subtle, rgba(15, 148, 136,0.10)) 0%, rgba(15, 148, 136,0.06) 100%);
+  border-color: rgba(15, 148, 136, 0.3);
 }
 
 .tt-info-bar--cancelled {

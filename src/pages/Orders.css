@@ -180,7 +180,7 @@
   white-space: nowrap;
 }
 .status-badge--pending {
-  background: var(--secondary-subtle, rgba(201,168,76,0.10));
+  background: var(--secondary-subtle, rgba(15, 148, 136,0.10));
   color: var(--gold-800, #094d47);
 }
 .status-badge--confirmed {
@@ -188,7 +188,7 @@
   color: var(--primary, #d24e33);
 }
 .status-badge--processing {
-  background: var(--secondary-subtle, rgba(201,168,76,0.10));
+  background: var(--secondary-subtle, rgba(15, 148, 136,0.10));
   color: var(--gold-700, #0a6159);
 }
 .status-badge--shipped {
@@ -246,7 +246,7 @@
   box-shadow: 0 2px 8px var(--btn-brand-glow, rgba(124,58,237,0.28));
 }
 .orders-empty-btn:hover {
-  background: var(--btn-brand-grad-h, linear-gradient(135deg, #b8412a, #4a0d25));
+  background: var(--btn-brand-grad-h, linear-gradient(135deg, #b8412a, #8a3322));
   transform: translateY(-1px);
   box-shadow: 0 4px 16px var(--btn-brand-glow, rgba(124,58,237,0.4));
 }

@@ -108,7 +108,7 @@
 
 .nav-link-item--active {
   color: var(--gold-300, #6fd3c5) !important;
-  background: rgba(201, 168, 76, 0.15) !important;
+  background: rgba(15, 148, 136, 0.15) !important;
   font-weight: var(--font-weight-semibold) !important;
 }
 
@@ -117,7 +117,7 @@
 }
 
 .nav-link-item--active:hover {
-  background: rgba(201, 168, 76, 0.22) !important;
+  background: rgba(15, 148, 136, 0.22) !important;
 }
 
 .nav-link-item:focus-visible {
@@ -295,14 +295,14 @@
 
 .nav-mobile-link--active {
   color: var(--gold-300, #6fd3c5) !important;
-  background: rgba(201, 168, 76, 0.15) !important;
+  background: rgba(15, 148, 136, 0.15) !important;
   font-weight: var(--font-weight-semibold) !important;
 }
 
 .nav-mobile-link:focus-visible {
   outline: 2px solid var(--gold-300, #6fd3c5) !important;
   outline-offset: -2px !important;
-  background: rgba(201, 168, 76, 0.10) !important;
+  background: rgba(15, 148, 136, 0.10) !important;
 }
 
 .nav-mobile-divider {

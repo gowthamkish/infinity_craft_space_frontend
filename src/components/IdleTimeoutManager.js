@@ -331,7 +331,7 @@ const IdleTimeoutManager = () => {
                   background:
                     countdown > 5
                       ? "linear-gradient(90deg, #d24e33 0%, #0f9488 100%)"
-                      : "linear-gradient(90deg, #5c0f30 0%, #d24e33 100%)",
+                      : "linear-gradient(90deg, #a63c27 0%, #d24e33 100%)",
                   borderRadius: "15px",
                   transition: "all 1s ease",
                   boxShadow: "0 2px 8px rgba(210, 78, 51, 0.4)",
@@ -368,7 +368,7 @@ const IdleTimeoutManager = () => {
               background:
                 "linear-gradient(135deg, #f7f4ee 0%, #f0fdf4 100%)",
               borderRadius: "15px",
-              border: "1px solid rgba(201, 168, 76, 0.2)",
+              border: "1px solid rgba(15, 148, 136, 0.2)",
             }}
           >
             <Box
@@ -422,7 +422,7 @@ const IdleTimeoutManager = () => {
               borderRadius: "12px",
               fontWeight: 600,
               "&:hover": {
-                borderColor: "#5c0f30",
+                borderColor: "#a63c27",
                 backgroundColor: "rgba(210, 78, 51,0.05)",
               },
             }}
@@ -442,7 +442,7 @@ const IdleTimeoutManager = () => {
               color: "white",
               "&:hover": {
                 background:
-                  "linear-gradient(135deg, #5c0f30 0%, #a8882e 100%)",
+                  "linear-gradient(135deg, #a63c27 0%, #a8882e 100%)",
               },
             }}
           >

@@ -116,7 +116,7 @@
 }
 
 .ntf-action-btn--primary:hover:not(:disabled) {
-  background: var(--btn-brand-grad-h, linear-gradient(135deg, #b8412a 0%, #4a0d25 100%));
+  background: var(--btn-brand-grad-h, linear-gradient(135deg, #b8412a 0%, #8a3322 100%));
   transform: translateY(-1px);
 }
 

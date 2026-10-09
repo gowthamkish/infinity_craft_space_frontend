@@ -89,7 +89,7 @@
 .loader-orbit__ring--2 {
   inset: 10px;
   border-top-color: var(--gold-500, #0f9488);
-  border-right-color: rgba(201, 168, 76, 0.15);
+  border-right-color: rgba(15, 148, 136, 0.15);
   animation-duration: 1.15s;
   animation-direction: reverse;
 }

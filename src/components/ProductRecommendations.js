@@ -253,7 +253,7 @@ const ProductRecommendationCard = ({ product }) => {
             fontWeight: 600,
             textTransform: "none",
             "&:hover": {
-              background: `linear-gradient(135deg, #5c0f30 0%, #a8882e 100%)`,
+              background: `linear-gradient(135deg, #a63c27 0%, #a8882e 100%)`,
             },
           }}
         >

@@ -23,7 +23,7 @@ function AriaAvatar({ size = 34, ring = false }) {
     <Box sx={{
       width: size, height: size, borderRadius: "50%", flexShrink: 0,
       overflow: "hidden",
-      ...(ring ? { border: "2px solid rgba(255,255,255,0.6)", boxShadow: "0 0 0 2px rgba(201,168,76,0.5)" } : {}),
+      ...(ring ? { border: "2px solid rgba(255,255,255,0.6)", boxShadow: "0 0 0 2px rgba(15, 148, 136,0.5)" } : {}),
     }}>
       <Box
         component="img"
@@ -89,7 +89,7 @@ export default function ChatWidget() {
               width: 56, height: 56,
               boxShadow: "0 4px 20px rgba(210, 78, 51,0.4)",
               "&:hover": {
-                background: `linear-gradient(135deg, ${PRIMARY_DARK}, #4a0d25)`,
+                background: `linear-gradient(135deg, ${PRIMARY_DARK}, #8a3322)`,
                 boxShadow: "0 6px 24px rgba(210, 78, 51,0.5)",
                 transform: "scale(1.06)",
               },

@@ -342,9 +342,9 @@ const ProductCard = React.memo(({
               startIcon={cartLoading ? null : requiresOptionSelection ? <FiEye size={13} /> : <FiShoppingCart size={13} />}
               sx={{
                 borderRadius: "8px", textTransform: "none", fontSize: "0.8rem", fontWeight: 700, py: 0.875,
-                background: `linear-gradient(135deg, ${ROSE} 0%, #7a1640 100%)`,
+                background: `linear-gradient(135deg, ${ROSE} 0%, #b8412a 100%)`,
                 boxShadow: "0 3px 10px rgba(210, 78, 51,0.25)",
-                "&:hover": { background: "linear-gradient(135deg, #7a1640 0%, #5e1232 100%)" },
+                "&:hover": { background: "linear-gradient(135deg, #b8412a 0%, #a63c27 100%)" },
               }}
             >
               {cartLoading ? <CircularProgress size={14} color="inherit" /> : requiresOptionSelection ? "Select Options" : "Add to Cart"}
@@ -574,9 +574,9 @@ const ProductListing = () => {
               startIcon={<FiShoppingCart size={14} />}
               sx={{
                 textTransform: "none", borderRadius: "10px", fontWeight: 700, whiteSpace: "nowrap", flexShrink: 0, px: 2,
-                background: `linear-gradient(135deg, ${ROSE}, #7a1640)`,
+                background: `linear-gradient(135deg, ${ROSE}, #b8412a)`,
                 boxShadow: "0 3px 10px rgba(210, 78, 51,0.25)",
-                "&:hover": { background: "linear-gradient(135deg, #7a1640, #5e1232)" },
+                "&:hover": { background: "linear-gradient(135deg, #b8412a, #a63c27)" },
               }}
             >
               Cart ({totalCartItems}) · Checkout
@@ -623,7 +623,7 @@ const ProductListing = () => {
                     fontSize: "0.8125rem", fontWeight: isActive ? 700 : 500,
                     fontFamily: "inherit",
                     transition: "all 140ms",
-                    "&:hover": { borderColor: ROSE, bgcolor: isActive ? "#7a1640" : "rgba(210, 78, 51,0.06)", color: isActive ? "#fff" : ROSE },
+                    "&:hover": { borderColor: ROSE, bgcolor: isActive ? "#b8412a" : "rgba(210, 78, 51,0.06)", color: isActive ? "#fff" : ROSE },
                   }}
                 >
                   <FiArrowUp size={12} />
@@ -670,7 +670,7 @@ const ProductListing = () => {
                     fontSize: "0.8125rem", fontWeight: isActive ? 700 : 500,
                     fontFamily: "inherit",
                     transition: "all 140ms",
-                    "&:hover": { borderColor: ROSE, bgcolor: isActive ? "#7a1640" : "rgba(210, 78, 51,0.06)", color: isActive ? "#fff" : ROSE },
+                    "&:hover": { borderColor: ROSE, bgcolor: isActive ? "#b8412a" : "rgba(210, 78, 51,0.06)", color: isActive ? "#fff" : ROSE },
                   }}
                 >
                   {cat.name}
@@ -711,7 +711,7 @@ const ProductListing = () => {
                     fontSize: "0.8125rem", fontWeight: isActive ? 700 : 500,
                     fontFamily: "inherit",
                     transition: "all 140ms",
-                    "&:hover": { borderColor: ROSE, bgcolor: isActive ? "#7a1640" : "rgba(210, 78, 51,0.06)", color: isActive ? "#fff" : ROSE },
+                    "&:hover": { borderColor: ROSE, bgcolor: isActive ? "#b8412a" : "rgba(210, 78, 51,0.06)", color: isActive ? "#fff" : ROSE },
                   }}
                 >
                   <FiTag size={12} />
@@ -905,9 +905,9 @@ const ProductListing = () => {
             }}
             sx={{
               textTransform: "none", borderRadius: "10px", fontWeight: 700,
-              background: `linear-gradient(135deg, ${ROSE}, #7a1640)`,
+              background: `linear-gradient(135deg, ${ROSE}, #b8412a)`,
               boxShadow: "none",
-              "&:hover": { background: "linear-gradient(135deg, #7a1640, #5e1232)" },
+              "&:hover": { background: "linear-gradient(135deg, #b8412a, #a63c27)" },
               "&.Mui-disabled": { opacity: 0.4 },
             }}
           >

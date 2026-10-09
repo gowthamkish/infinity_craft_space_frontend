@@ -42,12 +42,12 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--gold-200, #a9e6dd) 0%, var(--gold-500, #0f9488) 100%);
+  background: linear-gradient(135deg, #fde68a 0%, #f59e0b 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.25rem;
-  box-shadow: 0 4px 14px rgba(201, 168, 76, 0.35);
+  box-shadow: 0 4px 14px rgba(15, 148, 136, 0.35);
 }
 
 .com-icon {
@@ -99,7 +99,7 @@
 }
 
 .com-item-dot {
-  color: var(--gold-500, #0f9488);
+  color: #f59e0b;
   font-size: 0.7rem;
   flex-shrink: 0;
 }
@@ -119,8 +119,8 @@
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
-  background: linear-gradient(135deg, var(--gold-100, #d5f3ee) 0%, var(--gold-200, #a9e6dd) 100%);
-  border: 1px solid var(--gold-300, #6fd3c5);
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #fcd34d;
   border-radius: 12px;
   padding: 0.9rem 1rem;
   margin-bottom: 1.5rem;
@@ -135,13 +135,13 @@
 .com-notice strong {
   display: block;
   font-size: 0.92rem;
-  color: var(--gold-800, #094d47);
+  color: #92400e;
   margin-bottom: 0.25rem;
 }
 
 .com-notice-sub {
   font-size: 0.83rem;
-  color: var(--gold-700, #0a6159);
+  color: #b45309;
   margin: 0;
   line-height: 1.5;
 }

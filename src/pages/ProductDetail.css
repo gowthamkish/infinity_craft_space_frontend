@@ -588,7 +588,7 @@
 /* Customization panel */
 .pdp-custom {
   background: linear-gradient(135deg, var(--bg-tertiary, #efebe3) 0%, var(--bg-tertiary, #efebe3) 100%);
-  border: 1.5px solid var(--rose-200, #f8c4d4);
+  border: 1.5px solid var(--rose-200, #ffcdb9);
   border-radius: var(--pdp-radius-sm);
   padding: 16px;
 }
@@ -610,7 +610,7 @@
 .pdp-custom-title {
   font-size: 0.875rem;
   font-weight: 700;
-  color: var(--rose-900, #4a0d26);
+  color: var(--rose-900, #8a3322);
   margin: 0 0 2px;
 }
 
@@ -623,7 +623,7 @@
 
 .pdp-custom-input {
   width: 100%;
-  border: 1.5px solid var(--rose-200, #f8c4d4);
+  border: 1.5px solid var(--rose-200, #ffcdb9);
   border-radius: 8px;
   padding: 10px 12px;
   font-size: 0.875rem;

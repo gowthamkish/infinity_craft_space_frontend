@@ -1,17 +1,9 @@
 import { useState } from "react";
-import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import Alert from "@mui/material/Alert";
-import Chip from "@mui/material/Chip";
-import InputAdornment from "@mui/material/InputAdornment";
-import CircularProgress from "@mui/material/CircularProgress";
-import { BRAND } from "../theme/muiTheme";
 import { FiTag, FiCheck, FiX } from "react-icons/fi";
 import { useValidateCouponMutation } from "../services/engagementApi";
+import { Spinner } from "../pages/checkout/ui";
 
+/** Coupon box shown in the checkout summary (styles: styles/checkout.css .ck-coupon*) */
 const CouponInput = ({ cartTotal, onCouponApplied, appliedCoupon = null, onRemoveCoupon }) => {
   const [code, setCode] = useState("");
   const [validateCoupon, { isLoading: loading }] = useValidateCouponMutation();
@@ -47,85 +39,44 @@ const CouponInput = ({ cartTotal, onCouponApplied, appliedCoupon = null, onRemov
   };
 
   return (
-    <Box>
-      <Typography variant="body2" sx={{ fontWeight: 600, mb: 1.25 }}>
-        Have a coupon?
-      </Typography>
+    <div className="ck-coupon">
+      <label className="ck-label" htmlFor="ck-coupon-code">Have a coupon?</label>
 
       {validatedCoupon ? (
-        <Alert
-          severity="success"
-          icon={<FiCheck size={16} />}
-          action={
-            <Button
-              color="inherit"
-              size="small"
-              startIcon={<FiX size={13} />}
-              onClick={handleRemove}
-              sx={{ textTransform: "none", fontWeight: 600, fontSize: "0.75rem" }}
-            >
-              Remove
-            </Button>
-          }
-          sx={{ borderRadius: 2, py: 0.75 }}
-        >
-          <Typography variant="body2" sx={{ fontWeight: 700 }}>
-            {validatedCoupon.code}
-          </Typography>
-          <Typography variant="caption" sx={{ color: "success.dark" }}>
-            −₹{validatedCoupon.discount?.toFixed(2)} discount applied
-          </Typography>
-        </Alert>
+        <div className="ck-coupon-applied" role="status">
+          <span className="ck-coupon-tick" aria-hidden="true"><FiCheck size={16} /></span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <b>{validatedCoupon.code}</b>
+            <small>−₹{validatedCoupon.discount?.toFixed(2)} discount applied</small>
+          </div>
+          <button type="button" className="ck-link" onClick={handleRemove} aria-label="Remove coupon">
+            <FiX size={16} /> Remove
+          </button>
+        </div>
       ) : (
-        <Box component="form" onSubmit={handleValidate} noValidate>
-          <Stack direction="row" spacing={1}>
-            <TextField
+        <form className="ck-coupon-form" onSubmit={handleValidate} noValidate>
+          <div className="ck-coupon-input">
+            <FiTag size={17} aria-hidden="true" />
+            <input
+              id="ck-coupon-code"
+              className={`ck-input ${error ? "is-error" : ""}`}
               value={code}
               onChange={(e) => { setCode(e.target.value.toUpperCase()); setError(null); }}
-              placeholder="Enter coupon code"
-              size="small"
-              fullWidth
+              placeholder="Enter code"
+              autoComplete="off"
               disabled={loading}
-              error={!!error}
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <FiTag size={15} color={BRAND.rose[800]} />
-                    </InputAdornment>
-                  ),
-                  style: { letterSpacing: "0.08em", fontWeight: 600 },
-                },
-              }}
-              aria-label="Coupon code"
+              aria-invalid={!!error}
             />
-            <Button
-              type="submit"
-              variant="outlined"
-              disabled={loading || !code.trim()}
-              sx={{
-                minWidth: 72,
-                flexShrink: 0,
-                fontWeight: 700,
-                fontSize: "0.8125rem",
-              }}
-            >
-              {loading ? <CircularProgress size={16} color="inherit" /> : "Apply"}
-            </Button>
-          </Stack>
-
-          {error && (
-            <Typography variant="caption" color="error" sx={{ mt: 0.75, display: "block" }}>
-              {error}
-            </Typography>
-          )}
-        </Box>
+          </div>
+          <button type="submit" className="ck-btn ck-btn--ghost" disabled={loading || !code.trim()}>
+            {loading ? <Spinner /> : "Apply"}
+          </button>
+        </form>
       )}
 
-      <Typography variant="caption" sx={{ color: "text.secondary", mt: 1, display: "block" }}>
-        💡 Check your email for exclusive discount codes
-      </Typography>
-    </Box>
+      {error && <span className="ck-help ck-help--err" role="alert">{error}</span>}
+      <span className="ck-help">💡 Check your email for exclusive discount codes</span>
+    </div>
   );
 };
 
