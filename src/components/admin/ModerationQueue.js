@@ -772,13 +772,17 @@ export default function ModerationQueue() {
   };
 
   // ── Derived data ─────────────────────────────────────────────────────────────
+  // Lowercase the query once (not 3× per review), and parse each date once
+  // before sorting rather than twice per comparison (O(n) vs O(n log n) parses).
+  const q = search.toLowerCase();
+  const sortDir = sortBy === "newest" ? -1 : 1;
   const filteredReviews = reviews
-    .filter((r) => !search || r.comment?.toLowerCase().includes(search.toLowerCase())
-      || r.user?.username?.toLowerCase().includes(search.toLowerCase())
-      || r.title?.toLowerCase().includes(search.toLowerCase()))
-    .sort((a, b) => sortBy === "newest"
-      ? new Date(b.createdAt) - new Date(a.createdAt)
-      : new Date(a.createdAt) - new Date(b.createdAt));
+    .filter((r) => !search || r.comment?.toLowerCase().includes(q)
+      || r.user?.username?.toLowerCase().includes(q)
+      || r.title?.toLowerCase().includes(q))
+    .map((r) => ({ r, t: new Date(r.createdAt).getTime() }))
+    .sort((a, b) => sortDir * (a.t - b.t))
+    .map(({ r }) => r);
 
   const reviewsBadge = (counts.pending || 0) + (counts.drafts || 0);
 

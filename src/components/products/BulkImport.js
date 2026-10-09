@@ -38,6 +38,23 @@ const ALL_COLS = [
   "seoTitle","seoDescription","seoKeywords",
 ];
 
+/* ── template sample row (same order as ALL_COLS) ────────────────── */
+const SAMPLE_ROW = [
+  "Handmade Kundan Bangle","Jewellery","Bangles","KUN-001","499","699","50","5",
+  "Beautiful handcrafted kundan bangle.","kundan;bangle","50","5","false","","",
+  "Handmade Kundan Bangle | Infinity Craft Space","Shop beautiful handcrafted kundan bangles.","kundan bangle",
+];
+
+const COL_NOTES = {
+  name: "Product name",
+  category: "Use the same spelling as in Admin → Categories",
+  price: "Selling price in ₹ (greater than 0)",
+  compareAtPrice: "Original/MRP price shown struck-through",
+  tags: "Separate multiple tags with ;",
+  isCustomizable: "true or false",
+  estimatedDelivery: "Days to deliver",
+};
+
 /* ── CSV parser (handles quoted fields + commas inside quotes) ────── */
 function parseCsv(text) {
   const lines = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
@@ -191,18 +208,30 @@ export default function BulkImport() {
       URL.revokeObjectURL(url);
     } catch {
       const header = ALL_COLS.join(",");
-      const sample = ["Handmade Kundan Bangle","Jewellery","Bangles","KUN-001","499","699","50","5","Beautiful handcrafted kundan bangle.","kundan;bangle","50","5","false","","","Handmade Kundan Bangle | Infinity Craft Space","Shop beautiful handcrafted kundan bangles.","kundan bangle"].map(v=>`"${v}"`).join(",");
+      const sample = SAMPLE_ROW.map(v=>`"${v}"`).join(",");
       const url = URL.createObjectURL(new Blob([`${header}\n${sample}`], { type: "text/csv" }));
       const a = document.createElement("a"); a.href = url; a.download = "products_template.csv"; a.click();
       URL.revokeObjectURL(url);
     }
   };
 
+  // Generated client-side with SheetJS — there is no static .xlsx in /public,
+  // and linking to a missing file makes the SPA fallback serve index.html.
   const downloadExcelTemplate = () => {
-    const a = document.createElement("a");
-    a.href = "/products_import_sample.xlsx";
-    a.download = "products_template.xlsx";
-    a.click();
+    const wb = XLSX.utils.book_new();
+
+    const products = XLSX.utils.aoa_to_sheet([ALL_COLS, SAMPLE_ROW]);
+    products["!cols"] = ALL_COLS.map((c) => ({ wch: Math.max(14, c.length + 2) }));
+    XLSX.utils.book_append_sheet(wb, products, "Products");
+
+    const instructions = XLSX.utils.aoa_to_sheet([
+      ["Column", "Required", "Notes"],
+      ...ALL_COLS.map((c) => [c, REQUIRED_COLS.includes(c) ? "Yes" : "No", COL_NOTES[c] || ""]),
+    ]);
+    instructions["!cols"] = [{ wch: 20 }, { wch: 10 }, { wch: 60 }];
+    XLSX.utils.book_append_sheet(wb, instructions, "Instructions");
+
+    XLSX.writeFile(wb, "products_template.xlsx");
   };
 
   const reset = () => { setCsvRows([]); setHeaders([]); setRowErrors({}); setResult(null); setFileError(""); setStep("upload"); };

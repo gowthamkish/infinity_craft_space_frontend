@@ -181,15 +181,17 @@ const cartSlice = createSlice({
 
     mergeGuestCart: (state, action) => {
       const guestItems = action.payload;
+      // Index cart items by product id once → O(n + m) merge instead of O(n·m)
+      const byId = new Map(state.items.map((item) => [item.product._id, item]));
       guestItems.forEach((guestItem) => {
-        const existing = state.items.find(
-          (item) => item.product._id === guestItem.product._id,
-        );
+        const existing = byId.get(guestItem.product._id);
         if (existing) {
           existing.quantity += guestItem.quantity;
           existing.totalPrice = existing.quantity * existing.product.price;
         } else {
           state.items.push(guestItem);
+          // Register the draft so a repeated guest item merges into it
+          byId.set(guestItem.product._id, state.items[state.items.length - 1]);
         }
       });
     },

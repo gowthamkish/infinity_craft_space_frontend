@@ -32,6 +32,9 @@ const SORT_OPTIONS = [
 ];
 
 const PAGE_SIZE = 16;
+// Shared collator: String#localeCompare builds a new collator on every call,
+// which is the hot path of an O(n log n) sort
+const nameCollator = new Intl.Collator();
 const ROSE = "#8B1A4A";
 
 /* ── Lazy Image ─────────────────────────────────────────────────────── */
@@ -440,15 +443,18 @@ const ProductListing = () => {
   const filteredProducts = useMemo(() => {
     if (!Array.isArray(products) || !products.length) return [];
     let out = products;
-    if (filters.searchTerm) { const re = new RegExp(filters.searchTerm, "i"); out = out.filter((p) => re.test(p.name) || re.test(p.description || "")); }
+    // Plain case-insensitive substring match. (Was `new RegExp(searchTerm)`, which
+    // threw — and crashed the page — on input like "(" or "*", since user text
+    // was parsed as a regex.)
+    if (filters.searchTerm) { const q = filters.searchTerm.toLowerCase(); out = out.filter((p) => (p.name || "").toLowerCase().includes(q) || (p.description || "").toLowerCase().includes(q)); }
     if (filters.categories?.length) { const s = new Set(filters.categories.map((c) => c.toLowerCase())); out = out.filter((p) => s.has(p.category?.toLowerCase()) || s.has(p.subCategory?.toLowerCase())); }
     if (filters.priceRange) { const { min, max } = filters.priceRange; out = out.filter((p) => p.price >= min && p.price <= max); }
     if (filters.sortBy) {
       out = [...out];
       if (filters.sortBy === "price-low-high") out.sort((a, b) => a.price - b.price);
       else if (filters.sortBy === "price-high-low") out.sort((a, b) => b.price - a.price);
-      else if (filters.sortBy === "name-asc") out.sort((a, b) => a.name.localeCompare(b.name));
-      else if (filters.sortBy === "name-desc") out.sort((a, b) => b.name.localeCompare(a.name));
+      else if (filters.sortBy === "name-asc") out.sort((a, b) => nameCollator.compare(a.name, b.name));
+      else if (filters.sortBy === "name-desc") out.sort((a, b) => nameCollator.compare(b.name, a.name));
     }
     return out;
   }, [products, filters]);
@@ -461,6 +467,9 @@ const ProductListing = () => {
   const handleImageClick = useCallback((p) => { setSelectedProduct(p); setShowImageModal(true); }, []);
   const handleShowToast  = useCallback((msg, type = "success") => { setToastMsg(msg); setToastType(type); setShowToast(true); setTimeout(() => setShowToast(false), 3000); }, []);
   const handleWishlistToggle = useCallback((id, added) => { setWishlistIds((prev) => { const s = new Set(prev); added ? s.add(id) : s.delete(id); return s; }); }, []);
+
+  // O(1) membership for the category pills (checked for every category + subcategory)
+  const selectedCategorySet = useMemo(() => new Set(filters.categories), [filters.categories]);
 
   const activeFilterCount = [filters.categories.length > 0, !!filters.priceRange, !!filters.sortBy].filter(Boolean).length;
 
@@ -610,7 +619,7 @@ const ProductListing = () => {
             {/* ── Category pills ── */}
             {publicCategories.filter((c) => c.isActive !== false).map((cat) => {
               const allNames = [cat.name, ...(cat.subcategories?.filter((s) => s.isActive !== false).map((s) => s.name) || [])];
-              const selectedInCat = allNames.filter((n) => filters.categories.includes(n));
+              const selectedInCat = allNames.filter((n) => selectedCategorySet.has(n));
               const isActive = selectedInCat.length > 0;
               const hasSubs = cat.subcategories?.some((s) => s.isActive !== false);
 
