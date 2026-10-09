@@ -49,9 +49,9 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 2.5px solid var(--border-color, #EAD9C5);
+  border: 2.5px solid var(--border-color, #e4dfd6);
   background: white;
-  color: var(--charcoal-400, #C0A882);
+  color: var(--charcoal-400, #b4b2a8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -62,9 +62,9 @@
 }
 
 .cpb-circle--active {
-  border-color: var(--primary, #8B1A4A);
-  color: var(--primary, #8B1A4A);
-  box-shadow: 0 0 0 4px rgba(139, 26, 74, 0.12), 0 4px 10px rgba(139, 26, 74, 0.2);
+  border-color: var(--primary, #d24e33);
+  color: var(--primary, #d24e33);
+  box-shadow: 0 0 0 4px rgba(210, 78, 51, 0.12), 0 4px 10px rgba(210, 78, 51, 0.2);
 }
 
 .cpb-circle--done {
@@ -78,21 +78,21 @@
 .cpb-label {
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--charcoal-400, #C0A882);
+  color: var(--charcoal-400, #b4b2a8);
   transition: color 0.2s ease;
   text-align: center;
   white-space: nowrap;
   line-height: 1.2;
 }
 
-.cpb-label--active { color: var(--primary, #8B1A4A); font-weight: 700; }
+.cpb-label--active { color: var(--primary, #d24e33); font-weight: 700; }
 .cpb-label--done   { color: var(--success, #2e7d32); }
 
 /* Connector line */
 .cpb-connector {
   flex: 1;
   height: 2px;
-  background: var(--border-color, #EAD9C5);
+  background: var(--border-color, #e4dfd6);
   margin: 20px 4px 0;
   border-radius: 99px;
   position: relative;

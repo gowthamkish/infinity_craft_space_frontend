@@ -48,7 +48,7 @@ const CouponInput = ({ cartTotal, onCouponApplied, appliedCoupon = null, onRemov
 
   return (
     <Box>
-      <Typography variant="body2" fontWeight={600} sx={{ mb: 1.25 }}>
+      <Typography variant="body2" sx={{ fontWeight: 600, mb: 1.25 }}>
         Have a coupon?
       </Typography>
 
@@ -69,10 +69,10 @@ const CouponInput = ({ cartTotal, onCouponApplied, appliedCoupon = null, onRemov
           }
           sx={{ borderRadius: 2, py: 0.75 }}
         >
-          <Typography variant="body2" fontWeight={700}>
+          <Typography variant="body2" sx={{ fontWeight: 700 }}>
             {validatedCoupon.code}
           </Typography>
-          <Typography variant="caption" color="success.dark">
+          <Typography variant="caption" sx={{ color: "success.dark" }}>
             −₹{validatedCoupon.discount?.toFixed(2)} discount applied
           </Typography>
         </Alert>
@@ -122,7 +122,7 @@ const CouponInput = ({ cartTotal, onCouponApplied, appliedCoupon = null, onRemov
         </Box>
       )}
 
-      <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: "block" }}>
+      <Typography variant="caption" sx={{ color: "text.secondary", mt: 1, display: "block" }}>
         💡 Check your email for exclusive discount codes
       </Typography>
     </Box>

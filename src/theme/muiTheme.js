@@ -2,59 +2,61 @@ import { createTheme, alpha } from "@mui/material/styles";
 
 // ── Brand design tokens ────────────────────────────────────────────────────
 export const BRAND = {
-  // Primary: Deep Rose / Maroon
+  // Primary: Ember orange (key kept as `rose` so existing BRAND.rose[...] usages keep working)
   rose: {
-    50:  "#fdf2f6",
-    100: "#fce7ef",
-    200: "#fad0e1",
-    300: "#f5a8c6",
-    400: "#ee77a3",
-    500: "#de4a7e",
-    600: "#c42b61",
-    700: "#a51e50",
-    800: "#8B1A4A",  // ← main brand primary
-    900: "#6b1238",
+    50:  "#fff3ee",
+    100: "#ffe6dc",
+    200: "#ffcdb9",
+    300: "#ffab8c",
+    400: "#ff8d66",
+    500: "#ff7a50",
+    600: "#e8623d",
+    700: "#de5637",
+    800: "#d24e33",  // ← main brand primary
+    900: "#b8412a",
   },
-  // Secondary: Gold
+  // Secondary: Teal (key kept as `gold` for the same reason)
   gold: {
-    50:  "#fdfaed",
-    100: "#faf2cc",
-    200: "#f4e28b",
-    300: "#edcc59",
-    400: "#e2b535",
-    500: "#C9A84C",  // ← main brand secondary
-    600: "#b08930",
-    700: "#8e6a24",
-    800: "#745422",
-    900: "#624620",
+    50:  "#effaf8",
+    100: "#d5f3ee",
+    200: "#a9e6dd",
+    300: "#6fd3c5",
+    400: "#2dd4bf",
+    500: "#0f9488",  // ← main brand secondary
+    600: "#0c7a70",
+    700: "#0a6159",
+    800: "#094d47",
+    900: "#073f3a",
   },
-  // Accent: Blush Pink
+  // Accent: Peach tints of the ember
   blush: {
-    50:  "#fff5f8",
-    100: "#ffe4ed",
-    200: "#fec9db",
-    300: "#FDA4BE",
-    400: "#F4A7B9",  // ← main accent
-    500: "#e87898",
-    600: "#d4567a",
-    700: "#b13d60",
-    800: "#93334f",
-    900: "#7c2e45",
+    50:  "#fff6f2",
+    100: "#ffe9e0",
+    200: "#ffd3c2",
+    300: "#ffb399",
+    400: "#ff9d7a",  // ← main accent
+    500: "#ff7a50",
+    600: "#e8623d",
+    700: "#c9472d",
+    800: "#a63c27",
+    900: "#8a3322",
   },
-  // Neutral: Warm charcoal
+  // Neutral: warm paper → charcoal
   charcoal: {
-    50:  "#FDF6EC",  // ← main background (soft cream)
-    100: "#F5EDE0",
-    200: "#EAD9C5",
-    300: "#D9C4A8",
-    400: "#C0A882",
-    500: "#A08060",
-    600: "#7A5E42",
-    700: "#5C4330",
-    800: "#3D2C20",
-    900: "#2C2C2C",  // ← main text
+    50:  "#f7f4ee",  // ← main background (soft cream)
+    100: "#efebe3",
+    200: "#e4dfd6",
+    300: "#d3ccc0",
+    400: "#b4b2a8",
+    500: "#8a8c85",
+    600: "#5b5d58",
+    700: "#46473f",
+    800: "#2f302b",
+    900: "#232420",  // ← main text
   },
 };
+
+const HEADING_FONT = "'Space Grotesk', 'Inter', 'Noto Sans', sans-serif";
 
 const muiTheme = createTheme({
   palette: {
@@ -82,7 +84,7 @@ const muiTheme = createTheme({
       disabled:  BRAND.charcoal[300],
     },
     background: {
-      default: BRAND.charcoal[50],  // soft cream #FDF6EC
+      default: BRAND.charcoal[50],  // soft cream #f7f4ee
       paper:   "#FFFDF9",            // warm white
     },
     divider: BRAND.charcoal[200],
@@ -102,12 +104,12 @@ const muiTheme = createTheme({
 
   typography: {
     fontFamily: "'Inter', 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    h1: { fontWeight: 800, fontSize: "clamp(1.75rem, 4vw, 2.75rem)", letterSpacing: "-0.02em", lineHeight: 1.15 },
-    h2: { fontWeight: 700, fontSize: "clamp(1.5rem, 3vw, 2.25rem)", letterSpacing: "-0.015em", lineHeight: 1.2  },
-    h3: { fontWeight: 700, fontSize: "clamp(1.25rem, 2.5vw, 1.875rem)", letterSpacing: "-0.01em", lineHeight: 1.25 },
-    h4: { fontWeight: 700, fontSize: "clamp(1.1rem, 2vw, 1.5rem)", letterSpacing: "-0.008em", lineHeight: 1.3 },
-    h5: { fontWeight: 600, fontSize: "clamp(1rem, 1.5vw, 1.25rem)", lineHeight: 1.4 },
-    h6: { fontWeight: 600, fontSize: "1rem", lineHeight: 1.4 },
+    h1: { fontFamily: HEADING_FONT, fontWeight: 700, fontSize: "clamp(1.75rem, 4vw, 2.75rem)", letterSpacing: "-0.02em", lineHeight: 1.15 },
+    h2: { fontFamily: HEADING_FONT, fontWeight: 700, fontSize: "clamp(1.5rem, 3vw, 2.25rem)", letterSpacing: "-0.015em", lineHeight: 1.2  },
+    h3: { fontFamily: HEADING_FONT, fontWeight: 700, fontSize: "clamp(1.25rem, 2.5vw, 1.875rem)", letterSpacing: "-0.01em", lineHeight: 1.25 },
+    h4: { fontFamily: HEADING_FONT, fontWeight: 700, fontSize: "clamp(1.1rem, 2vw, 1.5rem)", letterSpacing: "-0.008em", lineHeight: 1.3 },
+    h5: { fontFamily: HEADING_FONT, fontWeight: 600, fontSize: "clamp(1rem, 1.5vw, 1.25rem)", lineHeight: 1.4 },
+    h6: { fontFamily: HEADING_FONT, fontWeight: 600, fontSize: "1rem", lineHeight: 1.4 },
     subtitle1: { fontWeight: 500, lineHeight: 1.6, letterSpacing: "0.005em" },
     subtitle2: { fontWeight: 600, fontSize: "0.875rem", lineHeight: 1.5, letterSpacing: "0.01em" },
     body1: { fontSize: "1rem", lineHeight: 1.7 },
@@ -121,17 +123,17 @@ const muiTheme = createTheme({
 
   shadows: [
     "none",
-    "0 1px 2px 0 rgba(139,26,74,0.04)",
-    "0 1px 4px 0 rgba(139,26,74,0.06), 0 1px 2px -1px rgba(0,0,0,0.05)",
-    "0 2px 8px -1px rgba(139,26,74,0.08), 0 2px 4px -2px rgba(0,0,0,0.06)",
-    "0 4px 12px -2px rgba(139,26,74,0.10), 0 2px 6px -2px rgba(0,0,0,0.07)",
-    "0 8px 20px -4px rgba(139,26,74,0.12), 0 4px 8px -4px rgba(0,0,0,0.07)",
-    "0 12px 28px -6px rgba(139,26,74,0.14), 0 6px 12px -4px rgba(0,0,0,0.08)",
-    "0 16px 36px -8px rgba(139,26,74,0.15), 0 8px 16px -6px rgba(0,0,0,0.09)",
-    "0 20px 48px -10px rgba(139,26,74,0.16)",
-    "0 24px 60px -12px rgba(139,26,74,0.18)",
-    "0 32px 72px -12px rgba(139,26,74,0.20)",
-    "0 40px 80px -16px rgba(139,26,74,0.22)",
+    "0 1px 2px 0 rgba(210, 78, 51,0.04)",
+    "0 1px 4px 0 rgba(210, 78, 51,0.06), 0 1px 2px -1px rgba(0,0,0,0.05)",
+    "0 2px 8px -1px rgba(210, 78, 51,0.08), 0 2px 4px -2px rgba(0,0,0,0.06)",
+    "0 4px 12px -2px rgba(210, 78, 51,0.10), 0 2px 6px -2px rgba(0,0,0,0.07)",
+    "0 8px 20px -4px rgba(210, 78, 51,0.12), 0 4px 8px -4px rgba(0,0,0,0.07)",
+    "0 12px 28px -6px rgba(210, 78, 51,0.14), 0 6px 12px -4px rgba(0,0,0,0.08)",
+    "0 16px 36px -8px rgba(210, 78, 51,0.15), 0 8px 16px -6px rgba(0,0,0,0.09)",
+    "0 20px 48px -10px rgba(210, 78, 51,0.16)",
+    "0 24px 60px -12px rgba(210, 78, 51,0.18)",
+    "0 32px 72px -12px rgba(210, 78, 51,0.20)",
+    "0 40px 80px -16px rgba(210, 78, 51,0.22)",
     ...Array(13).fill("none"),
   ],
 

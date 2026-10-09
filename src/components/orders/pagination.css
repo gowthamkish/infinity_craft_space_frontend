@@ -4,8 +4,8 @@
   flex-direction: column;
   gap: 1.5rem;
   padding: 1.5rem;
-  background: linear-gradient(135deg, var(--bg-secondary, #FDF6EC) 0%, var(--bg-tertiary, #F5EDE0) 100%);
-  border-top: 1px solid var(--border-color, #EAD9C5);
+  background: linear-gradient(135deg, var(--bg-secondary, #f7f4ee) 0%, var(--bg-tertiary, #efebe3) 100%);
+  border-top: 1px solid var(--border-color, #e4dfd6);
   border-radius: 0 0 12px 12px;
   margin-top: 1rem;
 }
@@ -21,12 +21,12 @@
 
 .adm-pagination-text {
   font-size: 0.9rem;
-  color: var(--charcoal-500, #A08060);
+  color: var(--charcoal-500, #8a8c85);
   font-weight: 500;
 }
 
 .adm-pagination-text strong {
-  color: var(--charcoal-800, #3D2C20);
+  color: var(--charcoal-800, #2f302b);
   font-weight: 600;
 }
 
@@ -39,17 +39,17 @@
 
 .adm-pagination-label {
   font-size: 0.9rem;
-  color: var(--charcoal-500, #A08060);
+  color: var(--charcoal-500, #8a8c85);
   font-weight: 500;
   margin: 0;
 }
 
 .adm-pagination-select {
   padding: 0.5rem 0.75rem;
-  border: 1px solid var(--border-color, #EAD9C5);
+  border: 1px solid var(--border-color, #e4dfd6);
   border-radius: 6px;
   background: white;
-  color: var(--charcoal-800, #3D2C20);
+  color: var(--charcoal-800, #2f302b);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
@@ -57,13 +57,13 @@
 }
 
 .adm-pagination-select:hover {
-  border-color: var(--charcoal-400, #C0A882);
+  border-color: var(--charcoal-400, #b4b2a8);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .adm-pagination-select:focus {
   outline: none;
-  border-color: var(--secondary, #C9A84C);
+  border-color: var(--secondary, #0f9488);
   box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
 }
 
@@ -85,9 +85,9 @@
   height: var(--btn-h-sm, 36px);
   padding: 0 var(--btn-px-sm, 14px);
   background: white;
-  border: 1px solid var(--border-color, #EAD9C5);
+  border: 1px solid var(--border-color, #e4dfd6);
   border-radius: var(--btn-radius-sm, 8px);
-  color: var(--btn-brand, #8B1A4A);
+  color: var(--btn-brand, #d24e33);
   font-weight: var(--btn-fw, 600);
   font-size: 0.85rem;
   cursor: pointer;
@@ -96,21 +96,21 @@
 }
 
 .adm-pagination-btn:hover:not(:disabled) {
-  background: var(--btn-brand-subtle, rgba(139,26,74,0.08));
-  border-color: var(--btn-brand, #8B1A4A);
-  box-shadow: 0 2px 8px var(--btn-brand-glow, rgba(139,26,74,0.18));
+  background: var(--btn-brand-subtle, rgba(210, 78, 51,0.08));
+  border-color: var(--btn-brand, #d24e33);
+  box-shadow: 0 2px 8px var(--btn-brand-glow, rgba(210, 78, 51,0.18));
   transform: translateY(-1px);
 }
 
 .adm-pagination-btn:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 1px 4px var(--btn-brand-glow, rgba(139,26,74,0.12));
+  box-shadow: 0 1px 4px var(--btn-brand-glow, rgba(210, 78, 51,0.12));
 }
 
 .adm-pagination-btn:disabled {
-  background: var(--bg-tertiary, #F5EDE0);
-  border-color: var(--border-color, #EAD9C5);
-  color: var(--border-color, #EAD9C5);
+  background: var(--bg-tertiary, #efebe3);
+  border-color: var(--border-color, #e4dfd6);
+  color: var(--border-color, #e4dfd6);
   cursor: not-allowed;
   opacity: 0.5;
 }
@@ -146,9 +146,9 @@
   height: var(--btn-h-sm, 36px);
   padding: 0;
   background: white;
-  border: 1px solid var(--border-color, #EAD9C5);
+  border: 1px solid var(--border-color, #e4dfd6);
   border-radius: var(--btn-radius-sm, 8px);
-  color: var(--charcoal-500, #A08060);
+  color: var(--charcoal-500, #8a8c85);
   font-weight: var(--btn-fw, 600);
   font-size: 0.9rem;
   cursor: pointer;
@@ -157,20 +157,20 @@
 }
 
 .adm-pagination-page-btn:hover {
-  background: var(--btn-brand-subtle, rgba(139,26,74,0.08));
-  border-color: var(--btn-brand, #8B1A4A);
-  color: var(--btn-brand, #8B1A4A);
+  background: var(--btn-brand-subtle, rgba(210, 78, 51,0.08));
+  border-color: var(--btn-brand, #d24e33);
+  color: var(--btn-brand, #d24e33);
 }
 
 .adm-pagination-page-btn.active {
-  background: var(--btn-brand-grad, linear-gradient(135deg, #8B1A4A, #6b1238));
-  border-color: var(--btn-brand-dark, #6b1238);
+  background: var(--btn-brand-grad, linear-gradient(135deg, #d24e33, #b8412a));
+  border-color: var(--btn-brand-dark, #b8412a);
   color: white;
-  box-shadow: 0 2px 8px var(--btn-brand-glow, rgba(139,26,74,0.25));
+  box-shadow: 0 2px 8px var(--btn-brand-glow, rgba(210, 78, 51,0.25));
 }
 
 .adm-pagination-ellipsis {
-  color: var(--border-color, #EAD9C5);
+  color: var(--border-color, #e4dfd6);
   font-weight: 600;
   padding: 0 0.35rem;
   line-height: 36px;
@@ -263,17 +263,17 @@
 }
 
 .adm-pagination-btn:hover:not(:disabled) {
-  background: var(--primary-subtle, rgba(139,26,74,0.06)) !important;
-  border-color: var(--primary, #8B1A4A) !important;
-  box-shadow: 0 2px 8px rgba(139, 26, 74, 0.15) !important;
+  background: var(--primary-subtle, rgba(210, 78, 51,0.06)) !important;
+  border-color: var(--primary, #d24e33) !important;
+  box-shadow: 0 2px 8px rgba(210, 78, 51, 0.15) !important;
 }
 .adm-pagination-page-btn:hover {
-  color: var(--primary, #8B1A4A) !important;
-  border-color: var(--rose-300, #f5a8c6) !important;
-  background: var(--primary-subtle, rgba(139,26,74,0.06)) !important;
+  color: var(--primary, #d24e33) !important;
+  border-color: var(--rose-300, #ffab8c) !important;
+  background: var(--primary-subtle, rgba(210, 78, 51,0.06)) !important;
 }
 .adm-pagination-page-btn.active {
-  background: var(--btn-brand-grad, linear-gradient(135deg, var(--primary, #8B1A4A), var(--primary-dark, #6b1238))) !important;
-  border-color: var(--primary, #8B1A4A) !important;
-  box-shadow: 0 2px 8px rgba(139, 26, 74, 0.25) !important;
+  background: var(--btn-brand-grad, linear-gradient(135deg, var(--primary, #d24e33), var(--primary-dark, #b8412a))) !important;
+  border-color: var(--primary, #d24e33) !important;
+  box-shadow: 0 2px 8px rgba(210, 78, 51, 0.25) !important;
 }

@@ -2,7 +2,7 @@ import React, {
   useState, useMemo, useCallback, lazy, Suspense, useEffect, useRef,
 } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { addToCart, removeFromCart } from "../features/cartSlice";
 import { useProductFeedInfiniteQuery } from "../services/productsApi";
 import { useGetPublicCategoriesQuery } from "../services/categoriesApi";
@@ -12,6 +12,7 @@ import {
   useRemoveFromWishlistMutation,
 } from "../services/accountApi";
 import { errMsg } from "../app/baseApi";
+import { onImgError, PLACEHOLDER_SRC } from "../utils/imageFallback";
 import {
   Box, Typography, TextField, InputAdornment, IconButton, Button,
   Chip, Skeleton, CircularProgress, Alert, Stack, Popover, Tooltip,
@@ -40,7 +41,7 @@ const PAGE_SIZE = 16;
 // Shared collator: String#localeCompare builds a new collator on every call,
 // which is the hot path of an O(n log n) sort
 const nameCollator = new Intl.Collator();
-const ROSE = "#8B1A4A";
+const ROSE = "#d24e33";
 
 /* ── Lazy Image ─────────────────────────────────────────────────────── */
 function useLazyImage(src) {
@@ -134,7 +135,7 @@ const ProductCard = React.memo(({
         flexDirection: "column",
         transition: "box-shadow 0.22s ease, transform 0.22s ease",
         "&:hover": {
-          boxShadow: "0 12px 32px rgba(139,26,74,0.12)",
+          boxShadow: "0 12px 32px rgba(210, 78, 51,0.12)",
           transform: "translateY(-3px)",
           "& .card-img": { transform: "scale(1.05)" },
           "& .card-overlay": { opacity: 1 },
@@ -152,7 +153,7 @@ const ProductCard = React.memo(({
             loading="lazy"
             decoding="async"
             onLoad={() => setImgLoaded(true)}
-            onError={(e) => { e.target.src = "https://via.placeholder.com/400x400?text=No+Image"; setImgLoaded(true); }}
+            onError={(e) => { onImgError(e); setImgLoaded(true); }}
             className="card-img"
             sx={{
               width: "100%", aspectRatio: "1/1", objectFit: "cover", display: "block",
@@ -160,9 +161,8 @@ const ProductCard = React.memo(({
             }}
           />
         ) : (
-          <Box sx={{ aspectRatio: "1/1", display: "flex", alignItems: "center", justifyContent: "center", bgcolor: "#f8f5f0" }}>
-            <FiPackage size={44} color="#c0a882" />
-          </Box>
+          <Box component="img" src={PLACEHOLDER_SRC} alt={product.name} loading="lazy"
+            sx={{ width: "100%", aspectRatio: "1/1", objectFit: "cover", display: "block" }} />
         )}
 
         {/* Hover overlay */}
@@ -247,9 +247,8 @@ const ProductCard = React.memo(({
         {/* Name */}
         <Typography
           variant="body2"
-          fontWeight={600}
           onClick={() => navigate(`/product/${product._id}`)}
-          sx={{
+          sx={{ fontWeight: 600,
             cursor: "pointer", lineHeight: 1.4, color: "#1c1917",
             display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
             "&:hover": { color: ROSE },
@@ -262,7 +261,7 @@ const ProductCard = React.memo(({
 
         {/* Rating */}
         {product.averageRating > 0 && (
-          <Stack direction="row" alignItems="center" spacing={0.4} sx={{ mt: 0.6 }}>
+          <Stack direction="row" spacing={0.4} sx={{ alignItems: "center", mt: 0.6 }}>
             <Box sx={{ display: "flex", color: "#f59e0b" }}>
               {Array.from({ length: 5 }).map((_, i) => (
                 <span key={i} style={{ fontSize: "0.78rem" }}>
@@ -270,7 +269,7 @@ const ProductCard = React.memo(({
                 </span>
               ))}
             </Box>
-            <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.72rem" }}>
+            <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.72rem" }}>
               {product.averageRating.toFixed(1)}
               {product.ratingCount > 0 && ` (${product.ratingCount})`}
             </Typography>
@@ -284,7 +283,7 @@ const ProductCard = React.memo(({
           const shown = visibleColors.slice(0, 7);
           const overflow = visibleColors.length - 7;
           return (
-            <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mt: 0.75 }}>
+            <Stack direction="row" spacing={0.5} sx={{ alignItems: "center", mt: 0.75 }}>
               {shown.map((c, i) => (
                 <Tooltip key={c._id || c.id || i} title={c.name} arrow>
                   <Box sx={{
@@ -304,7 +303,7 @@ const ProductCard = React.memo(({
         })()}
 
         {/* Price row */}
-        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ mt: "auto", pt: 1.25 }}>
+        <Stack direction="row" spacing={1} sx={{ alignItems: "center", justifyContent: "space-between", mt: "auto", pt: 1.25 }}>
           <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.75 }}>
             <Typography component="div" sx={{ fontSize: "1.05rem", fontWeight: 800, color: "#1c1917", lineHeight: 1.4 }}>
               ₹{product.price?.toLocaleString()}
@@ -316,8 +315,8 @@ const ProductCard = React.memo(({
             )}
           </Box>
           {quantityInCart > 0 && (
-            <Stack direction="row" alignItems="center" spacing={0.4}
-              sx={{ bgcolor: "rgba(16,185,129,0.1)", border: "1px solid #86efac", borderRadius: "6px", px: 0.75, py: 0.375, flexShrink: 0 }}>
+            <Stack direction="row" spacing={0.4}
+              sx={{ alignItems: "center", bgcolor: "rgba(16,185,129,0.1)", border: "1px solid #86efac", borderRadius: "6px", px: 0.75, py: 0.375, flexShrink: 0 }}>
               <FiShoppingCart size={11} color="#15803d" style={{ display: "block" }} />
               <Typography component="span" sx={{ fontSize: "0.72rem", fontWeight: 700, color: "#15803d", lineHeight: 1 }}>
                 {quantityInCart}
@@ -344,7 +343,7 @@ const ProductCard = React.memo(({
               sx={{
                 borderRadius: "8px", textTransform: "none", fontSize: "0.8rem", fontWeight: 700, py: 0.875,
                 background: `linear-gradient(135deg, ${ROSE} 0%, #7a1640 100%)`,
-                boxShadow: "0 3px 10px rgba(139,26,74,0.25)",
+                boxShadow: "0 3px 10px rgba(210, 78, 51,0.25)",
                 "&:hover": { background: "linear-gradient(135deg, #7a1640 0%, #5e1232 100%)" },
               }}
             >
@@ -399,7 +398,27 @@ const ProductListing = () => {
   const error = productsError ? errMsg(productsError, "Failed to fetch products") : null;
   const sentinelRef = useRef(null);
 
-  const [filters, setFilters] = useState({ categories: [], priceRange: null, searchTerm: "", sortBy: "" });
+  // Deep links (?q=Diwali, ?category=Jewellery, ?customizable=true) pre-apply filters — used by the
+  // home page's category / occasion cards and festival banner.
+  const [searchParams] = useSearchParams();
+  const filtersFromUrl = useCallback(
+    () => ({
+      categories: searchParams.get("category") ? [searchParams.get("category")] : [],
+      priceRange: null,
+      searchTerm: searchParams.get("q") || "",
+      sortBy: "",
+      customizable: searchParams.get("customizable") === "true",
+    }),
+    [searchParams],
+  );
+  const [filters, setFilters] = useState(filtersFromUrl);
+  const urlKey = searchParams.toString();
+  const lastUrlKey = useRef(urlKey);
+  useEffect(() => {
+    if (lastUrlKey.current === urlKey) return; // first render already used the URL
+    lastUrlKey.current = urlKey;
+    setFilters(filtersFromUrl());
+  }, [urlKey, filtersFromUrl]);
 
   // Popovers for horizontal filter strip
   const [sortAnchor,    setSortAnchor]   = useState(null);
@@ -450,6 +469,7 @@ const ProductListing = () => {
     if (filters.searchTerm) { const q = filters.searchTerm.toLowerCase(); out = out.filter((p) => (p.name || "").toLowerCase().includes(q) || (p.description || "").toLowerCase().includes(q)); }
     if (filters.categories?.length) { const s = new Set(filters.categories.map((c) => c.toLowerCase())); out = out.filter((p) => s.has(p.category?.toLowerCase()) || s.has(p.subCategory?.toLowerCase())); }
     if (filters.priceRange) { const { min, max } = filters.priceRange; out = out.filter((p) => p.price >= min && p.price <= max); }
+    if (filters.customizable) out = out.filter((p) => p.isCustomizable);
     if (filters.sortBy) {
       out = [...out];
       if (filters.sortBy === "price-low-high") out.sort((a, b) => a.price - b.price);
@@ -461,7 +481,7 @@ const ProductListing = () => {
   }, [products, filters]);
 
   const handleFiltersChange = useCallback((f) => setFilters(f), []);
-  const handleClearFilters  = useCallback(() => setFilters({ categories: [], priceRange: null, searchTerm: "", sortBy: "" }), []);
+  const handleClearFilters  = useCallback(() => setFilters({ categories: [], priceRange: null, searchTerm: "", sortBy: "", customizable: false }), []);
   const handleAddToCart     = useCallback((p) => { dispatch(addToCart({ product: p, quantity: 1 })); trackAddToCart(p, 1); }, [dispatch]);
   const handleRemoveFromCart = useCallback((p) => { dispatch(removeFromCart({ product: p })); trackRemoveFromCart(p, 1); }, [dispatch]);
   const handleCheckout = useCallback(() => { if (!isAuthenticated) { localStorage.setItem("redirectAfterLogin", "/checkout"); navigate("/login"); } else navigate("/checkout"); }, [isAuthenticated, navigate]);
@@ -471,7 +491,7 @@ const ProductListing = () => {
   // O(1) membership for the category pills (checked for every category + subcategory)
   const selectedCategorySet = useMemo(() => new Set(filters.categories), [filters.categories]);
 
-  const activeFilterCount = [filters.categories.length > 0, !!filters.priceRange, !!filters.sortBy].filter(Boolean).length;
+  const activeFilterCount = [filters.categories.length > 0, !!filters.priceRange, !!filters.sortBy, !!filters.customizable].filter(Boolean).length;
 
   const activeCategory = filters.categories?.[0] || null;
   const seoTitle = filters.searchTerm
@@ -512,7 +532,7 @@ const ProductListing = () => {
   };
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#fdf6ec" }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "#f7f4ee" }}>
       <SEOHead
         title={seoTitle}
         description={seoDescription}
@@ -526,7 +546,7 @@ const ProductListing = () => {
 
       {/* ── Sticky search bar ───────────────────────────────────── */}
       <Box sx={{ position: "sticky", top: 0, zIndex: 100, bgcolor: "rgba(255,255,255,0.97)", backdropFilter: "blur(10px)", borderBottom: "1px solid #e7e5e4", boxShadow: "0 1px 8px rgba(0,0,0,0.06)", px: { xs: 2, sm: 3, md: 4, lg: 5 }, py: 1.25 }}>
-        <Stack direction="row" alignItems="center" spacing={1.5}>
+        <Stack direction="row" sx={{ alignItems: "center" }} spacing={1.5}>
           <TextField
             size="small"
             placeholder="Search products…"
@@ -555,7 +575,7 @@ const ProductListing = () => {
               sx={{
                 textTransform: "none", borderRadius: "10px", fontWeight: 700, whiteSpace: "nowrap", flexShrink: 0, px: 2,
                 background: `linear-gradient(135deg, ${ROSE}, #7a1640)`,
-                boxShadow: "0 3px 10px rgba(139,26,74,0.25)",
+                boxShadow: "0 3px 10px rgba(210, 78, 51,0.25)",
                 "&:hover": { background: "linear-gradient(135deg, #7a1640, #5e1232)" },
               }}
             >
@@ -563,7 +583,7 @@ const ProductListing = () => {
             </Button>
           )}
           {!loading && products?.length > 0 && (
-            <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: "nowrap", ml: "auto !important", display: { xs: "none", sm: "block" } }}>
+            <Typography variant="caption" sx={{ color: "text.secondary", whiteSpace: "nowrap", ml: "auto !important", display: { xs: "none", sm: "block" } }}>
               {filteredProducts.length}{filteredProducts.length !== (products?.length || 0) && ` of ${products?.length || 0}`} results
             </Typography>
           )}
@@ -582,7 +602,7 @@ const ProductListing = () => {
           "&::-webkit-scrollbar": { display: "none" },
           msOverflowStyle: "none", scrollbarWidth: "none",
         }}>
-          <Stack direction="row" alignItems="center" spacing={1} sx={{ width: "max-content", minWidth: "100%", py: 0.5 }}>
+          <Stack direction="row" spacing={1} sx={{ alignItems: "center", width: "max-content", minWidth: "100%", py: 0.5 }}>
 
             {/* ── Sort pill ── */}
             {(() => {
@@ -603,7 +623,7 @@ const ProductListing = () => {
                     fontSize: "0.8125rem", fontWeight: isActive ? 700 : 500,
                     fontFamily: "inherit",
                     transition: "all 140ms",
-                    "&:hover": { borderColor: ROSE, bgcolor: isActive ? "#7a1640" : "rgba(139,26,74,0.06)", color: isActive ? "#fff" : ROSE },
+                    "&:hover": { borderColor: ROSE, bgcolor: isActive ? "#7a1640" : "rgba(210, 78, 51,0.06)", color: isActive ? "#fff" : ROSE },
                   }}
                 >
                   <FiArrowUp size={12} />
@@ -650,7 +670,7 @@ const ProductListing = () => {
                     fontSize: "0.8125rem", fontWeight: isActive ? 700 : 500,
                     fontFamily: "inherit",
                     transition: "all 140ms",
-                    "&:hover": { borderColor: ROSE, bgcolor: isActive ? "#7a1640" : "rgba(139,26,74,0.06)", color: isActive ? "#fff" : ROSE },
+                    "&:hover": { borderColor: ROSE, bgcolor: isActive ? "#7a1640" : "rgba(210, 78, 51,0.06)", color: isActive ? "#fff" : ROSE },
                   }}
                 >
                   {cat.name}
@@ -691,7 +711,7 @@ const ProductListing = () => {
                     fontSize: "0.8125rem", fontWeight: isActive ? 700 : 500,
                     fontFamily: "inherit",
                     transition: "all 140ms",
-                    "&:hover": { borderColor: ROSE, bgcolor: isActive ? "#7a1640" : "rgba(139,26,74,0.06)", color: isActive ? "#fff" : ROSE },
+                    "&:hover": { borderColor: ROSE, bgcolor: isActive ? "#7a1640" : "rgba(210, 78, 51,0.06)", color: isActive ? "#fff" : ROSE },
                   }}
                 >
                   <FiTag size={12} />
@@ -749,11 +769,11 @@ const ProductListing = () => {
                 display: "flex", alignItems: "center", gap: 1.25,
                 width: "100%", px: 1.5, py: 1, borderRadius: "10px",
                 border: "none", cursor: "pointer", textAlign: "left",
-                bgcolor: active ? "rgba(139,26,74,0.08)" : "transparent",
+                bgcolor: active ? "rgba(210, 78, 51,0.08)" : "transparent",
                 color: active ? ROSE : "#44403c",
                 fontFamily: "inherit", fontSize: "0.875rem", fontWeight: active ? 700 : 400,
                 transition: "all 120ms",
-                "&:hover": { bgcolor: "rgba(139,26,74,0.06)", color: ROSE },
+                "&:hover": { bgcolor: "rgba(210, 78, 51,0.06)", color: ROSE },
               }}
             >
               {Icon && <Icon size={14} />}
@@ -791,10 +811,10 @@ const ProductListing = () => {
             width: "100%", px: 1.25, py: 0.75, borderRadius: "8px",
             border: "none", cursor: "pointer", textAlign: "left", transition: "all 100ms",
             fontFamily: "inherit",
-            bgcolor: active ? "rgba(139,26,74,0.08)" : "transparent",
+            bgcolor: active ? "rgba(210, 78, 51,0.08)" : "transparent",
             color: active ? ROSE : "#44403c",
             fontWeight: active ? 600 : 400,
-            "&:hover": { bgcolor: "rgba(139,26,74,0.06)", color: ROSE },
+            "&:hover": { bgcolor: "rgba(210, 78, 51,0.06)", color: ROSE },
           });
 
           return (
@@ -850,7 +870,7 @@ const ProductListing = () => {
         <Typography sx={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "text.disabled", mb: 1.5 }}>
           Price Range
         </Typography>
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1.5 }}>
+        <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 1.5 }}>
           <TextField
             size="small" type="number" placeholder="Min"
             value={priceMin}
@@ -858,7 +878,7 @@ const ProductListing = () => {
             slotProps={{ input: { startAdornment: <InputAdornment position="start"><Typography sx={{ fontSize: "0.8rem", color: "text.disabled" }}>₹</Typography></InputAdornment> } }}
             sx={{ flex: 1, "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
           />
-          <Typography color="text.disabled">–</Typography>
+          <Typography sx={{ color: "text.disabled" }}>–</Typography>
           <TextField
             size="small" type="number" placeholder="Max"
             value={priceMax}
@@ -902,17 +922,17 @@ const ProductListing = () => {
         <Box sx={{ minWidth: 0 }}>
 
         {/* Page heading row */}
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2.5 }}>
-          <Stack direction="row" alignItems="center" spacing={1.25}>
-            <Box sx={{ width: 34, height: 34, borderRadius: 2, bgcolor: "rgba(139,26,74,0.08)", display: "flex", alignItems: "center", justifyContent: "center", color: ROSE }}>
+        <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", mb: 2.5 }}>
+          <Stack direction="row" sx={{ alignItems: "center" }} spacing={1.25}>
+            <Box sx={{ width: 34, height: 34, borderRadius: 2, bgcolor: "rgba(210, 78, 51,0.08)", display: "flex", alignItems: "center", justifyContent: "center", color: ROSE }}>
               <FiGrid size={17} />
             </Box>
             <Box>
-              <Typography variant="h5" component="h1" fontWeight={800} color="#1c1917" sx={{ lineHeight: 1 }}>
+              <Typography variant="h5" component="h1" sx={{ fontWeight: 800, color: "#1c1917", lineHeight: 1 }}>
                 Products
               </Typography>
               {!loading && products?.length > 0 && (
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>
                   {filteredProducts.length} item{filteredProducts.length !== 1 ? "s" : ""}
                 </Typography>
               )}
@@ -923,7 +943,7 @@ const ProductListing = () => {
         {/* Guest banner */}
         {!isAuthenticated && (
           <Alert severity="info" icon={<FiStar size={16} />}
-            sx={{ mb: 2.5, borderRadius: 2.5, bgcolor: "rgba(139,26,74,0.05)", border: "1px solid rgba(139,26,74,0.15)", color: "#6b1238", "& .MuiAlert-icon": { color: ROSE } }}>
+            sx={{ mb: 2.5, borderRadius: 2.5, bgcolor: "rgba(210, 78, 51,0.05)", border: "1px solid rgba(210, 78, 51,0.15)", color: "#b8412a", "& .MuiAlert-icon": { color: ROSE } }}>
             Browse freely —{" "}
             <Box component="a" href="/login" sx={{ color: ROSE, fontWeight: 700, textDecoration: "none", "&:hover": { textDecoration: "underline" } }}>
               sign in
@@ -944,15 +964,15 @@ const ProductListing = () => {
             {/* No filter results */}
             {filteredProducts.length === 0 && (products?.length || 0) > 0 && (
               <Box sx={{ textAlign: "center", py: 10 }}>
-                <Box sx={{ width: 80, height: 80, borderRadius: "50%", bgcolor: "rgba(139,26,74,0.06)", display: "flex", alignItems: "center", justifyContent: "center", mx: "auto", mb: 2 }}>
+                <Box sx={{ width: 80, height: 80, borderRadius: "50%", bgcolor: "rgba(210, 78, 51,0.06)", display: "flex", alignItems: "center", justifyContent: "center", mx: "auto", mb: 2 }}>
                   <FiSearch size={32} color={ROSE} />
                 </Box>
-                <Typography variant="h6" fontWeight={700} color="#1c1917" sx={{ mb: 0.5 }}>No products found</Typography>
-                <Typography color="text.secondary" sx={{ mb: 3 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: "#1c1917", mb: 0.5 }}>No products found</Typography>
+                <Typography sx={{ color: "text.secondary", mb: 3 }}>
                   {filters.searchTerm ? `No results for "${filters.searchTerm}"` : "Try adjusting your filters"}
                 </Typography>
                 <Button variant="outlined" onClick={handleClearFilters} startIcon={<FiX size={14} />}
-                  sx={{ textTransform: "none", borderRadius: 2, borderColor: ROSE, color: ROSE, "&:hover": { bgcolor: "rgba(139,26,74,0.05)" } }}>
+                  sx={{ textTransform: "none", borderRadius: 2, borderColor: ROSE, color: ROSE, "&:hover": { bgcolor: "rgba(210, 78, 51,0.05)" } }}>
                   Clear filters
                 </Button>
               </Box>
@@ -961,11 +981,11 @@ const ProductListing = () => {
             {/* Empty store */}
             {(products?.length || 0) === 0 && !error && (
               <Box sx={{ textAlign: "center", py: 10 }}>
-                <Box sx={{ width: 80, height: 80, borderRadius: "50%", bgcolor: "rgba(139,26,74,0.06)", display: "flex", alignItems: "center", justifyContent: "center", mx: "auto", mb: 2 }}>
+                <Box sx={{ width: 80, height: 80, borderRadius: "50%", bgcolor: "rgba(210, 78, 51,0.06)", display: "flex", alignItems: "center", justifyContent: "center", mx: "auto", mb: 2 }}>
                   <FiPackage size={32} color={ROSE} />
                 </Box>
-                <Typography variant="h6" fontWeight={700} color="#1c1917" sx={{ mb: 0.5 }}>No products yet</Typography>
-                <Typography color="text.secondary">Check back soon — new arrivals are on their way.</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: "#1c1917", mb: 0.5 }}>No products yet</Typography>
+                <Typography sx={{ color: "text.secondary" }}>Check back soon — new arrivals are on their way.</Typography>
               </Box>
             )}
 
@@ -991,7 +1011,7 @@ const ProductListing = () => {
                 {hasMore && <Box ref={sentinelRef} sx={{ height: 1 }} aria-hidden="true" />}
 
                 {!hasMore && filteredProducts.length > PAGE_SIZE && (
-                  <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 4, pb: 2 }}>
+                  <Typography variant="body2" align="center" sx={{ color: "text.secondary", mt: 4, pb: 2 }}>
                     ✓ All {totalProducts ?? filteredProducts.length} products shown
                   </Typography>
                 )}

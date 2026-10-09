@@ -7,60 +7,60 @@
 
 :root {
   /* ── BRAND: Primary — Deep Rose / Maroon ──────────────────── */
-  --rose-50:  #fdf2f6;
-  --rose-100: #fce7ef;
-  --rose-200: #fad0e1;
-  --rose-300: #f5a8c6;
-  --rose-400: #ee77a3;
-  --rose-500: #de4a7e;
-  --rose-600: #c42b61;
-  --rose-700: #a51e50;
-  --rose-800: #8B1A4A;   /* ← primary.main */
-  --rose-900: #6b1238;
+  --rose-50:  #fff3ee;
+  --rose-100: #ffe6dc;
+  --rose-200: #ffcdb9;
+  --rose-300: #ffab8c;
+  --rose-400: #ff8d66;
+  --rose-500: #ff7a50;
+  --rose-600: #e8623d;
+  --rose-700: #de5637;
+  --rose-800: #d24e33;   /* ← primary.main */
+  --rose-900: #b8412a;
 
   /* ── BRAND: Secondary — Gold ──────────────────────────────── */
-  --gold-50:  #fdfaed;
-  --gold-100: #faf2cc;
-  --gold-200: #f4e28b;
-  --gold-300: #edcc59;
-  --gold-400: #e2b535;
-  --gold-500: #C9A84C;   /* ← secondary.main */
-  --gold-600: #b08930;
-  --gold-700: #8e6a24;
-  --gold-800: #745422;
-  --gold-900: #624620;
+  --gold-50:  #effaf8;
+  --gold-100: #d5f3ee;
+  --gold-200: #a9e6dd;
+  --gold-300: #6fd3c5;
+  --gold-400: #2dd4bf;
+  --gold-500: #0f9488;   /* ← secondary.main */
+  --gold-600: #0c7a70;
+  --gold-700: #0a6159;
+  --gold-800: #094d47;
+  --gold-900: #073f3a;
 
   /* ── BRAND: Accent — Blush Pink ───────────────────────────── */
-  --blush-50:  #fff5f8;
-  --blush-100: #ffe4ed;
-  --blush-200: #fec9db;
-  --blush-300: #FDA4BE;
-  --blush-400: #F4A7B9;  /* ← accent.main */
-  --blush-500: #e87898;
-  --blush-600: #d4567a;
-  --blush-700: #b13d60;
-  --blush-800: #93334f;
-  --blush-900: #7c2e45;
+  --blush-50:  #fff6f2;
+  --blush-100: #ffe9e0;
+  --blush-200: #ffd3c2;
+  --blush-300: #ffb399;
+  --blush-400: #ff9d7a;  /* ← accent.main */
+  --blush-500: #ff7a50;
+  --blush-600: #e8623d;
+  --blush-700: #c9472d;
+  --blush-800: #a63c27;
+  --blush-900: #8a3322;
 
   /* ── BRAND: Neutral — Warm Charcoal ───────────────────────── */
-  --charcoal-50:  #FDF6EC;  /* ← background.default / cream */
-  --charcoal-100: #F5EDE0;
-  --charcoal-200: #EAD9C5;
-  --charcoal-300: #D9C4A8;
-  --charcoal-400: #C0A882;
-  --charcoal-500: #A08060;
-  --charcoal-600: #7A5E42;
-  --charcoal-700: #5C4330;
-  --charcoal-800: #3D2C20;
-  --charcoal-900: #2C2C2C;  /* ← text.primary */
+  --charcoal-50:  #f7f4ee;  /* ← background.default / cream */
+  --charcoal-100: #efebe3;
+  --charcoal-200: #e4dfd6;
+  --charcoal-300: #d3ccc0;
+  --charcoal-400: #b4b2a8;
+  --charcoal-500: #8a8c85;
+  --charcoal-600: #5b5d58;
+  --charcoal-700: #46473f;
+  --charcoal-800: #2f302b;
+  --charcoal-900: #232420;  /* ← text.primary */
 
   /* ── SEMANTIC COLOR ALIASES ───────────────────────────────── */
   /* Primary */
   --primary:        var(--rose-800);
   --primary-dark:   var(--rose-900);
   --primary-light:  var(--rose-600);
-  --primary-subtle: rgba(139, 26, 74, 0.08);
-  --primary-glow:   rgba(139, 26, 74, 0.35);
+  --primary-subtle: rgba(210, 78, 51, 0.08);
+  --primary-glow:   rgba(210, 78, 51, 0.35);
 
   /* Secondary / Gold */
   --secondary:        var(--gold-500);
@@ -100,35 +100,35 @@
   --danger-subtle:  var(--error-subtle);
 
   /* ── TEXT ─────────────────────────────────────────────────── */
-  --text-primary:   var(--charcoal-900);  /* #2C2C2C */
-  --text-secondary: var(--charcoal-600);  /* #7A5E42 warm brown */
-  --text-muted:     var(--charcoal-500);  /* #A08060 */
+  --text-primary:   var(--charcoal-900);  /* #232420 */
+  --text-secondary: var(--charcoal-600);  /* #5b5d58 warm brown */
+  --text-muted:     var(--charcoal-500);  /* #8a8c85 */
   --text-disabled:  var(--charcoal-300);
   --text-inverse:   #ffffff;
   --text-on-primary: #ffffff;
 
   /* ── BACKGROUNDS ──────────────────────────────────────────── */
   --bg-primary:   #FFFDF9;              /* warm white — cards/paper */
-  --bg-secondary: var(--charcoal-50);   /* #FDF6EC — page default */
-  --bg-tertiary:  var(--charcoal-100);  /* #F5EDE0 — section bg */
+  --bg-secondary: var(--charcoal-50);   /* #f7f4ee — page default */
+  --bg-tertiary:  var(--charcoal-100);  /* #efebe3 — section bg */
   --bg-elevated:  #FFFDF9;
-  --bg-dark:      #3D1A2A;             /* dark maroon header */
+  --bg-dark:      #151a21;             /* dark maroon header */
   --bg-overlay:   rgba(44, 20, 30, 0.55);
 
   /* ── BORDERS ──────────────────────────────────────────────── */
-  --border-color:   var(--charcoal-200); /* #EAD9C5 */
-  --border-light:   var(--charcoal-100); /* #F5EDE0 */
+  --border-color:   var(--charcoal-200); /* #e4dfd6 */
+  --border-light:   var(--charcoal-100); /* #efebe3 */
   --border-focus:   var(--primary);
   --border-error:   var(--error);
   --border-success: var(--success);
 
   /* ── ELEVATION / SHADOWS (rose-tinted) ───────────────────── */
-  --shadow-xs:  0 1px 2px 0 rgba(139,26,74,0.04);
-  --shadow-sm:  0 1px 4px 0 rgba(139,26,74,0.06), 0 1px 2px -1px rgba(0,0,0,0.05);
-  --shadow-md:  0 4px 12px -2px rgba(139,26,74,0.10), 0 2px 6px -2px rgba(0,0,0,0.07);
-  --shadow-lg:  0 10px 28px -4px rgba(139,26,74,0.12), 0 4px 8px -4px rgba(0,0,0,0.07);
-  --shadow-xl:  0 20px 48px -10px rgba(139,26,74,0.16);
-  --shadow-2xl: 0 24px 60px rgba(139,26,74,0.22);
+  --shadow-xs:  0 1px 2px 0 rgba(210, 78, 51,0.04);
+  --shadow-sm:  0 1px 4px 0 rgba(210, 78, 51,0.06), 0 1px 2px -1px rgba(0,0,0,0.05);
+  --shadow-md:  0 4px 12px -2px rgba(210, 78, 51,0.10), 0 2px 6px -2px rgba(0,0,0,0.07);
+  --shadow-lg:  0 10px 28px -4px rgba(210, 78, 51,0.12), 0 4px 8px -4px rgba(0,0,0,0.07);
+  --shadow-xl:  0 20px 48px -10px rgba(210, 78, 51,0.16);
+  --shadow-2xl: 0 24px 60px rgba(210, 78, 51,0.22);
 
   --elevation-1: var(--shadow-sm);
   --elevation-2: var(--shadow-md);
@@ -179,6 +179,7 @@
 
   /* ── TYPOGRAPHY ───────────────────────────────────────────── */
   --font-family: 'Inter', 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-head: 'Space Grotesk', 'Inter', 'Noto Sans', sans-serif;
   --font-family-mono: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 
   --font-size-xs:   0.75rem;   /* 12px */

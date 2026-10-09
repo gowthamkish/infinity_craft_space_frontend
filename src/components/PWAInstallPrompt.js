@@ -5,7 +5,7 @@ import {
 } from "@mui/material";
 import { FiSmartphone, FiDownload, FiShare2, FiPlus } from "react-icons/fi";
 
-const P = "#8B1A4A";
+const P = "#d24e33"; // Ember & Teal theme
 
 const IOSInstallModal = ({ open, onClose }) => (
   <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
@@ -29,12 +29,12 @@ const IOSInstallModal = ({ open, onClose }) => (
         </Typography>
       </Box>
 
-      <Stack gap={1.5}>
+      <Stack sx={{ gap: 1.5 }}>
         {[
           { step: 1, icon: FiShare2, text: <>Tap the <strong>Share</strong> button</> },
           { step: 2, icon: FiPlus,   text: <>Select <strong>"Add to Home Screen"</strong></> },
         ].map(({ step, icon: Icon, text }) => (
-          <Stack key={step} direction="row" alignItems="center" gap={1.5}>
+          <Stack key={step} direction="row" sx={{ alignItems: "center", gap: 1.5 }}>
             <Box sx={{
               width: 28, height: 28, borderRadius: "50%", bgcolor: P, color: "#fff",
               display: "flex", alignItems: "center", justifyContent: "center",
@@ -42,7 +42,7 @@ const IOSInstallModal = ({ open, onClose }) => (
             }}>
               {step}
             </Box>
-            <Stack direction="row" alignItems="center" gap={0.75}>
+            <Stack direction="row" sx={{ alignItems: "center", gap: 0.75 }}>
               <Typography variant="body2">{text}</Typography>
               <Icon size={16} color="#64748b" />
             </Stack>
@@ -147,13 +147,13 @@ const PWAInstallPrompt = () => {
           maxWidth: 520, mx: "auto",
           boxShadow: "0 8px 28px rgba(0,0,0,0.25)",
           borderRadius: "12px",
-          background: `linear-gradient(135deg, ${P} 0%, #6b1238 100%)`,
+          background: `linear-gradient(135deg, #e8623d 0%, #d24e33 100%)`,
           color: "#fff",
           "& .MuiAlert-action": { color: "rgba(255,255,255,0.7)", alignItems: "center" },
         }}
       >
-        <Stack direction="row" alignItems="center" justifyContent="space-between" gap={2}>
-          <Stack direction="row" alignItems="center" gap={1.75}>
+        <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", gap: 2 }}>
+          <Stack direction="row" sx={{ alignItems: "center", gap: 1.75 }}>
             <Box sx={{
               width: 44, height: 44, bgcolor: "rgba(255,255,255,0.18)",
               borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center",

@@ -105,18 +105,18 @@
 
 .ntf-action-btn--ghost:hover:not(:disabled) {
   background: var(--btn-brand-subtle, rgba(124,58,237,0.08));
-  border-color: var(--btn-brand, #8B1A4A);
-  color: var(--btn-brand, #8B1A4A);
+  border-color: var(--btn-brand, #d24e33);
+  color: var(--btn-brand, #d24e33);
 }
 
 .ntf-action-btn--primary {
-  background: var(--btn-brand-grad, linear-gradient(135deg, #8B1A4A 0%, #6b1238 100%));
+  background: var(--btn-brand-grad, linear-gradient(135deg, #d24e33 0%, #b8412a 100%));
   color: #fff;
   box-shadow: 0 2px 8px var(--btn-brand-glow, rgba(124,58,237,0.28));
 }
 
 .ntf-action-btn--primary:hover:not(:disabled) {
-  background: var(--btn-brand-grad-h, linear-gradient(135deg, #6b1238 0%, #4a0d25 100%));
+  background: var(--btn-brand-grad-h, linear-gradient(135deg, #b8412a 0%, #4a0d25 100%));
   transform: translateY(-1px);
 }
 
@@ -219,11 +219,11 @@
 }
 
 .ntf-row--unread {
-  background: var(--primary-subtle, rgba(139,26,74,0.04));
+  background: var(--primary-subtle, rgba(210, 78, 51,0.04));
 }
 
 .ntf-row--unread:hover {
-  background: var(--primary-subtle, rgba(139,26,74,0.08));
+  background: var(--primary-subtle, rgba(210, 78, 51,0.08));
 }
 
 .ntf-row__icon-wrap {
@@ -302,11 +302,11 @@
 
 .ntf-btn--view {
   background: var(--btn-brand-subtle, rgba(124,58,237,0.08));
-  color: var(--btn-brand, #8B1A4A);
+  color: var(--btn-brand, #d24e33);
 }
 
 .ntf-btn--view:hover {
-  background: var(--btn-brand-grad, linear-gradient(135deg,#8B1A4A,#6b1238));
+  background: var(--btn-brand-grad, linear-gradient(135deg,#d24e33,#b8412a));
   color: #fff;
 }
 

@@ -5,18 +5,18 @@
 
 /* ── PDP-scoped tokens ─────────────────────────────────────────── */
 .pdp-page {
-  --pdp-primary:        var(--primary, #8B1A4A);
-  --pdp-primary-dark:   var(--primary-dark, #6b1238);
-  --pdp-primary-light:  var(--primary-light, #a51e50);
-  --pdp-primary-subtle: var(--primary-subtle, rgba(139,26,74,0.08));
+  --pdp-primary:        var(--primary, #d24e33);
+  --pdp-primary-dark:   var(--primary-dark, #b8412a);
+  --pdp-primary-light:  var(--primary-light, #de5637);
+  --pdp-primary-subtle: var(--primary-subtle, rgba(210, 78, 51,0.08));
   --pdp-success:        var(--success, #2e7d32);
   --pdp-success-bg:     var(--success-subtle, rgba(46,125,50,0.08));
   --pdp-warning:        var(--gold-600, #a07a30);
-  --pdp-warning-bg:     var(--gold-100, #faf2cc);
+  --pdp-warning-bg:     var(--gold-100, #d5f3ee);
   --pdp-danger:         var(--error, #c62828);
   --pdp-danger-bg:      var(--error-subtle, rgba(198,40,40,0.08));
   --pdp-surface:        #ffffff;
-  --pdp-bg:             var(--bg-secondary, var(--bg-default, #FDF6EC));
+  --pdp-bg:             var(--bg-secondary, var(--bg-default, #f7f4ee));
   --pdp-border:         var(--border-color, #e7e5e4);
   --pdp-border-light:   var(--border-light, #f5f5f4);
   --pdp-text:           var(--text-primary, #1c1917);
@@ -396,9 +396,9 @@
 }
 
 .pdp-tag--custom {
-  background: linear-gradient(135deg, var(--bg-tertiary, #F5EDE0), var(--primary-subtle, rgba(139,26,74,0.08)));
-  color: var(--primary-dark, #6b1238);
-  border-color: var(--rose-300, #f5a8c6);
+  background: linear-gradient(135deg, var(--bg-tertiary, #efebe3), var(--primary-subtle, rgba(210, 78, 51,0.08)));
+  color: var(--primary-dark, #b8412a);
+  border-color: var(--rose-300, #ffab8c);
   cursor: default;
 }
 
@@ -570,7 +570,7 @@
   align-items: center;
   padding: 6px 0;
   font-size: 0.84375rem;
-  color: var(--charcoal-700, #5C4330);
+  color: var(--charcoal-700, #46473f);
   border-bottom: 1px solid var(--success-subtle, rgba(46,125,50,0.08));
 }
 
@@ -587,7 +587,7 @@
 
 /* Customization panel */
 .pdp-custom {
-  background: linear-gradient(135deg, var(--bg-tertiary, #F5EDE0) 0%, var(--bg-tertiary, #F5EDE0) 100%);
+  background: linear-gradient(135deg, var(--bg-tertiary, #efebe3) 0%, var(--bg-tertiary, #efebe3) 100%);
   border: 1.5px solid var(--rose-200, #f8c4d4);
   border-radius: var(--pdp-radius-sm);
   padding: 16px;
@@ -602,7 +602,7 @@
 
 .pdp-custom-icon {
   font-size: 1.1rem;
-  color: var(--primary, #8B1A4A);
+  color: var(--primary, #d24e33);
   line-height: 1.4;
   flex-shrink: 0;
 }
@@ -616,7 +616,7 @@
 
 .pdp-custom-sub {
   font-size: 0.78125rem;
-  color: var(--primary-dark, #6b1238);
+  color: var(--primary-dark, #b8412a);
   margin: 0;
   line-height: 1.4;
 }
@@ -643,7 +643,7 @@
 }
 
 .pdp-custom-input::placeholder {
-  color: var(--rose-300, #f5a8c6);
+  color: var(--rose-300, #ffab8c);
   font-size: 0.8125rem;
 }
 
@@ -862,7 +862,7 @@
   border-radius: var(--btn-radius);
   background: var(--pdp-surface);
   border: 1.5px solid var(--pdp-border, #e5e7eb);
-  color: var(--pdp-text-2, #A08060);
+  color: var(--pdp-text-2, #8a8c85);
   font-size: var(--btn-font-md);
   font-weight: var(--btn-fw);
   cursor: pointer;
@@ -993,7 +993,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  background: linear-gradient(135deg, var(--bg-default, #FDF6EC) 0%, var(--bg-tertiary, #F5EDE0)08 100%);
+  background: linear-gradient(135deg, var(--bg-default, #f7f4ee) 0%, var(--bg-tertiary, #efebe3)08 100%);
   border: 1px solid var(--pdp-border-light);
   border-radius: var(--pdp-radius-sm);
   padding: 16px;

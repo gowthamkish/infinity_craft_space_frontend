@@ -92,7 +92,7 @@ const ReviewList = ({ productId, productName }) => {
           mb: 2.5,
         }}
       >
-        <Typography variant="h6" fontWeight={700}>
+        <Typography variant="h6" sx={{ fontWeight: 700 }}>
           Customer Reviews
         </Typography>
         {isAuthenticated &&
@@ -152,13 +152,9 @@ const ReviewList = ({ productId, productName }) => {
       {reviews.length > 0 && (
         <Stack
           direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-          flexWrap="wrap"
-          gap={1}
-          sx={{ mb: 2 }}
+          sx={{ alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 1, mb: 2 }}
         >
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
             Showing {reviews.length} of {pagination?.totalReviews || 0} reviews
           </Typography>
           <TextField
@@ -179,9 +175,9 @@ const ReviewList = ({ productId, productName }) => {
 
       {/* Loading */}
       {loading && reviews.length === 0 && (
-        <Stack alignItems="center" gap={2} sx={{ py: 5 }}>
+        <Stack sx={{ alignItems: "center", gap: 2, py: 5 }}>
           <CircularProgress size={32} />
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
             Loading reviews…
           </Typography>
         </Stack>
@@ -218,21 +214,20 @@ const ReviewList = ({ productId, productName }) => {
         </>
       ) : (
         !loading && (
-          <Stack alignItems="center" gap={1.5} sx={{ py: 5 }}>
+          <Stack sx={{ alignItems: "center", gap: 1.5, py: 5 }}>
             <FiMessageSquare size={36} color="#94a3b8" />
             <Typography
               variant="subtitle1"
-              fontWeight={700}
-              color="text.secondary"
+              sx={{ fontWeight: 700, color: "text.secondary" }}
             >
               No reviews yet
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: "text.secondary" }}>
               Be the first to share your experience with this product!
             </Typography>
 
             {!isAuthenticated && (
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
                 <MuiLink href="/login" sx={{ fontWeight: 600 }}>
                   Login
                 </MuiLink>{" "}
@@ -284,9 +279,7 @@ const ReviewList = ({ productId, productName }) => {
               {selectedImages.length > 1 && (
                 <Stack
                   direction="row"
-                  justifyContent="center"
-                  gap={1}
-                  sx={{ p: 2 }}
+                  sx={{ justifyContent: "center", gap: 1, p: 2 }}
                 >
                   {selectedImages.map((img, idx) => (
                     <Box

@@ -9,6 +9,11 @@ export const engagementApi = baseApi.injectEndpoints({
       query: ({ code, cartTotal }) => ({ url: "/api/coupons/validate", method: "post", data: { code, cartTotal } }),
     }),
 
+    // Newsletter sign-up (home page + footer). Idempotent on the server.
+    subscribeNewsletter: build.mutation({
+      query: ({ email, source }) => ({ url: "/api/newsletter/subscribe", method: "post", data: { email, source } }),
+    }),
+
     // ── Product Q&A (paginated; each page/sort combination is cached separately) ──
     getQnA: build.query({
       query: ({ productId, page = 1, limit = 10, sort = "latest" }) => ({
@@ -53,6 +58,7 @@ export const engagementApi = baseApi.injectEndpoints({
 
 export const {
   useValidateCouponMutation,
+  useSubscribeNewsletterMutation,
   useGetQnAQuery,
   usePostQuestionMutation,
   usePostAnswerMutation,

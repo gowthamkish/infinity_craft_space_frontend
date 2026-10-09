@@ -4,7 +4,7 @@ import {
   FiShoppingCart, FiSearch, FiBox, FiHeart, FiAlertCircle,
 } from "react-icons/fi";
 
-const P = "#8B1A4A";
+const P = "#d24e33";
 
 const EmptyState = ({
   icon: Icon,
@@ -30,7 +30,7 @@ const EmptyState = ({
       <Box
         sx={{
           width: 72, height: 72, borderRadius: "50%", mx: "auto", mb: 2.5,
-          bgcolor: isError ? "rgba(220,38,38,0.08)" : "rgba(139,26,74,0.07)",
+          bgcolor: isError ? "rgba(220,38,38,0.08)" : "rgba(210, 78, 51,0.07)",
           display: "flex", alignItems: "center", justifyContent: "center",
           color: isError ? "#dc2626" : P,
         }}
@@ -49,7 +49,7 @@ const EmptyState = ({
       )}
 
       {actions.length > 0 && (
-        <Stack direction="row" gap={1.25} justifyContent="center" flexWrap="wrap">
+        <Stack direction="row" sx={{ gap: 1.25, justifyContent: "center", flexWrap: "wrap" }}>
           {actions.map((action, i) => {
             const isSecondary = action.className?.includes("secondary");
             return (
@@ -63,7 +63,7 @@ const EmptyState = ({
                   px: 2.5, py: 0.875,
                   ...(isSecondary
                     ? { borderColor: "#d4d4d4", color: "#57534e", "&:hover": { borderColor: P, color: P } }
-                    : { bgcolor: P, "&:hover": { bgcolor: "#6b1238" }, boxShadow: "none" }),
+                    : { bgcolor: P, "&:hover": { bgcolor: "#b8412a" }, boxShadow: "none" }),
                 }}
               >
                 {action.label}

@@ -248,7 +248,7 @@
 
   /* PWA splash screen support */
   body {
-    background-color: var(--bg-default, #fdf6ec);
+    background-color: var(--bg-default, #f7f4ee);
   }
 }
 
@@ -297,9 +297,9 @@
 /* Dark mode support for mobile */
 @media (prefers-color-scheme: dark) {
   :root {
-    --mobile-bg: var(--charcoal-800, #3d2c20);
-    --mobile-text: var(--charcoal-50, #fdf6ec);
-    --mobile-border: var(--charcoal-700, #5c4330);
+    --mobile-bg: var(--charcoal-800, #2f302b);
+    --mobile-text: var(--charcoal-50, #f7f4ee);
+    --mobile-border: var(--charcoal-700, #46473f);
   }
 
   .mobile-dark .card {
@@ -336,7 +336,7 @@
   top: 70px;
   left: 0;
   right: 0;
-  background: var(--secondary, #c9a84c);
+  background: var(--secondary, #0f9488);
   color: white;
   text-align: center;
   padding: 0.5rem;
@@ -393,7 +393,7 @@
 .image-carousel-modal .modal-header {
   background: linear-gradient(
     135deg,
-    var(--bg-secondary, #fdf6ec) 0%,
+    var(--bg-secondary, #f7f4ee) 0%,
     var(--charcoal-100, #f0e0c8) 100%
   );
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
@@ -401,7 +401,7 @@
 
 .image-carousel-modal .modal-body {
   padding: 0;
-  background: var(--bg-secondary, #fdf6ec);
+  background: var(--bg-secondary, #f7f4ee);
 }
 
 /* Product Card Image Hover Effects */

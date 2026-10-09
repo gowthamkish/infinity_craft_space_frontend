@@ -693,7 +693,7 @@ const OrderDetailsModal = ({
                 >
                   <Box
                     sx={{
-                      background: "linear-gradient(135deg, #C9A84C, #8B1A4A)",
+                      background: "linear-gradient(135deg, #0f9488, #d24e33)",
                       color: "white",
                       padding: "0.875rem 1rem",
                       display: "flex",
@@ -910,10 +910,10 @@ const OrderDetailsModal = ({
                 padding: "0.6rem 1.5rem",
                 fontWeight: 600,
                 fontSize: "0.9rem",
-                background: "linear-gradient(135deg, #C9A84C, #8B1A4A)",
+                background: "linear-gradient(135deg, #0f9488, #d24e33)",
                 color: "white",
                 border: "none",
-                "&:hover": { background: "linear-gradient(135deg, #8B1A4A, #7a1640)" },
+                "&:hover": { background: "linear-gradient(135deg, #d24e33, #7a1640)" },
               }}
             >
               🚚 Track Order

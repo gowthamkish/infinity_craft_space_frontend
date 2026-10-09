@@ -24,8 +24,8 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlined";
 import CheckIcon from "@mui/icons-material/Check";
 import { ProductThumb } from "./CartReviewStep";
 
-const P = "#8b2252";
-const P_LIGHT = "rgba(139,34,82,0.08)";
+const P = "#d24e33";
+const P_LIGHT = "rgba(210, 78, 51,0.08)";
 const BORDER = "rgba(0,0,0,0.09)";
 
 // ── Shipping zone data ────────────────────────────────────────────────
@@ -57,7 +57,7 @@ const ROAD_ZONES = {
     perKgAbove10: 70, perKgAbove50: 58,
   },
   SOUTH: {
-    label: "South India", sublabel: "AP, Telangana, Kerala, Tamil Nadu", deliveryDays: "3–5", color: "#8b2252",
+    label: "South India", sublabel: "AP, Telangana, Kerala, Tamil Nadu", deliveryDays: "3–5", color: "#d24e33",
     rates: [
       { maxG: 250, price: 85 },  { maxG: 500, price: 110 },
       { maxG: 750, price: 135 }, { maxG: 1000, price: 160 },
@@ -70,7 +70,7 @@ const ROAD_ZONES = {
     perKgAbove10: 88, perKgAbove50: 72,
   },
   PAN_INDIA: {
-    label: "Pan-India", sublabel: "MH, GJ, Goa, Delhi, UP, MP, RJ, HR, WB & more", deliveryDays: "5–8", color: "#8b2252",
+    label: "Pan-India", sublabel: "MH, GJ, Goa, Delhi, UP, MP, RJ, HR, WB & more", deliveryDays: "5–8", color: "#d24e33",
     rates: [
       { maxG: 250, price: 120 },  { maxG: 500, price: 155 },
       { maxG: 750, price: 190 },  { maxG: 1000, price: 225 },
@@ -172,7 +172,7 @@ function ShippingWidget({ zoneKey, weightKg, rate, dispatchBuffer = 0 }) {
         <LocalShippingOutlinedIcon sx={{ color: zone.color, fontSize: 20 }} />
       </Box>
       <Box sx={{ flex: 1 }}>
-        <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 0.25, flexWrap: "wrap" }}>
+        <Stack direction="row" spacing={0.75} sx={{ alignItems: "center", mb: 0.25, flexWrap: "wrap" }}>
           <Typography sx={{ fontSize: "0.8125rem", fontWeight: 500 }}>Standard Road Delivery</Typography>
           <Chip
             label={zone.label}
@@ -266,7 +266,7 @@ function AddressLabelChips({ value, onChange }) {
               borderRadius: "8px",
               height: 40,
               "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: P },
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: P, boxShadow: `0 0 0 3px rgba(139,34,82,0.12)` },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: P, boxShadow: `0 0 0 3px rgba(210, 78, 51,0.12)` },
             },
           }}
         />
@@ -283,7 +283,7 @@ const fieldSx = {
     "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: P },
     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
       borderColor: P,
-      boxShadow: `0 0 0 3px rgba(139,34,82,0.12)`,
+      boxShadow: `0 0 0 3px rgba(210, 78, 51,0.12)`,
     },
   },
   "& .MuiInputLabel-root.Mui-focused": { color: P },
@@ -297,7 +297,7 @@ const multilineSx = {
     "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: P },
     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
       borderColor: P,
-      boxShadow: `0 0 0 3px rgba(139,34,82,0.12)`,
+      boxShadow: `0 0 0 3px rgba(210, 78, 51,0.12)`,
     },
   },
   "& .MuiInputLabel-root.Mui-focused": { color: P },
@@ -497,7 +497,7 @@ export const ShippingStep = ({
   const displayTotal = subtotal + (shippingRate?.rate || 0);
 
   return (
-    <Grid container spacing={3} alignItems="flex-start">
+    <Grid container spacing={3} sx={{ alignItems: "flex-start" }}>
       {/* ── Left: form ───────────────────────────────────────────────── */}
       <Grid item xs={12} sm={7} lg={8}>
 
@@ -757,7 +757,7 @@ export const ShippingStep = ({
                   }}
                   onFocus={(e) => {
                     e.target.style.borderColor = P;
-                    e.target.style.boxShadow = "0 0 0 3px rgba(139,34,82,0.12)";
+                    e.target.style.boxShadow = "0 0 0 3px rgba(210, 78, 51,0.12)";
                   }}
                   onBlur={(e) => {
                     e.target.style.borderColor = "#d1d5db";
@@ -824,7 +824,7 @@ export const ShippingStep = ({
                 </Alert>
               )}
 
-              <Stack direction="row" spacing={1.5} justifyContent="space-between">
+              <Stack direction="row" spacing={1.5} sx={{ justifyContent: "space-between" }}>
                 <Button
                   variant="outlined"
                   startIcon={<ArrowBackIcon />}
@@ -857,8 +857,8 @@ export const ShippingStep = ({
                     borderRadius: "10px",
                     bgcolor: P,
                     textTransform: "none",
-                    boxShadow: "0 2px 12px rgba(139,34,82,0.28)",
-                    "&:hover": { bgcolor: "#7a1d47", boxShadow: "0 4px 16px rgba(139,34,82,0.36)" },
+                    boxShadow: "0 2px 12px rgba(210, 78, 51,0.28)",
+                    "&:hover": { bgcolor: "#7a1d47", boxShadow: "0 4px 16px rgba(210, 78, 51,0.36)" },
                   }}
                 >
                   {loading ? "Saving…" : "Continue to Payment"}

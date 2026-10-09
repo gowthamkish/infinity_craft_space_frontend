@@ -155,10 +155,10 @@ export default function Account() {
             }}
           >
             <CircularProgress size={56} />
-            <Typography variant="h6" color="text.secondary">
+            <Typography variant="h6" sx={{ color: "text.secondary" }}>
               Loading your account…
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: "text.secondary" }}>
               Fetching addresses and wishlist
             </Typography>
           </Box>
@@ -179,10 +179,10 @@ export default function Account() {
               >
                 IC
               </Avatar>
-              <Typography variant="h4" fontWeight={700} gutterBottom>
+              <Typography variant="h4" sx={{ fontWeight: 700 }} gutterBottom>
                 My Account
               </Typography>
-              <Typography variant="body1" color="text.secondary">
+              <Typography variant="body1" sx={{ color: "text.secondary" }}>
                 Manage your addresses and wishlist
               </Typography>
             </Box>
@@ -229,10 +229,10 @@ export default function Account() {
                           <EmojiEventsIcon sx={{ color: tc.color, fontSize: 24 }} />
                         </Box>
                         <Box sx={{ flex: 1 }}>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography variant="body2" sx={{ color: "text.secondary" }}>
                             Loyalty Points
                           </Typography>
-                          <Typography variant="h5" fontWeight={700}>
+                          <Typography variant="h5" sx={{ fontWeight: 700 }}>
                             {pts.toLocaleString()} pts
                           </Typography>
                           <Chip
@@ -247,9 +247,7 @@ export default function Account() {
                           />
                           <Typography
                             variant="caption"
-                            color="text.secondary"
-                            display="block"
-                            sx={{ mt: 1 }}
+                            sx={{ color: "text.secondary", display: "block", mt: 1 }}
                           >
                             Earn points on every purchase. Redeem at checkout.
                           </Typography>
@@ -283,17 +281,16 @@ export default function Account() {
                               flexShrink: 0,
                             }}
                           >
-                            <CardGiftcardIcon sx={{ color: "#8B1A4A", fontSize: 24 }} />
+                            <CardGiftcardIcon sx={{ color: "#d24e33", fontSize: 24 }} />
                           </Box>
                           <Box sx={{ flex: 1 }}>
-                            <Typography variant="body2" color="text.secondary">
+                            <Typography variant="body2" sx={{ color: "text.secondary" }}>
                               Referral Code
                             </Typography>
-                            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 0.5 }}>
+                            <Stack direction="row" spacing={1} sx={{ alignItems: "center", mt: 0.5 }}>
                               <Typography
                                 variant="h6"
-                                fontWeight={700}
-                                sx={{
+                                sx={{ fontWeight: 700,
                                   fontFamily: "monospace",
                                   bgcolor: "grey.100",
                                   px: 1.5,
@@ -316,15 +313,13 @@ export default function Account() {
                               </IconButton>
                             </Stack>
                             {credits > 0 && (
-                              <Typography variant="body2" sx={{ color: "#8B1A4A", mt: 0.5 }}>
+                              <Typography variant="body2" sx={{ color: "#d24e33", mt: 0.5 }}>
                                 ₹{credits} referral credits available
                               </Typography>
                             )}
                             <Typography
                               variant="caption"
-                              color="text.secondary"
-                              display="block"
-                              sx={{ mt: 1 }}
+                              sx={{ color: "text.secondary", display: "block", mt: 1 }}
                             >
                               Share your code — you both get ₹100 store credit when they order!
                             </Typography>
@@ -357,10 +352,10 @@ export default function Account() {
                     >
                       <LocationOnIcon color="primary" sx={{ fontSize: 28 }} />
                       <Box>
-                        <Typography variant="h6" fontWeight={700}>
+                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
                           Address Book
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
                           Manage your delivery addresses
                         </Typography>
                       </Box>
@@ -376,7 +371,7 @@ export default function Account() {
                           }}
                         >
                           <LocationOnIcon sx={{ fontSize: 56, mb: 2, opacity: 0.3 }} />
-                          <Typography variant="body1" fontWeight={500} gutterBottom>
+                          <Typography variant="body1" sx={{ fontWeight: 500 }} gutterBottom>
                             No saved addresses yet
                           </Typography>
                           <Typography variant="body2">
@@ -397,10 +392,10 @@ export default function Account() {
                                 bgcolor: a.isDefault ? "primary.50" : "background.paper",
                               }}
                             >
-                              <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
+                              <Stack direction="row" sx={{ alignItems: "flex-start", justifyContent: "space-between" }}>
                                 <Box>
-                                  <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
-                                    <Typography variant="subtitle2" fontWeight={700}>
+                                  <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 0.5 }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                                       {a.label || `${a.city}, ${a.state}`}
                                     </Typography>
                                     {a.isDefault && (
@@ -412,15 +407,15 @@ export default function Account() {
                                       />
                                     )}
                                   </Stack>
-                                  <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.5 }}>
+                                  <Stack direction="row" spacing={0.5} sx={{ alignItems: "center", mb: 0.5 }}>
                                     <MapIcon sx={{ fontSize: 14, color: "text.secondary" }} />
-                                    <Typography variant="body2" color="text.secondary">
+                                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
                                       {a.street}, {a.city}, {a.state} {a.zipCode}
                                     </Typography>
                                   </Stack>
-                                  <Stack direction="row" alignItems="center" spacing={0.5}>
+                                  <Stack direction="row" sx={{ alignItems: "center" }} spacing={0.5}>
                                     <PhoneIcon sx={{ fontSize: 14, color: "text.secondary" }} />
-                                    <Typography variant="body2" color="text.secondary">
+                                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
                                       {a.phone}
                                     </Typography>
                                   </Stack>
@@ -483,10 +478,10 @@ export default function Account() {
                     >
                       <FavoriteIcon color="error" sx={{ fontSize: 28 }} />
                       <Box>
-                        <Typography variant="h6" fontWeight={700}>
+                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
                           Wishlist
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
                           Your favorite products
                         </Typography>
                       </Box>
@@ -502,7 +497,7 @@ export default function Account() {
                           }}
                         >
                           <FavoriteIcon sx={{ fontSize: 56, mb: 2, opacity: 0.3 }} />
-                          <Typography variant="body1" fontWeight={500} gutterBottom>
+                          <Typography variant="body1" sx={{ fontWeight: 500 }} gutterBottom>
                             Your wishlist is empty
                           </Typography>
                           <Typography variant="body2">
@@ -522,10 +517,10 @@ export default function Account() {
                                 borderRadius: 2,
                               }}
                             >
-                              <Typography variant="subtitle2" fontWeight={700} gutterBottom>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 700 }} gutterBottom>
                                 {p.name}
                               </Typography>
-                              <Typography variant="h6" color="primary" fontWeight={700} sx={{ mb: 1.5 }}>
+                              <Typography variant="h6" color="primary" sx={{ fontWeight: 700, mb: 1.5 }}>
                                 ₹{p.price}
                               </Typography>
                               <Stack direction="row" spacing={1}>
@@ -569,13 +564,13 @@ export default function Account() {
           PaperProps={{ sx: { borderRadius: 2 } }}
         >
           <DialogTitle>
-            <Stack direction="row" alignItems="center" spacing={1}>
+            <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
               <EditIcon />
               <Box>
-                <Typography variant="h6" fontWeight={700}>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
                   Edit Address
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
                   Update your delivery address
                 </Typography>
               </Box>

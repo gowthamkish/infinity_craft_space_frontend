@@ -11,7 +11,7 @@ import {
 import { BRAND } from "../theme/muiTheme";
 
 const P    = BRAND.rose[800];
-const P_BG = "rgba(139,26,74,0.07)";
+const P_BG = "rgba(210, 78, 51,0.07)";
 const BORDER = "rgba(0,0,0,0.08)";
 
 const SORT_OPTIONS = [
@@ -110,7 +110,7 @@ export default function ProductFilters({ products, onFiltersChange, activeFilter
 
       {/* ── Categories ───────────────────────────────────── */}
       <Box>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.25 }}>
+        <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", mb: 1.25 }}>
           <SectionHeading>Categories</SectionHeading>
           {(activeFilters.categories?.length || 0) > 0 && (
             <Box
@@ -124,7 +124,7 @@ export default function ProductFilters({ products, onFiltersChange, activeFilter
         </Stack>
 
         {publicCategoriesLoading ? (
-          <Stack alignItems="center" py={3}>
+          <Stack sx={{ alignItems: "center", py: 3 }}>
             <CircularProgress size={22} sx={{ color: P }} />
           </Stack>
         ) : (
@@ -137,7 +137,7 @@ export default function ProductFilters({ products, onFiltersChange, activeFilter
 
               return (
                 <Box key={cat._id}>
-                  <Stack direction="row" alignItems="center" sx={{ borderRadius: "8px", "&:hover": { bgcolor: "rgba(0,0,0,0.03)" } }}>
+                  <Stack direction="row" sx={{ alignItems: "center", borderRadius: "8px", "&:hover": { bgcolor: "rgba(0,0,0,0.03)" } }}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -148,7 +148,7 @@ export default function ProductFilters({ products, onFiltersChange, activeFilter
                         />
                       }
                       label={
-                        <Stack direction="row" alignItems="center" spacing={0.75}>
+                        <Stack direction="row" sx={{ alignItems: "center" }} spacing={0.75}>
                           <Typography sx={{ fontSize: "0.875rem", fontWeight: catChecked ? 600 : 400, color: catChecked ? P : "text.primary" }}>
                             {cat.name}
                           </Typography>
@@ -211,7 +211,7 @@ export default function ProductFilters({ products, onFiltersChange, activeFilter
 
       {/* ── Price Range ──────────────────────────────────── */}
       <Box>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.25 }}>
+        <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", mb: 1.25 }}>
           <SectionHeading>Price Range</SectionHeading>
           {priceActive && (
             <Box component="button" onClick={clearPrice}
@@ -227,7 +227,7 @@ export default function ProductFilters({ products, onFiltersChange, activeFilter
           </Typography>
         )}
 
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
           <TextField
             size="small" type="number" placeholder="Min"
             value={priceMin}
@@ -238,7 +238,7 @@ export default function ProductFilters({ products, onFiltersChange, activeFilter
               "& .MuiOutlinedInput-root": {
                 borderRadius: "10px",
                 "& fieldset": { borderColor: BORDER },
-                "&:hover fieldset": { borderColor: "rgba(139,26,74,0.35)" },
+                "&:hover fieldset": { borderColor: "rgba(210, 78, 51,0.35)" },
                 "&.Mui-focused fieldset": { borderColor: P },
               },
             }}
@@ -254,7 +254,7 @@ export default function ProductFilters({ products, onFiltersChange, activeFilter
               "& .MuiOutlinedInput-root": {
                 borderRadius: "10px",
                 "& fieldset": { borderColor: BORDER },
-                "&:hover fieldset": { borderColor: "rgba(139,26,74,0.35)" },
+                "&:hover fieldset": { borderColor: "rgba(210, 78, 51,0.35)" },
                 "&.Mui-focused fieldset": { borderColor: P },
               },
             }}
@@ -276,8 +276,8 @@ export default function ProductFilters({ products, onFiltersChange, activeFilter
         </Button>
 
         {priceActive && (
-          <Box sx={{ mt: 1, p: 1, bgcolor: P_BG, borderRadius: "8px", border: `1px solid rgba(139,26,74,0.18)` }}>
-            <Stack direction="row" alignItems="center" spacing={0.5}>
+          <Box sx={{ mt: 1, p: 1, bgcolor: P_BG, borderRadius: "8px", border: `1px solid rgba(210, 78, 51,0.18)` }}>
+            <Stack direction="row" sx={{ alignItems: "center" }} spacing={0.5}>
               <FiTag size={11} color={P} />
               <Typography sx={{ fontSize: "0.75rem", color: P, fontWeight: 600 }}>
                 ₹{activeFilters.priceRange.min.toLocaleString()} – {activeFilters.priceRange.max === Infinity ? "Max" : `₹${activeFilters.priceRange.max.toLocaleString()}`}

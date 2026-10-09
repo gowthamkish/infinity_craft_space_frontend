@@ -159,18 +159,18 @@ const UsersList = () => {
       {/* Page header */}
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}>
         <Box>
-          <Typography variant="h5" fontWeight={700} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <FiUsers size={22} style={{ color: "#8B1A4A" }} />
+          <Typography variant="h5" sx={{ fontWeight: 700, display: "flex", alignItems: "center", gap: 1 }}>
+            <FiUsers size={22} style={{ color: "#d24e33" }} />
             Users
           </Typography>
-          <Typography variant="body2" color="text.secondary">{users.length} registered accounts</Typography>
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>{users.length} registered accounts</Typography>
         </Box>
       </Box>
 
       {/* Filter bar */}
       <Card elevation={0} sx={{ mb: 2, border: "1px solid #e2e8f0", borderRadius: 2 }}>
         <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
-          <Stack direction="row" spacing={2} alignItems="center">
+          <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
             <TextField
               size="small"
               placeholder="Search by name or email…"
@@ -186,7 +186,7 @@ const UsersList = () => {
               sx={{ minWidth: 280, "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
             />
             {searchTerm && (
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>
                 {filteredUsers.length} result{filteredUsers.length !== 1 ? "s" : ""}
               </Typography>
             )}
@@ -199,19 +199,19 @@ const UsersList = () => {
         {loading ? (
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 8, gap: 2 }}>
             <OrbitLoader size="lg" />
-            <Typography color="text.secondary">Loading users…</Typography>
+            <Typography sx={{ color: "text.secondary" }}>Loading users…</Typography>
           </Box>
         ) : error ? (
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 8, gap: 1 }}>
             <Box sx={{ color: "#cbd5e1", mb: 1 }}><FiUserX size={36} /></Box>
-            <Typography fontWeight={600} color="error.main">Error loading users</Typography>
-            <Typography variant="body2" color="text.secondary">{error}</Typography>
+            <Typography sx={{ fontWeight: 600, color: "error.main" }}>Error loading users</Typography>
+            <Typography variant="body2" sx={{ color: "text.secondary" }}>{error}</Typography>
           </Box>
         ) : filteredUsers.length === 0 ? (
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 8, gap: 1 }}>
             <Box sx={{ color: "#cbd5e1", mb: 1 }}><FiUsers size={36} /></Box>
-            <Typography fontWeight={600} color="text.primary">No users found</Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography sx={{ fontWeight: 600, color: "text.primary" }}>No users found</Typography>
+            <Typography variant="body2" sx={{ color: "text.secondary" }}>
               {searchTerm ? "Try adjusting your search terms." : "No users are registered yet."}
             </Typography>
           </Box>
@@ -241,14 +241,14 @@ const UsersList = () => {
                             width: 36, height: 36, fontSize: "0.85rem", fontWeight: 700,
                             background: user.isAdmin
                               ? "linear-gradient(135deg, #f59e0b, #d97706)"
-                              : "linear-gradient(135deg, #8B1A4A, #6b1238)",
+                              : "linear-gradient(135deg, #d24e33, #b8412a)",
                           }}
                         >
                           {initials(user)}
                         </Avatar>
                         <Box>
-                          <Typography variant="body2" fontWeight={600} color="text.primary">{user.username}</Typography>
-                          <Typography variant="caption" color="text.secondary">#{(user._id || user.id || "").toString().slice(-6)}</Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 600, color: "text.primary" }}>{user.username}</Typography>
+                          <Typography variant="caption" sx={{ color: "text.secondary" }}>#{(user._id || user.id || "").toString().slice(-6)}</Typography>
                         </Box>
                       </Box>
                     </TableCell>
@@ -283,12 +283,12 @@ const UsersList = () => {
                     </TableCell>
 
                     <TableCell align="center">
-                      <Stack direction="row" spacing={0.75} justifyContent="center">
+                      <Stack direction="row" spacing={0.75} sx={{ justifyContent: "center" }}>
                         <button
                           className="adm-btn adm-btn-sm adm-btn-secondary"
                           onClick={() => openEditModal(user)}
                           title="Edit email / password"
-                          style={{ borderColor: "#8B1A4A", color: "#8B1A4A" }}
+                          style={{ borderColor: "#d24e33", color: "#d24e33" }}
                         >
                           <FiEdit2 size={12} /> Edit
                         </button>
@@ -324,19 +324,19 @@ const UsersList = () => {
       {/* Edit user modal */}
       <Dialog open={showEditModal} onClose={() => setShowEditModal(false)} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1, pb: 1 }}>
-          <FiEdit2 size={16} style={{ color: "#8B1A4A" }} />
+          <FiEdit2 size={16} style={{ color: "#d24e33" }} />
           Edit User
         </DialogTitle>
         <DialogContent>
           {editUser && (
             <Stack spacing={2} sx={{ pt: 1 }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, bgcolor: "#f8fafc", borderRadius: 2, p: 1.5 }}>
-                <Avatar sx={{ width: 36, height: 36, fontSize: "0.85rem", fontWeight: 700, background: "linear-gradient(135deg, #8B1A4A, #6b1238)" }}>
+                <Avatar sx={{ width: 36, height: 36, fontSize: "0.85rem", fontWeight: 700, background: "linear-gradient(135deg, #d24e33, #b8412a)" }}>
                   {initials(editUser)}
                 </Avatar>
                 <Box>
-                  <Typography fontWeight={700}>{editUser.username}</Typography>
-                  <Typography variant="caption" color="text.secondary">#{(editUser._id || "").slice(-6)}</Typography>
+                  <Typography sx={{ fontWeight: 700 }}>{editUser.username}</Typography>
+                  <Typography variant="caption" sx={{ color: "text.secondary" }}>#{(editUser._id || "").slice(-6)}</Typography>
                 </Box>
               </Box>
 
@@ -381,7 +381,7 @@ const UsersList = () => {
           <button className="adm-btn adm-btn-secondary" onClick={() => setShowEditModal(false)}>Cancel</button>
           <button
             className="adm-btn"
-            style={{ background: "#8B1A4A", color: "white" }}
+            style={{ background: "#d24e33", color: "white" }}
             onClick={handleEditSave}
             disabled={editLoading}
           >
@@ -400,12 +400,12 @@ const UsersList = () => {
           {deleteUser && (
             <Stack spacing={2} sx={{ pt: 1 }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, bgcolor: "#f8fafc", borderRadius: 2, p: 1.5 }}>
-                <Avatar sx={{ width: 36, height: 36, fontSize: "0.85rem", fontWeight: 700, background: "linear-gradient(135deg, #8B1A4A, #6b1238)" }}>
+                <Avatar sx={{ width: 36, height: 36, fontSize: "0.85rem", fontWeight: 700, background: "linear-gradient(135deg, #d24e33, #b8412a)" }}>
                   {initials(deleteUser)}
                 </Avatar>
                 <Box>
-                  <Typography fontWeight={700}>{deleteUser.username}</Typography>
-                  <Typography variant="body2" color="text.secondary">{deleteUser.email}</Typography>
+                  <Typography sx={{ fontWeight: 700 }}>{deleteUser.username}</Typography>
+                  <Typography variant="body2" sx={{ color: "text.secondary" }}>{deleteUser.email}</Typography>
                 </Box>
               </Box>
               {deleteError && <Alert severity="error">{deleteError}</Alert>}
@@ -441,12 +441,12 @@ const UsersList = () => {
           {selectedUser && (
             <Stack spacing={2} sx={{ pt: 1 }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, bgcolor: "#f8fafc", borderRadius: 2, p: 1.5 }}>
-                <Avatar sx={{ width: 36, height: 36, fontSize: "0.85rem", fontWeight: 700, background: "linear-gradient(135deg, #8B1A4A, #6b1238)" }}>
+                <Avatar sx={{ width: 36, height: 36, fontSize: "0.85rem", fontWeight: 700, background: "linear-gradient(135deg, #d24e33, #b8412a)" }}>
                   {initials(selectedUser)}
                 </Avatar>
                 <Box>
-                  <Typography fontWeight={700}>{selectedUser.username}</Typography>
-                  <Typography variant="body2" color="text.secondary">{selectedUser.email}</Typography>
+                  <Typography sx={{ fontWeight: 700 }}>{selectedUser.username}</Typography>
+                  <Typography variant="body2" sx={{ color: "text.secondary" }}>{selectedUser.email}</Typography>
                 </Box>
               </Box>
               <Alert severity="info" icon={<FiShield size={14} style={{ marginTop: 1 }} />}>

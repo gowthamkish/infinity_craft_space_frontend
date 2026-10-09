@@ -18,9 +18,9 @@
 }
 
 @keyframes pulse-ring {
-  0%   { box-shadow: 0 0 0 0   rgba(139, 26, 74, 0.5); }
-  70%  { box-shadow: 0 0 0 18px rgba(139, 26, 74, 0);  }
-  100% { box-shadow: 0 0 0 0   rgba(139, 26, 74, 0);   }
+  0%   { box-shadow: 0 0 0 0   rgba(210, 78, 51, 0.5); }
+  70%  { box-shadow: 0 0 0 18px rgba(210, 78, 51, 0);  }
+  100% { box-shadow: 0 0 0 0   rgba(210, 78, 51, 0);   }
 }
 
 @keyframes fade-in-up {
@@ -81,14 +81,14 @@
 }
 
 .loader-orbit__ring--1 {
-  border-top-color: var(--primary, #8B1A4A);
-  border-right-color: rgba(139, 26, 74, 0.15);
+  border-top-color: var(--primary, #d24e33);
+  border-right-color: rgba(210, 78, 51, 0.15);
   animation-duration: 0.85s;
 }
 
 .loader-orbit__ring--2 {
   inset: 10px;
-  border-top-color: var(--gold-500, #C9A84C);
+  border-top-color: var(--gold-500, #0f9488);
   border-right-color: rgba(201, 168, 76, 0.15);
   animation-duration: 1.15s;
   animation-direction: reverse;
@@ -96,7 +96,7 @@
 
 .loader-orbit__ring--3 {
   inset: 20px;
-  border-top-color: var(--blush-400, #F4A7B9);
+  border-top-color: var(--blush-400, #ff9d7a);
   border-right-color: rgba(244, 167, 185, 0.15);
   animation-duration: 1.45s;
 }
@@ -151,7 +151,7 @@
 .loader-bars__bar {
   width: 4px;
   border-radius: 2px;
-  background: var(--primary, #8B1A4A);
+  background: var(--primary, #d24e33);
   animation: bar-grow 1s ease-in-out infinite;
   transform-origin: bottom;
 }
@@ -159,16 +159,16 @@
 .loader-bars--sm .loader-bars__bar { width: 3px; }
 
 .loader-bars__bar:nth-child(1) { animation-delay: 0s;    height: 100%; }
-.loader-bars__bar:nth-child(2) { animation-delay: 0.12s; height: 75%;  background: var(--gold-500, #C9A84C); }
-.loader-bars__bar:nth-child(3) { animation-delay: 0.24s; height: 55%;  background: var(--blush-400, #F4A7B9); }
-.loader-bars__bar:nth-child(4) { animation-delay: 0.36s; height: 75%;  background: var(--gold-500, #C9A84C); }
+.loader-bars__bar:nth-child(2) { animation-delay: 0.12s; height: 75%;  background: var(--gold-500, #0f9488); }
+.loader-bars__bar:nth-child(3) { animation-delay: 0.24s; height: 55%;  background: var(--blush-400, #ff9d7a); }
+.loader-bars__bar:nth-child(4) { animation-delay: 0.36s; height: 75%;  background: var(--gold-500, #0f9488); }
 .loader-bars__bar:nth-child(5) { animation-delay: 0.48s; height: 100%; }
 
 /* ── Page loader text ───────────────────────────────────────── */
 .loader-label {
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--text-primary, #2C2C2C);
+  color: var(--text-primary, #232420);
   margin: 0;
   letter-spacing: -0.01em;
 }

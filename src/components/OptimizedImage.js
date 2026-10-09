@@ -1,6 +1,7 @@
 import React, { useState, useCallback, memo } from "react";
 import Box from "@mui/material/Box";
 import { DotsLoader } from "./Loader";
+import { PLACEHOLDER_SRC } from "../utils/imageFallback";
 
 /**
  * Transforms a Cloudinary URL to serve the optimal format and size.
@@ -37,7 +38,7 @@ const OptimizedImage = memo(
   ({
     src,
     alt = "Product Image",
-    fallbackSrc = "https://placehold.co/400x400?text=No+Image",
+    fallbackSrc = PLACEHOLDER_SRC,
     className,
     style,
     loading = "lazy",

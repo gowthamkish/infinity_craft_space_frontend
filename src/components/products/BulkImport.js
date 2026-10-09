@@ -25,8 +25,8 @@ import AdminLayout from "../admin/AdminLayout";
 import api from "../../api/axios";
 
 /* ── tokens ─────────────────────────────────────────────────────── */
-const P      = "#8b2252";
-const P_DARK = "#6b1238";
+const P      = "#d24e33";
+const P_DARK = "#b8412a";
 const BORDER = "rgba(0,0,0,0.08)";
 
 const REQUIRED_COLS = ["name", "category", "price"];
@@ -251,7 +251,7 @@ export default function BulkImport() {
       <Box sx={{ maxWidth: 1100, mx: "auto", px: { xs: 2, md: 3 }, py: 3 }}>
 
         {/* ── header ─────────────────────────────────────────────── */}
-        <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 3 }}>
+        <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 3 }}>
           <Button startIcon={<FiArrowLeft />} onClick={() => navigate("/admin/products")}
             sx={{ color: "#6b7280", textTransform: "none", fontWeight: 600, "&:hover": { color: P } }}>
             Back
@@ -275,7 +275,7 @@ export default function BulkImport() {
           <Stack spacing={3}>
             {/* instructions */}
             <SC>
-              <Stack direction="row" alignItems="flex-start" spacing={2} sx={{ mb: 2 }}>
+              <Stack direction="row" spacing={2} sx={{ alignItems: "flex-start", mb: 2 }}>
                 <Box sx={{ width: 34, height: 34, borderRadius: "9px", bgcolor: "#eff6ff",
                   display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <FiAlertCircle size={15} style={{ color: "#3b82f6" }} />
@@ -297,7 +297,7 @@ export default function BulkImport() {
                   </Stack>
                 </Box>
               </Stack>
-              <Stack direction="row" spacing={1.5} flexWrap="wrap">
+              <Stack direction="row" spacing={1.5} sx={{ flexWrap: "wrap" }}>
                 <Button variant="outlined" startIcon={<FiDownload />} onClick={downloadExcelTemplate}
                   sx={{ borderColor: P, color: P, textTransform: "none", fontWeight: 600,
                     borderRadius: "10px", "&:hover": { bgcolor: `${P}08`, borderColor: P_DARK } }}>
@@ -347,9 +347,8 @@ export default function BulkImport() {
           <Stack spacing={3}>
             {/* summary bar */}
             <SC>
-              <Stack direction={{ xs: "column", sm: "row" }} alignItems={{ sm: "center" }}
-                justifyContent="space-between" spacing={2}>
-                <Stack direction="row" spacing={2} flexWrap="wrap">
+              <Stack direction={{ xs: "column", sm: "row" }} sx={{ alignItems: { sm: "center" }, justifyContent: "space-between" }} spacing={2}>
+                <Stack direction="row" spacing={2} sx={{ flexWrap: "wrap" }}>
                   <Chip label={`${csvRows.length} rows loaded`} size="small"
                     sx={{ bgcolor: "#f1f5f9", fontWeight: 600, fontSize: "0.8rem" }} />
                   <Chip icon={<FiCheckCircle size={13} />} label={`${validCount} valid`} size="small"
@@ -404,13 +403,13 @@ export default function BulkImport() {
                           <TableCell>
                             {errs ? (
                               <Tooltip title={errs.join(", ")} arrow>
-                                <Stack direction="row" alignItems="center" spacing={0.5} sx={{ cursor: "help" }}>
+                                <Stack direction="row" spacing={0.5} sx={{ alignItems: "center", cursor: "help" }}>
                                   <FiXCircle size={14} style={{ color: "#dc2626" }} />
                                   <Typography sx={{ fontSize: "0.72rem", color: "#dc2626", fontWeight: 600 }}>Error</Typography>
                                 </Stack>
                               </Tooltip>
                             ) : (
-                              <Stack direction="row" alignItems="center" spacing={0.5}>
+                              <Stack direction="row" sx={{ alignItems: "center" }} spacing={0.5}>
                                 <FiCheckCircle size={14} style={{ color: "#16a34a" }} />
                                 <Typography sx={{ fontSize: "0.72rem", color: "#16a34a", fontWeight: 600 }}>OK</Typography>
                               </Stack>
@@ -436,7 +435,7 @@ export default function BulkImport() {
         {step === "result" && result && (
           <Stack spacing={3}>
             <SC>
-              <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
+              <Stack direction="row" spacing={2} sx={{ alignItems: "center", mb: 3 }}>
                 <Box sx={{ width: 48, height: 48, borderRadius: "12px", bgcolor: "#f0fdf4",
                   display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <FiCheckCircle size={24} style={{ color: "#16a34a" }} />

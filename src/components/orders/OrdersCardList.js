@@ -24,10 +24,10 @@ const OrdersCardList = ({
           <CardContent>
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
               <Box>
-                <Typography variant="subtitle2" fontWeight={700}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                   Order #{order.orderNumber || order._id?.slice(-6)}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>
                   {order.items?.length || 0} items
                 </Typography>
               </Box>
@@ -42,7 +42,7 @@ const OrdersCardList = ({
               ].map(({ icon, text, bold, color }, i) => (
                 <Box key={i} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   {icon}
-                  <Typography variant="body2" fontWeight={bold ? 600 : 400} sx={{ color: color || "text.primary" }}>
+                  <Typography variant="body2" sx={{ fontWeight: bold ? 600 : 400, color: color || "text.primary" }}>
                     {text}
                   </Typography>
                 </Box>

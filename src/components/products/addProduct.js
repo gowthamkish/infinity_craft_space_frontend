@@ -38,9 +38,9 @@ import { useGetPublicCategoriesQuery } from "../../services/categoriesApi";
 import api from "../../api/axios";
 
 /* ── Design tokens ─────────────────────────────────────────────── */
-const P       = "#8b2252";
-const P_DARK  = "#6b1238";
-const P_LIGHT = "rgba(139,34,82,0.07)";
+const P       = "#d24e33";
+const P_DARK  = "#b8412a";
+const P_LIGHT = "rgba(210, 78, 51,0.07)";
 const BORDER  = "rgba(0,0,0,0.08)";
 
 /* ── Shared field sx ────────────────────────────────────────────── */
@@ -48,8 +48,8 @@ const FIELD_SX = {
   "& .MuiOutlinedInput-root": {
     borderRadius: "10px",
     "& fieldset": { borderColor: BORDER },
-    "&:hover fieldset": { borderColor: "rgba(139,34,82,0.35)" },
-    "&.Mui-focused fieldset": { borderColor: P, boxShadow: `0 0 0 3px rgba(139,34,82,0.1)` },
+    "&:hover fieldset": { borderColor: "rgba(210, 78, 51,0.35)" },
+    "&.Mui-focused fieldset": { borderColor: P, boxShadow: `0 0 0 3px rgba(210, 78, 51,0.1)` },
   },
 };
 
@@ -79,8 +79,8 @@ function SC({ children, sx }) {
 /* ── Section header ─────────────────────────────────────────────── */
 function SH({ icon: Icon, color = P, children, badge }) {
   return (
-    <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2.5 }}>
-      <Stack direction="row" alignItems="center" spacing={1.25}>
+    <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", mb: 2.5 }}>
+      <Stack direction="row" sx={{ alignItems: "center" }} spacing={1.25}>
         <Box sx={{
           width: 34, height: 34, borderRadius: "9px", flexShrink: 0,
           bgcolor: `${color}12`,
@@ -107,7 +107,7 @@ function SH({ icon: Icon, color = P, children, badge }) {
 /* ── Field label ────────────────────────────────────────────────── */
 function FL({ children, required, hint }) {
   return (
-    <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.75 }}>
+    <Stack direction="row" spacing={0.5} sx={{ alignItems: "center", mb: 0.75 }}>
       <Typography sx={{ fontWeight: 600, fontSize: "0.8125rem", color: "#374151" }}>
         {children}
         {required && <Box component="span" sx={{ color: "#ef4444", ml: 0.25 }}>*</Box>}
@@ -146,8 +146,8 @@ function FmtBtn({ children, onClick, title }) {
    ══════════════════════════════════════════════════════════════════ */
 function ProductColorsSection({ colors, setColors, showColorPicker, setShowColorPicker, stockErrors, setStockErrors }) {
   const [collapsed,     setCollapsed]     = useState(false);
-  const [draftHex,      setDraftHex]      = useState("#8b2252");
-  const [draftHexInput, setDraftHexInput] = useState("#8b2252");
+  const [draftHex,      setDraftHex]      = useState("#d24e33");
+  const [draftHexInput, setDraftHexInput] = useState("#d24e33");
   const [draftName,     setDraftName]     = useState("");
   const [addError,      setAddError]      = useState("");
   const [dragIdx,       setDragIdx]       = useState(null);
@@ -263,11 +263,11 @@ function ProductColorsSection({ colors, setColors, showColorPicker, setShowColor
       <CardContent sx={{ p: 3, "&:last-child": { pb: collapsed ? 3 : 3 } }}>
 
         {/* ── Section header row ─────────────────────────────────── */}
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: collapsed ? 0 : 0.75 }}>
-          <Stack direction="row" alignItems="center" spacing={1.25}>
+        <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", mb: collapsed ? 0 : 0.75 }}>
+          <Stack direction="row" sx={{ alignItems: "center" }} spacing={1.25}>
             <Box sx={{
               width: 34, height: 34, borderRadius: "9px", flexShrink: 0,
-              bgcolor: "rgba(139,34,82,0.08)",
+              bgcolor: "rgba(210, 78, 51,0.08)",
               display: "flex", alignItems: "center", justifyContent: "center",
             }}>
               <MdPalette size={17} style={{ color: P }} />
@@ -284,9 +284,9 @@ function ProductColorsSection({ colors, setColors, showColorPicker, setShowColor
             </Box>
           </Stack>
 
-          <Stack direction="row" alignItems="center" spacing={1.5}>
+          <Stack direction="row" sx={{ alignItems: "center" }} spacing={1.5}>
             {/* Master visibility toggle */}
-            <Stack direction="row" alignItems="center" spacing={0.75}>
+            <Stack direction="row" sx={{ alignItems: "center" }} spacing={0.75}>
               <Typography sx={{ fontSize: "0.8125rem", color: "#374151", fontWeight: 500 }}>
                 Show color picker to customers
               </Typography>
@@ -321,7 +321,7 @@ function ProductColorsSection({ colors, setColors, showColorPicker, setShowColor
             </Typography>
 
             {/* ── Add color row ───────────────────────────────────── */}
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25} alignItems="flex-start" sx={{ mb: 1.5 }}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25} sx={{ alignItems: "flex-start", mb: 1.5 }}>
 
               {/* Swatch + native picker */}
               <Box sx={{ flexShrink: 0 }}>
@@ -353,7 +353,7 @@ function ProductColorsSection({ colors, setColors, showColorPicker, setShowColor
                 value={draftHexInput}
                 onChange={handleHexInput}
                 onBlur={handleHexBlur}
-                placeholder="#8b2252"
+                placeholder="#d24e33"
                 sx={{
                   width: 116,
                   ...FIELD_SX,
@@ -427,7 +427,7 @@ function ProductColorsSection({ colors, setColors, showColorPicker, setShowColor
             )}
 
             {/* ── Color list + preview ────────────────────────────── */}
-            <Grid container spacing={2.5} alignItems="flex-start">
+            <Grid container spacing={2.5} sx={{ alignItems: "flex-start" }}>
 
               {/* List */}
               <Grid size={{ xs: 12, md: colors.length > 0 ? 8 : 12 }}>
@@ -438,7 +438,7 @@ function ProductColorsSection({ colors, setColors, showColorPicker, setShowColor
                 }}>
                   {colors.length === 0 ? (
                     /* Empty state */
-                    <Stack alignItems="center" justifyContent="center" spacing={0.75} sx={{ py: 4 }}>
+                    <Stack spacing={0.75} sx={{ alignItems: "center", justifyContent: "center", py: 4 }}>
                       <MdPalette size={32} style={{ color: "#d1d5db" }} />
                       <Typography sx={{ fontSize: "0.875rem", color: "#94a3b8", fontWeight: 500 }}>
                         No colors added yet
@@ -479,7 +479,7 @@ function ProductColorsSection({ colors, setColors, showColorPicker, setShowColor
                               },
                             }}
                           >
-                            <Stack direction="row" alignItems="center" spacing={1.25} flexWrap="wrap" gap={1}>
+                            <Stack direction="row" sx={{ alignItems: "center", flexWrap: "wrap", gap: 1 }} spacing={1.25}>
 
                               {/* Drag handle */}
                               <Box sx={{ color: "#d1d5db", cursor: "grab", display: "flex", "&:active": { cursor: "grabbing" } }}>
@@ -508,7 +508,7 @@ function ProductColorsSection({ colors, setColors, showColorPicker, setShowColor
                                       width: "100%", border: `1px solid ${P}`, borderRadius: 6,
                                       outline: "none", padding: "2px 6px", fontSize: "0.875rem",
                                       fontWeight: 500, color: "#0f172a", background: "#fff",
-                                      boxShadow: `0 0 0 2px rgba(139,34,82,0.1)`,
+                                      boxShadow: `0 0 0 2px rgba(210, 78, 51,0.1)`,
                                     }}
                                   />
                                 ) : (
@@ -586,7 +586,7 @@ function ProductColorsSection({ colors, setColors, showColorPicker, setShowColor
                               </Box>
 
                               {/* Visibility toggle */}
-                              <Stack alignItems="center" sx={{ flexShrink: 0 }}>
+                              <Stack sx={{ alignItems: "center", flexShrink: 0 }}>
                                 <Typography sx={{ fontSize: "0.68rem", color: "#94a3b8", fontWeight: 600, mb: 0.25, whiteSpace: "nowrap" }}>
                                   Visible
                                 </Typography>
@@ -623,7 +623,7 @@ function ProductColorsSection({ colors, setColors, showColorPicker, setShowColor
 
                               {/* Delete button */}
                               {confirmDel === color.id ? (
-                                <Stack direction="row" alignItems="center" spacing={0.5} sx={{ flexShrink: 0 }}>
+                                <Stack direction="row" spacing={0.5} sx={{ alignItems: "center", flexShrink: 0 }}>
                                   <Typography sx={{ fontSize: "0.72rem", color: "#64748b", whiteSpace: "nowrap" }}>
                                     Remove {color.name.slice(0, 10)}{color.name.length > 10 ? "…" : ""}?
                                   </Typography>
@@ -685,7 +685,7 @@ function ProductColorsSection({ colors, setColors, showColorPicker, setShowColor
                         bgcolor: "rgba(248,250,252,0.88)", backdropFilter: "blur(2px)",
                         display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2,
                       }}>
-                        <Stack alignItems="center" spacing={0.5}>
+                        <Stack sx={{ alignItems: "center" }} spacing={0.5}>
                           <FiEyeOff size={18} style={{ color: "#94a3b8" }} />
                           <Typography sx={{ fontSize: "0.72rem", color: "#94a3b8", textAlign: "center", px: 2 }}>
                             Color picker hidden from customers
@@ -703,7 +703,7 @@ function ProductColorsSection({ colors, setColors, showColorPicker, setShowColor
                     ) : (
                       <Box>
                         {/* Swatch row */}
-                        <Stack direction="row" flexWrap="wrap" gap={0.875} sx={{ mb: 1.5 }}>
+                        <Stack direction="row" sx={{ flexWrap: "wrap", gap: 0.875, mb: 1.5 }}>
                           {visibleColors.map((c, i) => {
                             const selected = previewSel === c.id;
                             return (
@@ -714,7 +714,7 @@ function ProductColorsSection({ colors, setColors, showColorPicker, setShowColor
                                     width: 28, height: 28, borderRadius: "50%",
                                     bgcolor: c.hex, cursor: "pointer",
                                     border: selected ? `2.5px solid ${P}` : "2px solid rgba(0,0,0,0.1)",
-                                    boxShadow: selected ? `0 0 0 3px rgba(139,34,82,0.18)` : "none",
+                                    boxShadow: selected ? `0 0 0 3px rgba(210, 78, 51,0.18)` : "none",
                                     transition: "all 0.18s",
                                     "&:hover": { transform: "scale(1.15)", boxShadow: "0 2px 8px rgba(0,0,0,0.18)" },
                                   }}
@@ -729,7 +729,7 @@ function ProductColorsSection({ colors, setColors, showColorPicker, setShowColor
                           const sel = visibleColors.find((c) => c.id === previewSel);
                           if (!sel) return null;
                           return (
-                            <Stack direction="row" alignItems="center" spacing={0.75}>
+                            <Stack direction="row" sx={{ alignItems: "center" }} spacing={0.75}>
                               <Box sx={{ width: 14, height: 14, borderRadius: "3px", bgcolor: sel.hex, border: "1px solid rgba(0,0,0,0.1)", flexShrink: 0 }} />
                               <Typography sx={{ fontSize: "0.78rem", color: "#374151", fontWeight: 500 }}>
                                 Selected: <strong>{sel.name}</strong>
@@ -802,7 +802,7 @@ function AiAutofillDialog({ open, onClose, productName, categories, onApply }) {
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth
       PaperProps={{ sx: { borderRadius: "20px", maxHeight: "90vh" } }}>
       <DialogTitle sx={{ pb: 1 }}>
-        <Stack direction="row" alignItems="center" spacing={1.5}>
+        <Stack direction="row" sx={{ alignItems: "center" }} spacing={1.5}>
           <Box sx={{ width: 34, height: 34, borderRadius: "9px", bgcolor: `${P}12`,
             display: "flex", alignItems: "center", justifyContent: "center" }}>
             <FiZap size={15} style={{ color: P }} />
@@ -867,7 +867,7 @@ function AiAutofillDialog({ open, onClose, productName, categories, onApply }) {
                 {result.tags?.length > 0 && (
                   <Box>
                     <Typography sx={{ fontSize: "0.72rem", fontWeight: 700, color: "#6b7280", mb: 0.5, textTransform: "uppercase", letterSpacing: "0.05em" }}>Tags</Typography>
-                    <Stack direction="row" flexWrap="wrap" gap={0.5}>
+                    <Stack direction="row" sx={{ flexWrap: "wrap", gap: 0.5 }}>
                       {result.tags.map(t => <Chip key={t} label={t} size="small" sx={{ fontSize: "0.72rem", height: 22 }} />)}
                     </Stack>
                   </Box>
@@ -1120,7 +1120,7 @@ const AddProduct = () => {
       <Box sx={{ width: "100%", bgcolor: "#f8f9fc", minHeight: "100vh", p: { xs: 2, md: 3 } }}>
 
         {/* ── Page header ─────────────────────────────────────────── */}
-        <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
+        <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 1 }}>
           <Box sx={{ fontSize: "0.78rem", color: "#94a3b8", display: "flex", alignItems: "center", gap: 0.5, cursor: "pointer" }}
             onClick={() => navigate("/")}>
             <FiHome size={13} /> Home
@@ -1136,8 +1136,8 @@ const AddProduct = () => {
           </Box>
         </Stack>
 
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3, gap: 2 }}>
-          <Stack direction="row" alignItems="center" spacing={2} sx={{ minWidth: 0 }}>
+        <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", mb: 3, gap: 2 }}>
+          <Stack direction="row" spacing={2} sx={{ alignItems: "center", minWidth: 0 }}>
             <Button variant="outlined" size="small" startIcon={<FiArrowLeft size={13} />}
               onClick={() => navigate("/admin/products")}
               sx={{
@@ -1195,7 +1195,7 @@ const AddProduct = () => {
         )}
 
         <Box component="form" onSubmit={handleSubmit}>
-          <Grid container spacing={3} alignItems="flex-start">
+          <Grid container spacing={3} sx={{ alignItems: "flex-start" }}>
 
             {/* ════ LEFT COLUMN (8/12) ════════════════════════════════ */}
             <Grid size={{ xs: 12, lg: 8 }}>
@@ -1248,7 +1248,7 @@ const AddProduct = () => {
                   <Box sx={{
                     border: `1px solid ${BORDER}`, borderRadius: "12px", overflow: "hidden",
                     transition: "border-color 0.15s, box-shadow 0.15s",
-                    "&:focus-within": { borderColor: P, boxShadow: `0 0 0 3px rgba(139,34,82,0.1)` },
+                    "&:focus-within": { borderColor: P, boxShadow: `0 0 0 3px rgba(210, 78, 51,0.1)` },
                   }}>
                     <Stack direction="row" spacing={0.75} sx={{ px: 1.5, py: 1, borderBottom: `1px solid ${BORDER}`, bgcolor: "#f8fafc" }}>
                       <FmtBtn onClick={() => insertFormat("bold")} title="Bold"><b>B</b></FmtBtn>
@@ -1286,8 +1286,8 @@ const AddProduct = () => {
                 {isHoopCategory && (
                   <Card elevation={0} sx={{ border: `1px solid ${BORDER}`, borderRadius: "16px", bgcolor: "#fff", overflow: "visible" }}>
                     <CardContent sx={{ p: 3, "&:last-child": { pb: 3 } }}>
-                      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-                        <Stack direction="row" alignItems="center" spacing={1.25}>
+                      <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+                        <Stack direction="row" sx={{ alignItems: "center" }} spacing={1.25}>
                           <Box sx={{
                             width: 34, height: 34, borderRadius: "9px", bgcolor: `${P}12`,
                             display: "flex", alignItems: "center", justifyContent: "center",
@@ -1303,7 +1303,7 @@ const AddProduct = () => {
                             </Typography>
                           </Box>
                         </Stack>
-                        <Stack direction="row" alignItems="center" spacing={0.75}>
+                        <Stack direction="row" sx={{ alignItems: "center" }} spacing={0.75}>
                           <Typography sx={{ fontSize: "0.8125rem", color: "#374151", fontWeight: 500 }}>
                             Show size picker to customers
                           </Typography>
@@ -1316,7 +1316,7 @@ const AddProduct = () => {
                         </Stack>
                       </Stack>
 
-                      <Stack direction="row" flexWrap="wrap" gap={1.5}>
+                      <Stack direction="row" sx={{ flexWrap: "wrap", gap: 1.5 }}>
                         {HOOP_SIZE_OPTIONS.map((size) => {
                           const selected = hoopSizes.includes(size);
                           return (
@@ -1376,11 +1376,11 @@ const AddProduct = () => {
                       bgcolor: dragOver ? P_LIGHT : "#fdfaf8",
                       transition: "all 0.2s ease",
                       mb: totalImages > 0 ? 2.5 : 0,
-                      "&:hover": { borderColor: "rgba(139,34,82,0.4)", bgcolor: P_LIGHT },
+                      "&:hover": { borderColor: "rgba(210, 78, 51,0.4)", bgcolor: P_LIGHT },
                     }}>
                     <Box sx={{
                       width: 56, height: 56, borderRadius: "50%", mx: "auto", mb: 2,
-                      background: `linear-gradient(135deg, rgba(139,34,82,0.12), rgba(139,34,82,0.22))`,
+                      background: `linear-gradient(135deg, rgba(210, 78, 51,0.12), rgba(210, 78, 51,0.22))`,
                       display: "flex", alignItems: "center", justifyContent: "center",
                     }}>
                       <FiCamera size={24} style={{ color: P }} />
@@ -1395,7 +1395,7 @@ const AddProduct = () => {
                       <Box sx={{
                         display: "inline-flex", alignItems: "center", gap: 0.75, mt: 2,
                         px: 2, height: 32, borderRadius: "20px",
-                        bgcolor: P_LIGHT, border: `1px solid rgba(139,34,82,0.2)`,
+                        bgcolor: P_LIGHT, border: `1px solid rgba(210, 78, 51,0.2)`,
                       }}>
                         <Typography sx={{ fontSize: "0.78rem", fontWeight: 600, color: P }}>Browse files</Typography>
                       </Box>
@@ -1406,7 +1406,7 @@ const AddProduct = () => {
 
                   {totalImages > 0 && (
                     <Box>
-                      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
+                      <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center", mb: 1.5 }}>
                         <Typography sx={{ fontWeight: 600, fontSize: "0.875rem", color: "#374151" }}>
                           Selected ({totalImages})
                           <Box component="span" sx={{ ml: 1, fontSize: "0.72rem", color: "#94a3b8", fontWeight: 400 }}>
@@ -1540,7 +1540,7 @@ const AddProduct = () => {
                     display: "flex", alignItems: "center", justifyContent: "space-between",
                     bgcolor: "#f8fafc", border: `1px solid ${BORDER}`, borderRadius: "12px", px: 2, py: 1.5,
                     transition: "all 0.2s",
-                    "&:hover": { borderColor: "rgba(139,34,82,0.2)" },
+                    "&:hover": { borderColor: "rgba(210, 78, 51,0.2)" },
                   }}>
                     <Box>
                       <Typography sx={{ fontWeight: 700, fontSize: "0.875rem", color: "#0f172a" }}>Track inventory</Typography>
@@ -1608,7 +1608,7 @@ const AddProduct = () => {
                       borderRadius: "12px", px: 2, py: 1.5,
                       transition: "all 0.2s ease",
                       mb: form.isCustomizable ? 2.5 : 0,
-                      "&:hover": { borderColor: form.isCustomizable ? "#f59e0b" : "rgba(139,34,82,0.2)" },
+                      "&:hover": { borderColor: form.isCustomizable ? "#f59e0b" : "rgba(210, 78, 51,0.2)" },
                     }}>
                     <Checkbox checked={form.isCustomizable}
                       onChange={(e) => { e.stopPropagation(); set("isCustomizable", e.target.checked); }}
@@ -1657,12 +1657,12 @@ const AddProduct = () => {
                       borderRadius: "12px", fontWeight: 700, py: 1.625, fontSize: "0.9375rem",
                       textTransform: "none", mb: 1.25,
                       background: `linear-gradient(135deg, ${P} 0%, ${P_DARK} 100%)`,
-                      boxShadow: `0 4px 16px rgba(139,34,82,0.3)`,
-                      "&:hover": { background: `linear-gradient(135deg, ${P_DARK} 0%, #5e1232 100%)`, boxShadow: `0 6px 20px rgba(139,34,82,0.4)` },
+                      boxShadow: `0 4px 16px rgba(210, 78, 51,0.3)`,
+                      "&:hover": { background: `linear-gradient(135deg, ${P_DARK} 0%, #5e1232 100%)`, boxShadow: `0 6px 20px rgba(210, 78, 51,0.4)` },
                       "&:disabled": { opacity: 0.65 },
                     }}>
                     {loading || imageUploading ? (
-                      <Stack direction="row" alignItems="center" spacing={1}>
+                      <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
                         <DotsLoader size="sm" />
                         <span>{imageUploading ? `Uploading ${imageFiles.length} image${imageFiles.length > 1 ? "s" : ""}…` : editingId ? "Updating…" : "Adding…"}</span>
                       </Stack>
@@ -1687,7 +1687,7 @@ const AddProduct = () => {
                       "Use Compare price to show a discount badge",
                       colors.length > 0 ? `${colors.length} color variant${colors.length !== 1 ? "s" : ""} added` : null,
                     ].filter(Boolean).map((tip) => (
-                      <Stack key={tip} direction="row" spacing={1} alignItems="flex-start">
+                      <Stack key={tip} direction="row" spacing={1} sx={{ alignItems: "flex-start" }}>
                         <Box sx={{ width: 4, height: 4, borderRadius: "50%", bgcolor: "#94a3b8", flexShrink: 0, mt: 0.875 }} />
                         <Typography sx={{ fontSize: "0.75rem", color: "#94a3b8", lineHeight: 1.5 }}>{tip}</Typography>
                       </Stack>

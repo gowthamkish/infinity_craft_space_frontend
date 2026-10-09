@@ -5,22 +5,22 @@
 
 .co-page {
   /* ── Color tokens ─────────────────────────────────────────────────── */
-  --co-bg:          var(--bg-default, #FDF6EC);
+  --co-bg:          var(--bg-default, #f7f4ee);
   --co-surface:     var(--bg-primary, #FFFDF9);
-  --co-surface-2:   var(--bg-secondary, #FDF6EC);
-  --co-surface-3:   var(--bg-tertiary, #F5EDE0);
-  --co-border:      var(--border-color, #EAD9C5);
+  --co-surface-2:   var(--bg-secondary, #f7f4ee);
+  --co-surface-3:   var(--bg-tertiary, #efebe3);
+  --co-border:      var(--border-color, #e4dfd6);
   --co-border-2:    var(--charcoal-300, #C8A87A);
 
-  --co-ink:         var(--charcoal-900, #2C2C2C);
-  --co-ink-2:       var(--charcoal-700, #5C4330);
-  --co-ink-3:       var(--charcoal-500, #A08060);
-  --co-ink-4:       var(--charcoal-400, #C0A882);
+  --co-ink:         var(--charcoal-900, #232420);
+  --co-ink-2:       var(--charcoal-700, #46473f);
+  --co-ink-3:       var(--charcoal-500, #8a8c85);
+  --co-ink-4:       var(--charcoal-400, #b4b2a8);
 
-  --co-primary:     var(--primary, #8B1A4A);
-  --co-primary-lt:  var(--primary-light, #a51e50);
-  --co-primary-glow: rgba(139, 26, 74, 0.16);
-  --co-primary-sub: var(--primary-subtle, rgba(139,26,74,0.08));
+  --co-primary:     var(--primary, #d24e33);
+  --co-primary-lt:  var(--primary-light, #de5637);
+  --co-primary-glow: rgba(210, 78, 51, 0.16);
+  --co-primary-sub: var(--primary-subtle, rgba(210, 78, 51,0.08));
 
   --co-green:       var(--success, #2e7d32);
   --co-green-lt:    var(--success-light, #60ad5e);
@@ -33,8 +33,8 @@
   --co-danger-bd:   rgba(198, 40, 40, 0.2);
 
   --co-warn:        var(--gold-600, #a07a30);
-  --co-warn-bg:     var(--gold-100, #faf2cc);
-  --co-warn-bd:     var(--gold-300, #edcc59);
+  --co-warn-bg:     var(--gold-100, #d5f3ee);
+  --co-warn-bd:     var(--gold-300, #6fd3c5);
 
   /* ── Border radius ───────────────────────────────────────────────── */
   --co-r-xs:  6px;
@@ -141,7 +141,7 @@
 }
 .co-section-icon--purple { background: var(--co-primary-sub); color: var(--co-primary); }
 .co-section-icon--green  { background: var(--co-green-sub);   color: var(--co-green);   }
-.co-section-icon--blue   { background: var(--primary-subtle, rgba(139,26,74,0.06)); color: #8B1A4A; }
+.co-section-icon--blue   { background: var(--primary-subtle, rgba(210, 78, 51,0.06)); color: #d24e33; }
 .co-section-icon--amber  { background: var(--gold-100, #fef9e7); color: var(--gold-600, #a07a30); }
 
 .co-section-title {
@@ -197,7 +197,7 @@
 
 .co-handcraft-text {
   font-size: 0.78rem;
-  color: var(--gold-800, #745422);
+  color: var(--gold-800, #094d47);
   line-height: 1.55;
   margin: 0;
 }
@@ -271,7 +271,7 @@
 .co-item-tag--custom {
   background: var(--co-warn-bg);
   border: 1px solid var(--co-warn-bd);
-  color: var(--gold-800, #745422);
+  color: var(--gold-800, #094d47);
   margin-bottom: 6px;
 }
 
@@ -465,7 +465,7 @@
 }
 
 .co-summary-head {
-  background: linear-gradient(135deg, var(--rose-900, #4a0d25) 0%, var(--charcoal-900, #2C2C2C) 100%);
+  background: linear-gradient(135deg, var(--rose-900, #4a0d25) 0%, var(--charcoal-900, #232420) 100%);
   padding: 16px 20px;
 }
 
@@ -1073,9 +1073,9 @@
 }
 
 .co-method-card:hover {
-  border-color: var(--primary, #8B1A4A);
-  background: var(--primary-subtle, rgba(139,26,74,0.06));
-  box-shadow: 0 4px 16px rgba(139,26,74,0.09);
+  border-color: var(--primary, #d24e33);
+  background: var(--primary-subtle, rgba(210, 78, 51,0.06));
+  box-shadow: 0 4px 16px rgba(210, 78, 51,0.09);
 }
 
 .co-method-card.selected {
@@ -1446,9 +1446,9 @@
 }
 
 .co-confirm-btn--track {
-  background: var(--btn-brand-grad, linear-gradient(135deg, var(--secondary, #C9A84C), var(--primary, #8B1A4A)));
+  background: var(--btn-brand-grad, linear-gradient(135deg, var(--secondary, #0f9488), var(--primary, #d24e33)));
   color: white;
-  box-shadow: 0 6px 16px rgba(139,26,74,0.25);
+  box-shadow: 0 6px 16px rgba(210, 78, 51,0.25);
 }
 
 .co-confirm-btn--track:hover  { box-shadow: 0 10px 22px rgba(59,130,246,0.4); transform: translateY(-1px); }
@@ -1676,8 +1676,8 @@
 }
 
 .co-cta--blue {
-  background: var(--btn-brand-grad, linear-gradient(135deg, var(--secondary, #C9A84C), var(--primary, #8B1A4A)));
-  box-shadow: 0 6px 20px rgba(139,26,74,0.25);
+  background: var(--btn-brand-grad, linear-gradient(135deg, var(--secondary, #0f9488), var(--primary, #d24e33)));
+  box-shadow: 0 6px 20px rgba(210, 78, 51,0.25);
 }
 
 .co-cta--blue:hover:not(:disabled) { box-shadow: 0 12px 28px rgba(59,130,246,0.4); }

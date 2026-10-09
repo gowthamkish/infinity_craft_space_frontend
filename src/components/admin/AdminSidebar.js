@@ -30,8 +30,8 @@ import {
   FiUploadCloud,
 } from "react-icons/fi";
 
-const PRIMARY = "#8B1A4A";
-const PRIMARY_ALPHA = "rgba(139,26,74,0.12)";
+const PRIMARY = "#d24e33";
+const PRIMARY_ALPHA = "rgba(210, 78, 51,0.12)";
 
 const NAV_ITEMS = [
   {
@@ -248,7 +248,7 @@ export default function AdminSidebar() {
           sx={{
             width: 32,
             height: 32,
-            background: "linear-gradient(135deg, #8B1A4A, #6b1238)",
+            background: "linear-gradient(135deg, #d24e33, #b8412a)",
             fontSize: "0.75rem",
             fontWeight: 700,
             flexShrink: 0,

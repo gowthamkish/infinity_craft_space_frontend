@@ -18,7 +18,7 @@ export const EmptyCart = ({ navigate }) => (
           width: 100,
           height: 100,
           borderRadius: "50%",
-          background: "linear-gradient(135deg, #fdf2f6, #fdf6ec)",
+          background: "linear-gradient(135deg, #fff3ee, #f7f4ee)",
           border: "2px solid #f0e8e2",
           display: "flex",
           alignItems: "center",
@@ -27,12 +27,12 @@ export const EmptyCart = ({ navigate }) => (
           mb: 3,
         }}
       >
-        <ShoppingBagOutlinedIcon sx={{ fontSize: 48, color: "#8B1A4A" }} />
+        <ShoppingBagOutlinedIcon sx={{ fontSize: 48, color: "#d24e33" }} />
       </Box>
-      <Typography variant="h5" fontWeight={800} sx={{ mb: 1, color: "#1c1917" }}>
+      <Typography variant="h5" sx={{ fontWeight: 800, mb: 1, color: "#1c1917" }}>
         Your Cart is Empty
       </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 3.5, lineHeight: 1.7 }}>
+      <Typography variant="body1" sx={{ color: "text.secondary", mb: 3.5, lineHeight: 1.7 }}>
         Looks like you haven't added any items yet. Discover our beautiful handcrafted collection!
       </Typography>
       <Button
@@ -45,8 +45,8 @@ export const EmptyCart = ({ navigate }) => (
           px: 4,
           fontWeight: 700,
           borderRadius: 2,
-          background: "linear-gradient(135deg, #8B1A4A, #7a1640)",
-          boxShadow: "0 4px 14px rgba(139,26,74,0.35)",
+          background: "linear-gradient(135deg, #d24e33, #7a1640)",
+          boxShadow: "0 4px 14px rgba(210, 78, 51,0.35)",
           "&:hover": { background: "linear-gradient(135deg, #7a1640, #6b1236)" },
         }}
       >

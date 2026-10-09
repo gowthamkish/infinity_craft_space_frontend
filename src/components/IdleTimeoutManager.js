@@ -175,7 +175,7 @@ const IdleTimeoutManager = () => {
           <Box
             sx={{
               background:
-                "linear-gradient(135deg, #8B1A4A 0%, #C9A84C 100%)",
+                "linear-gradient(135deg, #d24e33 0%, #0f9488 100%)",
               p: "25px 30px",
               borderRadius: "25px 25px 0 0",
               color: "white",
@@ -230,8 +230,8 @@ const IdleTimeoutManager = () => {
               background:
                 "linear-gradient(135deg, #fff5f5 0%, #ffebee 100%)",
               borderRadius: "20px",
-              border: "1px solid rgba(139, 26, 74, 0.1)",
-              boxShadow: "0 8px 25px rgba(139, 26, 74, 0.08)",
+              border: "1px solid rgba(210, 78, 51, 0.1)",
+              boxShadow: "0 8px 25px rgba(210, 78, 51, 0.08)",
             }}
           >
             {/* Timer Circle */}
@@ -242,9 +242,9 @@ const IdleTimeoutManager = () => {
                 width: "120px",
                 height: "120px",
                 background:
-                  "linear-gradient(135deg, #8B1A4A 0%, #C9A84C 100%)",
+                  "linear-gradient(135deg, #d24e33 0%, #0f9488 100%)",
                 borderRadius: "50%",
-                boxShadow: "0 10px 30px rgba(139, 26, 74, 0.3)",
+                boxShadow: "0 10px 30px rgba(210, 78, 51, 0.3)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -304,10 +304,10 @@ const IdleTimeoutManager = () => {
 
             <Typography
               variant="h6"
-              sx={{ fontWeight: 700, color: "#2C2C2C", mb: 3, fontSize: "1.3rem" }}
+              sx={{ fontWeight: 700, color: "#232420", mb: 3, fontSize: "1.3rem" }}
             >
               Your session will expire in{" "}
-              <Box component="span" sx={{ color: "#8B1A4A" }}>
+              <Box component="span" sx={{ color: "#d24e33" }}>
                 {countdown}
               </Box>{" "}
               seconds
@@ -330,11 +330,11 @@ const IdleTimeoutManager = () => {
                   width: `${(countdown / (IDLE_TIMEOUT_CONFIG.WARNING_TIME / 1000)) * 100}%`,
                   background:
                     countdown > 5
-                      ? "linear-gradient(90deg, #8B1A4A 0%, #C9A84C 100%)"
-                      : "linear-gradient(90deg, #5c0f30 0%, #8B1A4A 100%)",
+                      ? "linear-gradient(90deg, #d24e33 0%, #0f9488 100%)"
+                      : "linear-gradient(90deg, #5c0f30 0%, #d24e33 100%)",
                   borderRadius: "15px",
                   transition: "all 1s ease",
-                  boxShadow: "0 2px 8px rgba(139, 26, 74, 0.4)",
+                  boxShadow: "0 2px 8px rgba(210, 78, 51, 0.4)",
                 }}
               />
             </Box>
@@ -366,7 +366,7 @@ const IdleTimeoutManager = () => {
               p: 3,
               mb: 3,
               background:
-                "linear-gradient(135deg, #FDF6EC 0%, #f0fdf4 100%)",
+                "linear-gradient(135deg, #f7f4ee 0%, #f0fdf4 100%)",
               borderRadius: "15px",
               border: "1px solid rgba(201, 168, 76, 0.2)",
             }}
@@ -376,7 +376,7 @@ const IdleTimeoutManager = () => {
                 width: "40px",
                 height: "40px",
                 background:
-                  "linear-gradient(135deg, #8B1A4A 0%, #C9A84C 100%)",
+                  "linear-gradient(135deg, #d24e33 0%, #0f9488 100%)",
                 borderRadius: "10px",
                 color: "white",
                 display: "flex",
@@ -391,11 +391,11 @@ const IdleTimeoutManager = () => {
             <Box>
               <Typography
                 variant="body2"
-                sx={{ fontWeight: 600, color: "#2C2C2C", mb: 0.5 }}
+                sx={{ fontWeight: 600, color: "#232420", mb: 0.5 }}
               >
                 Security Feature
               </Typography>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>
                 This timeout helps protect your account from unauthorized
                 access
               </Typography>
@@ -417,13 +417,13 @@ const IdleTimeoutManager = () => {
             startIcon={<FiLogOut />}
             sx={{
               minWidth: "140px",
-              borderColor: "#8B1A4A",
-              color: "#8B1A4A",
+              borderColor: "#d24e33",
+              color: "#d24e33",
               borderRadius: "12px",
               fontWeight: 600,
               "&:hover": {
                 borderColor: "#5c0f30",
-                backgroundColor: "rgba(139,26,74,0.05)",
+                backgroundColor: "rgba(210, 78, 51,0.05)",
               },
             }}
           >
@@ -436,7 +436,7 @@ const IdleTimeoutManager = () => {
             startIcon={<FiRefreshCw />}
             sx={{
               minWidth: "160px",
-              background: "linear-gradient(135deg, #8B1A4A 0%, #C9A84C 100%)",
+              background: "linear-gradient(135deg, #d24e33 0%, #0f9488 100%)",
               borderRadius: "12px",
               fontWeight: 600,
               color: "white",
@@ -459,7 +459,7 @@ const IdleTimeoutManager = () => {
             bottom: "20px",
             right: "20px",
             background:
-              "linear-gradient(135deg, #8B1A4A 0%, #C9A84C 100%)",
+              "linear-gradient(135deg, #d24e33 0%, #0f9488 100%)",
             color: "white",
             p: "12px 16px",
             borderRadius: "15px",
@@ -467,7 +467,7 @@ const IdleTimeoutManager = () => {
             fontWeight: "600",
             zIndex: 9999,
             fontFamily: "system-ui, -apple-system, sans-serif",
-            boxShadow: "0 8px 25px rgba(139, 26, 74, 0.3)",
+            boxShadow: "0 8px 25px rgba(210, 78, 51, 0.3)",
             border: "1px solid rgba(255,255,255,0.2)",
             backdropFilter: "blur(10px)",
             display: "flex",

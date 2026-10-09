@@ -346,7 +346,7 @@ export default function Checkout() {
 
   if (cartItems.length === 0 && currentStep === 1) {
     return (
-      <Box sx={{ minHeight: "100vh", bgcolor: "#fdf8f5" }}>
+      <Box sx={{ minHeight: "100vh", bgcolor: "#f7f4ee" }}>
         <Header />
         <EmptyCart navigate={navigate} />
       </Box>
@@ -370,7 +370,7 @@ export default function Checkout() {
         noindex={true}
         canonical={`${SEO_CONFIG.SITE_URL}/checkout`}
       />
-      <Box sx={{ minHeight: "100vh", bgcolor: "#fdf8f5" }}>
+      <Box sx={{ minHeight: "100vh", bgcolor: "#f7f4ee" }}>
         <Header />
         <Container maxWidth="lg" sx={{ py: { xs: 2, md: 4 }, px: { xs: 2, sm: 3 } }}>
           {/* Stepper card */}
@@ -385,7 +385,7 @@ export default function Checkout() {
               border: "0.5px solid rgba(0,0,0,0.09)",
             }}
           >
-            <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 2 }}>
+            <Stack direction="row" spacing={0.75} sx={{ alignItems: "center", mb: 2 }}>
               <LockIcon sx={{ fontSize: 12, color: "#9ca3af" }} />
               <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>
                 Secure &amp; Encrypted Checkout
@@ -396,18 +396,18 @@ export default function Checkout() {
               alternativeLabel
               sx={{
                 "& .MuiStepLabel-label": { fontWeight: 400, fontSize: "0.75rem", mt: 0.5, color: "#9ca3af" },
-                "& .MuiStepLabel-label.Mui-active": { color: "#8b2252", fontWeight: 500 },
-                "& .MuiStepLabel-label.Mui-completed": { color: "#8b2252", fontWeight: 400 },
+                "& .MuiStepLabel-label.Mui-active": { color: "#d24e33", fontWeight: 500 },
+                "& .MuiStepLabel-label.Mui-completed": { color: "#d24e33", fontWeight: 400 },
                 "& .MuiStepIcon-root": { width: 32, height: 32, color: "#e5e7eb" },
-                "& .MuiStepIcon-root.Mui-active": { color: "#8b2252" },
-                "& .MuiStepIcon-root.Mui-completed": { color: "#8b2252" },
+                "& .MuiStepIcon-root.Mui-active": { color: "#d24e33" },
+                "& .MuiStepIcon-root.Mui-completed": { color: "#d24e33" },
                 "& .MuiStepIcon-text": { fontSize: "0.75rem", fontWeight: 600 },
                 "& .MuiStepConnector-line": {
                   borderColor: "#e5e7eb",
                   borderTopWidth: 2,
                 },
-                "& .MuiStepConnector-root.Mui-active .MuiStepConnector-line": { borderColor: "#8b2252" },
-                "& .MuiStepConnector-root.Mui-completed .MuiStepConnector-line": { borderColor: "#8b2252" },
+                "& .MuiStepConnector-root.Mui-active .MuiStepConnector-line": { borderColor: "#d24e33" },
+                "& .MuiStepConnector-root.Mui-completed .MuiStepConnector-line": { borderColor: "#d24e33" },
               }}
             >
               {steps.map((step) => (

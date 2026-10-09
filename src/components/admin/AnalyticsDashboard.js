@@ -36,8 +36,8 @@ import {
 } from "react-icons/fi";
 
 /* ── Design tokens ─────────────────────────────────────────────── */
-const P      = "#8b2252";
-const P_DARK = "#6b1238";
+const P      = "#d24e33";
+const P_DARK = "#b8412a";
 const BORDER = "rgba(0,0,0,0.07)";
 const BG     = "#f8f9fc";
 
@@ -93,8 +93,8 @@ function SectionCard({ title, subtitle, icon: Icon, iconColor = P, action, child
       overflow: "hidden", height: "100%", ...sx,
     }}>
       <Box sx={{ px: 3, pt: 2.5, pb: 0 }}>
-        <Stack direction="row" alignItems="flex-start" justifyContent="space-between" sx={{ mb: 2.5 }}>
-          <Stack direction="row" alignItems="center" spacing={1.5}>
+        <Stack direction="row" sx={{ alignItems: "flex-start", justifyContent: "space-between", mb: 2.5 }}>
+          <Stack direction="row" sx={{ alignItems: "center" }} spacing={1.5}>
             <Box sx={{
               width: 38, height: 38, borderRadius: "10px",
               bgcolor: `${iconColor}15`,
@@ -124,7 +124,7 @@ function KpiCard({ icon: Icon, label, value, sub, trend, color }) {
       "&:hover": { transform: "translateY(-4px)", boxShadow: `0 12px 32px rgba(0,0,0,0.09)` },
     }}>
       <CardContent sx={{ p: 3 }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+        <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "flex-start" }}>
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Typography sx={{ fontSize: "0.78rem", fontWeight: 600, color: "#94a3b8", mb: 1, textTransform: "uppercase", letterSpacing: "0.05em" }}>
               {label}
@@ -143,7 +143,7 @@ function KpiCard({ icon: Icon, label, value, sub, trend, color }) {
           </Box>
         </Stack>
         {trend !== undefined && (
-          <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mt: 1.5, pt: 1.5, borderTop: `1px solid ${BORDER}` }}>
+          <Stack direction="row" spacing={0.5} sx={{ alignItems: "center", mt: 1.5, pt: 1.5, borderTop: `1px solid ${BORDER}` }}>
             {trend >= 0
               ? <FiTrendingUp size={14} style={{ color: "#059669" }} />
               : <FiTrendingDown size={14} style={{ color: "#dc2626" }} />}
@@ -168,7 +168,7 @@ function ChartSkeleton({ height = 260 }) {
 
 function EmptyState({ icon: Icon = FiBarChart2, message }) {
   return (
-    <Stack alignItems="center" justifyContent="center" spacing={1.5} sx={{ py: 6 }}>
+    <Stack spacing={1.5} sx={{ alignItems: "center", justifyContent: "center", py: 6 }}>
       <Box sx={{ width: 52, height: 52, borderRadius: "50%", bgcolor: "#f1f5f9",
         display: "flex", alignItems: "center", justifyContent: "center" }}>
         <Icon size={22} style={{ color: "#94a3b8" }} />
@@ -275,7 +275,7 @@ function PredictionGroupedChart({ data, height = 360 }) {
 
 function CategoryPredictionDonut({ data, height = 280 }) {
   const CAT_COLORS = { Paintings: "#3b82f6", Sculptures: "#10b981", "Handmade Crafts": "#f59e0b",
-    "Digital Art": "#8b5cf6", Textiles: "#ef4444", Jewelry: "#ec4899", Pottery: "#14b8a6", Woodwork: "#84cc16" };
+    "Digital Art": "#8b5cf6", Textiles: "#ef4444", Jewelry: "#e8623d", Pottery: "#14b8a6", Woodwork: "#84cc16" };
   if (!data?.length) return <EmptyState message="No category data" />;
   const chartData = data.slice(0, 6).map((item) => ({ name: item.category || "Other", value: item.predictedQuantity || 0 }));
   return (
@@ -343,10 +343,9 @@ export default function AnalyticsDashboard() {
         <Box sx={{ bgcolor: BG, minHeight: "100vh", p: { xs: 2, md: 3 } }}>
 
           {/* ── Page header ─────────────────────────────────────────── */}
-          <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between"
-            alignItems={{ xs: "flex-start", sm: "center" }} spacing={2} sx={{ mb: 3.5 }}>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ justifyContent: "space-between", alignItems: { xs: "flex-start", sm: "center" }, mb: 3.5 }}>
             <Box>
-              <Stack direction="row" alignItems="center" spacing={1.25} sx={{ mb: 0.5 }}>
+              <Stack direction="row" spacing={1.25} sx={{ alignItems: "center", mb: 0.5 }}>
                 <Box sx={{ width: 36, height: 36, borderRadius: "10px", bgcolor: `${P}15`,
                   display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <FiBarChart2 size={18} style={{ color: P }} />
@@ -360,7 +359,7 @@ export default function AnalyticsDashboard() {
               </Typography>
             </Box>
 
-            <Stack direction="row" spacing={1.25} alignItems="center">
+            <Stack direction="row" spacing={1.25} sx={{ alignItems: "center" }}>
               {/* Period pills */}
               <Stack direction="row" spacing={0.5} sx={{
                 bgcolor: "#fff", border: `1px solid ${BORDER}`, borderRadius: "10px", p: 0.5,
@@ -405,7 +404,7 @@ export default function AnalyticsDashboard() {
                   </Grid>
                 ))}
               </Grid>
-              <Stack alignItems="center" gap={2} sx={{ py: 8 }}>
+              <Stack sx={{ alignItems: "center", gap: 2, py: 8 }}>
                 <OrbitLoader size="lg" />
                 <Typography sx={{ fontSize: "0.875rem", color: "#94a3b8" }}>Loading analytics…</Typography>
               </Stack>
@@ -494,8 +493,8 @@ export default function AnalyticsDashboard() {
                               const pct = (product.quantity / maxQty) * 100;
                               return (
                                 <Box key={i}>
-                                  <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.75 }}>
-                                    <Stack direction="row" alignItems="center" spacing={1.25}>
+                                  <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center", mb: 0.75 }}>
+                                    <Stack direction="row" sx={{ alignItems: "center" }} spacing={1.25}>
                                       <Box sx={{
                                         width: 24, height: 24, borderRadius: "50%", flexShrink: 0,
                                         bgcolor: i === 0 ? "#fef9ec" : "#f8fafc",
@@ -546,10 +545,10 @@ export default function AnalyticsDashboard() {
                             <Grid key={day.day || i} size={{ xs: 12 / 4, sm: 12 / 7 }}>
                               <Box sx={{
                                 p: 2, borderRadius: "12px", textAlign: "center",
-                                bgcolor: isWeekend ? "#fdf8f5" : "#fff",
-                                border: `1px solid ${isWeekend ? "rgba(139,34,82,0.12)" : BORDER}`,
+                                bgcolor: isWeekend ? "#f7f4ee" : "#fff",
+                                border: `1px solid ${isWeekend ? "rgba(210, 78, 51,0.12)" : BORDER}`,
                                 transition: "all 0.22s",
-                                "&:hover": { borderColor: P, boxShadow: `0 4px 16px rgba(139,34,82,0.1)` },
+                                "&:hover": { borderColor: P, boxShadow: `0 4px 16px rgba(210, 78, 51,0.1)` },
                               }}>
                                 <Typography sx={{ fontSize: "0.7rem", fontWeight: 700, color: isWeekend ? P : "#94a3b8",
                                   mb: 1, textTransform: "uppercase", letterSpacing: "0.06em" }}>
@@ -648,12 +647,11 @@ export default function AnalyticsDashboard() {
                 <Box sx={{
                   px: 3, pt: 2.5, pb: 2.5,
                   borderBottom: `1px solid ${BORDER}`,
-                  background: "linear-gradient(135deg,#fdf8f5 0%,#fff 100%)",
+                  background: "linear-gradient(135deg,#f7f4ee 0%,#fff 100%)",
                 }}>
-                  <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between"
-                    alignItems={{ sm: "center" }} spacing={2}>
-                    <Stack direction="row" alignItems="center" spacing={1.5}>
-                      <Box sx={{ width: 38, height: 38, borderRadius: "10px", bgcolor: "rgba(139,34,82,0.1)",
+                  <Stack direction={{ xs: "column", sm: "row" }} sx={{ justifyContent: "space-between", alignItems: { sm: "center" } }} spacing={2}>
+                    <Stack direction="row" sx={{ alignItems: "center" }} spacing={1.5}>
+                      <Box sx={{ width: 38, height: 38, borderRadius: "10px", bgcolor: "rgba(210, 78, 51,0.1)",
                         display: "flex", alignItems: "center", justifyContent: "center" }}>
                         <FiTarget size={18} style={{ color: P }} />
                       </Box>
@@ -680,7 +678,7 @@ export default function AnalyticsDashboard() {
 
                 <Box sx={{ p: 3 }}>
                   {predictionsLoading ? (
-                    <Stack alignItems="center" gap={2} sx={{ py: 6 }}>
+                    <Stack sx={{ alignItems: "center", gap: 2, py: 6 }}>
                       <OrbitLoader />
                       <Typography sx={{ fontSize: "0.875rem", color: "#94a3b8" }}>Analyzing order patterns…</Typography>
                     </Stack>
@@ -712,7 +710,7 @@ export default function AnalyticsDashboard() {
                       <Grid container spacing={2.5}>
                         <Grid size={{ xs: 12, md: 8 }}>
                           <Box sx={{ bgcolor: "#fafbfc", border: `1px solid ${BORDER}`, borderRadius: "14px", p: 2.5 }}>
-                            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+                            <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 2 }}>
                               <FiBarChart2 size={16} style={{ color: "#3b82f6" }} />
                               <Typography sx={{ fontWeight: 700, fontSize: "0.875rem", color: "#0f172a" }}>
                                 Top 10 Product Predictions
@@ -723,7 +721,7 @@ export default function AnalyticsDashboard() {
                         </Grid>
                         <Grid size={{ xs: 12, md: 4 }}>
                           <Box sx={{ bgcolor: "#fafbfc", border: `1px solid ${BORDER}`, borderRadius: "14px", p: 2.5, height: "100%" }}>
-                            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+                            <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 2 }}>
                               <FiPieChart size={16} style={{ color: "#8b5cf6" }} />
                               <Typography sx={{ fontWeight: 700, fontSize: "0.875rem", color: "#0f172a" }}>
                                 By Category
@@ -737,7 +735,7 @@ export default function AnalyticsDashboard() {
                       {/* Prediction detail table */}
                       <Box sx={{ bgcolor: "#fafbfc", border: `1px solid ${BORDER}`, borderRadius: "14px", overflow: "hidden" }}>
                         <Box sx={{ px: 3, py: 2, borderBottom: `1px solid ${BORDER}` }}>
-                          <Stack direction="row" alignItems="center" spacing={1}>
+                          <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
                             <FiPackage size={16} style={{ color: "#f59e0b" }} />
                             <Typography sx={{ fontWeight: 700, fontSize: "0.875rem", color: "#0f172a" }}>
                               Detailed Product Predictions
@@ -783,7 +781,7 @@ export default function AnalyticsDashboard() {
                                     <Typography sx={{ fontSize: "0.875rem", fontWeight: 600, color: "#059669" }}>{item.currentMonthQuantity}</Typography>
                                   </TableCell>
                                   <TableCell sx={{ textAlign: "center", py: 1.5, borderBottom: `1px solid ${BORDER}` }}>
-                                    <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.5}>
+                                    <Stack direction="row" sx={{ alignItems: "center", justifyContent: "center" }} spacing={0.5}>
                                       {item.trendPercentage >= 0
                                         ? <FiTrendingUp size={13} style={{ color: "#059669" }} />
                                         : <FiTrendingDown size={13} style={{ color: "#dc2626" }} />}

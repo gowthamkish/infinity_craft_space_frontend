@@ -4,8 +4,8 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import LinearProgress from "@mui/material/LinearProgress";
 
-const GOLD = "#C9A84C";
-const GOLD_EMPTY = "#EAD9C5";
+const GOLD = "#0f9488";
+const GOLD_EMPTY = "#e4dfd6";
 
 export const StarRating = ({ rating, size = "1rem", showValue = false }) => {
   const fullStars = Math.floor(rating);

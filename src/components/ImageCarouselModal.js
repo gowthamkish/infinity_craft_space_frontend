@@ -192,7 +192,7 @@ const ImageCarouselModal = ({
         sx={{
           px: 2.5,
           py: 1.5,
-          bgcolor: "#2D0B1F",
+          bgcolor: "#0f1217",
           borderBottom: "1px solid rgba(255,255,255,0.08)",
           display: "flex",
           alignItems: "center",
@@ -200,8 +200,8 @@ const ImageCarouselModal = ({
           gap: 2,
         }}
       >
-        <Stack direction="row" alignItems="center" spacing={1.5}>
-          <Typography variant="subtitle1" fontWeight={700} sx={{ color: "#fff", lineHeight: 1.2 }}>
+        <Stack direction="row" sx={{ alignItems: "center" }} spacing={1.5}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#fff", lineHeight: 1.2 }}>
             {productName}
           </Typography>
           <Chip
@@ -209,7 +209,7 @@ const ImageCarouselModal = ({
             size="small"
             sx={{
               bgcolor: "rgba(201,168,76,0.2)",
-              color: "#C9A84C",
+              color: "#0f9488",
               fontWeight: 700,
               fontSize: "0.7rem",
               height: 22,
@@ -218,7 +218,7 @@ const ImageCarouselModal = ({
         </Stack>
 
         {/* Toolbar icons */}
-        <Stack direction="row" alignItems="center" spacing={0.5}>
+        <Stack direction="row" sx={{ alignItems: "center" }} spacing={0.5}>
           <Tooltip title="Zoom out (−)">
             <span>
               <IconButton sx={toolbarBtnSx} onClick={handleZoomOut} disabled={zoomLevel <= 1} size="small">
@@ -260,7 +260,7 @@ const ImageCarouselModal = ({
             sx={{
               ...toolbarBtnSx,
               ml: 0.5,
-              "&:hover": { bgcolor: "rgba(139,26,74,0.5)", color: "#fff" },
+              "&:hover": { bgcolor: "rgba(210, 78, 51,0.5)", color: "#fff" },
             }}
           >
             <FiX size={16} />
@@ -317,7 +317,7 @@ const ImageCarouselModal = ({
                 bottom: 12,
                 left: 12,
                 bgcolor: "rgba(0,0,0,0.7)",
-                color: "#C9A84C",
+                color: "#0f9488",
                 px: 1.25,
                 py: 0.5,
                 borderRadius: 2,
@@ -406,7 +406,7 @@ const ImageCarouselModal = ({
         {images.length > 1 && !isFullscreen && (
           <Box
             sx={{
-              bgcolor: "#2D0B1F",
+              bgcolor: "#0f1217",
               borderTop: "1px solid rgba(255,255,255,0.08)",
               px: 2,
               py: 1.5,
@@ -415,7 +415,7 @@ const ImageCarouselModal = ({
               "&::-webkit-scrollbar-thumb": { bgcolor: BRAND_ROSE, borderRadius: 2 },
             }}
           >
-            <Stack direction="row" spacing={1} justifyContent="center" sx={{ minWidth: "fit-content" }}>
+            <Stack direction="row" spacing={1} sx={{ justifyContent: "center", minWidth: "fit-content" }}>
               {images.map((image, index) => (
                 <Box
                   key={index}

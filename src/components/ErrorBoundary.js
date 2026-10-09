@@ -122,16 +122,16 @@ class ErrorBoundary extends Component {
                 <FiAlertTriangle size={40} color="white" />
               </Box>
 
-              <Typography variant="h5" fontWeight={700} sx={{ mb: 1.5, color: "#1e293b" }}>
+              <Typography variant="h5" sx={{ fontWeight: 700, mb: 1.5, color: "#1e293b" }}>
                 Oops! Something went wrong
               </Typography>
 
-              <Typography color="text.secondary" sx={{ mb: 4 }}>
+              <Typography sx={{ color: "text.secondary", mb: 4 }}>
                 We're sorry, but something unexpected happened. Don't worry, our
                 team has been notified and we're working to fix it.
               </Typography>
 
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={2} justifyContent="center" sx={{ mb: 3 }}>
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ justifyContent: "center", mb: 3 }}>
                 <Button variant="contained" color="primary" onClick={this.handleRetry}
                   startIcon={<FiRefreshCw size={18} />}>
                   Try Again

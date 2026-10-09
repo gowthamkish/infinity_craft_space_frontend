@@ -1,3 +1,4 @@
+import { PLACEHOLDER_SRC } from "../utils/imageFallback";
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 // Intersection Observer hook for lazy loading and animations
@@ -66,7 +67,7 @@ export const useLazyImage = (src, placeholder = '') => {
         setImageLoaded(true);
       };
       img.onerror = () => {
-        setImageSrc(placeholder || 'https://via.placeholder.com/300x200?text=Error');
+        setImageSrc(placeholder || PLACEHOLDER_SRC);
         setImageLoaded(true);
       };
       img.src = src;

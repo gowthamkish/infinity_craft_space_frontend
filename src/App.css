@@ -218,7 +218,7 @@ pre {
 .form-control:focus,
 .form-select:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(139, 26, 74, 0.15);
+  box-shadow: 0 0 0 3px rgba(210, 78, 51, 0.15);
   outline: none;
   background-color: var(--bg-primary);
 }
@@ -347,12 +347,12 @@ pre {
 }
 
 .btn-warning {
-  background: linear-gradient(135deg, var(--gold-400, #e2b535), var(--gold-600, #b08930)) !important;
+  background: linear-gradient(135deg, var(--gold-400, #2dd4bf), var(--gold-600, #0c7a70)) !important;
   border-color: transparent !important;
   color: white !important;
 }
 .btn-warning:hover:not(:disabled):not(.disabled) {
-  background: linear-gradient(135deg, var(--gold-500, #C9A84C), var(--gold-700, #8e6a24)) !important;
+  background: linear-gradient(135deg, var(--gold-500, #0f9488), var(--gold-700, #0a6159)) !important;
   transform: translateY(-1px);
 }
 
@@ -499,7 +499,7 @@ pre {
   background: linear-gradient(
     135deg,
     var(--bg-dark) 0%,
-    var(--charcoal-800, #3D2C20) 100%
+    var(--charcoal-800, #2f302b) 100%
   ) !important;
   box-shadow: var(--shadow-lg);
   backdrop-filter: blur(10px);
@@ -510,7 +510,7 @@ pre {
 .navbar-brand {
   font-weight: 700;
   font-size: clamp(1rem, 2vw, 1.25rem);
-  background: linear-gradient(45deg, var(--gold-300, #edcc59), var(--blush-400, #F4A7B9));
+  background: linear-gradient(45deg, var(--gold-300, #6fd3c5), var(--blush-400, #ff9d7a));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -553,8 +553,8 @@ pre {
 }
 
 .alert-info {
-  background: linear-gradient(135deg, var(--blush-100, #ffe4ed) 0%, var(--blush-50, #fff5f8) 100%);
-  color: var(--blush-800, #93334f);
+  background: linear-gradient(135deg, var(--blush-100, #ffe9e0) 0%, var(--blush-50, #fff6f2) 100%);
+  color: var(--blush-800, #a63c27);
   border-left: 3px solid var(--accent);
 }
 .alert-success {
@@ -626,11 +626,11 @@ pre {
   background: var(--bg-tertiary);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--rose-300, #f5a8c6);
+  background: var(--rose-300, #ffab8c);
   border-radius: var(--radius-full);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--rose-600, #c42b61);
+  background: var(--rose-600, #e8623d);
 }
 
 /* ── 14. Animations (used by components) ──────────────────── */
@@ -690,13 +690,13 @@ pre {
 
 @keyframes cartPulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(139, 26, 74, 0.4);
+    box-shadow: 0 0 0 0 rgba(210, 78, 51, 0.4);
   }
   70% {
-    box-shadow: 0 0 0 8px rgba(139, 26, 74, 0);
+    box-shadow: 0 0 0 8px rgba(210, 78, 51, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(139, 26, 74, 0);
+    box-shadow: 0 0 0 0 rgba(210, 78, 51, 0);
   }
 }
 
@@ -707,7 +707,7 @@ pre {
 
 /* Loading shimmer */
 .loading-shimmer {
-  background: linear-gradient(90deg, var(--charcoal-100, #F5EDE0) 25%, var(--charcoal-200, #EAD9C5) 50%, var(--charcoal-100, #F5EDE0) 75%);
+  background: linear-gradient(90deg, var(--charcoal-100, #efebe3) 25%, var(--charcoal-200, #e4dfd6) 50%, var(--charcoal-100, #efebe3) 75%);
   background-size: 400px 100%;
   animation: shimmer 1.5s infinite;
 }
@@ -752,7 +752,7 @@ pre {
   padding: 0.75rem;
   background: linear-gradient(
     90deg,
-    rgba(139, 26, 74, 0.06),
+    rgba(210, 78, 51, 0.06),
     rgba(201, 168, 76, 0.04)
   );
   border-radius: var(--radius-lg);
@@ -766,7 +766,7 @@ pre {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--rose-700, #a51e50), var(--rose-900, #6b1238));
+  background: linear-gradient(135deg, var(--rose-700, #de5637), var(--rose-900, #b8412a));
   color: white;
   font-weight: 700;
   font-size: 1.1rem;
@@ -836,10 +836,10 @@ pre {
 .account-grid .compact-card.wishlist-gradient {
   background: linear-gradient(
     135deg,
-    rgba(139, 26, 74, 0.06) 0%,
+    rgba(210, 78, 51, 0.06) 0%,
     rgba(201, 168, 76, 0.04) 100%
   );
-  border: 1px solid rgba(139, 26, 74, 0.08);
+  border: 1px solid rgba(210, 78, 51, 0.08);
 }
 .account-grid .compact-card.address-gradient .card-header,
 .account-grid .compact-card.wishlist-gradient .card-header {
@@ -896,7 +896,7 @@ pre {
   background: linear-gradient(135deg, var(--primary), var(--primary-light));
 }
 .bg-gradient-secondary {
-  background: linear-gradient(135deg, var(--gold-500, #C9A84C), var(--gold-300, #edcc59));
+  background: linear-gradient(135deg, var(--gold-500, #0f9488), var(--gold-300, #6fd3c5));
 }
 
 /* Breadcrumbs */
@@ -1001,19 +1001,19 @@ pre {
   color: var(--gold-800, #5a3e10) !important;
 }
 .toast--warning .toast-header {
-  color: var(--gold-700, #8e6a24) !important;
+  color: var(--gold-700, #0a6159) !important;
 }
 
 /* Variant: info / primary */
 .toast--info,
 .toast--primary {
-  background: linear-gradient(135deg, var(--blush-50, #fff5f8), var(--blush-100, #ffe4ed)) !important;
+  background: linear-gradient(135deg, var(--blush-50, #fff6f2), var(--blush-100, #ffe9e0)) !important;
   border-left: 4px solid var(--primary) !important;
-  color: var(--rose-900, #6b1238) !important;
+  color: var(--rose-900, #b8412a) !important;
 }
 .toast--info .toast-header,
 .toast--primary .toast-header {
-  color: var(--rose-800, #8B1A4A) !important;
+  color: var(--rose-800, #d24e33) !important;
 }
 
 /* Toast close button */
@@ -1036,7 +1036,7 @@ pre {
 }
 
 .modal-header {
-  background: linear-gradient(135deg, var(--rose-900, #6b1238), var(--rose-800, #8B1A4A));
+  background: linear-gradient(135deg, var(--rose-900, #b8412a), var(--rose-800, #d24e33));
   color: white;
   border-bottom: none !important;
   padding: 1.125rem 1.5rem !important;

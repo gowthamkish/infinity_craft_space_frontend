@@ -165,7 +165,7 @@ export default function TrackOrder() {
 
       <Box sx={{ mt: 4, mb: 5 }}>
         {/* ── Action row ── */}
-        <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={1} sx={{ mb: 2 }}>
+        <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 1, mb: 2 }}>
           <button
             className="to-refresh-btn"
             onClick={() => navigate("/orders")}
@@ -173,9 +173,9 @@ export default function TrackOrder() {
             <FiArrowLeft size={15} /> My Orders
           </button>
 
-          <Stack direction="row" alignItems="center" gap={1}>
+          <Stack direction="row" sx={{ alignItems: "center", gap: 1 }}>
             {lastUpdated && (
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>
                 Updated {lastUpdated.toLocaleTimeString("en-IN")}
               </Typography>
             )}
@@ -208,13 +208,13 @@ export default function TrackOrder() {
                 Shipment Status
               </div>
               <div className="to-card-body">
-                <Stack direction="row" alignItems="center" flexWrap="wrap" gap={1.5} sx={{ mb: 2 }}>
+                <Stack direction="row" sx={{ alignItems: "center", flexWrap: "wrap", gap: 1.5, mb: 2 }}>
                   <div className={badgeClass}>
                     {STATUS_ICON[status] || "📦"}{" "}
                     {status.charAt(0).toUpperCase() + status.slice(1)}
                   </div>
                   {order?.estimatedDelivery && (
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
                       Est. delivery: <strong>{fmtDate(order.estimatedDelivery)}</strong>
                     </Typography>
                   )}
@@ -277,7 +277,7 @@ export default function TrackOrder() {
               <div
                 className="to-card-header"
                 style={{
-                  background: "linear-gradient(135deg, #C9A84C, #8B1A4A)",
+                  background: "linear-gradient(135deg, #0f9488, #d24e33)",
                 }}
               >
                 <FiShoppingBag size={16} />

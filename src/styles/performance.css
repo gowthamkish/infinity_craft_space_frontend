@@ -224,7 +224,7 @@
 }
 
 .main-container::-webkit-scrollbar-thumb:hover {
-  background: var(--charcoal-500, #A08060);
+  background: var(--charcoal-500, #8a8c85);
 }
 
 /* Ensure fixed header doesn't interfere with content */

@@ -8,7 +8,7 @@
 }
 
 .rating-summary {
-  background: linear-gradient(135deg, var(--bg-secondary, #FDF6EC) 0%, var(--charcoal-100, #F0E0C8) 100%);
+  background: linear-gradient(135deg, var(--bg-secondary, #f7f4ee) 0%, var(--charcoal-100, #F0E0C8) 100%);
   border-radius: 16px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
@@ -66,7 +66,7 @@
 
 .rating-bar-fill {
   height: 100%;
-  background: linear-gradient(135deg, var(--gold-300, #edcc59) 0%, var(--gold-500, #C9A84C) 100%);
+  background: linear-gradient(135deg, var(--gold-300, #6fd3c5) 0%, var(--gold-500, #0f9488) 100%);
   border-radius: 4px;
   transition: width 0.3s ease;
 }
@@ -92,7 +92,7 @@
 }
 
 .star-rating-input .star.filled {
-  color: var(--gold-300, #edcc59);
+  color: var(--gold-300, #6fd3c5);
 }
 
 .star-rating-input .star:hover {
@@ -130,7 +130,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: var(--btn-brand-grad, linear-gradient(135deg, var(--primary, #8B1A4A) 0%, var(--primary-dark, #6b1238) 100%));
+  background: var(--btn-brand-grad, linear-gradient(135deg, var(--primary, #d24e33) 0%, var(--primary-dark, #b8412a) 100%));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -175,7 +175,7 @@
 }
 
 .review-rating .star {
-  color: var(--gold-300, #edcc59);
+  color: var(--gold-300, #6fd3c5);
   font-size: 1rem;
 }
 
@@ -216,7 +216,7 @@
 }
 
 .review-image:hover {
-  border-color: var(--primary, #8B1A4A);
+  border-color: var(--primary, #d24e33);
   transform: scale(1.05);
 }
 
@@ -245,23 +245,23 @@
 
 .helpful-button:hover {
   background: var(--bg-secondary);
-  border-color: var(--primary, #8B1A4A);
-  color: var(--primary, #8B1A4A);
+  border-color: var(--primary, #d24e33);
+  color: var(--primary, #d24e33);
 }
 
 .helpful-button.voted {
-  background: linear-gradient(135deg, var(--gold-500, #C9A84C) 0%, var(--primary, #8B1A4A) 100%);
+  background: linear-gradient(135deg, var(--gold-500, #0f9488) 0%, var(--primary, #d24e33) 100%);
   color: white;
   border-color: transparent;
 }
 
 /* Admin Response */
 .admin-response {
-  background: linear-gradient(135deg, var(--bg-secondary, #FDF6EC) 0%, var(--bg-tertiary, #F5EDE0) 100%);
+  background: linear-gradient(135deg, var(--bg-secondary, #f7f4ee) 0%, var(--bg-tertiary, #efebe3) 100%);
   border-radius: 8px;
   padding: 1rem;
   margin-top: 0.75rem;
-  border-left: 3px solid var(--primary, #8B1A4A);
+  border-left: 3px solid var(--primary, #d24e33);
 }
 
 .admin-response-header {
@@ -273,7 +273,7 @@
 
 .admin-response-label {
   font-weight: 600;
-  color: var(--primary, #8B1A4A);
+  color: var(--primary, #d24e33);
   font-size: 0.85rem;
 }
 
@@ -315,13 +315,13 @@
 }
 
 .image-upload-area:hover {
-  border-color: var(--primary, #8B1A4A);
-  background: var(--primary-subtle, rgba(139, 26, 74, 0.05));
+  border-color: var(--primary, #d24e33);
+  background: var(--primary-subtle, rgba(210, 78, 51, 0.05));
 }
 
 .image-upload-area.dragover {
-  border-color: var(--primary, #8B1A4A);
-  background: var(--primary-subtle, rgba(139, 26, 74, 0.10));
+  border-color: var(--primary, #d24e33);
+  background: var(--primary-subtle, rgba(210, 78, 51, 0.10));
 }
 
 .upload-icon {
@@ -444,7 +444,7 @@
 
 .load-more-btn:hover {
   background: var(--bg-tertiary);
-  border-color: var(--primary, #8B1A4A);
+  border-color: var(--primary, #d24e33);
 }
 
 /* Responsive */
@@ -485,6 +485,6 @@
 [class*="review-btn"],
 [class*="rev-cta"],
 [class*="write-review"] button {
-  background: var(--btn-brand-grad, linear-gradient(135deg, var(--primary, #8B1A4A), var(--primary-dark, #6b1238))) !important;
-  box-shadow: 0 2px 8px rgba(139, 26, 74, 0.20) !important;
+  background: var(--btn-brand-grad, linear-gradient(135deg, var(--primary, #d24e33), var(--primary-dark, #b8412a))) !important;
+  box-shadow: 0 2px 8px rgba(210, 78, 51, 0.20) !important;
 }

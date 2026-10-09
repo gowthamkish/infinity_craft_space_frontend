@@ -1,0 +1,69 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   EMBER & TEAL THEME TOKENS
+   Palette and type system adapted from the Zestro reference site
+   (warm ember orange + teal accents on a warm paper-white background).
+
+   Prefixed --ics-* so nothing collides with the existing design tokens.
+   ───────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Brand */
+  --ics-ember:        #e8623d;
+  --ics-ember-light:  #ff7a50;
+  --ics-ember-deep:   #d24e33;
+  --ics-teal:         #0f9488;
+  --ics-teal-light:   #2dd4bf;
+  --ics-teal-deep:    #0c7a70;
+
+  /* Light surfaces */
+  --ics-bg:           #f7f4ee;   /* page */
+  --ics-bg-2:         #fffdf9;   /* raised sections, cards, footer */
+  --ics-surface:      rgba(20, 24, 30, 0.03);
+  --ics-surface-2:    rgba(20, 24, 30, 0.05);
+  --ics-border:       rgba(20, 24, 30, 0.10);
+  --ics-border-strong:rgba(20, 24, 30, 0.18);
+
+  /* Text */
+  --ics-text:         #232420;
+  --ics-text-2:       #5b5d58;   /* body copy */
+  --ics-text-3:       #8a8c85;   /* captions only (3.5:1 — never for body text) */
+  --ics-teal-text:    #0c7a70;   /* teal that is readable on light backgrounds */
+
+  /* Gradients / effects */
+  --ics-grad:         linear-gradient(135deg, var(--ics-ember), var(--ics-ember-deep));
+  --ics-grad-teal:    linear-gradient(135deg, var(--ics-teal), var(--ics-teal-deep));
+  --ics-glow:         0 0 50px rgba(232, 98, 61, 0.18);
+  --ics-shadow-sm:    0 1px 2px rgba(35, 36, 32, 0.06), 0 4px 14px rgba(35, 36, 32, 0.05);
+  --ics-shadow-md:    0 12px 32px rgba(35, 36, 32, 0.10);
+  --ics-shadow-lg:    0 28px 60px rgba(35, 36, 32, 0.14);
+  --ics-shadow-ember: 0 10px 30px rgba(232, 98, 61, 0.35);
+
+  /* Type */
+  --ics-font-head:    "Space Grotesk", "Inter", system-ui, sans-serif;
+  --ics-font-body:    "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ics-font-mono:    "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* Radii */
+  --ics-r-sm: 10px;
+  --ics-r-md: 14px;
+  --ics-r-lg: 20px;
+  --ics-r-xl: 28px;
+
+  /* Spacing scale (8-pt grid) — use these instead of one-off pixel values */
+  --ics-sp-1: 4px;
+  --ics-sp-2: 8px;
+  --ics-sp-3: 12px;
+  --ics-sp-4: 16px;
+  --ics-sp-5: 24px;
+  --ics-sp-6: 32px;
+  --ics-sp-7: 48px;
+  --ics-sp-8: 64px;
+  --ics-sp-9: 96px;
+
+  /* Layout */
+  --ics-maxw: 1160px;
+  --ics-gutter: 24px;
+}
+
+@media (max-width: 600px) {
+  :root { --ics-gutter: 16px; }
+}

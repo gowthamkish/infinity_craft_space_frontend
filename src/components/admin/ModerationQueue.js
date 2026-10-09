@@ -17,8 +17,8 @@ import { BRAND } from "../../theme/muiTheme";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const P      = BRAND.rose[800];
-const P_DARK = BRAND.rose[900] || "#6b1238";
-const P_BG   = "rgba(139,26,74,0.07)";
+const P_DARK = BRAND.rose[900] || "#b8412a";
+const P_BG   = "rgba(210, 78, 51,0.07)";
 const BORDER = "#e7e5e4";
 const BG     = "#fafaf9";
 
@@ -73,7 +73,7 @@ function VerdictBadge({ verdict, confidence }) {
 
 function Stars({ rating }) {
   return (
-    <Stack direction="row" gap={0.25} alignItems="center" aria-label={`${rating} out of 5 stars`}>
+    <Stack direction="row" sx={{ gap: 0.25, alignItems: "center" }} aria-label={`${rating} out of 5 stars`}>
       {[1, 2, 3, 4, 5].map((n) => (
         <FiStar key={n} size={12}
           fill={n <= rating ? "#f59e0b" : "none"}
@@ -111,17 +111,17 @@ function TabPill({ count }) {
 function CardSkeleton() {
   return (
     <Box sx={{ border: `1px solid ${BORDER}`, borderRadius: "12px", p: 2.5 }}>
-      <Stack direction="row" gap={2} alignItems="flex-start">
+      <Stack direction="row" sx={{ gap: 2, alignItems: "flex-start" }}>
         <Skeleton variant="rounded" width={20} height={20} sx={{ mt: 0.25, flexShrink: 0 }} />
         <Box sx={{ flex: 1 }}>
-          <Stack direction="row" justifyContent="space-between" gap={2} mb={1}>
+          <Stack direction="row" sx={{ justifyContent: "space-between", gap: 2, mb: 1 }}>
             <Skeleton width="50%" height={16} />
             <Skeleton width={120} height={20} />
           </Stack>
           <Skeleton width="80%" height={14} sx={{ mb: 0.5 }} />
           <Skeleton width="65%" height={14} sx={{ mb: 1.5 }} />
           <Skeleton width="100%" height={56} sx={{ borderRadius: "8px", mb: 1.5 }} />
-          <Stack direction="row" gap={1}>
+          <Stack direction="row" sx={{ gap: 1 }}>
             <Skeleton width={88} height={32} sx={{ borderRadius: "8px" }} />
             <Skeleton width={72} height={32} sx={{ borderRadius: "8px" }} />
           </Stack>
@@ -227,9 +227,9 @@ function DraftBox({ title, content, extra }) {
   return (
     <Box sx={{
       border: `1.5px dashed ${P}`, borderRadius: "10px", p: 2,
-      bgcolor: "rgba(139,26,74,0.025)", mb: 2,
+      bgcolor: "rgba(210, 78, 51,0.025)", mb: 2,
     }}>
-      <Stack direction="row" alignItems="center" gap={0.75} mb={0.75}>
+      <Stack direction="row" sx={{ alignItems: "center", gap: 0.75, mb: 0.75 }}>
         <FiMessageSquare size={13} color={P} aria-hidden="true" />
         <Typography sx={{ fontSize: "0.6875rem", fontWeight: 700, color: P, letterSpacing: "0.05em", textTransform: "uppercase" }}>
           {title}
@@ -276,13 +276,13 @@ function ReviewCard({ review, onAction, isRefreshing, selected, onSelect }) {
           borderRadius: "12px",
           opacity: isRefreshing ? 0.5 : 1,
           transition: "opacity 0.2s, border-color 0.15s",
-          bgcolor: selected ? "rgba(139,26,74,0.02)" : "#fff",
+          bgcolor: selected ? "rgba(210, 78, 51,0.02)" : "#fff",
           "&:focus-within": { outline: `2px solid ${P}`, outlineOffset: 2 },
         }}
       >
         {/* Card header */}
         <Box sx={{ px: 2.5, pt: 2.5, pb: 0 }}>
-          <Stack direction="row" alignItems="flex-start" gap={2}>
+          <Stack direction="row" sx={{ alignItems: "flex-start", gap: 2 }}>
             {/* Checkbox */}
             <Checkbox
               id={checkId}
@@ -296,8 +296,8 @@ function ReviewCard({ review, onAction, isRefreshing, selected, onSelect }) {
             {/* Main content */}
             <Box sx={{ flex: 1, minWidth: 0 }}>
               {/* Row 1: stars + title + badges */}
-              <Stack direction="row" alignItems="flex-start" justifyContent="space-between" gap={2} mb={0.75}>
-                <Stack direction="row" alignItems="center" gap={1.25} flexWrap="wrap">
+              <Stack direction="row" sx={{ alignItems: "flex-start", justifyContent: "space-between", gap: 2, mb: 0.75 }}>
+                <Stack direction="row" sx={{ alignItems: "center", gap: 1.25, flexWrap: "wrap" }}>
                   <Stars rating={review.rating} />
                   {review.title && (
                     <Typography sx={{ fontSize: "0.875rem", fontWeight: 700, color: "#1c1917", lineHeight: 1.4 }}>
@@ -311,14 +311,14 @@ function ReviewCard({ review, onAction, isRefreshing, selected, onSelect }) {
                   )}
                 </Stack>
                 {/* Badges right-aligned */}
-                <Stack direction="row" gap={0.75} alignItems="center" flexShrink={0} flexWrap="wrap" justifyContent="flex-end">
+                <Stack direction="row" sx={{ gap: 0.75, alignItems: "center", flexShrink: 0, flexWrap: "wrap", justifyContent: "flex-end" }}>
                   {verdict && <VerdictBadge verdict={verdict} confidence={confidence} />}
                   <StatusBadge status={review.status} />
                 </Stack>
               </Stack>
 
               {/* Row 2: meta */}
-              <Stack direction="row" alignItems="center" gap={0.75} sx={{ mb: 1.5 }} flexWrap="wrap">
+              <Stack direction="row" sx={{ alignItems: "center", gap: 0.75, flexWrap: "wrap", mb: 1.5 }}>
                 <Typography variant="caption" sx={{ color: "#78716c" }}>
                   {review.user?.username || review.user?.email}
                 </Typography>
@@ -374,9 +374,9 @@ function ReviewCard({ review, onAction, isRefreshing, selected, onSelect }) {
 
         {/* Card footer / actions */}
         <Box sx={{ px: 2.5, py: 1.75 }}>
-          <Stack direction="row" alignItems="center" justifyContent="space-between" gap={2} flexWrap="wrap">
+          <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", gap: 2, flexWrap: "wrap" }}>
             {/* Primary actions */}
-            <Stack direction="row" gap={1} alignItems="center" flexWrap="wrap">
+            <Stack direction="row" sx={{ gap: 1, alignItems: "center", flexWrap: "wrap" }}>
               {isPending && (
                 <>
                   <Button
@@ -489,12 +489,12 @@ function QnADraftCard({ item, onAction, selected, onSelect }) {
       <Card elevation={0} sx={{
         border: `1px solid ${selected ? P : BORDER}`,
         borderRadius: "12px",
-        bgcolor: selected ? "rgba(139,26,74,0.02)" : "#fff",
+        bgcolor: selected ? "rgba(210, 78, 51,0.02)" : "#fff",
         transition: "border-color 0.15s",
       }}>
         {/* Header */}
         <Box sx={{ px: 2.5, pt: 2.5, pb: 0 }}>
-          <Stack direction="row" alignItems="flex-start" gap={2}>
+          <Stack direction="row" sx={{ alignItems: "flex-start", gap: 2 }}>
             <Checkbox
               id={checkId}
               size="small"
@@ -504,7 +504,7 @@ function QnADraftCard({ item, onAction, selected, onSelect }) {
               sx={{ p: 0, mt: 0.25, flexShrink: 0, color: BORDER, "&.Mui-checked": { color: P } }}
             />
             <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Stack direction="row" alignItems="flex-start" justifyContent="space-between" gap={2} mb={0.75}>
+              <Stack direction="row" sx={{ alignItems: "flex-start", justifyContent: "space-between", gap: 2, mb: 0.75 }}>
                 <Typography sx={{ fontSize: "0.9375rem", fontWeight: 700, color: "#1c1917", lineHeight: 1.5, flex: 1 }}>
                   {item.question}
                 </Typography>
@@ -520,7 +520,7 @@ function QnADraftCard({ item, onAction, selected, onSelect }) {
                   />
                 )}
               </Stack>
-              <Stack direction="row" alignItems="center" gap={0.75} mb={1.75} flexWrap="wrap">
+              <Stack direction="row" sx={{ alignItems: "center", gap: 0.75, mb: 1.75, flexWrap: "wrap" }}>
                 <Typography variant="caption" sx={{ color: "#78716c" }}>
                   on <Box component="span" sx={{ fontWeight: 600, color: "#1c1917" }}>{item.product?.name}</Box>
                 </Typography>
@@ -548,8 +548,8 @@ function QnADraftCard({ item, onAction, selected, onSelect }) {
 
         {/* Footer */}
         <Box sx={{ px: 2.5, py: 1.75 }}>
-          <Stack direction="row" alignItems="center" justifyContent="space-between" gap={2}>
-            <Stack direction="row" gap={1} alignItems="center">
+          <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", gap: 2 }}>
+            <Stack direction="row" sx={{ gap: 1, alignItems: "center" }}>
               <Button size="small" variant="outlined"
                 startIcon={<FiEdit3 size={14} aria-hidden="true" />}
                 onClick={() => setDraftOpen(true)}
@@ -616,7 +616,7 @@ function BulkBar({ count, onApprove, onReject, onClear }) {
       <Typography sx={{ color: "#fff", fontWeight: 600, fontSize: "0.875rem" }}>
         {count} selected
       </Typography>
-      <Stack direction="row" gap={1} alignItems="center">
+      <Stack direction="row" sx={{ gap: 1, alignItems: "center" }}>
         <Button size="small" onClick={onApprove}
           startIcon={<FiCheckCircle size={14} />}
           sx={{
@@ -797,10 +797,9 @@ export default function ModerationQueue() {
   return (
     <AdminLayout>
       {/* ── Page header ─────────────────────────────────────────────────── */}
-      <Stack direction="row" alignItems="center" justifyContent="space-between"
-        flexWrap="wrap" gap={2} sx={{ mb: 3 }}>
+      <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 2, mb: 3 }}>
         <Box>
-          <Stack direction="row" alignItems="center" gap={1.5} sx={{ mb: 0.5 }}>
+          <Stack direction="row" sx={{ alignItems: "center", gap: 1.5, mb: 0.5 }}>
             <Box sx={{
               width: 40, height: 40, borderRadius: "10px", bgcolor: P_BG,
               display: "flex", alignItems: "center", justifyContent: "center",
@@ -836,7 +835,7 @@ export default function ModerationQueue() {
       </Stack>
 
       {/* ── Stats strip ─────────────────────────────────────────────────── */}
-      <Stack direction="row" gap={1.5} sx={{ mb: 3 }} flexWrap="wrap">
+      <Stack direction="row" sx={{ gap: 1.5, flexWrap: "wrap", mb: 3 }}>
         {stats.map(({ label, value, color }) => (
           <Box key={label} sx={{
             display: "flex", alignItems: "center", gap: 1,
@@ -936,8 +935,8 @@ export default function ModerationQueue() {
                   <Tab
                     key={key} value={key}
                     label={
-                      <Stack direction="row" alignItems="center" gap={1} component="span"
-                        sx={{ display: "inline-flex" }}>
+                      <Stack direction="row" component="span"
+                        sx={{ alignItems: "center", gap: 1, display: "inline-flex" }}>
                         <Icon size={13} aria-hidden="true" />
                         {label}
                         {counts[key] > 0 && (
@@ -981,7 +980,7 @@ export default function ModerationQueue() {
                   "& .MuiOutlinedInput-root": { borderRadius: "10px", bgcolor: BG },
                 }}
               />
-              <Stack direction="row" alignItems="center" gap={0.75}>
+              <Stack direction="row" sx={{ alignItems: "center", gap: 0.75 }}>
                 <FiFilter size={14} color="#9ca3af" aria-hidden="true" />
                 <FormControl size="small">
                   <Select
@@ -1015,13 +1014,13 @@ export default function ModerationQueue() {
               />
 
               {loading ? (
-                <Stack gap={2}>
+                <Stack sx={{ gap: 2 }}>
                   {[1, 2, 3].map((i) => <CardSkeleton key={i} />)}
                 </Stack>
               ) : filteredReviews.length === 0 ? (
                 <EmptyQueue message={search ? `No reviews match "${search}".` : EMPTY_MSGS[reviewTab]} />
               ) : (
-                <Stack gap={2}>
+                <Stack sx={{ gap: 2 }}>
                   {filteredReviews.map((r) => (
                     <ReviewCard
                       key={r._id}
@@ -1048,13 +1047,13 @@ export default function ModerationQueue() {
               onClear={() => setSelected(new Set())}
             />
             {loading ? (
-              <Stack gap={2}>
+              <Stack sx={{ gap: 2 }}>
                 {[1, 2, 3].map((i) => <CardSkeleton key={i} />)}
               </Stack>
             ) : qnaDrafts.length === 0 ? (
               <EmptyQueue message="No Q&A drafts pending approval." />
             ) : (
-              <Stack gap={2}>
+              <Stack sx={{ gap: 2 }}>
                 {qnaDrafts.map((item) => (
                   <QnADraftCard
                     key={item._id}

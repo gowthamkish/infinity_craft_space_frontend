@@ -18,15 +18,15 @@ import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 
-const P = "#8b2252";
-const P_LIGHT = "rgba(139,34,82,0.08)";
+const P = "#d24e33";
+const P_LIGHT = "rgba(210, 78, 51,0.08)";
 const BORDER = "rgba(0,0,0,0.09)";
 
 /* ── Confetti ────────────────────────────────────────────────────────── */
 function Confetti({ container }) {
   useEffect(() => {
     if (!container.current) return;
-    const COLORS = [P, "#C9A84C", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6"];
+    const COLORS = [P, "#0f9488", "#10b981", "#f59e0b", "#e8623d", "#8b5cf6"];
     const pieces = [];
     for (let i = 0; i < 60; i++) {
       const el = document.createElement("div");
@@ -148,7 +148,7 @@ export const ConfirmationStep = ({
             justifyContent: "center",
             mx: "auto",
             mb: 3,
-            boxShadow: `0 8px 28px rgba(139,34,82,0.35)`,
+            boxShadow: `0 8px 28px rgba(210, 78, 51,0.35)`,
             animation: "checkPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
             "@keyframes checkPop": {
               "0%": { transform: "scale(0.5)", opacity: 0 },
@@ -175,7 +175,7 @@ export const ConfirmationStep = ({
               px: 2,
               py: 0.75,
               bgcolor: P_LIGHT,
-              border: `1px solid rgba(139,34,82,0.2)`,
+              border: `1px solid rgba(210, 78, 51,0.2)`,
               borderRadius: "20px",
             }}
           >
@@ -258,7 +258,7 @@ export const ConfirmationStep = ({
                       <Divider sx={{ borderColor: BORDER }} />
                       <Stack spacing={1}>
                         {items.map((it, idx) => (
-                          <Stack key={idx} direction="row" justifyContent="space-between">
+                          <Stack key={idx} direction="row" sx={{ justifyContent: "space-between" }}>
                             <Typography sx={{ fontSize: "0.75rem", flex: 1, pr: 1, color: "#57534e" }}>
                               {it.productName || it.name || it.product?.name} × {it.quantity}
                             </Typography>
@@ -275,7 +275,7 @@ export const ConfirmationStep = ({
             </Grid>
 
             <Grid item xs={12} md={4}>
-              <InfoCard icon={CreditCardOutlinedIcon} iconColor="#C9A84C" title="Payment">
+              <InfoCard icon={CreditCardOutlinedIcon} iconColor="#0f9488" title="Payment">
                 <Stack spacing={1.5}>
                   <Box>
                     <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", fontWeight: 500, mb: 0.5 }}>
@@ -342,7 +342,7 @@ export const ConfirmationStep = ({
                   borderRadius: "10px",
                   bgcolor: P,
                   textTransform: "none",
-                  boxShadow: "0 2px 12px rgba(139,34,82,0.28)",
+                  boxShadow: "0 2px 12px rgba(210, 78, 51,0.28)",
                   "&:hover": { bgcolor: "#7a1d47" },
                 }}
               >
@@ -449,7 +449,7 @@ export const ConfirmationStep = ({
           </Paper>
 
           {/* Email note */}
-          <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.75} sx={{ mb: 4 }}>
+          <Stack direction="row" spacing={0.75} sx={{ alignItems: "center", justifyContent: "center", mb: 4 }}>
             <EmailOutlinedIcon sx={{ fontSize: 14, color: "#9ca3af" }} />
             <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af" }}>
               You'll receive a confirmation email with your order details shortly

@@ -21,8 +21,8 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CheckoutDeliveryPanel from "../../components/CheckoutDeliveryPanel";
 import { ProductThumb } from "./CartReviewStep";
 
-const P = "#8b2252";
-const P_LIGHT = "rgba(139,34,82,0.08)";
+const P = "#d24e33";
+const P_LIGHT = "rgba(210, 78, 51,0.08)";
 const BORDER = "rgba(0,0,0,0.09)";
 
 const PAYMENT_METHODS = [
@@ -69,7 +69,7 @@ export const PaymentStep = ({
   };
 
   return (
-    <Grid container spacing={3} alignItems="flex-start">
+    <Grid container spacing={3} sx={{ alignItems: "flex-start" }}>
       {/* ── Left: payment method ──────────────────────────────────────── */}
       <Grid item xs={12} md={7}>
         <Paper
@@ -241,7 +241,7 @@ export const PaymentStep = ({
               <Typography sx={{ fontSize: "0.75rem", color: "#9ca3af", mb: 1 }}>
                 Accepted via:
               </Typography>
-              <Stack direction="row" flexWrap="wrap" gap={0.75}>
+              <Stack direction="row" sx={{ flexWrap: "wrap", gap: 0.75 }}>
                 {ACCEPTED_PAYMENTS.map((p) => (
                   <Box
                     key={p}
@@ -275,9 +275,8 @@ export const PaymentStep = ({
             >
               <Stack
                 direction="row"
-                alignItems="center"
                 spacing={0.75}
-                sx={{ mb: 1.25 }}
+                sx={{ alignItems: "center", mb: 1.25 }}
               >
                 <CheckCircleIcon sx={{ fontSize: 16, color: "#16a34a" }} />
                 <Typography
@@ -292,8 +291,7 @@ export const PaymentStep = ({
               </Stack>
               <Stack
                 direction="row"
-                flexWrap="wrap"
-                gap={0}
+                sx={{ flexWrap: "wrap", gap: 0 }}
                 divider={
                   <Box
                     component="span"
@@ -307,7 +305,7 @@ export const PaymentStep = ({
                   <Stack
                     key={label}
                     direction="row"
-                    alignItems="center"
+                    sx={{ alignItems: "center" }}
                     spacing={0.5}
                   >
                     <Typography sx={{ fontSize: 12 }}>{icon}</Typography>
@@ -327,7 +325,7 @@ export const PaymentStep = ({
               </Alert>
             )}
 
-            <Stack direction="row" spacing={1.5} justifyContent="space-between">
+            <Stack direction="row" spacing={1.5} sx={{ justifyContent: "space-between" }}>
               <Button
                 variant="outlined"
                 startIcon={<ArrowBackIcon />}
@@ -367,10 +365,10 @@ export const PaymentStep = ({
                   borderRadius: "10px",
                   bgcolor: P,
                   textTransform: "none",
-                  boxShadow: "0 2px 12px rgba(139,34,82,0.28)",
+                  boxShadow: "0 2px 12px rgba(210, 78, 51,0.28)",
                   "&:hover": {
                     bgcolor: "#7a1d47",
-                    boxShadow: "0 4px 16px rgba(139,34,82,0.36)",
+                    boxShadow: "0 4px 16px rgba(210, 78, 51,0.36)",
                   },
                 }}
                 aria-label={`Pay ₹${total.toFixed(2)} securely`}
@@ -398,7 +396,7 @@ export const PaymentStep = ({
           }}
         >
           {/* Dark maroon header */}
-          <Box sx={{ px: 2.5, py: 2.25, bgcolor: "#3d1a2e" }}>
+          <Box sx={{ px: 2.5, py: 2.25, bgcolor: "#151a21" }}>
             <Typography
               sx={{
                 fontSize: "1rem",
@@ -435,7 +433,7 @@ export const PaymentStep = ({
                 <Stack
                   key={item.product._id}
                   direction="row"
-                  alignItems="center"
+                  sx={{ alignItems: "center" }}
                   spacing={1.25}
                 >
                   <ProductThumb product={item.product} size="xs" />
@@ -479,7 +477,7 @@ export const PaymentStep = ({
                 mb: 2,
               }}
             >
-              <Stack direction="row" alignItems="flex-start" spacing={1}>
+              <Stack direction="row" sx={{ alignItems: "flex-start" }} spacing={1}>
                 <LocationOnOutlinedIcon
                   sx={{ fontSize: 15, color: P, mt: 0.25, flexShrink: 0 }}
                 />
@@ -518,14 +516,14 @@ export const PaymentStep = ({
             <Divider sx={{ borderColor: BORDER, my: 2 }} />
 
             <Stack spacing={1.25} sx={{ width: "100%" }}>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center" }}>
                 <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>Subtotal</Typography>
                 <Typography sx={{ fontSize: "0.9375rem", fontWeight: 500 }}>
                   ₹{subtotal.toFixed(2)}
                 </Typography>
               </Stack>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Stack direction="row" alignItems="center" spacing={0.75}>
+              <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center" }}>
+                <Stack direction="row" sx={{ alignItems: "center" }} spacing={0.75}>
                   <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>Shipping</Typography>
                   {shipping === 0 && (
                     <Chip
@@ -547,7 +545,7 @@ export const PaymentStep = ({
                 </Typography>
               </Stack>
               {tax > 0 && (
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center" }}>
                   <Typography sx={{ fontSize: "0.875rem", color: "#6b7280" }}>Tax (18% GST)</Typography>
                   <Typography sx={{ fontSize: "0.9375rem", fontWeight: 500 }}>
                     ₹{tax.toFixed(2)}
@@ -558,7 +556,7 @@ export const PaymentStep = ({
 
             <Divider sx={{ borderColor: BORDER, my: 2 }} />
 
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: "100%" }}>
+            <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center", width: "100%" }}>
               <Typography sx={{ fontSize: "1rem", fontWeight: 500 }}>Total to Pay</Typography>
               <Typography sx={{ fontSize: "1.25rem", fontWeight: 600, color: P }}>
                 ₹{total.toFixed(2)}
@@ -577,15 +575,14 @@ export const PaymentStep = ({
           >
             <Stack
               direction="row"
-              justifyContent="center"
-              alignItems="center"
+              sx={{ justifyContent: "center", alignItems: "center" }}
               spacing={1.5}
             >
               {["🔒 Encrypted", "🏦 PCI-DSS", "✅ Verified"].map((t, i) => (
                 <Stack
                   key={t}
                   direction="row"
-                  alignItems="center"
+                  sx={{ alignItems: "center" }}
                   spacing={0.5}
                 >
                   {i > 0 && (

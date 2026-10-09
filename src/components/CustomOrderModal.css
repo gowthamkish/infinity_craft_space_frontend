@@ -42,7 +42,7 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--gold-200, #f4e28b) 0%, var(--gold-500, #C9A84C) 100%);
+  background: linear-gradient(135deg, var(--gold-200, #a9e6dd) 0%, var(--gold-500, #0f9488) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -59,7 +59,7 @@
 .com-title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--charcoal-900, #2C2C2C);
+  color: var(--charcoal-900, #232420);
   text-align: center;
   margin: 0 0 0.4rem;
   letter-spacing: -0.01em;
@@ -67,7 +67,7 @@
 
 .com-subtitle {
   font-size: 0.92rem;
-  color: var(--charcoal-600, #7A5E42);
+  color: var(--charcoal-600, #5b5d58);
   text-align: center;
   margin: 0 0 1.25rem;
   line-height: 1.55;
@@ -78,8 +78,8 @@
   list-style: none;
   padding: 0;
   margin: 0 0 1.25rem;
-  background: var(--bg-secondary, #FDF6EC);
-  border: 1px solid var(--border-color, #EAD9C5);
+  background: var(--bg-secondary, #f7f4ee);
+  border: 1px solid var(--border-color, #e4dfd6);
   border-radius: 12px;
   overflow: hidden;
 }
@@ -90,8 +90,8 @@
   gap: 0.5rem;
   padding: 0.6rem 1rem;
   font-size: 0.88rem;
-  color: var(--charcoal-700, #5C4330);
-  border-bottom: 1px solid var(--border-color, #EAD9C5);
+  color: var(--charcoal-700, #46473f);
+  border-bottom: 1px solid var(--border-color, #e4dfd6);
 }
 
 .com-item:last-child {
@@ -99,7 +99,7 @@
 }
 
 .com-item-dot {
-  color: var(--gold-500, #C9A84C);
+  color: var(--gold-500, #0f9488);
   font-size: 0.7rem;
   flex-shrink: 0;
 }
@@ -110,7 +110,7 @@
 }
 
 .com-item-qty {
-  color: var(--charcoal-400, #C0A882);
+  color: var(--charcoal-400, #b4b2a8);
   font-size: 0.82rem;
 }
 
@@ -119,8 +119,8 @@
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
-  background: linear-gradient(135deg, var(--gold-100, #faf2cc) 0%, var(--gold-200, #f4e28b) 100%);
-  border: 1px solid var(--gold-300, #edcc59);
+  background: linear-gradient(135deg, var(--gold-100, #d5f3ee) 0%, var(--gold-200, #a9e6dd) 100%);
+  border: 1px solid var(--gold-300, #6fd3c5);
   border-radius: 12px;
   padding: 0.9rem 1rem;
   margin-bottom: 1.5rem;
@@ -135,13 +135,13 @@
 .com-notice strong {
   display: block;
   font-size: 0.92rem;
-  color: var(--gold-800, #745422);
+  color: var(--gold-800, #094d47);
   margin-bottom: 0.25rem;
 }
 
 .com-notice-sub {
   font-size: 0.83rem;
-  color: var(--gold-700, #8e6a24);
+  color: var(--gold-700, #0a6159);
   margin: 0;
   line-height: 1.5;
 }
@@ -169,13 +169,13 @@
 }
 
 .com-btn--back {
-  background: var(--bg-secondary, #FDF6EC);
-  color: var(--charcoal-600, #7A5E42);
-  border: 1.5px solid var(--border-color, #EAD9C5);
+  background: var(--bg-secondary, #f7f4ee);
+  color: var(--charcoal-600, #5b5d58);
+  border: 1.5px solid var(--border-color, #e4dfd6);
 }
 
 .com-btn--back:hover {
-  background: var(--border-color, #EAD9C5);
+  background: var(--border-color, #e4dfd6);
 }
 
 .com-btn--confirm {
@@ -197,13 +197,13 @@
 
 /* ── Dark mode ──────────────────────────────────── */
 @media (prefers-color-scheme: dark) {
-  .com-card { background: var(--charcoal-800, #3D2C20); }
-  .com-title { color: var(--charcoal-50, #FDF6EC); }
-  .com-subtitle { color: var(--charcoal-400, #C0A882); }
-  .com-item-list { background: var(--charcoal-900, #2C2C2C); border-color: var(--charcoal-700, #5C4330); }
-  .com-item { color: var(--charcoal-200, #EAD9C5); border-color: var(--charcoal-700, #5C4330); }
-  .com-btn--back { background: var(--charcoal-700, #5C4330); color: var(--charcoal-200, #EAD9C5); border-color: var(--charcoal-600, #7A5E42); }
-  .com-btn--back:hover { background: var(--charcoal-600, #7A5E42); }
+  .com-card { background: var(--charcoal-800, #2f302b); }
+  .com-title { color: var(--charcoal-50, #f7f4ee); }
+  .com-subtitle { color: var(--charcoal-400, #b4b2a8); }
+  .com-item-list { background: var(--charcoal-900, #232420); border-color: var(--charcoal-700, #46473f); }
+  .com-item { color: var(--charcoal-200, #e4dfd6); border-color: var(--charcoal-700, #46473f); }
+  .com-btn--back { background: var(--charcoal-700, #46473f); color: var(--charcoal-200, #e4dfd6); border-color: var(--charcoal-600, #5b5d58); }
+  .com-btn--back:hover { background: var(--charcoal-600, #5b5d58); }
 }
 
 /* ── Mobile ─────────────────────────────────────── */

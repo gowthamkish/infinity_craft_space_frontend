@@ -19,7 +19,7 @@
   left: 5%;
   right: 5%;
   height: 3px;
-  background: var(--border-color, #EAD9C5);
+  background: var(--border-color, #e4dfd6);
   z-index: 0;
 }
 
@@ -48,7 +48,7 @@
   align-items: center;
   justify-content: center;
   font-size: 1.1rem;
-  border: 3px solid var(--border-color, #EAD9C5);
+  border: 3px solid var(--border-color, #e4dfd6);
   background: white;
   transition: all 0.3s ease;
   position: relative;
@@ -62,17 +62,17 @@
 }
 
 .tt-step-dot--active {
-  border-color: #C9A84C;
+  border-color: #0f9488;
   background: white;
-  color: #C9A84C;
+  color: #0f9488;
   box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.25);
   animation: ttPulse 2s infinite;
 }
 
 .tt-step-dot--pending {
-  border-color: var(--border-color, #EAD9C5);
-  background: var(--bg-secondary, #FDF6EC);
-  color: var(--charcoal-400, #C0A882);
+  border-color: var(--border-color, #e4dfd6);
+  background: var(--bg-secondary, #f7f4ee);
+  color: var(--charcoal-400, #b4b2a8);
 }
 
 .tt-step-dot--cancelled {
@@ -90,13 +90,13 @@
   font-size: 0.7rem;
   font-weight: 600;
   text-align: center;
-  color: var(--charcoal-500, #A08060);
+  color: var(--charcoal-500, #8a8c85);
   line-height: 1.2;
   max-width: 80px;
 }
 
 .tt-step-label--done   { color: var(--success, #2e7d32); }
-.tt-step-label--active { color: #8B1A4A; }
+.tt-step-label--active { color: #d24e33; }
 .tt-step-label--cancelled { color: var(--error, #c62828); }
 
 /* ── Microcopy ───────────────────────────────────────────────── */
@@ -105,9 +105,9 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: var(--charcoal-700, #5C4330);
-  background: var(--bg-secondary, #FDF6EC);
-  border: 1px solid var(--border-color, #EAD9C5);
+  color: var(--charcoal-700, #46473f);
+  background: var(--bg-secondary, #f7f4ee);
+  border: 1px solid var(--border-color, #e4dfd6);
   border-radius: 10px;
   padding: 0.65rem 1rem;
   margin-bottom: 1rem;
@@ -131,7 +131,7 @@
   font-size: 0.9rem;
 }
 .tt-alert--cancelled { background: var(--error-subtle, rgba(198,40,40,0.08)); color: var(--error-dark, #8e0000); }
-.tt-alert--returned  { background: var(--secondary-subtle, rgba(201,168,76,0.10)); color: var(--gold-800, #745422); }
+.tt-alert--returned  { background: var(--secondary-subtle, rgba(201,168,76,0.10)); color: var(--gold-800, #094d47); }
 
 /* ── Info Bar (AWB, courier, ETA) ────────────────────────────── */
 .tt-info-bar {
@@ -146,8 +146,8 @@
 }
 
 .tt-info-bar--shipped {
-  background: linear-gradient(135deg, var(--primary-subtle, rgba(139,26,74,0.08)) 0%, rgba(139,26,74,0.04) 100%);
-  border-color: rgba(139, 26, 74, 0.2);
+  background: linear-gradient(135deg, var(--primary-subtle, rgba(210, 78, 51,0.08)) 0%, rgba(210, 78, 51,0.04) 100%);
+  border-color: rgba(210, 78, 51, 0.2);
 }
 
 .tt-info-bar--delivered {
@@ -176,17 +176,17 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--charcoal-500, #A08060);
+  color: var(--charcoal-500, #8a8c85);
 }
 
 .tt-info-value {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--charcoal-800, #3D2C20);
+  color: var(--charcoal-800, #2f302b);
 }
 
 .tt-info-value a {
-  color: #8B1A4A;
+  color: #d24e33;
   text-decoration: none;
 }
 .tt-info-value a:hover { text-decoration: underline; }
@@ -253,14 +253,14 @@
 }
 
 .tt-activity-dot--muted {
-  background: var(--charcoal-400, #C0A882);
-  box-shadow: 0 0 0 2px var(--charcoal-400, #C0A882);
+  background: var(--charcoal-400, #b4b2a8);
+  box-shadow: 0 0 0 2px var(--charcoal-400, #b4b2a8);
 }
 
 .tt-activity-line {
   flex: 1;
   width: 2px;
-  background: var(--border-color, #EAD9C5);
+  background: var(--border-color, #e4dfd6);
   margin-top: 2px;
 }
 
@@ -272,26 +272,26 @@
 .tt-activity-status {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--charcoal-800, #3D2C20);
+  color: var(--charcoal-800, #2f302b);
   margin-bottom: 0.2rem;
 }
 
 .tt-activity-location {
   font-size: 0.8rem;
-  color: var(--charcoal-500, #A08060);
+  color: var(--charcoal-500, #8a8c85);
   margin-bottom: 0.15rem;
 }
 
 .tt-activity-date {
   font-size: 0.75rem;
-  color: var(--charcoal-400, #C0A882);
+  color: var(--charcoal-400, #b4b2a8);
 }
 
 /* ── Empty / Loading States ──────────────────────────────────── */
 .tt-empty {
   text-align: center;
   padding: 2rem;
-  color: var(--charcoal-400, #C0A882);
+  color: var(--charcoal-400, #b4b2a8);
 }
 
 .tt-empty-icon {

@@ -101,7 +101,7 @@ export default function OrderStatusModal({ event, onClose }) {
           </Box>
 
           {/* Status transition */}
-          <Stack direction="row" alignItems="center" justifyContent="center" gap={1} sx={{ mb: 1.75, flexWrap: "wrap" }}>
+          <Stack direction="row" sx={{ alignItems: "center", justifyContent: "center", gap: 1, mb: 1.75, flexWrap: "wrap" }}>
             {prevCfg && (
               <>
                 <Chip
@@ -125,7 +125,7 @@ export default function OrderStatusModal({ event, onClose }) {
           </Typography>
 
           {/* Actions */}
-          <Stack direction="row" gap={1.25}>
+          <Stack direction="row" sx={{ gap: 1.25 }}>
             <Button
               fullWidth variant="contained"
               onClick={() => { navigate("/orders"); onClose(); }}

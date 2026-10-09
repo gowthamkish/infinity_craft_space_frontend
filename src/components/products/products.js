@@ -183,11 +183,11 @@ const ProductList = () => {
       {/* Page header */}
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}>
         <Box>
-          <Typography variant="h5" fontWeight={700} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <FiPackage size={22} style={{ color: "#8B1A4A" }} />
+          <Typography variant="h5" sx={{ fontWeight: 700, display: "flex", alignItems: "center", gap: 1 }}>
+            <FiPackage size={22} style={{ color: "#d24e33" }} />
             Products
           </Typography>
-          <Typography variant="body2" color="text.secondary">{totalProducts} total products</Typography>
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>{totalProducts} total products</Typography>
         </Box>
         <button className="adm-btn adm-btn-primary adm-btn-lg" onClick={() => navigate("/admin/addProduct")}>
           <FiPlus size={16} />
@@ -198,7 +198,7 @@ const ProductList = () => {
       {/* Filter bar */}
       <Card elevation={0} sx={{ mb: 2, border: "1px solid #e2e8f0", borderRadius: 2 }}>
         <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ alignItems: "center" }}>
             <TextField
               size="small"
               placeholder="Search products…"
@@ -213,7 +213,7 @@ const ProductList = () => {
               }}
               sx={{ minWidth: 220, "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
             />
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
               <FiFilter size={14} color="#94a3b8" />
               <Select
                 size="small"
@@ -226,7 +226,7 @@ const ProductList = () => {
               </Select>
             </Stack>
             {(searchTerm || selectedCategory !== "all") && (
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>
                 {filteredProducts.length} result{filteredProducts.length !== 1 ? "s" : ""}
               </Typography>
             )}
@@ -239,13 +239,13 @@ const ProductList = () => {
         {loading ? (
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 8, gap: 2 }}>
             <OrbitLoader size="lg" />
-            <Typography color="text.secondary">Loading products…</Typography>
+            <Typography sx={{ color: "text.secondary" }}>Loading products…</Typography>
           </Box>
         ) : filteredProducts.length === 0 ? (
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 8, gap: 1 }}>
             <Box sx={{ color: "#cbd5e1", mb: 1 }}><FiPackage size={36} /></Box>
-            <Typography fontWeight={600} color="text.primary">No products found</Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography sx={{ fontWeight: 600, color: "text.primary" }}>No products found</Typography>
+            <Typography variant="body2" sx={{ color: "text.secondary" }}>
               {searchTerm || selectedCategory !== "all"
                 ? "Try adjusting your search or filters."
                 : "Add your first product to get started."}
@@ -279,20 +279,19 @@ const ProductList = () => {
                       <TableCell><ProductThumb product={product} /></TableCell>
 
                       <TableCell>
-                        <Typography variant="body2" fontWeight={600} color="text.primary" sx={{ mb: 0.25 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 600, color: "text.primary", mb: 0.25 }}>
                           {product.name}
                         </Typography>
                         <Typography
                           variant="caption"
-                          color="text.secondary"
-                          sx={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", maxWidth: 280 }}
+                          sx={{ color: "text.secondary", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", maxWidth: 280 }}
                         >
                           {product.description}
                         </Typography>
                       </TableCell>
 
                       <TableCell>
-                        <Typography variant="body2" fontWeight={700} sx={{ color: "#059669", fontSize: "0.9375rem" }}>
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: "#059669", fontSize: "0.9375rem" }}>
                           ₹{product.price}
                         </Typography>
                       </TableCell>
@@ -309,7 +308,7 @@ const ProductList = () => {
                       <TableCell><StockBadge product={product} /></TableCell>
 
                       <TableCell>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
                           {product.weightInGrams
                             ? product.weightInGrams >= 1000
                               ? `${(product.weightInGrams / 1000).toFixed(2).replace(/\.?0+$/, "")} kg`
@@ -321,21 +320,21 @@ const ProductList = () => {
                       <TableCell>
                         {edited ? (
                           <Box>
-                            <Typography variant="body2" fontWeight={500}>{edited.date}</Typography>
-                            <Typography variant="caption" color="text.secondary">{edited.time}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 500 }}>{edited.date}</Typography>
+                            <Typography variant="caption" sx={{ color: "text.secondary" }}>{edited.time}</Typography>
                             {product.lastEditedBy?.name && (
-                              <Typography variant="caption" color="text.secondary" display="block">{product.lastEditedBy.name}</Typography>
+                              <Typography variant="caption" sx={{ color: "text.secondary", display: "block" }}>{product.lastEditedBy.name}</Typography>
                             )}
                           </Box>
                         ) : (
-                          <Typography variant="body2" color="text.secondary">—</Typography>
+                          <Typography variant="body2" sx={{ color: "text.secondary" }}>—</Typography>
                         )}
                       </TableCell>
 
                       <TableCell align="center">
-                        <Stack direction="row" spacing={0.5} justifyContent="center">
+                        <Stack direction="row" spacing={0.5} sx={{ justifyContent: "center" }}>
                           <Tooltip title="Edit">
-                            <button className="adm-btn-icon" onClick={() => handleEdit(product)} style={{ color: "#8B1A4A" }}>
+                            <button className="adm-btn-icon" onClick={() => handleEdit(product)} style={{ color: "#d24e33" }}>
                               <FiEdit2 size={14} />
                             </button>
                           </Tooltip>
@@ -376,29 +375,29 @@ const ProductList = () => {
           {restockDone ? (
             <Box sx={{ textAlign: "center", py: 1 }}>
               <FiCheckCircle size={44} style={{ color: "#059669", marginBottom: 12 }} />
-              <Typography fontWeight={700} sx={{ mb: 0.5 }}>Restock Successful!</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{restockTarget?.name}</Typography>
+              <Typography sx={{ fontWeight: 700, mb: 0.5 }}>Restock Successful!</Typography>
+              <Typography variant="body2" sx={{ color: "text.secondary", mb: 2 }}>{restockTarget?.name}</Typography>
               <Alert severity="success" sx={{ textAlign: "left" }}>
                 <Stack spacing={0.5}>
                   <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                     <Typography variant="body2">Previous stock</Typography>
-                    <Typography variant="body2" fontWeight={600}>{restockDone.prev}</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{restockDone.prev}</Typography>
                   </Box>
                   <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                     <Typography variant="body2">Added</Typography>
-                    <Typography variant="body2" fontWeight={600}>+{restockDone.added}</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>+{restockDone.added}</Typography>
                   </Box>
                   <Divider sx={{ my: 0.5 }} />
                   <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Typography variant="body2" fontWeight={700}>New stock</Typography>
-                    <Typography variant="body1" fontWeight={700}>{restockDone.newStock}</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 700 }}>New stock</Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 700 }}>{restockDone.newStock}</Typography>
                   </Box>
                 </Stack>
               </Alert>
             </Box>
           ) : (
             <Stack spacing={2} sx={{ pt: 1 }}>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
                 Adding stock to <strong>{restockTarget?.name}</strong>.{" "}
                 {restockTarget?.trackInventory && <>Current: <strong>{restockTarget?.stock ?? 0}</strong></>}
               </Typography>

@@ -95,7 +95,7 @@
 .pf-input:focus,
 .pf-select:focus {
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 3px rgba(139, 26, 74, 0.1) !important;
+  box-shadow: 0 0 0 3px rgba(210, 78, 51, 0.1) !important;
   background: var(--bg-primary) !important;
 }
 
@@ -142,7 +142,7 @@
 
 .pf-apply-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-  box-shadow: 0 4px 12px rgba(139, 26, 74, 0.3);
+  box-shadow: 0 4px 12px rgba(210, 78, 51, 0.3);
   transform: translateY(-2px);
 }
 
@@ -174,7 +174,7 @@
 
 .pf-cat-item:hover {
   border-color: var(--primary);
-  background: var(--bg-tertiary, #F5EDE0);
+  background: var(--bg-tertiary, #efebe3);
 }
 
 .pf-cat-row {
@@ -348,11 +348,11 @@
 }
 
 .pf-chip--search {
-  background: linear-gradient(135deg, var(--gold-500, #C9A84C), var(--gold-300, #edcc59));
+  background: linear-gradient(135deg, var(--gold-500, #0f9488), var(--gold-300, #6fd3c5));
 }
 
 .pf-chip--sort {
-  background: linear-gradient(135deg, var(--rose-700, #a51e50), var(--rose-500, #de4a7e));
+  background: linear-gradient(135deg, var(--rose-700, #de5637), var(--rose-500, #ff7a50));
 }
 
 /* ── RESPONSIVE ────────────────────────────────────────────────– */

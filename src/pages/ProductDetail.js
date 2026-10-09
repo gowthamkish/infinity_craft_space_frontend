@@ -30,6 +30,7 @@ import {
   useRemoveFromWishlistMutation,
 } from "../services/accountApi";
 import { errMsg } from "../app/baseApi";
+import { onImgError } from "../utils/imageFallback";
 import SEOHead, {
   generateProductStructuredData,
   generateBreadcrumbStructuredData,
@@ -66,9 +67,9 @@ const ReviewList = lazy(() => import("../components/reviews/ReviewList"));
 const ImageCarouselModal = lazy(() => import("../components/ImageCarouselModal"));
 
 // ─── Design tokens ──────────────────────────────────────────────────────────
-const PRIMARY      = "#8B1A4A";
-const PRIMARY_DARK = "#6b1238";
-const PRIMARY_BG   = "rgba(139,26,74,0.07)";
+const PRIMARY      = "#d24e33";
+const PRIMARY_DARK = "#b8412a";
+const PRIMARY_BG   = "rgba(210, 78, 51,0.07)";
 const SUCCESS      = "#059669";
 const SUCCESS_BG   = "#d1fae5";
 const WARNING      = "#d97706";
@@ -105,7 +106,7 @@ function TabPanel({ children, value, index }) {
 function PDPSkeleton() {
   return (
     <Box sx={{ mt: 2 }}>
-      <Grid container spacing={4} alignItems="flex-start">
+      <Grid container spacing={4} sx={{ alignItems: "flex-start" }}>
         <Grid size={{ xs: 12, md: 7 }}>
           <Skeleton variant="rectangular" width="100%" sx={{ aspectRatio: "4/5", borderRadius: "12px" }} />
           <Stack direction="row" spacing={1} sx={{ mt: 1.5 }}>
@@ -162,8 +163,8 @@ function PDPBreadcrumb({ category, subCategory, productName }) {
 function QuantitySelector({ value, onChange, min = 1, max = 99 }) {
   return (
     <Stack
-      direction="row" alignItems="center" role="group" aria-label="Quantity"
-      sx={{
+      direction="row" role="group" aria-label="Quantity"
+      sx={{ alignItems: "center",
         border: `1px solid ${BORDER}`,
         borderRadius: "10px",
         overflow: "hidden",
@@ -400,7 +401,7 @@ const ProductDetail = () => {
                 display: "flex", alignItems: "center", justifyContent: "center", mb: 3 }}>
                 <FiBox size={40} />
               </Box>
-              <Typography variant="h5" fontWeight={700} mb={1.5}>
+              <Typography variant="h5" sx={{ fontWeight: 700, mb: 1.5 }}>
                 {error ? "Couldn't load product" : "Product not found"}
               </Typography>
               <Typography sx={{ ...T.body, maxWidth: 400, mb: 4 }}>
@@ -468,7 +469,7 @@ const ProductDetail = () => {
           <PDPBreadcrumb category={product.category} subCategory={product.subCategory} productName={product.name} />
 
           {/* ══ HERO: Gallery + Info ══════════════════════════════════════════ */}
-          <Grid container spacing={4} alignItems="flex-start">
+          <Grid container spacing={4} sx={{ alignItems: "flex-start" }}>
 
             {/* ── IMAGE GALLERY (left ~55%) ────────────────────────────────── */}
             <Grid size={{ xs: 12, md: 7 }} onKeyDown={handleKeyNav} tabIndex={-1} sx={{ outline: "none" }}>
@@ -496,7 +497,7 @@ const ProductDetail = () => {
                 }}
               >
                 {images.length > 0 ? (
-                  <Box component="img" className="gallery-img"
+                  <Box component="img" onError={onImgError} className="gallery-img"
                     src={images[selectedImageIndex]?.url}
                     alt={`${product.name} — image ${selectedImageIndex + 1}`}
                     fetchPriority={selectedImageIndex === 0 ? "high" : "auto"}
@@ -603,7 +604,7 @@ const ProductDetail = () => {
                         transition: "all 120ms",
                         "&:hover": { borderColor: index === selectedImageIndex ? PRIMARY : "#bbb", transform: "translateY(-1px)" },
                       }}>
-                      <Box component="img" src={image.url} alt={`${product.name} thumbnail ${index + 1}`} loading="lazy"
+                      <Box component="img" onError={onImgError} src={image.url} alt={`${product.name} thumbnail ${index + 1}`} loading="lazy"
                         sx={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: "4px" }} />
                     </Paper>
                   ))}
@@ -618,12 +619,12 @@ const ProductDetail = () => {
 
                   {/* ── GROUP 1: Identity ─────────────────────────────────── */}
                   {/* Category pills */}
-                  <Stack direction="row" flexWrap="wrap" gap={0.75} sx={{ mb: 1.5 }}>
+                  <Stack direction="row" sx={{ flexWrap: "wrap", gap: 0.75, mb: 1.5 }}>
                     {product.category && (
                       <Chip label={product.category} size="small"
                         component={RouterLink} to={`/products?category=${encodeURIComponent(product.category)}`} clickable
-                        sx={{ bgcolor: PRIMARY_BG, color: PRIMARY, border: `1px solid rgba(139,26,74,0.2)`,
-                          fontWeight: 500, ...T.badge, "&:hover": { bgcolor: "rgba(139,26,74,0.12)", color: PRIMARY_DARK } }} />
+                        sx={{ bgcolor: PRIMARY_BG, color: PRIMARY, border: `1px solid rgba(210, 78, 51,0.2)`,
+                          fontWeight: 500, ...T.badge, "&:hover": { bgcolor: "rgba(210, 78, 51,0.12)", color: PRIMARY_DARK } }} />
                     )}
                     {product.subCategory && (
                       <Chip label={product.subCategory} size="small"
@@ -633,7 +634,7 @@ const ProductDetail = () => {
                     )}
                     {product.isCustomizable && (
                       <Chip label="✦ Customizable" size="small"
-                        sx={{ bgcolor: PRIMARY_BG, color: PRIMARY, border: `1px solid rgba(139,26,74,0.25)`,
+                        sx={{ bgcolor: PRIMARY_BG, color: PRIMARY, border: `1px solid rgba(210, 78, 51,0.25)`,
                           fontWeight: 500, ...T.badge }} />
                     )}
                   </Stack>
@@ -647,7 +648,7 @@ const ProductDetail = () => {
 
                   {/* Rating */}
                   {ratingStats?.reviewCount > 0 && (
-                    <Stack direction="row" alignItems="center" gap={0.75} sx={{ mb: 1.75 }}>
+                    <Stack direction="row" sx={{ alignItems: "center", gap: 0.75, mb: 1.75 }}>
                       <StarRating rating={ratingStats.averageRating} size="0.875rem" showValue />
                       <Typography sx={{ ...T.supporting, color: "text.secondary" }}>
                         · {ratingStats.reviewCount} {ratingStats.reviewCount === 1 ? "review" : "reviews"}
@@ -657,7 +658,7 @@ const ProductDetail = () => {
 
                   {/* Price block */}
                   <Box sx={{ mb: 2 }}>
-                    <Stack direction="row" alignItems="center" flexWrap="wrap" gap={1.25} sx={{ mb: 0.5 }}>
+                    <Stack direction="row" sx={{ alignItems: "center", flexWrap: "wrap", gap: 1.25, mb: 0.5 }}>
                       <Typography sx={{ fontSize: "1.875rem", fontWeight: 700, color: PRIMARY,
                         lineHeight: 1, letterSpacing: "-0.02em" }}>
                         ₹{product.price.toLocaleString("en-IN")}
@@ -732,7 +733,7 @@ const ProductDetail = () => {
                             Colour
                           </Typography>
                           {selectedColor && (
-                            <Stack direction="row" alignItems="center" spacing={0.75}>
+                            <Stack direction="row" sx={{ alignItems: "center" }} spacing={0.75}>
                               <Box sx={{ width: 10, height: 10, borderRadius: "50%", bgcolor: selectedColor.hex,
                                 border: "1px solid rgba(0,0,0,0.12)", flexShrink: 0 }} />
                               <Typography sx={{ fontSize: "0.8125rem", fontWeight: 600, color: "text.primary" }}>
@@ -741,7 +742,7 @@ const ProductDetail = () => {
                             </Stack>
                           )}
                         </Box>
-                        <Stack direction="row" flexWrap="wrap" gap={1}>
+                        <Stack direction="row" sx={{ flexWrap: "wrap", gap: 1 }}>
                           {visibleColors.map((c, i) => (
                             <Tooltip key={c._id || c.id || i} title={c.name} arrow>
                               <Box component="button" onClick={() => setSelectedColor(c)}
@@ -749,7 +750,7 @@ const ProductDetail = () => {
                                 sx={{
                                   width: 32, height: 32, borderRadius: "50%", bgcolor: c.hex,
                                   border: selectedColor?.hex === c.hex ? `3px solid ${PRIMARY}` : "2px solid rgba(0,0,0,0.12)",
-                                  boxShadow: selectedColor?.hex === c.hex ? `0 0 0 2px rgba(139,26,74,0.2)` : "0 1px 3px rgba(0,0,0,0.10)",
+                                  boxShadow: selectedColor?.hex === c.hex ? `0 0 0 2px rgba(210, 78, 51,0.2)` : "0 1px 3px rgba(0,0,0,0.10)",
                                   cursor: "pointer", p: 0, flexShrink: 0, transition: "all 140ms",
                                   "&:hover": { transform: "scale(1.15)", boxShadow: "0 2px 10px rgba(0,0,0,0.2)" },
                                 }} />
@@ -779,7 +780,7 @@ const ProductDetail = () => {
                           </Typography>
                         )}
                       </Box>
-                      <Stack direction="row" flexWrap="wrap" spacing={1.5} useFlexGap>
+                      <Stack direction="row" sx={{ flexWrap: "wrap" }} spacing={1.5} useFlexGap>
                         {[...product.hoopSizes].sort((a, b) => a - b).map((size) => (
                           <Box
                             key={size}
@@ -793,10 +794,10 @@ const ProductDetail = () => {
                               gap: "2px",
                               border: `2px solid ${selectedHoopSize === size ? PRIMARY : "rgba(0,0,0,0.12)"}`,
                               bgcolor: selectedHoopSize === size ? PRIMARY_BG : "#fafafa",
-                              boxShadow: selectedHoopSize === size ? `0 0 0 3px rgba(139,26,74,0.15)` : "0 1px 4px rgba(0,0,0,0.07)",
+                              boxShadow: selectedHoopSize === size ? `0 0 0 3px rgba(210, 78, 51,0.15)` : "0 1px 4px rgba(0,0,0,0.07)",
                               transition: "all 150ms ease",
                               p: 0,
-                              "&:hover": { borderColor: PRIMARY, bgcolor: PRIMARY_BG, transform: "translateY(-1px)", boxShadow: "0 4px 12px rgba(139,26,74,0.15)" },
+                              "&:hover": { borderColor: PRIMARY, bgcolor: PRIMARY_BG, transform: "translateY(-1px)", boxShadow: "0 4px 12px rgba(210, 78, 51,0.15)" },
                             }}
                           >
                             <Typography sx={{ fontWeight: 800, fontSize: "1.0625rem", color: selectedHoopSize === size ? PRIMARY : "text.primary", lineHeight: 1 }}>
@@ -815,7 +816,7 @@ const ProductDetail = () => {
                   {product.bulkDiscounts?.length > 0 && (
                     <Paper elevation={0} sx={{ bgcolor: "#f0fdf4", border: "0.5px solid #a7f3d0",
                       borderRadius: "12px", p: 2, mb: 2.5 }}>
-                      <Stack direction="row" alignItems="center" spacing={0.75} mb={1.25}>
+                      <Stack direction="row" sx={{ alignItems: "center", mb: 1.25 }} spacing={0.75}>
                         <FiStar size={13} color="#065f46" />
                         <Typography sx={{ fontSize: "0.875rem", fontWeight: 600, color: "#065f46" }}>
                           Buy more, save more
@@ -836,9 +837,9 @@ const ProductDetail = () => {
 
                   {/* Customization textarea */}
                   {product.isCustomizable && (
-                    <Paper elevation={0} sx={{ bgcolor: "#fdf8f2", border: "0.5px solid #EAD9C5",
+                    <Paper elevation={0} sx={{ bgcolor: "#fdf8f2", border: "0.5px solid #e4dfd6",
                       borderRadius: "12px", p: 2, mb: 2.5 }}>
-                      <Stack direction="row" alignItems="flex-start" spacing={1.25} mb={1.5}>
+                      <Stack direction="row" sx={{ alignItems: "flex-start", mb: 1.5 }} spacing={1.25}>
                         <Typography sx={{ fontSize: "1rem", color: PRIMARY, lineHeight: 1.4, flexShrink: 0 }}>✦</Typography>
                         <Box>
                           <Typography sx={{ fontSize: "0.875rem", fontWeight: 600, color: PRIMARY, mb: 0.25 }}>
@@ -856,7 +857,7 @@ const ProductDetail = () => {
                         size="small"
                         sx={{
                           "& .MuiOutlinedInput-root": { borderRadius: "10px", bgcolor: "#fff",
-                            "& fieldset": { borderColor: "#EAD9C5" },
+                            "& fieldset": { borderColor: "#e4dfd6" },
                             "&:hover fieldset": { borderColor: PRIMARY },
                             "&.Mui-focused fieldset": { borderColor: PRIMARY } },
                         }} />
@@ -878,13 +879,13 @@ const ProductDetail = () => {
                         </Alert>
                       ) : (
                         <>
-                          <Stack direction="row" alignItems="center" spacing={0.75} mb={1.25}>
+                          <Stack direction="row" sx={{ alignItems: "center", mb: 1.25 }} spacing={0.75}>
                             <FiBell size={14} />
                             <Typography sx={{ fontSize: "0.875rem", fontWeight: 600, color: "text.secondary" }}>
                               Get notified when available
                             </Typography>
                           </Stack>
-                          <Stack direction="row" spacing={1} component="form" onSubmit={handleNotifyMe} flexWrap="wrap">
+                          <Stack direction="row" spacing={1} component="form" onSubmit={handleNotifyMe} sx={{ flexWrap: "wrap" }}>
                             <TextField type="email" placeholder="your@email.com"
                               value={notifyEmail} onChange={(e) => setNotifyEmail(e.target.value)}
                               required size="small"
@@ -912,14 +913,14 @@ const ProductDetail = () => {
                         <Typography sx={{ fontSize: "0.875rem", fontWeight: 600, color: "text.secondary" }}>
                           Quantity
                         </Typography>
-                        <Stack direction="row" alignItems="center" gap={1.25}>
+                        <Stack direction="row" sx={{ alignItems: "center", gap: 1.25 }}>
                           <QuantitySelector
                             value={quantity} onChange={setQuantity}
                             max={product.trackInventory !== false ? product.stock : 99} />
                           {quantityInCart > 0 && (
                             <Chip icon={<FiShoppingCart size={11} />}
                               label={`${quantityInCart} in cart`} size="small"
-                              sx={{ bgcolor: PRIMARY_BG, color: PRIMARY, border: `1px solid rgba(139,26,74,0.18)`,
+                              sx={{ bgcolor: PRIMARY_BG, color: PRIMARY, border: `1px solid rgba(210, 78, 51,0.18)`,
                                 fontWeight: 600, flexShrink: 0, ...T.badge }} />
                           )}
                         </Stack>
@@ -933,9 +934,9 @@ const ProductDetail = () => {
                           sx={{
                             height: 50, bgcolor: PRIMARY,
                             background: `linear-gradient(135deg, ${PRIMARY} 0%, ${PRIMARY_DARK} 100%)`,
-                            "&:hover": { background: `linear-gradient(135deg, ${PRIMARY_DARK} 0%, #4c0d28 100%)`,
-                              transform: "translateY(-1px)", boxShadow: "0 6px 20px rgba(139,26,74,0.32)" },
-                            boxShadow: "0 4px 14px rgba(139,26,74,0.22)",
+                            "&:hover": { background: `linear-gradient(135deg, ${PRIMARY_DARK} 0%, #a63c27 100%)`,
+                              transform: "translateY(-1px)", boxShadow: "0 6px 20px rgba(210, 78, 51,0.32)" },
+                            boxShadow: "0 4px 14px rgba(210, 78, 51,0.22)",
                             borderRadius: "12px", fontWeight: 600, fontSize: "0.9375rem",
                             textTransform: "none", transition: "all 180ms",
                           }}>
@@ -1002,7 +1003,7 @@ const ProductDetail = () => {
 
                     {/* Product meta */}
                     {(product.sku || product.category) && (
-                      <Stack direction="row" flexWrap="wrap" gap={2} sx={{ pt: 0.5 }}>
+                      <Stack direction="row" sx={{ flexWrap: "wrap", gap: 2, pt: 0.5 }}>
                         {product.sku && (
                           <Typography sx={T.supporting}>
                             <Box component="span" sx={{ fontWeight: 600, color: "text.secondary" }}>SKU:</Box>{" "}{product.sku}
@@ -1093,9 +1094,9 @@ const ProductDetail = () => {
             boxShadow: "0 -1px 0 rgba(0,0,0,0.06), 0 -8px 24px rgba(0,0,0,0.07)",
             borderTop: `1px solid ${BORDER}`,
           }}>
-          <Stack direction="row" alignItems="center" spacing={1.25} sx={{ flex: 1, minWidth: 0 }}>
+          <Stack direction="row" spacing={1.25} sx={{ alignItems: "center", flex: 1, minWidth: 0 }}>
             {images[0]?.url && (
-              <Box component="img" src={images[0].url} alt={product.name}
+              <Box component="img" onError={onImgError} src={images[0].url} alt={product.name}
                 sx={{ width: 44, height: 44, objectFit: "contain", borderRadius: "8px",
                   border: `0.5px solid ${BORDER}`, bgcolor: "#fff", flexShrink: 0, p: 0.4 }} />
             )}
@@ -1115,7 +1116,7 @@ const ProductDetail = () => {
             sx={{
               bgcolor: PRIMARY,
               background: `linear-gradient(135deg, ${PRIMARY} 0%, ${PRIMARY_DARK} 100%)`,
-              "&:hover": { background: `linear-gradient(135deg, ${PRIMARY_DARK} 0%, #4c0d28 100%)` },
+              "&:hover": { background: `linear-gradient(135deg, ${PRIMARY_DARK} 0%, #a63c27 100%)` },
               borderRadius: "10px", fontWeight: 600, fontSize: "0.875rem",
               flexShrink: 0, minHeight: 44, px: 2.5,
             }}>

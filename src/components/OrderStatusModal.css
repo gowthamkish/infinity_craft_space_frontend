@@ -64,7 +64,7 @@
   height: 28px;
   border: none;
   background: rgba(0, 0, 0, 0.07);
-  color: var(--charcoal-500, #A08060);
+  color: var(--charcoal-500, #8a8c85);
   border-radius: 50%;
   font-size: 1.1rem;
   line-height: 1;
@@ -113,14 +113,14 @@
 .osm-title {
   font-size: 1.4rem;
   font-weight: 800;
-  color: var(--charcoal-900, #2C2C2C);
+  color: var(--charcoal-900, #232420);
   margin: 0 0 0.5rem;
   line-height: 1.2;
 }
 
 .osm-desc {
   font-size: 0.9rem;
-  color: var(--charcoal-500, #A08060);
+  color: var(--charcoal-500, #8a8c85);
   margin: 0 0 1rem;
   line-height: 1.5;
 }
@@ -145,9 +145,9 @@
 }
 
 .osm-status--prev {
-  background: var(--bg-tertiary, #F5EDE0);
-  color: var(--charcoal-500, #A08060);
-  border-color: var(--border-color, #EAD9C5);
+  background: var(--bg-tertiary, #efebe3);
+  color: var(--charcoal-500, #8a8c85);
+  border-color: var(--border-color, #e4dfd6);
   text-decoration: line-through;
   opacity: 0.7;
 }
@@ -158,14 +158,14 @@
 
 .osm-arrow {
   font-size: 1rem;
-  color: var(--charcoal-400, #C0A882);
+  color: var(--charcoal-400, #b4b2a8);
   flex-shrink: 0;
 }
 
 /* Order ID */
 .osm-order-id {
   font-size: 0.78rem;
-  color: var(--charcoal-400, #C0A882);
+  color: var(--charcoal-400, #b4b2a8);
   margin: 0 0 1.25rem;
   font-family: monospace;
   letter-spacing: 0.06em;
@@ -199,8 +199,8 @@
 }
 
 .osm-btn--ghost {
-  background: var(--bg-tertiary, #F5EDE0);
-  color: var(--charcoal-600, #7A5E42);
+  background: var(--bg-tertiary, #efebe3);
+  color: var(--charcoal-600, #5b5d58);
 }
 
 /* Responsive — center on desktop */

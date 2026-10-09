@@ -21,7 +21,7 @@ const P      = BRAND.rose[800];
 const BORDER = "#e7e5e4";
 
 const TYPE_CONFIG = {
-  order:    { icon: FiPackage,      color: "#8B1A4A", bg: "rgba(139,26,74,0.10)",  label: "Order"     },
+  order:    { icon: FiPackage,      color: "#d24e33", bg: "rgba(210, 78, 51,0.10)",  label: "Order"     },
   shipped:  { icon: FiTruck,        color: "#0284c7", bg: "rgba(2,132,199,0.10)",  label: "Shipped"   },
   returned: { icon: FiRotateCcw,    color: "#b45309", bg: "rgba(180,83,9,0.10)",   label: "Return"    },
   cancelled:{ icon: FiXCircle,      color: "#dc2626", bg: "rgba(220,38,38,0.10)",  label: "Cancelled" },
@@ -71,7 +71,7 @@ function NotificationRow({ n, onMarkRead, onViewOrder }) {
         px: 2.5,
         py: 2,
         position: "relative",
-        bgcolor: n.read ? "transparent" : "rgba(139,26,74,0.025)",
+        bgcolor: n.read ? "transparent" : "rgba(210, 78, 51,0.025)",
         transition: "background 150ms ease",
         "&:hover": { bgcolor: "#fafaf9" },
       }}
@@ -98,7 +98,7 @@ function NotificationRow({ n, onMarkRead, onViewOrder }) {
       </Box>
 
       {/* Actions */}
-      <Stack direction="row" alignItems="center" gap={0.75} sx={{ flexShrink: 0 }}>
+      <Stack direction="row" sx={{ alignItems: "center", gap: 0.75, flexShrink: 0 }}>
         {n.orderId && (
           <Button
             size="small"
@@ -107,7 +107,7 @@ function NotificationRow({ n, onMarkRead, onViewOrder }) {
             sx={{
               fontSize: "0.75rem", fontWeight: 600, textTransform: "none",
               color: P, borderRadius: "8px", px: 1.25, py: 0.5,
-              "&:hover": { bgcolor: "rgba(139,26,74,0.08)" },
+              "&:hover": { bgcolor: "rgba(210, 78, 51,0.08)" },
             }}
           >
             View
@@ -187,12 +187,11 @@ export default function Notifications() {
   return (
     <AdminLayout>
       {/* ── Page header ─────────────────────────────────────────────── */}
-      <Stack direction="row" alignItems="flex-start" justifyContent="space-between"
-        flexWrap="wrap" gap={2} sx={{ mb: 3 }}>
-        <Stack direction="row" alignItems="center" gap={1.5}>
+      <Stack direction="row" sx={{ alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 2, mb: 3 }}>
+        <Stack direction="row" sx={{ alignItems: "center", gap: 1.5 }}>
           <Box sx={{
             width: 44, height: 44, borderRadius: "12px",
-            bgcolor: "rgba(139,26,74,0.10)", color: P,
+            bgcolor: "rgba(210, 78, 51,0.10)", color: P,
             display: "flex", alignItems: "center", justifyContent: "center",
             flexShrink: 0, position: "relative",
           }}>
@@ -222,7 +221,7 @@ export default function Notifications() {
           </Box>
         </Stack>
 
-        <Stack direction="row" gap={1}>
+        <Stack direction="row" sx={{ gap: 1 }}>
           <Button
             size="small"
             startIcon={isFetching ? <CircularProgress size={13} color="inherit" /> : <FiRefreshCw size={14} />}
@@ -258,7 +257,7 @@ export default function Notifications() {
       </Stack>
 
       {/* ── Filter tabs ─────────────────────────────────────────────── */}
-      <Stack direction="row" gap={0.75} sx={{ mb: 2.5 }}>
+      <Stack direction="row" sx={{ gap: 0.75, mb: 2.5 }}>
         {FILTERS.map((f) => {
           const active = filter === f.key;
           const count  = countFor(f.key);
@@ -284,7 +283,7 @@ export default function Notifications() {
                 <Box component="span" sx={{
                   display: "inline-flex", alignItems: "center", justifyContent: "center",
                   minWidth: 18, height: 18, borderRadius: "9px", px: 0.5,
-                  bgcolor: active ? "rgba(255,255,255,0.25)" : "rgba(139,26,74,0.10)",
+                  bgcolor: active ? "rgba(255,255,255,0.25)" : "rgba(210, 78, 51,0.10)",
                   color: active ? "#fff" : P,
                   fontSize: "0.65rem", fontWeight: 800,
                 }}>
@@ -301,7 +300,7 @@ export default function Notifications() {
         {loading ? (
           <Box sx={{ p: 2.5 }}>
             {[1, 2, 3, 4].map((i) => (
-              <Stack key={i} direction="row" gap={2} sx={{ mb: i < 4 ? 2.5 : 0 }}>
+              <Stack key={i} direction="row" sx={{ gap: 2, mb: i < 4 ? 2.5 : 0 }}>
                 <Skeleton variant="rounded" width={40} height={40} sx={{ borderRadius: "10px", flexShrink: 0 }} />
                 <Box sx={{ flex: 1 }}>
                   <Skeleton width="75%" height={16} sx={{ mb: 1 }} />
@@ -314,7 +313,7 @@ export default function Notifications() {
           <Box sx={{ textAlign: "center", py: 8, px: 3 }}>
             <Box sx={{
               width: 64, height: 64, borderRadius: "50%", mx: "auto", mb: 2,
-              bgcolor: "rgba(139,26,74,0.06)",
+              bgcolor: "rgba(210, 78, 51,0.06)",
               display: "flex", alignItems: "center", justifyContent: "center", color: P,
             }}>
               <FiInbox size={28} />
@@ -337,7 +336,7 @@ export default function Notifications() {
       </Paper>
 
       {filtered.length > 0 && (
-        <Stack direction="row" alignItems="center" gap={0.75} sx={{ mt: 2 }}>
+        <Stack direction="row" sx={{ alignItems: "center", gap: 0.75, mt: 2 }}>
           <FiAlertCircle size={13} color="#a8a29e" />
           <Typography sx={{ fontSize: "0.75rem", color: "#a8a29e" }}>
             Notifications are retained for 30 days.

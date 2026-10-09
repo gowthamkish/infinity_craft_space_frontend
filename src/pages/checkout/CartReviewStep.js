@@ -29,14 +29,15 @@ import { isCustomItem } from "../../components/CheckoutDeliveryPanel";
 import { updateCartItemNote } from "../../features/cartSlice";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { useGetRecommendationsQuery } from "../../services/productsApi";
+import { onImgError } from "../../utils/imageFallback";
 
-const P = "#8b2252";
-const P_LIGHT = "rgba(139,34,82,0.07)";
+const P = "#d24e33";
+const P_LIGHT = "rgba(210, 78, 51,0.07)";
 const BORDER = "rgba(0,0,0,0.08)";
 
 const THUMB_COLORS = [
   ["#10b981", "#059669"], ["#3b82f6", "#1d4ed8"], ["#f59e0b", "#d97706"],
-  ["#ef4444", "#dc2626"], ["#8b5cf6", "#7c3aed"], ["#ec4899", "#db2777"],
+  ["#ef4444", "#dc2626"], ["#8b5cf6", "#7c3aed"], ["#e8623d", "#d24e33"],
 ];
 
 /* ── ProductThumb ──────────────────────────────────────────────────── */
@@ -212,7 +213,7 @@ function CartItemRow({ item, handleQuantityChange, handleRemoveItem, isLast }) {
           {/* Bottom row: stepper + remove */}
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mt: 1.25 }}>
             {/* Pill stepper */}
-            <Stack direction="row" alignItems="stretch" sx={{
+            <Stack direction="row" sx={{ alignItems: "stretch",
               border: `1.5px solid ${P}`, borderRadius: "20px", overflow: "hidden", height: 30,
             }}>
               <IconButton size="small"
@@ -225,7 +226,7 @@ function CartItemRow({ item, handleQuantityChange, handleRemoveItem, isLast }) {
               <Typography sx={{
                 minWidth: 30, textAlign: "center", fontSize: "0.8125rem", fontWeight: 600,
                 color: "#1c1917", display: "flex", alignItems: "center", justifyContent: "center",
-                borderLeft: `1px solid rgba(139,34,82,0.15)`, borderRight: `1px solid rgba(139,34,82,0.15)`,
+                borderLeft: `1px solid rgba(210, 78, 51,0.15)`, borderRight: `1px solid rgba(210, 78, 51,0.15)`,
               }}>
                 {item.quantity}
               </Typography>
@@ -269,7 +270,7 @@ function CrossSellSection({ cartItems, navigate }) {
       border: `0.5px solid ${BORDER}`, borderRadius: "12px", mt: 2, overflow: "hidden", bgcolor: "#fff",
     }}>
       <Box sx={{ px: 2.5, py: 1.75, borderBottom: `0.5px solid ${BORDER}` }}>
-        <Stack direction="row" alignItems="center" spacing={1}>
+        <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
           <LocalOfferOutlinedIcon sx={{ fontSize: 15, color: P }} />
           <Typography sx={{ fontSize: "0.875rem", fontWeight: 500 }}>You might also like</Typography>
         </Stack>
@@ -288,7 +289,7 @@ function CrossSellSection({ cartItems, navigate }) {
                   transition: "all 0.15s ease",
                 }}>
                   {img && (
-                    <Box component="img" src={img} alt={product.name}
+                    <Box component="img" src={img} alt={product.name} onError={onImgError}
                       sx={{ width: 40, height: 40, borderRadius: "8px", objectFit: "cover", flexShrink: 0 }} />
                   )}
                   <Box sx={{ minWidth: 0 }}>
@@ -339,7 +340,7 @@ export const CartReviewStep = ({
   const discountedTotal = Math.max(0, total - discount);
 
   return (
-    <Grid container spacing={3} alignItems="flex-start">
+    <Grid container spacing={3} sx={{ alignItems: "flex-start" }}>
 
       {/* ── Left: cart items ─────────────────────────────────────────── */}
       <Grid item xs={12} md={7}>
@@ -502,8 +503,8 @@ export const CartReviewStep = ({
                 sx={{
                   height: 50, fontSize: "0.9375rem", fontWeight: 600, borderRadius: "12px",
                   bgcolor: P, textTransform: "none",
-                  boxShadow: "0 2px 14px rgba(139,34,82,0.26)",
-                  "&:hover": { bgcolor: "#7a1d47", boxShadow: "0 4px 20px rgba(139,34,82,0.34)" },
+                  boxShadow: "0 2px 14px rgba(210, 78, 51,0.26)",
+                  "&:hover": { bgcolor: "#7a1d47", boxShadow: "0 4px 20px rgba(210, 78, 51,0.34)" },
                   "&.Mui-disabled": { bgcolor: "#d1d5db", color: "#fff", boxShadow: "none" },
                 }}>
                 Proceed to Checkout
@@ -517,8 +518,8 @@ export const CartReviewStep = ({
             display: "flex", justifyContent: "center", alignItems: "center", gap: 2,
           }}>
             {TRUST.map(({ Icon, label }, i) => (
-              <Stack key={label} direction="row" alignItems="center" spacing={0.5}
-                sx={{ "&:not(:last-child)::after": {
+              <Stack key={label} direction="row" spacing={0.5}
+                sx={{ alignItems: "center", "&:not(:last-child)::after": {
                   content: '""', display: "block", width: 3, height: 3,
                   borderRadius: "50%", bgcolor: "#d1d5db", ml: 2,
                 }}}>

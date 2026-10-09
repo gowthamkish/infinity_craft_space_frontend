@@ -68,14 +68,10 @@ export default function Dashboard() {
         {/* Page header */}
         <Stack
           direction="row"
-          alignItems="flex-start"
-          justifyContent="space-between"
-          flexWrap="wrap"
-          gap={2}
-          sx={{ mb: 3 }}
+          sx={{ alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 2, mb: 3 }}
         >
           <Box>
-            <Stack direction="row" alignItems="center" gap={1.5} sx={{ mb: 0.5 }}>
+            <Stack direction="row" sx={{ alignItems: "center", gap: 1.5, mb: 0.5 }}>
               <FiBarChart2 size={22} color={BRAND.rose[800]} />
               <Typography variant="h4" sx={{ fontWeight: 800, color: "#1c1917", letterSpacing: "-0.025em", lineHeight: 1.2 }}>
                 Dashboard
@@ -96,7 +92,7 @@ export default function Dashboard() {
         {loading ? (
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 300, gap: 2 }}>
             <CircularProgress sx={{ color: BRAND.rose[800] }} />
-            <Typography variant="body2" color="text.secondary">Loading dashboard data…</Typography>
+            <Typography variant="body2" sx={{ color: "text.secondary" }}>Loading dashboard data…</Typography>
           </Box>
         ) : (
           <>
@@ -131,7 +127,7 @@ export default function Dashboard() {
                     >
                       <CardContent sx={{ p: 2.5, "&:last-child": { pb: 2.5 } }}>
                         {/* Icon row */}
-                        <Stack direction="row" alignItems="flex-start" justifyContent="space-between" sx={{ mb: 2 }}>
+                        <Stack direction="row" sx={{ alignItems: "flex-start", justifyContent: "space-between", mb: 2 }}>
                           <Box
                             sx={{
                               width: 48,
@@ -193,7 +189,7 @@ export default function Dashboard() {
                           "&:hover": {
                             borderColor: BRAND.rose[800],
                             color: BRAND.rose[800],
-                            bgcolor: `rgba(139,26,74,0.08)`,
+                            bgcolor: `rgba(210, 78, 51,0.08)`,
                             transform: "translateY(-1px)",
                           },
                           transition: "all 150ms ease",

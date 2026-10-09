@@ -10,7 +10,7 @@
 }
 
 .to-hero {
-  background: linear-gradient(135deg, var(--rose-900, #4a0d26) 0%, var(--primary, #8B1A4A) 60%, var(--rose-900, #4a0d26) 100%);
+  background: linear-gradient(135deg, var(--rose-900, #4a0d26) 0%, var(--primary, #d24e33) 60%, var(--rose-900, #4a0d26) 100%);
   padding: 2.5rem 1.5rem;
   text-align: center;
   color: white;
@@ -28,7 +28,7 @@
 }
 
 .to-hero p {
-  color: var(--charcoal-400, #C0A882);
+  color: var(--charcoal-400, #b4b2a8);
   margin: 0;
   font-size: 0.95rem;
 }
@@ -72,13 +72,13 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--charcoal-400, #C0A882);
+  color: var(--charcoal-400, #b4b2a8);
 }
 
 .to-meta-value {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--charcoal-800, #3D2C20);
+  color: var(--charcoal-800, #2f302b);
 }
 
 .to-status-badge {
@@ -92,23 +92,23 @@
   text-transform: capitalize;
 }
 
-.to-status-badge--confirmed  { background: var(--primary-subtle, rgba(139,26,74,0.08)); color: var(--primary, #8B1A4A); }
-.to-status-badge--processing { background: var(--secondary-subtle, rgba(201,168,76,0.10)); color: var(--gold-700, #8e6a24); }
-.to-status-badge--shipped         { background: var(--primary-subtle, rgba(139,26,74,0.08)); color: var(--primary-dark, #6b1238); }
-.to-status-badge--out_for_delivery{ background: var(--secondary-subtle, rgba(201,168,76,0.10)); color: var(--gold-800, #745422); }
+.to-status-badge--confirmed  { background: var(--primary-subtle, rgba(210, 78, 51,0.08)); color: var(--primary, #d24e33); }
+.to-status-badge--processing { background: var(--secondary-subtle, rgba(201,168,76,0.10)); color: var(--gold-700, #0a6159); }
+.to-status-badge--shipped         { background: var(--primary-subtle, rgba(210, 78, 51,0.08)); color: var(--primary-dark, #b8412a); }
+.to-status-badge--out_for_delivery{ background: var(--secondary-subtle, rgba(201,168,76,0.10)); color: var(--gold-800, #094d47); }
 .to-status-badge--delivered       { background: var(--success-subtle, rgba(46,125,50,0.08)); color: var(--success-dark, #1b5e20); }
 .to-status-badge--cancelled  { background: var(--error-subtle, rgba(198,40,40,0.08)); color: var(--error-dark, #8e0000); }
-.to-status-badge--returned   { background: var(--secondary-subtle, rgba(201,168,76,0.10)); color: var(--gold-700, #8e6a24); }
+.to-status-badge--returned   { background: var(--secondary-subtle, rgba(201,168,76,0.10)); color: var(--gold-700, #0a6159); }
 
 .to-refresh-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
   padding: 0.5rem 1rem;
-  border: 1.5px solid var(--border-color, #EAD9C5);
+  border: 1.5px solid var(--border-color, #e4dfd6);
   border-radius: 8px;
   background: white;
-  color: var(--charcoal-600, #7A5E42);
+  color: var(--charcoal-600, #5b5d58);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -116,8 +116,8 @@
 }
 
 .to-refresh-btn:hover {
-  border-color: var(--charcoal-400, #C0A882);
-  color: var(--charcoal-800, #3D2C20);
+  border-color: var(--charcoal-400, #b4b2a8);
+  color: var(--charcoal-800, #2f302b);
 }
 
 .to-refresh-btn--loading {
@@ -130,7 +130,7 @@
 }
 
 .to-skeleton {
-  background: linear-gradient(90deg, var(--bg-tertiary, #F5EDE0) 25%, var(--border-color, #EAD9C5) 50%, var(--bg-tertiary, #F5EDE0) 75%);
+  background: linear-gradient(90deg, var(--bg-tertiary, #efebe3) 25%, var(--border-color, #e4dfd6) 50%, var(--bg-tertiary, #efebe3) 75%);
   background-size: 200% 100%;
   animation: toShimmer 1.5s infinite;
   border-radius: 8px;

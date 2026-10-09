@@ -31,7 +31,7 @@
   font-size: 2rem;
   font-weight: 800;
   color: white;
-  box-shadow: 0 8px 24px rgba(139, 26, 74, 0.25);
+  box-shadow: 0 8px 24px rgba(210, 78, 51, 0.25);
   margin-bottom: 1rem;
 }
 
@@ -79,10 +79,10 @@
 }
 
 .account-card-header--address {
-  background: linear-gradient(135deg, var(--charcoal-900, #2C2C2C), var(--charcoal-800, #3D2C20));
+  background: linear-gradient(135deg, var(--charcoal-900, #232420), var(--charcoal-800, #2f302b));
 }
 .account-card-header--wishlist {
-  background: linear-gradient(135deg, var(--charcoal-800, #3D2C20), var(--charcoal-900, #2C2C2C));
+  background: linear-gradient(135deg, var(--charcoal-800, #2f302b), var(--charcoal-900, #232420));
 }
 
 .account-card-header-text h4 {
@@ -106,7 +106,7 @@
   color: var(--text-muted);
 }
 .account-empty-icon {
-  color: var(--charcoal-200, #EAD9C5);
+  color: var(--charcoal-200, #e4dfd6);
   margin-bottom: 0.875rem;
 }
 .account-empty-title {
@@ -138,7 +138,7 @@
 
 .account-item:hover {
   border-color: var(--primary-light);
-  box-shadow: 0 4px 16px rgba(139, 26, 74, 0.08);
+  box-shadow: 0 4px 16px rgba(210, 78, 51, 0.08);
 }
 
 .account-item--wishlist:hover {
@@ -262,7 +262,7 @@
 
 /* ── Edit Modal ──────────────────────────────────────────────── */
 .acct-modal-header {
-  background: linear-gradient(135deg, var(--charcoal-900, #2C2C2C), var(--charcoal-800, #3D2C20));
+  background: linear-gradient(135deg, var(--charcoal-900, #232420), var(--charcoal-800, #2f302b));
   padding: 1.125rem 1.5rem;
   color: white;
   display: flex;
@@ -330,7 +330,7 @@
 }
 .acct-input:focus {
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 3px rgba(139, 26, 74, 0.12) !important;
+  box-shadow: 0 0 0 3px rgba(210, 78, 51, 0.12) !important;
   background: var(--bg-primary) !important;
 }
 
@@ -452,7 +452,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /* box-shadow: 0 8px 24px rgba(139, 26, 74, 0.2); */
+  /* box-shadow: 0 8px 24px rgba(210, 78, 51, 0.2); */
   margin-bottom: 0.5rem;
 }
 
@@ -531,7 +531,7 @@
 .account-loyalty-note {
   grid-column: 1 / -1;
   font-size: 0.75rem;
-  color: var(--charcoal-400, #C0A882);
+  color: var(--charcoal-400, #b4b2a8);
   line-height: 1.5;
   border-top: 1px solid var(--border-light, #F0E0C8);
   padding-top: 0.6rem;
@@ -541,7 +541,7 @@
 .account-loyalty-label {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--charcoal-400, #C0A882);
+  color: var(--charcoal-400, #b4b2a8);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   margin: 0 0 0.2rem;
@@ -550,7 +550,7 @@
 .account-loyalty-pts {
   font-size: 1.5rem;
   font-weight: 900;
-  color: var(--charcoal-900, #2C2C2C);
+  color: var(--charcoal-900, #232420);
   margin: 0 0 0.3rem;
 }
 
@@ -574,24 +574,24 @@
   font-family: monospace;
   font-size: 1.1rem;
   font-weight: 800;
-  color: var(--primary, #8B1A4A);
+  color: var(--primary, #d24e33);
   letter-spacing: 0.1em;
 }
 
 .account-copy-btn {
-  background: var(--primary-subtle, rgba(139,26,74,0.06));
+  background: var(--primary-subtle, rgba(210, 78, 51,0.06));
   border: none;
   border-radius: 8px;
   padding: 0.3rem 0.5rem;
   cursor: pointer;
-  color: var(--primary, #8B1A4A);
+  color: var(--primary, #d24e33);
   display: flex;
   align-items: center;
   transition: background 0.15s;
 }
 
 .account-copy-btn:hover {
-  background: var(--primary-subtle, rgba(139,26,74,0.08));
+  background: var(--primary-subtle, rgba(210, 78, 51,0.08));
 }
 
 .account-referral-credits {
@@ -618,21 +618,21 @@
 
 /* Avatar → brand purple (replaces blue/green) */
 .account-avatar {
-  background: linear-gradient(135deg, var(--primary, #8B1A4A), var(--primary-dark, #6b1238)) !important;
+  background: linear-gradient(135deg, var(--primary, #d24e33), var(--primary-dark, #b8412a)) !important;
   box-shadow: 0 8px 24px rgba(109, 40, 217, 0.22) !important;
 }
 
 /* Card header strips → brand purple */
 .account-card-header--address {
-  background: linear-gradient(135deg, var(--rose-900, #4a0d26), var(--primary-dark, #6b1238)) !important;
+  background: linear-gradient(135deg, var(--rose-900, #4a0d26), var(--primary-dark, #b8412a)) !important;
 }
 .account-card-header--wishlist {
-  background: linear-gradient(135deg, var(--primary-dark, #6b1238), var(--primary, #8B1A4A)) !important;
+  background: linear-gradient(135deg, var(--primary-dark, #b8412a), var(--primary, #d24e33)) !important;
 }
 
 /* Item hover → brand purple ring */
 .account-item:hover {
-  border-color: var(--rose-300, #f5a8c6) !important;
+  border-color: var(--rose-300, #ffab8c) !important;
   box-shadow: 0 4px 16px rgba(124, 58, 237, 0.1) !important;
 }
 .account-item--wishlist:hover {
@@ -643,35 +643,35 @@
 /* Edit button → brand purple */
 .acct-btn--edit {
   background: rgba(124, 58, 237, 0.1) !important;
-  color: var(--primary, #8B1A4A) !important;
+  color: var(--primary, #d24e33) !important;
   border-color: rgba(124, 58, 237, 0.2) !important;
 }
 .acct-btn--edit:hover {
-  background: var(--primary, #8B1A4A) !important;
+  background: var(--primary, #d24e33) !important;
   color: white !important;
-  border-color: var(--primary, #8B1A4A) !important;
+  border-color: var(--primary, #d24e33) !important;
 }
 
 /* Modal header → brand purple */
 .acct-modal-header {
-  background: linear-gradient(135deg, var(--rose-900, #4a0d26), var(--primary-dark, #6b1238)) !important;
+  background: linear-gradient(135deg, var(--rose-900, #4a0d26), var(--primary-dark, #b8412a)) !important;
 }
 
 /* Input focus → brand purple */
 .acct-input:focus {
-  border-color: var(--primary, #8B1A4A) !important;
+  border-color: var(--primary, #d24e33) !important;
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12) !important;
 }
 
 /* Save button → brand purple */
 .acct-btn--save {
-  background: linear-gradient(135deg, var(--primary, #8B1A4A), var(--primary-dark, #6b1238)) !important;
+  background: linear-gradient(135deg, var(--primary, #d24e33), var(--primary-dark, #b8412a)) !important;
   box-shadow: 0 2px 8px rgba(109, 40, 217, 0.22) !important;
 }
 
 /* Cart button → brand purple (replaces green) */
 .acct-btn--cart {
-  background: linear-gradient(135deg, var(--primary, #8B1A4A), var(--primary-dark, #6b1238)) !important;
+  background: linear-gradient(135deg, var(--primary, #d24e33), var(--primary-dark, #b8412a)) !important;
   box-shadow: 0 2px 8px rgba(109, 40, 217, 0.2) !important;
 }
 .acct-btn--cart:hover {
@@ -679,4 +679,4 @@
   box-shadow: 0 4px 14px rgba(109, 40, 217, 0.28) !important;
 }
 
-/* Loyalty card — referral code already uses var(--primary, #8B1A4A), keep it */
+/* Loyalty card — referral code already uses var(--primary, #d24e33), keep it */

@@ -38,13 +38,13 @@
 /* ── DESIGN TOKENS ────────────────────────────────────────────────────────── */
 :root {
   /* Brand — Deep Rose */
-  --btn-brand:          var(--primary, #8B1A4A);
-  --btn-brand-dark:     var(--primary-dark, #6b1238);
+  --btn-brand:          var(--primary, #d24e33);
+  --btn-brand-dark:     var(--primary-dark, #b8412a);
   --btn-brand-darker:   var(--rose-900, #4a0d25);
-  --btn-brand-glow:     rgba(139, 26, 74, 0.28);
-  --btn-brand-subtle:   var(--primary-subtle, rgba(139, 26, 74, 0.08));
-  --btn-brand-grad:     linear-gradient(135deg, var(--primary, #8B1A4A) 0%, var(--primary-dark, #6b1238) 100%);
-  --btn-brand-grad-h:   linear-gradient(135deg, var(--primary-dark, #6b1238) 0%, var(--rose-900, #4a0d25) 100%);
+  --btn-brand-glow:     rgba(210, 78, 51, 0.28);
+  --btn-brand-subtle:   var(--primary-subtle, rgba(210, 78, 51, 0.08));
+  --btn-brand-grad:     linear-gradient(135deg, var(--primary, #d24e33) 0%, var(--primary-dark, #b8412a) 100%);
+  --btn-brand-grad-h:   linear-gradient(135deg, var(--primary-dark, #b8412a) 0%, var(--rose-900, #4a0d25) 100%);
 
   /* Success — Green */
   --btn-success:        var(--success, #2e7d32);
@@ -63,12 +63,12 @@
   --btn-danger-bd:      rgba(198, 40, 40, 0.30);
 
   /* Neutral */
-  --btn-neutral-bg:     var(--bg-secondary, #FDF6EC);
-  --btn-neutral-bg-h:   var(--bg-tertiary, #F5EDE0);
-  --btn-neutral-bd:     var(--border-color, #EAD9C5);
+  --btn-neutral-bg:     var(--bg-secondary, #f7f4ee);
+  --btn-neutral-bg-h:   var(--bg-tertiary, #efebe3);
+  --btn-neutral-bd:     var(--border-color, #e4dfd6);
   --btn-neutral-bd-h:   var(--charcoal-300, #D5BC9A);
-  --btn-neutral-text:   var(--text-secondary, #5C4330);
-  --btn-neutral-text-h: var(--text-primary, #2C2C2C);
+  --btn-neutral-text:   var(--text-secondary, #46473f);
+  --btn-neutral-text-h: var(--text-primary, #232420);
 
   /* Geometry */
   --btn-radius:         12px;   /* standard */
@@ -451,7 +451,6 @@
    ════════════════════════════════════════════════════════════════════════════ */
 
 /* ── Shared transition for ALL context buttons ───────────────────────────── */
-.hp-btn,
 .auth-btn,
 .pdp-btn,
 .pc-btn,
@@ -478,7 +477,6 @@
 }
 
 /* ── Shared focus ring for ALL context buttons ───────────────────────────── */
-.hp-btn:focus-visible,
 .auth-btn:focus-visible,
 .pdp-btn:focus-visible,
 .pc-btn:focus-visible,
@@ -498,7 +496,6 @@
 }
 
 /* ── Shared active press for ALL context buttons ─────────────────────────── */
-.hp-btn:active,
 .auth-btn:active,
 .pdp-btn:active,
 .pc-btn:active,
@@ -516,8 +513,6 @@
 /* ── Standardize border-radius across all context buttons ────────────────── */
 /* Use 12px (--btn-radius) for standard, 8px (--btn-radius-sm) for compact */
 
-.hp-btn         { border-radius: var(--btn-radius) !important; }
-.hp-btn--lg     { border-radius: var(--btn-radius-lg) !important; }
 .auth-btn       { border-radius: var(--btn-radius) !important; }
 .pdp-btn        { border-radius: var(--btn-radius) !important; }
 .pdp-action-btn { border-radius: var(--btn-radius) !important; }
@@ -630,21 +625,9 @@
   box-shadow: 0 4px 14px var(--btn-brand-glow) !important;
 }
 
-/* Home hero CTA */
-.hp-btn--primary {
-  background: var(--btn-brand-grad) !important;
-  box-shadow: 0 4px 16px var(--btn-brand-glow) !important;
-}
-.hp-btn--primary:hover {
-  background: var(--btn-brand-grad-h) !important;
-  box-shadow: 0 8px 28px var(--btn-brand-glow) !important;
-  transform: translateY(-3px) !important;
-}
-
 /* ── Touch target minimum (48px for mobile) ──────────────────────────────── */
 @media (max-width: 767px) {
   .ics-btn,
-  .hp-btn,
   .auth-btn,
   .pdp-btn,
   .pl-checkout-btn,

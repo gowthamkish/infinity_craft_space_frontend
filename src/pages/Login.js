@@ -34,7 +34,7 @@ function BrandPanel({ title, subtitle, perks }) {
       sx={{
         display: { xs: "none", lg: "flex" },
         flex: "0 0 420px",
-        background: "linear-gradient(135deg, #3D1A2A 0%, #5C2038 45%, #6b1238 100%)",
+        background: "linear-gradient(135deg, #151a21 0%, #1b2029 45%, #b8412a 100%)",
         alignItems: "center",
         justifyContent: "center",
         p: "3rem 2.5rem",
@@ -68,7 +68,7 @@ function BrandPanel({ title, subtitle, perks }) {
           sx={{
             fontWeight: 800,
             mb: 0.75,
-            background: "linear-gradient(135deg, #fff 0%, #F4A7B9 100%)",
+            background: "linear-gradient(135deg, #fff 0%, #ff9d7a 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
@@ -208,7 +208,7 @@ export default function Login() {
             <Typography variant="h5" sx={{ fontWeight: 800, mb: 0.5 }}>
               Welcome back
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
+            <Typography variant="body2" sx={{ color: "text.secondary", mb: 2.5 }}>
               Sign in to continue shopping
             </Typography>
 
@@ -305,7 +305,7 @@ export default function Login() {
               </Button>
 
               <Divider sx={{ my: 1.5 }}>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>
                   or
                 </Typography>
               </Divider>

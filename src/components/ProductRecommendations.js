@@ -123,10 +123,10 @@ const ProductRecommendationCard = ({ product }) => {
         flexDirection: "column",
         cursor: "pointer",
         borderRadius: "16px",
-        boxShadow: "0 4px 16px rgba(139,26,74,0.08)",
+        boxShadow: "0 4px 16px rgba(210, 78, 51,0.08)",
         transition: "box-shadow 0.3s ease, transform 0.3s ease",
         "&:hover": {
-          boxShadow: "0 8px 32px rgba(139,26,74,0.18)",
+          boxShadow: "0 8px 32px rgba(210, 78, 51,0.18)",
           transform: "translateY(-4px)",
         },
       }}
@@ -222,7 +222,7 @@ const ProductRecommendationCard = ({ product }) => {
         {product.ratingCount > 0 && (
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}>
             <StarRating rating={product.averageRating} size="0.85rem" />
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: "text.secondary" }}>
               ({product.ratingCount})
             </Typography>
           </Box>

@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { useNewsletterSignup } from "../hooks/useNewsletterSignup";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
@@ -25,7 +26,6 @@ import {
   FiTwitter,
   FiLinkedin,
 } from "react-icons/fi";
-import { BRAND } from "../theme/muiTheme";
 
 const QUICK_LINKS = [
   { label: "Shop All Products",  to: "/",                    icon: FiShoppingBag  },
@@ -35,9 +35,9 @@ const QUICK_LINKS = [
 ];
 
 const TRUST_ITEMS = [
-  { icon: FiTruck,  label: "Free Shipping",   sub: "On orders above ₹999",  color: "#10b981" },
-  { icon: FiShield, label: "Secure Payments", sub: "100% safe checkout",    color: "#8B1A4A" },
-  { icon: FiAward,  label: "Quality Promise", sub: "Curated craft supplies", color: "#f59e0b" },
+  { icon: FiTruck,  label: "Free Shipping",   sub: "On orders above ₹999",  color: "#0f9488" },
+  { icon: FiShield, label: "Secure Payments", sub: "100% safe checkout",    color: "#e8623d" },
+  { icon: FiAward,  label: "Quality Promise", sub: "Curated craft supplies", color: "#e8623d" },
 ];
 
 const SOCIAL_LINKS = [
@@ -53,14 +53,15 @@ const BUSINESS_HOURS = [
   { day: "Sunday",          time: "Closed",        isOpen: false },
 ];
 
-const DARK_BG = "#2D0B1F";
-const DARK_SURFACE = "#3D1A2A";
-const DARK_TEXT = "#F5E6EE";
-const DARK_MUTED = "#C9A8B8";
-const DARK_BORDER = "rgba(255,255,255,0.1)";
+const DARK_BG = "#0f1217";
+const DARK_SURFACE = "#151a21";
+const DARK_TEXT = "#f2efea";
+const DARK_MUTED = "#9aa0ab";
+const DARK_BORDER = "rgba(255,255,255,0.09)";
 
 export default function Footer() {
   const location = useLocation();
+  const newsletter = useNewsletterSignup("footer");
   if (location.pathname.startsWith("/admin")) return null;
 
   return (
@@ -68,7 +69,7 @@ export default function Footer() {
       {/* ── Trust Bar ─────────────────────────────────────────────── */}
       <Paper
         elevation={0}
-        sx={{ bgcolor: "#FDF6EC", borderRadius: 0, borderTop: "1px solid #EAD9C5", borderBottom: "1px solid #EAD9C5" }}
+        sx={{ bgcolor: "#fffdf9", borderRadius: 0, borderTop: "1px solid rgba(20,24,30,0.10)", borderBottom: "1px solid rgba(20,24,30,0.10)" }}
       >
         <Box sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, sm: 4, md: 6 }, py: { xs: 3, md: 4 } }}>
           <Grid container spacing={3} sx={{ justifyContent: "center" }}>
@@ -76,9 +77,7 @@ export default function Footer() {
               <Grid key={label} size={{ xs: 12, sm: 4 }}>
                 <Stack
                   direction="row"
-                  alignItems="center"
-                  gap={2}
-                  justifyContent={{ xs: "center", sm: "center" }}
+                  sx={{ alignItems: "center", gap: 2, justifyContent: { xs: "center", sm: "center" } }}
                   role="region"
                   aria-label={label}
                 >
@@ -98,10 +97,10 @@ export default function Footer() {
                     <Icon size={22} />
                   </Box>
                   <Box>
-                    <Typography variant="body2" sx={{ fontWeight: 700, color: "#2C2C2C", lineHeight: 1.3, fontSize: "0.9rem" }}>
+                    <Typography variant="body2" sx={{ fontWeight: 700, color: "#232420", lineHeight: 1.3, fontSize: "0.9rem" }}>
                       {label}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: "#78614F", fontSize: "0.8rem" }}>
+                    <Typography variant="caption" sx={{ color: "#5b5d58", fontSize: "0.8rem" }}>
                       {sub}
                     </Typography>
                   </Box>
@@ -121,7 +120,7 @@ export default function Footer() {
         >
           {/* Brand column */}
           <Grid size={{ xs: 12, md: 4.5 }}>
-            <Stack direction="row" alignItems="center" gap={1.5} sx={{ mb: 2 }}>
+            <Stack direction="row" sx={{ alignItems: "center", gap: 1.5, mb: 2 }}>
               <Box sx={{ width: 40, height: 40, borderRadius: 2, overflow: "hidden", flexShrink: 0 }}>
                 <img
                   src="/ICS_Logo.jpeg"
@@ -143,14 +142,14 @@ export default function Footer() {
             <Typography variant="overline" sx={{ color: DARK_MUTED, fontSize: "0.65rem", letterSpacing: "0.1em", display: "block", mb: 1.5 }}>
               Get In Touch
             </Typography>
-            <Stack gap={1.25} sx={{ mb: 3 }}>
+            <Stack sx={{ gap: 1.25, mb: 3 }}>
               <MuiLink
                 href="mailto:infinitycraftspacejsag@gmail.com"
                 aria-label="Email us"
                 sx={{
                   display: "flex", alignItems: "center", gap: 1,
                   color: DARK_MUTED, textDecoration: "none", fontSize: "0.8125rem",
-                  "&:hover": { color: "#C9A84C" }, transition: "color 150ms ease",
+                  "&:hover": { color: "#ff7a50" }, transition: "color 150ms ease",
                 }}
               >
                 <FiMail size={15} style={{ flexShrink: 0 }} />
@@ -162,13 +161,13 @@ export default function Footer() {
                 sx={{
                   display: "flex", alignItems: "center", gap: 1,
                   color: DARK_MUTED, textDecoration: "none", fontSize: "0.8125rem",
-                  "&:hover": { color: "#C9A84C" }, transition: "color 150ms ease",
+                  "&:hover": { color: "#ff7a50" }, transition: "color 150ms ease",
                 }}
               >
                 <FiPhone size={15} style={{ flexShrink: 0 }} />
                 +91 (892) 508-3167
               </MuiLink>
-              <Stack direction="row" alignItems="flex-start" gap={1}>
+              <Stack direction="row" sx={{ alignItems: "flex-start", gap: 1 }}>
                 <FiMapPin size={15} color={DARK_MUTED} style={{ marginTop: 2, flexShrink: 0 }} />
                 <Typography variant="body2" sx={{ color: DARK_MUTED, fontSize: "0.8125rem" }}>
                   Bangalore, Karnataka, India
@@ -180,7 +179,7 @@ export default function Footer() {
             <Typography variant="overline" sx={{ color: DARK_MUTED, fontSize: "0.65rem", letterSpacing: "0.1em", display: "block", mb: 1 }}>
               Follow Us
             </Typography>
-            <Stack direction="row" gap={0.75}>
+            <Stack direction="row" sx={{ gap: 0.75 }}>
               {SOCIAL_LINKS.map(({ icon: Icon, label, url }) => (
                 <IconButton
                   key={label}
@@ -193,7 +192,7 @@ export default function Footer() {
                     border: `1px solid ${DARK_BORDER}`,
                     borderRadius: 1.5,
                     p: 0.875,
-                    "&:hover": { bgcolor: "rgba(201,168,76,0.15)", color: "#C9A84C", borderColor: "#C9A84C" },
+                    "&:hover": { bgcolor: "rgba(232,98,61,0.16)", color: "#ff7a50", borderColor: "#ff7a50" },
                     transition: "all 150ms ease",
                   }}
                 >
@@ -208,7 +207,7 @@ export default function Footer() {
             <Typography variant="overline" sx={{ color: "#fff", fontSize: "0.7rem", letterSpacing: "0.1em", fontWeight: 700, display: "block", mb: 2 }}>
               Quick Links
             </Typography>
-            <Stack component="nav" aria-label="Footer quick links" gap={0.75}>
+            <Stack component="nav" aria-label="Footer quick links" sx={{ gap: 0.75 }}>
               {QUICK_LINKS.map(({ label, to, icon: Icon }) => (
                 <MuiLink
                   key={to}
@@ -218,7 +217,7 @@ export default function Footer() {
                     display: "flex", alignItems: "center", gap: 1,
                     color: DARK_MUTED, textDecoration: "none", fontSize: "0.8125rem",
                     py: 0.375,
-                    "&:hover": { color: "#C9A84C", pl: 0.5 },
+                    "&:hover": { color: "#ff7a50", pl: 0.5 },
                     transition: "all 150ms ease",
                   }}
                 >
@@ -234,7 +233,7 @@ export default function Footer() {
             <Typography variant="overline" sx={{ color: "#fff", fontSize: "0.7rem", letterSpacing: "0.1em", fontWeight: 700, display: "block", mb: 2 }}>
               Business Hours
             </Typography>
-            <Stack gap={1.25}>
+            <Stack sx={{ gap: 1.25 }}>
               {BUSINESS_HOURS.map(({ day, time, isOpen }) => (
                 <Box key={day}>
                   <Typography variant="caption" sx={{ color: DARK_MUTED, display: "block", mb: 0.25, fontSize: "0.75rem" }}>
@@ -245,14 +244,14 @@ export default function Footer() {
                     sx={{
                       fontSize: "0.8125rem",
                       fontWeight: 600,
-                      color: isOpen ? "#10b981" : "#ef4444",
+                      color: isOpen ? "#0f9488" : "#ef4444",
                     }}
                   >
                     {time}
                   </Typography>
                 </Box>
               ))}
-              <Typography variant="caption" sx={{ color: "#475569", fontSize: "0.7rem", mt: 0.5 }}>
+              <Typography variant="caption" sx={{ color: "#7d8491", fontSize: "0.7rem", mt: 0.5 }}>
                 All times in IST (GMT+5:30)
               </Typography>
             </Stack>
@@ -266,7 +265,7 @@ export default function Footer() {
             <Typography variant="body2" sx={{ color: DARK_MUTED, mb: 2, fontSize: "0.8125rem", lineHeight: 1.6 }}>
               Subscribe to get special offers &amp; updates!
             </Typography>
-            <Box component="form" onSubmit={(e) => e.preventDefault()}>
+            <Box component="form" onSubmit={newsletter.submit} noValidate>
               <TextField
                 type="email"
                 placeholder="Enter your email"
@@ -274,6 +273,11 @@ export default function Footer() {
                 size="small"
                 fullWidth
                 variant="outlined"
+                autoComplete="email"
+                value={newsletter.email}
+                onChange={newsletter.onChange}
+                disabled={newsletter.loading}
+                error={newsletter.status === "error"}
                 sx={{
                   mb: 1.25,
                   "& .MuiOutlinedInput-root": {
@@ -282,7 +286,7 @@ export default function Footer() {
                     color: DARK_TEXT,
                     "& fieldset": { borderColor: DARK_BORDER },
                     "&:hover fieldset": { borderColor: "rgba(255,255,255,0.2)" },
-                    "&.Mui-focused fieldset": { borderColor: "#C9A84C" },
+                    "&.Mui-focused fieldset": { borderColor: "#ff7a50" },
                   },
                   "& input::placeholder": { color: DARK_MUTED, opacity: 1 },
                 }}
@@ -292,20 +296,34 @@ export default function Footer() {
                 variant="contained"
                 fullWidth
                 aria-label="Subscribe"
+                disabled={newsletter.loading}
                 sx={{
-                  bgcolor: BRAND.rose[800],
+                  bgcolor: "#e8623d",
                   color: "#fff",
                   borderRadius: 2,
                   fontWeight: 600,
                   textTransform: "none",
-                  "&:hover": { bgcolor: BRAND.rose[900] },
+                  "&:hover": { bgcolor: "#d24e33" },
                   mb: 1,
                 }}
               >
-                Subscribe
+                {newsletter.loading ? "Subscribing…" : "Subscribe"}
               </Button>
-              <Typography variant="caption" sx={{ color: "#475569", fontSize: "0.7rem" }}>
-                No spam, ever. Unsubscribe anytime.
+              <Typography
+                variant="caption"
+                role="status"
+                aria-live="polite"
+                sx={{
+                  display: "block",
+                  fontSize: "0.75rem",
+                  lineHeight: 1.5,
+                  color:
+                    newsletter.status === "success" ? "#2dd4bf"
+                    : newsletter.status === "error" ? "#f87171"
+                    : "#7d8491",
+                }}
+              >
+                {newsletter.message || "No spam, ever. Unsubscribe anytime."}
               </Typography>
             </Box>
           </Grid>
@@ -313,15 +331,12 @@ export default function Footer() {
       </Box>
 
       {/* ── Bottom Bar ────────────────────────────────────────────── */}
-      <Box sx={{ bgcolor: "#1A0610", borderTop: `1px solid ${DARK_BORDER}` }}>
+      <Box sx={{ bgcolor: "#0a0c0f", borderTop: `1px solid ${DARK_BORDER}` }}>
         <Stack
           direction={{ xs: "column", sm: "row" }}
-          alignItems="center"
-          justifyContent="space-between"
-          gap={1.5}
-          sx={{ maxWidth: 1280, mx: "auto", px: { xs: 2, sm: 4, md: 6 }, py: 2.5 }}
+          sx={{ alignItems: "center", justifyContent: "space-between", gap: 1.5, maxWidth: 1280, mx: "auto", px: { xs: 2, sm: 4, md: 6 }, py: 2.5 }}
         >
-          <Typography variant="caption" sx={{ color: "#475569", fontSize: "0.8rem" }}>
+          <Typography variant="caption" sx={{ color: "#7d8491", fontSize: "0.8rem" }}>
             © {new Date().getFullYear()}{" "}
             <Box component="strong" sx={{ color: DARK_MUTED }}>
               Infinity Craft Space
@@ -334,8 +349,7 @@ export default function Footer() {
             direction="row"
             aria-label="Footer legal links"
             divider={<Box sx={{ width: 1, height: 12, bgcolor: "#334155", borderRadius: 1 }} />}
-            gap={1.5}
-            alignItems="center"
+            sx={{ gap: 1.5, alignItems: "center" }}
           >
             {[
               { label: "Terms",   to: "/terms-and-conditions", component: Link },
@@ -348,10 +362,10 @@ export default function Footer() {
                 component={component || "a"}
                 {...(to ? { to } : { href })}
                 sx={{
-                  color: "#475569",
+                  color: "#7d8491",
                   textDecoration: "none",
                   fontSize: "0.75rem",
-                  "&:hover": { color: BRAND.rose[800] },
+                  "&:hover": { color: "#e8623d" },
                   transition: "color 150ms ease",
                 }}
               >

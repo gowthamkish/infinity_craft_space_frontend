@@ -311,10 +311,10 @@ function ReturnModal({ order, onClose, onSuccess }) {
   return (
     <Dialog open onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>
-        <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Stack direction="row" alignItems="center" spacing={1}>
+        <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}>
+          <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
             <FiRotateCcw style={{ color: "#f59e0b" }} />
-            <Typography variant="subtitle1" fontWeight={700}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
               Request Return / Refund
             </Typography>
           </Stack>
@@ -356,10 +356,10 @@ function ReturnModal({ order, onClose, onSuccess }) {
 
         <Box component="form" id="return-form" onSubmit={handleSubmit}>
           {/* Return type */}
-          <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75 }}>
+          <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.75 }}>
             Return Type <Box component="span" sx={{ color: "error.main" }}>*</Box>
           </Typography>
-          <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mb: 2 }}>
+          <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", mb: 2 }}>
             {[["return", "↩ Return"], ["refund", "💳 Refund"], ["exchange", "🔁 Exchange"]].map(([val, lbl]) => (
               <Chip
                 key={val}
@@ -374,7 +374,7 @@ function ReturnModal({ order, onClose, onSuccess }) {
           </Stack>
 
           {/* Reason */}
-          <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75 }}>
+          <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.75 }}>
             Reason <Box component="span" sx={{ color: "error.main" }}>*</Box>
           </Typography>
           <Select
@@ -396,7 +396,7 @@ function ReturnModal({ order, onClose, onSuccess }) {
           </Select>
 
           {/* Additional details */}
-          <Typography variant="body2" fontWeight={600} sx={{ mb: 0.75 }}>
+          <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.75 }}>
             Additional Details{" "}
             <Box component="span" sx={{ color: "text.secondary", fontWeight: 400 }}>
               (optional)
@@ -414,7 +414,7 @@ function ReturnModal({ order, onClose, onSuccess }) {
           />
 
           {/* Image upload */}
-          <Typography variant="body2" fontWeight={600} sx={{ mb: 0.5 }}>
+          <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
             Product Images{" "}
             <Box component="span" sx={{ color: "error.main" }}>*</Box>
             <Box component="span" sx={{ color: "text.secondary", fontWeight: 400, ml: 0.5 }}>
@@ -526,9 +526,9 @@ function ReturnModal({ order, onClose, onSuccess }) {
           )}
 
           {imageFiles.length > 0 && (
-            <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mt: 0.5 }}>
+            <Stack direction="row" spacing={0.5} sx={{ alignItems: "center", mt: 0.5 }}>
               <FiImage size={12} />
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>
                 {imageFiles.length} image{imageFiles.length !== 1 ? "s" : ""} selected
               </Typography>
             </Stack>
@@ -682,7 +682,7 @@ export default function Orders() {
         >
           <CircularProgress size={48} />
           <Typography variant="h6">Loading your orders…</Typography>
-          <Typography color="text.secondary">
+          <Typography sx={{ color: "text.secondary" }}>
             Please wait while we fetch your order history
           </Typography>
         </Box>
@@ -710,14 +710,14 @@ export default function Orders() {
 
       <Box sx={{ maxWidth: 1100, mx: "auto", px: { xs: 2, md: 3 }, py: 4 }}>
         {/* Hero */}
-        <Stack alignItems="center" sx={{ mb: 4, textAlign: "center" }}>
+        <Stack sx={{ alignItems: "center", mb: 4, textAlign: "center" }}>
           <Box sx={{ color: "primary.main", mb: 1 }}>
             <FiShoppingBag size={40} />
           </Box>
-          <Typography variant="h4" fontWeight={800}>
+          <Typography variant="h4" sx={{ fontWeight: 800 }}>
             My Orders
           </Typography>
-          <Typography color="text.secondary">
+          <Typography sx={{ color: "text.secondary" }}>
             Track and manage all your orders in one place
           </Typography>
         </Stack>
@@ -772,7 +772,7 @@ export default function Orders() {
             <Typography variant="h6" sx={{ mb: 1 }}>
               No orders found
             </Typography>
-            <Typography color="text.secondary" sx={{ mb: 3 }}>
+            <Typography sx={{ color: "text.secondary", mb: 3 }}>
               You haven't placed any orders yet. Start shopping to see your orders here!
             </Typography>
             <Button
@@ -815,13 +815,13 @@ export default function Orders() {
                       }}
                     >
                       <Stack spacing={0.25}>
-                        <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ textTransform: "uppercase", letterSpacing: 0.5 }}>
+                        <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>
                           Order ID
                         </Typography>
-                        <Typography variant="body2" fontWeight={700} sx={{ fontFamily: "monospace" }}>
+                        <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: "monospace" }}>
                           {formatOrderId(oid)}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="caption" sx={{ color: "text.secondary" }}>
                           {order.createdAt ? formatDate(order.createdAt) : "—"}
                         </Typography>
                       </Stack>
@@ -833,11 +833,11 @@ export default function Orders() {
                       <Stack
                         direction={{ xs: "column", sm: "row" }}
                         spacing={3}
-                        justifyContent="space-between"
+                        sx={{ justifyContent: "space-between" }}
                       >
                         {/* Items */}
                         <Box sx={{ flex: 1 }}>
-                          <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ textTransform: "uppercase", letterSpacing: 0.5 }}>
+                          <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>
                             Items Ordered
                           </Typography>
                           <Box
@@ -863,13 +863,13 @@ export default function Orders() {
 
                         {/* Summary */}
                         <Box>
-                          <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ textTransform: "uppercase", letterSpacing: 0.5 }}>
+                          <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>
                             Summary
                           </Typography>
-                          <Typography variant="h6" fontWeight={700} sx={{ mt: 0.5 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 700, mt: 0.5 }}>
                             ₹{total}
                           </Typography>
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" sx={{ color: "text.secondary" }}>
                             {(order.items || []).length} item
                             {(order.items || []).length !== 1 ? "s" : ""}
                           </Typography>
@@ -877,11 +877,11 @@ export default function Orders() {
 
                         {/* Shipping */}
                         <Box>
-                          <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ textTransform: "uppercase", letterSpacing: 0.5 }}>
+                          <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>
                             Shipping Address
                           </Typography>
                           {order.shippingAddress ? (
-                            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, maxWidth: 180 }}>
+                            <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5, maxWidth: 180 }}>
                               {order.shippingAddress.street}
                               <br />
                               {order.shippingAddress.city},{" "}
@@ -889,13 +889,13 @@ export default function Orders() {
                               {order.shippingAddress.zipCode}
                             </Typography>
                           ) : (
-                            <Typography variant="body2" color="text.secondary">—</Typography>
+                            <Typography variant="body2" sx={{ color: "text.secondary" }}>—</Typography>
                           )}
                         </Box>
 
                         {/* Actions */}
                         <Box sx={{ minWidth: 140 }}>
-                          <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ textTransform: "uppercase", letterSpacing: 0.5, display: "block", mb: 0.5 }}>
+                          <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5, display: "block", mb: 0.5 }}>
                             Actions
                           </Typography>
                           <TrackButton
@@ -923,13 +923,11 @@ export default function Orders() {
             {orders.length > 0 && (
               <Stack
                 direction={{ xs: "column", sm: "row" }}
-                alignItems="center"
-                justifyContent="space-between"
                 spacing={2}
-                sx={{ mt: 3 }}
+                sx={{ alignItems: "center", justifyContent: "space-between", mt: 3 }}
               >
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  <Typography variant="body2" color="text.secondary">
+                <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
+                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
                     Rows per page:
                   </Typography>
                   <Select
@@ -949,7 +947,7 @@ export default function Orders() {
                   </Select>
                 </Stack>
 
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
                   Page {current} of {totalPages}
                 </Typography>
 

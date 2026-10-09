@@ -31,8 +31,16 @@ const NAV_LINKS = [
   { path: "/account", label: "My Account", icon: FiUser, showWhen: "auth" },
 ];
 
-const NAV_BG = "linear-gradient(135deg, #3D1A2A 0%, #5C2038 40%, #3D1A2A 100%)";
-const ACCENT = "#C9A84C";
+// Ember & Teal theme (tokens live in styles/ember.css)
+const NAV_BG = "rgba(247, 244, 238, 0.82)";
+const ACCENT = "#d24e33";                       // active link text
+const ACCENT_BG = "rgba(232, 98, 61, 0.10)";
+const TEXT = "#232420";
+const TEXT_2 = "#5b5d58";
+const BORDER = "rgba(20, 24, 30, 0.10)";
+const BORDER_STRONG = "rgba(20, 24, 30, 0.18)";
+const EMBER_GRAD = "linear-gradient(135deg, #e8623d, #d24e33)";
+const HEAD_FONT = '"Space Grotesk", "Inter", system-ui, sans-serif';
 
 function Header() {
   const dispatch = useDispatch();
@@ -87,36 +95,36 @@ function Header() {
   const isActive = (path) => location.pathname === path;
 
   const navLinkSx = (path) => ({
-    color: isActive(path) ? ACCENT : "#e2e8f0",
+    color: isActive(path) ? ACCENT : TEXT_2,
     fontWeight: isActive(path) ? 600 : 500,
-    fontSize: "0.875rem",
+    fontSize: "0.9rem",
     gap: 0.75,
-    px: 1.5,
+    px: 1.75,
     py: 1,
-    borderRadius: "8px",
-    background: isActive(path) ? "rgba(201,168,76,0.18)" : "transparent",
+    borderRadius: "10px",
+    background: isActive(path) ? ACCENT_BG : "transparent",
     textTransform: "none",
     minWidth: 0,
     "&:hover": {
-      background: "rgba(255,255,255,0.1)",
-      color: "#fff",
-      transform: "translateY(-1px)",
+      background: ACCENT_BG,
+      color: ACCENT,
     },
-    transition: "all 0.15s ease",
+    transition: "all 0.2s ease",
   });
 
   const iconBtnSx = {
-    color: "#e2e8f0",
-    background: "rgba(255,255,255,0.08)",
-    border: "1.5px solid rgba(255,255,255,0.16)",
-    borderRadius: "8px",
-    p: "8px",
+    color: TEXT_2,
+    background: "#fffdf9",
+    border: `1px solid ${BORDER}`,
+    borderRadius: "10px",
+    p: "9px",
     "&:hover": {
-      background: "rgba(255,255,255,0.15)",
-      color: "#fff",
+      background: "#fffdf9",
+      color: ACCENT,
+      borderColor: "#e8623d",
       transform: "translateY(-1px)",
     },
-    transition: "all 0.15s ease",
+    transition: "all 0.2s ease",
   };
 
   return (
@@ -126,13 +134,16 @@ function Header() {
         elevation={0}
         sx={{
           background: NAV_BG,
+          color: TEXT,
+          backdropFilter: "blur(16px) saturate(160%)",
+          WebkitBackdropFilter: "blur(16px) saturate(160%)",
           borderRadius: 0,
-          borderBottom: "1px solid rgba(255,255,255,0.08)",
-          boxShadow: "0 1px 0 rgba(255,255,255,0.06), 0 8px 24px rgba(0,0,0,0.15)",
+          borderBottom: `1px solid ${BORDER}`,
+          boxShadow: "0 8px 30px rgba(35, 36, 32, 0.06)",
           zIndex: 1200,
         }}
       >
-        <Toolbar sx={{ px: { xs: 2, sm: 3, md: 4 }, minHeight: { xs: 56, md: 64 }, gap: 1 }}>
+        <Toolbar disableGutters sx={{ width: "100%", maxWidth: 1280, mx: "auto", px: { xs: 2, sm: 3, md: 4 }, minHeight: { xs: 60, md: 68 }, gap: 1 }}>
 
           {/* Hamburger — mobile only */}
           <IconButton
@@ -160,7 +171,8 @@ function Header() {
               sx={{
                 display: { xs: "none", sm: "block" },
                 fontWeight: 700, fontSize: { sm: "1rem", md: "1.1rem" },
-                background: "linear-gradient(135deg, #C9A84C, #F4A7B9)",
+                fontFamily: HEAD_FONT, letterSpacing: "-0.02em",
+                background: "linear-gradient(135deg, #ff7a50, #d24e33)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
@@ -218,8 +230,8 @@ function Header() {
                 startIcon={<FiLogOut size={15} />}
                 sx={{
                   ...iconBtnSx, display: { xs: "none", lg: "inline-flex" },
-                  gap: 0.75, px: 1.5, py: 1, fontSize: "0.875rem",
-                  textTransform: "none", fontWeight: 500,
+                  gap: 0.75, px: 1.75, py: 1, fontSize: "0.875rem",
+                  textTransform: "none", fontWeight: 600,
                 }}
               >
                 Logout
@@ -228,20 +240,20 @@ function Header() {
               <Box sx={{ display: { xs: "none", lg: "flex" }, gap: 1 }}>
                 <Button onClick={() => navigate("/login")}
                   sx={{
-                    color: "#e2e8f0", border: "1.5px solid rgba(255,255,255,0.2)",
-                    borderRadius: "8px", textTransform: "none", fontWeight: 500,
-                    fontSize: "0.875rem", px: 2,
-                    "&:hover": { background: "rgba(255,255,255,0.1)", borderColor: "rgba(255,255,255,0.35)", color: "#fff" },
+                    color: TEXT, border: `1px solid ${BORDER_STRONG}`, background: "#fffdf9",
+                    borderRadius: "10px", textTransform: "none", fontWeight: 600,
+                    fontSize: "0.875rem", px: 2.25,
+                    "&:hover": { borderColor: "#e8623d", color: ACCENT, background: "#fffdf9" },
                   }}>
                   Login
                 </Button>
                 <Button onClick={() => navigate("/register")}
                   sx={{
-                    background: "linear-gradient(135deg, #8B1A4A, #6b1238)",
-                    color: "#fff", borderRadius: "8px", textTransform: "none",
-                    fontWeight: 600, fontSize: "0.875rem", px: 2, border: "none",
-                    boxShadow: "0 4px 12px rgba(139,26,74,0.3)",
-                    "&:hover": { background: "linear-gradient(135deg, #6b1238, #4c0d28)", boxShadow: "0 6px 16px rgba(139,26,74,0.42)" },
+                    background: EMBER_GRAD,
+                    color: "#fff", borderRadius: "10px", textTransform: "none",
+                    fontWeight: 600, fontSize: "0.875rem", px: 2.25, border: "none",
+                    boxShadow: "0 8px 22px rgba(232,98,61,0.32)",
+                    "&:hover": { background: EMBER_GRAD, boxShadow: "0 12px 28px rgba(232,98,61,0.45)", transform: "translateY(-1px)" },
                   }}>
                   Sign Up
                 </Button>
@@ -259,24 +271,24 @@ function Header() {
         PaperProps={{
           sx: {
             width: { xs: "100%", sm: 300 },
-            background: "linear-gradient(to bottom, #3D1A2A 0%, #5C2038 100%)",
-            color: "white",
+            background: "#f7f4ee",
+            color: TEXT,
           },
         }}
       >
         {/* Drawer header */}
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 2, py: 1.5, borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 2, py: 1.5, borderBottom: `1px solid ${BORDER}` }}>
           <Box component="button" onClick={() => { handleBrandClick(); setDrawerOpen(false); }}
             sx={{ display: "flex", alignItems: "center", gap: 1, background: "none", border: "none", cursor: "pointer", p: 0 }}>
             <img src="/ICS_Logo.jpeg" alt="Infinity Craft Space"
               style={{ height: 36, width: "auto", objectFit: "contain", borderRadius: 8 }} />
             <Box component="span"
-              sx={{ fontWeight: 700, fontSize: "1rem", background: "linear-gradient(135deg, #C9A84C, #F4A7B9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+              sx={{ fontWeight: 700, fontSize: "1rem", fontFamily: HEAD_FONT, letterSpacing: "-0.02em", background: "linear-gradient(135deg, #ff7a50, #d24e33)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
               InfinityCraftSpace
             </Box>
           </Box>
           <IconButton onClick={() => setDrawerOpen(false)} aria-label="Close menu"
-            sx={{ color: "white", "&:hover": { background: "rgba(255,255,255,0.1)" } }}>
+            sx={{ color: TEXT, "&:hover": { background: ACCENT_BG } }}>
             <FiX size={22} />
           </IconButton>
         </Box>
@@ -288,13 +300,13 @@ function Header() {
               onClick={() => { navigate(path); setDrawerOpen(false); }}
               sx={{
                 display: "flex", alignItems: "center", gap: 1.5,
-                background: isActive(path) ? "rgba(201,168,76,0.18)" : "transparent",
-                color: isActive(path) ? ACCENT : "#e2e8f0",
+                background: isActive(path) ? ACCENT_BG : "transparent",
+                color: isActive(path) ? ACCENT : TEXT_2,
                 border: "none", borderRadius: "8px", px: 2, py: 1.5,
                 cursor: "pointer", fontWeight: isActive(path) ? 600 : 500,
                 fontSize: "1rem", width: "100%", textAlign: "left",
                 transition: "all 0.15s ease",
-                "&:hover": { background: "rgba(255,255,255,0.08)", color: "white" },
+                "&:hover": { background: ACCENT_BG, color: ACCENT },
               }}
             >
               <Icon size={19} />
@@ -303,7 +315,7 @@ function Header() {
           ))}
         </Box>
 
-        <Divider sx={{ borderColor: "rgba(255,255,255,0.12)", mx: 2 }} />
+        <Divider sx={{ borderColor: BORDER, mx: 2 }} />
 
         {/* Drawer auth */}
         <Box sx={{ p: 2, mt: "auto", display: "flex", flexDirection: "column", gap: 1 }}>
@@ -312,10 +324,10 @@ function Header() {
               onClick={() => { handleLogout(); setDrawerOpen(false); }}
               sx={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 1,
-                border: "1.5px solid rgba(255,255,255,0.2)", borderRadius: "8px",
-                background: "transparent", color: "#e2e8f0", px: 2, py: 1.5,
+                border: `1px solid ${BORDER_STRONG}`, borderRadius: "10px",
+                background: "#fffdf9", color: TEXT, px: 2, py: 1.5,
                 cursor: "pointer", fontWeight: 500, fontSize: "1rem", width: "100%",
-                "&:hover": { background: "rgba(255,255,255,0.1)", color: "white" },
+                "&:hover": { borderColor: "#e8623d", color: ACCENT },
                 transition: "all 0.15s ease",
               }}
             >
@@ -324,11 +336,11 @@ function Header() {
           ) : (
             <>
               <Box component="button" onClick={() => { navigate("/login"); setDrawerOpen(false); }}
-                sx={{ border: "1.5px solid rgba(255,255,255,0.2)", borderRadius: "8px", background: "transparent", color: "#e2e8f0", px: 2, py: 1.5, cursor: "pointer", fontWeight: 500, fontSize: "1rem", width: "100%", transition: "all 0.15s ease", "&:hover": { background: "rgba(255,255,255,0.1)", color: "white" } }}>
+                sx={{ border: `1px solid ${BORDER_STRONG}`, borderRadius: "10px", background: "#fffdf9", color: TEXT, px: 2, py: 1.5, cursor: "pointer", fontWeight: 600, fontSize: "1rem", width: "100%", transition: "all 0.15s ease", "&:hover": { borderColor: "#e8623d", color: ACCENT } }}>
                 Login
               </Box>
               <Box component="button" onClick={() => { navigate("/register"); setDrawerOpen(false); }}
-                sx={{ background: "linear-gradient(135deg, #8B1A4A, #6b1238)", borderRadius: "8px", border: "none", color: "white", px: 2, py: 1.5, cursor: "pointer", fontWeight: 600, fontSize: "1rem", width: "100%", boxShadow: "0 4px 12px rgba(139,26,74,0.3)", transition: "all 0.15s ease", "&:hover": { background: "linear-gradient(135deg, #6b1238, #4c0d28)" } }}>
+                sx={{ background: EMBER_GRAD, borderRadius: "10px", border: "none", color: "white", px: 2, py: 1.5, cursor: "pointer", fontWeight: 600, fontSize: "1rem", width: "100%", boxShadow: "0 8px 22px rgba(232,98,61,0.32)", transition: "all 0.15s ease", "&:hover": { boxShadow: "0 12px 28px rgba(232,98,61,0.45)" } }}>
                 Sign Up
               </Box>
             </>

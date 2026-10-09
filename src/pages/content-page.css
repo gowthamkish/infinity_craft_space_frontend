@@ -37,7 +37,7 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--primary);
-  background: rgba(139, 26, 74, 0.08);
+  background: rgba(210, 78, 51, 0.08);
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
   margin-bottom: 0.75rem;
@@ -144,6 +144,6 @@
 [class*="highlight"],
 [class*="callout"],
 [class*="tip"] {
-  background: var(--primary-subtle, rgba(139, 26, 74, 0.06)) !important;
-  border-left-color: var(--primary, #8B1A4A) !important;
+  background: var(--primary-subtle, rgba(210, 78, 51, 0.06)) !important;
+  border-left-color: var(--primary, #d24e33) !important;
 }

@@ -24,7 +24,7 @@ function BrandPanel({ title, subtitle, perks }) {
       sx={{
         display: { xs: "none", lg: "flex" },
         flex: "0 0 420px",
-        background: "linear-gradient(135deg, #3D1A2A 0%, #5C2038 45%, #6b1238 100%)",
+        background: "linear-gradient(135deg, #151a21 0%, #1b2029 45%, #b8412a 100%)",
         alignItems: "center",
         justifyContent: "center",
         p: "3rem 2.5rem",
@@ -50,7 +50,7 @@ function BrandPanel({ title, subtitle, perks }) {
           variant="h5"
           sx={{
             fontWeight: 800, mb: 0.75,
-            background: "linear-gradient(135deg, #fff 0%, #F4A7B9 100%)",
+            background: "linear-gradient(135deg, #fff 0%, #ff9d7a 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
@@ -105,7 +105,7 @@ function StepBar({ current }) {
                   background: done
                     ? "linear-gradient(135deg,#10b981,#059669)"
                     : active
-                    ? "linear-gradient(135deg,#8B1A4A,#6b1238)"
+                    ? "linear-gradient(135deg,#d24e33,#b8412a)"
                     : "#e5e7eb",
                   color: done || active ? "white" : "#9ca3af",
                   transition: "all 0.25s",
@@ -117,7 +117,7 @@ function StepBar({ current }) {
                 variant="caption"
                 sx={{
                   fontWeight: 600,
-                  color: done ? "#059669" : active ? "#6b1238" : "#9ca3af",
+                  color: done ? "#059669" : active ? "#b8412a" : "#9ca3af",
                   fontSize: "0.72rem",
                 }}
               >
@@ -303,7 +303,7 @@ export default function ResetPassword() {
             <Typography variant="h5" sx={{ fontWeight: 800, mb: 0.5 }}>
               Create New Password
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
+            <Typography variant="body2" sx={{ color: "text.secondary", mb: 2.5 }}>
               Choose a strong password. Signing in from other devices will be required.
             </Typography>
 

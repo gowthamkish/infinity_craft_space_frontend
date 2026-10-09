@@ -15,7 +15,7 @@
   width: 120px;
   height: 120px;
   margin-bottom: var(--spacing-xl);
-  color: var(--charcoal-300, #D9C4A8);
+  color: var(--charcoal-300, #d3ccc0);
   font-size: 4rem;
   line-height: 1;
 }
@@ -72,7 +72,7 @@
 }
 
 .breadcrumb-item a:hover {
-  color: var(--rose-700, #a51e50);
+  color: var(--rose-700, #de5637);
   text-decoration: underline;
 }
 
@@ -137,8 +137,8 @@
 
 /* Badge Styles */
 .badge-primary {
-  background: var(--rose-100, #fce7ef);
-  color: var(--rose-700, #a51e50);
+  background: var(--rose-100, #ffe6dc);
+  color: var(--rose-700, #de5637);
   border-radius: var(--radius-full);
   padding: var(--spacing-xs) var(--spacing-sm);
   font-size: var(--font-size-xs);
@@ -226,12 +226,12 @@
 }
 
 .star {
-  color: var(--gold-500, #C9A84C);
+  color: var(--gold-500, #0f9488);
   font-size: 0.875rem;
 }
 
 .star.empty {
-  color: var(--charcoal-300, #D9C4A8);
+  color: var(--charcoal-300, #d3ccc0);
 }
 
 .rating-count {
@@ -276,7 +276,7 @@
   display: inline-block;
   width: 1rem;
   height: 1rem;
-  border: 2px solid var(--rose-200, #fad0e1);
+  border: 2px solid var(--rose-200, #ffcdb9);
   border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;

@@ -87,10 +87,10 @@ export default function ChatWidget() {
               background: `linear-gradient(135deg, ${PRIMARY}, ${PRIMARY_DARK})`,
               color: "white",
               width: 56, height: 56,
-              boxShadow: "0 4px 20px rgba(139,26,74,0.4)",
+              boxShadow: "0 4px 20px rgba(210, 78, 51,0.4)",
               "&:hover": {
                 background: `linear-gradient(135deg, ${PRIMARY_DARK}, #4a0d25)`,
-                boxShadow: "0 6px 24px rgba(139,26,74,0.5)",
+                boxShadow: "0 6px 24px rgba(210, 78, 51,0.5)",
                 transform: "scale(1.06)",
               },
               transition: "all 200ms cubic-bezier(0.4,0,0.2,1)",
@@ -120,7 +120,7 @@ export default function ChatWidget() {
             borderRadius: isMobile ? 0 : "20px",
             overflow: "hidden",
             // single clean border — no border on mobile (edge-to-edge)
-            border: isMobile ? "none" : `1px solid rgba(139,26,74,0.15)`,
+            border: isMobile ? "none" : `1px solid rgba(210, 78, 51,0.15)`,
           }}
         >
           {/* ── Header ─────────────────────────────────────────── */}
@@ -170,7 +170,7 @@ export default function ChatWidget() {
             overflowY: "auto",
             px: { xs: 1.5, sm: 1.5 },
             py: 1.5,
-            bgcolor: "#FDF6EC",
+            bgcolor: "#f7f4ee",
             display: "flex",
             flexDirection: "column",
             "&::-webkit-scrollbar": { width: 4 },
@@ -209,7 +209,7 @@ export default function ChatWidget() {
               transition: "border-color 150ms",
               "&:focus-within": {
                 borderColor: PRIMARY,
-                boxShadow: `0 0 0 3px rgba(139,26,74,0.1)`,
+                boxShadow: `0 0 0 3px rgba(210, 78, 51,0.1)`,
               },
             }}>
               <InputBase

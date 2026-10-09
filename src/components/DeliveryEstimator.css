@@ -4,7 +4,7 @@
 
 .de-root {
   font-size: 0.9rem;
-  color: var(--text-primary, #2C2C2C);
+  color: var(--text-primary, #232420);
 }
 
 /* ── Custom / Handcrafted banner ─────────────────────────────── */
@@ -12,12 +12,12 @@
   display: flex;
   gap: 0.6rem;
   align-items: flex-start;
-  background: linear-gradient(135deg, var(--gold-100, #faf2cc) 0%, var(--gold-200, #f4e28b) 100%);
-  border: 1px solid var(--gold-300, #edcc59);
+  background: linear-gradient(135deg, var(--gold-100, #d5f3ee) 0%, var(--gold-200, #a9e6dd) 100%);
+  border: 1px solid var(--gold-300, #6fd3c5);
   border-radius: 10px;
   padding: 0.7rem 0.9rem;
   margin-bottom: 0.85rem;
-  color: var(--gold-800, #745422);
+  color: var(--gold-800, #094d47);
 }
 
 .de-custom-icon {
@@ -38,7 +38,7 @@
   font-size: 0.82rem;
   margin: 0;
   line-height: 1.5;
-  color: var(--gold-800, #745422);
+  color: var(--gold-800, #094d47);
 }
 
 /* ── Label ───────────────────────────────────────────────────── */
@@ -48,7 +48,7 @@
   gap: 0.3rem;
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--text-secondary, #7A5E42);
+  color: var(--text-secondary, #5b5d58);
   margin-bottom: 0.4rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -70,14 +70,14 @@
 .de-input {
   width: 100%;
   padding: 0.6rem 2rem 0.6rem 0.85rem;
-  border: 1.5px solid var(--border-color, #EAD9C5);
+  border: 1.5px solid var(--border-color, #e4dfd6);
   border-right: none;
   border-radius: 8px 0 0 8px;
   font-size: 0.92rem;
   font-family: "JetBrains Mono", "Courier New", monospace;
   letter-spacing: 0.06em;
   background: var(--bg-primary, #FFFDF9);
-  color: var(--text-primary, #2C2C2C);
+  color: var(--text-primary, #232420);
   transition: border-color 0.15s;
   outline: none;
   -moz-appearance: textfield;
@@ -87,7 +87,7 @@
 .de-input::-webkit-outer-spin-button { display: none; }
 
 .de-input:focus {
-  border-color: var(--primary, #8B1A4A);
+  border-color: var(--primary, #d24e33);
 }
 
 .de-input--error {
@@ -103,13 +103,13 @@
   border: none;
   cursor: pointer;
   padding: 0.2rem;
-  color: var(--text-muted, #A08060);
+  color: var(--text-muted, #8a8c85);
   display: flex;
   align-items: center;
   border-radius: 50%;
 }
 
-.de-clear-btn:hover { color: var(--text-primary, #2C2C2C); }
+.de-clear-btn:hover { color: var(--text-primary, #232420); }
 
 /* ── Check button ────────────────────────────────────────────── */
 .de-check-btn {
@@ -117,7 +117,7 @@
   align-items: center;
   gap: 0.25rem;
   padding: 0 1.1rem;
-  background: var(--btn-brand-grad, linear-gradient(135deg, var(--primary, #8B1A4A), var(--primary-dark, #6b1238)));
+  background: var(--btn-brand-grad, linear-gradient(135deg, var(--primary, #d24e33), var(--primary-dark, #b8412a)));
   color: #fff;
   border: none;
   border-radius: 0 8px 8px 0;
@@ -304,8 +304,8 @@
 .de-result-custom-note {
   margin: 0.4rem 0 0;
   font-size: 0.8rem;
-  color: var(--gold-700, #8e6a24);
-  background: var(--gold-100, #faf2cc);
+  color: var(--gold-700, #0a6159);
+  background: var(--gold-100, #d5f3ee);
   border-radius: 6px;
   padding: 0.3rem 0.5rem;
 }
@@ -313,12 +313,12 @@
 /* ── Dark mode ───────────────────────────────────────────────── */
 @media (prefers-color-scheme: dark) {
   .de-input {
-    background: var(--charcoal-800, #3D2C20);
-    color: var(--charcoal-50, #FDF6EC);
-    border-color: var(--charcoal-700, #5C4330);
+    background: var(--charcoal-800, #2f302b);
+    color: var(--charcoal-50, #f7f4ee);
+    border-color: var(--charcoal-700, #46473f);
   }
 
-  .de-input:focus { border-color: var(--primary, #8B1A4A); }
+  .de-input:focus { border-color: var(--primary, #d24e33); }
 
   .de-result {
     background: linear-gradient(135deg, rgba(46,125,50,0.18) 0%, rgba(46,125,50,0.12) 100%);
@@ -340,11 +340,11 @@
   .de-custom-banner {
     background: linear-gradient(135deg, rgba(201,168,76,0.2) 0%, rgba(201,168,76,0.12) 100%);
     border-color: rgba(201, 168, 76, 0.4);
-    color: var(--gold-200, #f4e28b);
+    color: var(--gold-200, #a9e6dd);
   }
 
-  .de-custom-banner strong { color: var(--gold-200, #f4e28b); }
-  .de-custom-sub { color: var(--gold-300, #edcc59); }
+  .de-custom-banner strong { color: var(--gold-200, #a9e6dd); }
+  .de-custom-sub { color: var(--gold-300, #6fd3c5); }
 }
 
 /* ── Mobile ──────────────────────────────────────────────────── */

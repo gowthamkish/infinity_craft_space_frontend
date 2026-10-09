@@ -29,7 +29,7 @@ const OrdersTable = ({
         <TableHead>
           <TableRow sx={{ background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)" }}>
             {[
-              { icon: <FiShoppingBag style={{ color: "#8B1A4A" }} />, label: "Order" },
+              { icon: <FiShoppingBag style={{ color: "#d24e33" }} />, label: "Order" },
               { icon: <FiUser style={{ color: "#10b981" }} />, label: "Customer" },
               { icon: <FiCalendar style={{ color: "#f59e0b" }} />, label: "Date" },
               { icon: <FiDollarSign style={{ color: "#059669" }} />, label: "Amount" },
@@ -50,34 +50,34 @@ const OrdersTable = ({
             <TableRow key={order._id || order.id}
               sx={{ "&:hover": { backgroundColor: "#faf5ff" }, transition: "background 150ms" }}>
               <TableCell>
-                <Typography variant="body2" fontWeight={600} color="text.primary">
+                <Typography variant="body2" sx={{ fontWeight: 600, color: "text.primary" }}>
                   #{order.orderNumber || order._id?.slice(-6)}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>
                   {order.items?.length || 0} items
                 </Typography>
               </TableCell>
               <TableCell>
-                <Typography variant="body2" fontWeight={500} color="text.primary">
+                <Typography variant="body2" sx={{ fontWeight: 500, color: "text.primary" }}>
                   {order.userId?.username || order.customerName || "Unknown"}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>
                   {order.user?.email || order.customerEmail}
                 </Typography>
               </TableCell>
               <TableCell>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
                   {formatDate(order.createdAt || order.orderDate)}
                 </Typography>
               </TableCell>
               <TableCell>
-                <Typography variant="body2" fontWeight={700} sx={{ color: "#059669", fontSize: "1rem" }}>
+                <Typography variant="body2" sx={{ fontWeight: 700, color: "#059669", fontSize: "1rem" }}>
                   {formatCurrency(order.totalAmount || order.total)}
                 </Typography>
               </TableCell>
               <TableCell>{getStatusBadge(order.status)}</TableCell>
               <TableCell align="center">
-                <Stack direction="row" spacing={0.75} justifyContent="center">
+                <Stack direction="row" spacing={0.75} sx={{ justifyContent: "center" }}>
                   <button className="adm-btn adm-btn-secondary adm-btn-sm"
                     onClick={() => handleViewDetails(order)}>
                     <FiEye size={12} style={{ marginRight: 4 }} /> View

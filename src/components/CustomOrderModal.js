@@ -3,7 +3,7 @@ import {
   Box, Typography, Button, Stack, Alert,
 } from "@mui/material";
 
-const P = "#8B1A4A";
+const P = "#d24e33";
 
 export default function CustomOrderModal({ customItems, onConfirm, onCancel }) {
   const confirmRef = useRef(null);
@@ -40,7 +40,7 @@ export default function CustomOrderModal({ customItems, onConfirm, onCancel }) {
         {/* Icon */}
         <Box sx={{
           width: 64, height: 64, borderRadius: "50%", mx: "auto", mb: 2,
-          bgcolor: "rgba(139,26,74,0.08)",
+          bgcolor: "rgba(210, 78, 51,0.08)",
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: "1.75rem",
         }}>
@@ -71,7 +71,7 @@ export default function CustomOrderModal({ customItems, onConfirm, onCancel }) {
               sx={{
                 display: "flex", alignItems: "center", gap: 1.25,
                 px: 1.5, py: 1, borderRadius: "10px",
-                bgcolor: "#fdf6ec", mb: 0.75,
+                bgcolor: "#f7f4ee", mb: 0.75,
                 border: "1px solid #f5e1cc",
               }}
             >
@@ -101,7 +101,7 @@ export default function CustomOrderModal({ customItems, onConfirm, onCancel }) {
         </Alert>
 
         {/* Actions */}
-        <Stack direction={{ xs: "column", sm: "row" }} gap={1.25}>
+        <Stack direction={{ xs: "column", sm: "row" }} sx={{ gap: 1.25 }}>
           <Button
             fullWidth variant="outlined"
             onClick={onCancel}
@@ -119,7 +119,7 @@ export default function CustomOrderModal({ customItems, onConfirm, onCancel }) {
             onClick={onConfirm}
             sx={{
               textTransform: "none", fontWeight: 700, borderRadius: "10px", py: 1,
-              bgcolor: P, "&:hover": { bgcolor: "#6b1238" },
+              bgcolor: P, "&:hover": { bgcolor: "#b8412a" },
               boxShadow: "none",
             }}
           >

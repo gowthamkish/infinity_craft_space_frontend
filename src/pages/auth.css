@@ -14,7 +14,7 @@
 .auth-brand-panel {
   display: none; /* hidden on mobile — shown ≥ lg */
   flex: 0 0 420px;
-  background: linear-gradient(160deg, var(--charcoal-800, #3D2C20) 0%, var(--primary, #8B1A4A) 60%, var(--gold-500, #C9A84C) 100%);
+  background: linear-gradient(160deg, var(--charcoal-800, #2f302b) 0%, var(--primary, #d24e33) 60%, var(--gold-500, #0f9488) 100%);
   padding: 3rem 2.5rem;
   position: relative;
   overflow: hidden;
@@ -197,7 +197,7 @@
 
 .auth-input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(139,26,74,0.12);
+  box-shadow: 0 0 0 3px rgba(210, 78, 51,0.12);
 }
 
 .auth-input--error {
@@ -259,20 +259,20 @@
   outline: none;
 }
 .auth-btn:focus-visible {
-  outline: 2px solid var(--btn-brand, #8B1A4A);
+  outline: 2px solid var(--btn-brand, #d24e33);
   outline-offset: 2px;
 }
 .auth-btn:active { transform: scale(0.98); }
 .auth-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
 .auth-btn--primary {
-  background: var(--btn-brand-grad, linear-gradient(135deg, #8B1A4A, #6b1238));
+  background: var(--btn-brand-grad, linear-gradient(135deg, #d24e33, #b8412a));
   color: white;
   box-shadow: 0 2px 8px var(--btn-brand-glow, rgba(124,58,237,0.28));
   margin-bottom: 0.875rem;
 }
 .auth-btn--primary:hover:not(:disabled) {
-  background: var(--btn-brand-grad-h, linear-gradient(135deg, #6b1238, #4a0d25));
+  background: var(--btn-brand-grad-h, linear-gradient(135deg, #b8412a, #4a0d25));
   box-shadow: 0 4px 16px var(--btn-brand-glow, rgba(124,58,237,0.4));
   transform: translateY(-1px);
 }
@@ -295,8 +295,8 @@
   border: 1.5px solid var(--border-color);
 }
 .auth-btn--outline:hover:not(:disabled) {
-  border-color: var(--btn-brand, #8B1A4A);
-  color: var(--btn-brand, #8B1A4A);
+  border-color: var(--btn-brand, #d24e33);
+  color: var(--btn-brand, #d24e33);
   background: var(--btn-brand-subtle, rgba(124,58,237,0.06));
 }
 
@@ -370,12 +370,12 @@
   font-weight: 500;
 }
 .pw-strength--weak   .pw-strength-fill { width: 25%; background: var(--error, #c62828); }
-.pw-strength--fair   .pw-strength-fill { width: 50%; background: var(--gold-500, #C9A84C); }
-.pw-strength--good   .pw-strength-fill { width: 75%; background: #C9A84C; }
+.pw-strength--fair   .pw-strength-fill { width: 50%; background: var(--gold-500, #0f9488); }
+.pw-strength--good   .pw-strength-fill { width: 75%; background: #0f9488; }
 .pw-strength--strong .pw-strength-fill { width: 100%; background: var(--success, #2e7d32); }
 .pw-strength--weak   .pw-strength-label { color: var(--error, #c62828); }
-.pw-strength--fair   .pw-strength-label { color: var(--gold-500, #C9A84C); }
-.pw-strength--good   .pw-strength-label { color: #C9A84C; }
+.pw-strength--fair   .pw-strength-label { color: var(--gold-500, #0f9488); }
+.pw-strength--good   .pw-strength-label { color: #0f9488; }
 .pw-strength--strong .pw-strength-label { color: var(--success, #2e7d32); }
 
 /* ── Password requirements checklist ───────────────────────── */

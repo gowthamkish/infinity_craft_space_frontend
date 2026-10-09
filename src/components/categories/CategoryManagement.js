@@ -231,17 +231,17 @@ const CategoryManagement = () => {
           <span>Category Management</span>
         </Breadcrumbs>
 
-        <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ xs: "flex-start", sm: "center" }} spacing={2} sx={{ mb: 4 }}>
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ justifyContent: "space-between", alignItems: { xs: "flex-start", sm: "center" }, mb: 4 }}>
           <Box>
-            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 0.5 }}>
-              <Box sx={{ width: 36, height: 36, borderRadius: 2, bgcolor: "rgba(139,26,74,0.08)", display: "flex", alignItems: "center", justifyContent: "center", color: "#8B1A4A" }}>
+            <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 0.5 }}>
+              <Box sx={{ width: 36, height: 36, borderRadius: 2, bgcolor: "rgba(210, 78, 51,0.08)", display: "flex", alignItems: "center", justifyContent: "center", color: "#d24e33" }}>
                 <FiLayers size={18} />
               </Box>
               <Typography variant="h4" sx={{ fontWeight: 800, color: "#1c1917", letterSpacing: "-0.02em" }}>
                 Category Management
               </Typography>
             </Stack>
-            <Typography variant="body2" color="text.secondary" sx={{ ml: 0.5 }}>
+            <Typography variant="body2" sx={{ color: "text.secondary", ml: 0.5 }}>
               Manage product categories and subcategories
             </Typography>
           </Box>
@@ -251,8 +251,8 @@ const CategoryManagement = () => {
             onClick={handleAddCategory}
             sx={{
               borderRadius: 2, textTransform: "none", fontWeight: 700, px: 2.5, py: 1.125,
-              background: "linear-gradient(135deg, #8B1A4A 0%, #7a1640 100%)",
-              boxShadow: "0 4px 12px rgba(139,26,74,0.28)",
+              background: "linear-gradient(135deg, #d24e33 0%, #7a1640 100%)",
+              boxShadow: "0 4px 12px rgba(210, 78, 51,0.28)",
               whiteSpace: "nowrap", flexShrink: 0,
               "&:hover": { background: "linear-gradient(135deg, #7a1640 0%, #5e1232 100%)" },
             }}
@@ -285,10 +285,10 @@ const CategoryManagement = () => {
           ) : categories.length === 0 ? (
             <Box sx={{ textAlign: "center", py: 6 }}>
               <FiLayers size={48} style={{ color: "#6c757d", marginBottom: 12 }} />
-              <Typography variant="h6" color="text.secondary" fontWeight={600}>No categories found</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>Start by adding your first category</Typography>
+              <Typography variant="h6" sx={{ color: "text.secondary", fontWeight: 600 }}>No categories found</Typography>
+              <Typography variant="body2" sx={{ color: "text.secondary", mb: 2 }}>Start by adding your first category</Typography>
               <Button variant="contained" startIcon={<FiPlus size={15} />} onClick={handleAddCategory}
-                sx={{ borderRadius: 2, textTransform: "none", fontWeight: 700, background: "linear-gradient(135deg, #8B1A4A 0%, #7a1640 100%)" }}>
+                sx={{ borderRadius: 2, textTransform: "none", fontWeight: 700, background: "linear-gradient(135deg, #d24e33 0%, #7a1640 100%)" }}>
                 Add Category
               </Button>
             </Box>
@@ -310,7 +310,7 @@ const CategoryManagement = () => {
                       <TableRow style={{ borderLeft: "4px solid var(--primary-color)" }}>
                         <TableCell style={{ padding: "1rem", verticalAlign: "middle" }}>
                           <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <div style={{ width: 40, height: 40, borderRadius: 8, background: "linear-gradient(135deg, #8B1A4A 0%, #7a1640 100%)", display: "flex", alignItems: "center", justifyContent: "center", marginRight: 12 }}>
+                            <div style={{ width: 40, height: 40, borderRadius: 8, background: "linear-gradient(135deg, #d24e33 0%, #7a1640 100%)", display: "flex", alignItems: "center", justifyContent: "center", marginRight: 12 }}>
                               <FiTag size={18} style={{ color: "white" }} />
                             </div>
                             <div>
@@ -332,7 +332,7 @@ const CategoryManagement = () => {
                             <Tooltip title="Add subcategory" arrow>
                               <IconButton size="small" onClick={() => handleAddSubcategory(category)}
                                 sx={{ width: 26, height: 26, border: "1.5px dashed #e2e8f0", color: "#94a3b8", borderRadius: "6px",
-                                  "&:hover": { borderColor: "#8B1A4A", color: "#8B1A4A", bgcolor: "rgba(139,26,74,0.06)" } }}>
+                                  "&:hover": { borderColor: "#d24e33", color: "#d24e33", bgcolor: "rgba(210, 78, 51,0.06)" } }}>
                                 <FiPlus size={13} />
                               </IconButton>
                             </Tooltip>
@@ -344,10 +344,10 @@ const CategoryManagement = () => {
                             sx={{ fontWeight: 600, fontSize: "0.72rem" }} />
                         </TableCell>
                         <TableCell style={{ padding: "1rem", textAlign: "center", verticalAlign: "middle" }}>
-                          <Stack direction="row" justifyContent="center" spacing={0.5}>
+                          <Stack direction="row" sx={{ justifyContent: "center" }} spacing={0.5}>
                             <Tooltip title="Edit category" arrow>
                               <IconButton size="small" onClick={() => handleEditCategory(category)}
-                                sx={{ color: "#57534e", "&:hover": { bgcolor: "rgba(139,26,74,0.08)", color: "#8B1A4A" } }}>
+                                sx={{ color: "#57534e", "&:hover": { bgcolor: "rgba(210, 78, 51,0.08)", color: "#d24e33" } }}>
                                 <FiEdit2 size={15} />
                               </IconButton>
                             </Tooltip>
@@ -383,10 +383,10 @@ const CategoryManagement = () => {
                             <Chip label="Inactive Subcategory" size="small" />
                           </TableCell>
                           <TableCell style={{ padding: "0.8rem", textAlign: "center", verticalAlign: "middle" }}>
-                            <Stack direction="row" justifyContent="center" spacing={0.5}>
+                            <Stack direction="row" sx={{ justifyContent: "center" }} spacing={0.5}>
                               <Tooltip title="Edit subcategory" arrow>
                                 <IconButton size="small" onClick={() => handleEditSubcategory(category, subcategory)}
-                                  sx={{ color: "#57534e", "&:hover": { bgcolor: "rgba(139,26,74,0.08)", color: "#8B1A4A" } }}>
+                                  sx={{ color: "#57534e", "&:hover": { bgcolor: "rgba(210, 78, 51,0.08)", color: "#d24e33" } }}>
                                   <FiEdit2 size={14} />
                                 </IconButton>
                               </Tooltip>
@@ -420,20 +420,20 @@ const CategoryManagement = () => {
         <form onSubmit={handleCategorySubmit}>
           {/* Header */}
           <Box sx={{ px: 3, pt: 3, pb: 2 }}>
-            <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
-              <Stack direction="row" alignItems="center" spacing={1.5}>
+            <Stack direction="row" sx={{ alignItems: "flex-start", justifyContent: "space-between" }}>
+              <Stack direction="row" sx={{ alignItems: "center" }} spacing={1.5}>
                 <Box sx={{
                   width: 40, height: 40, borderRadius: 2,
-                  bgcolor: "rgba(139,26,74,0.08)",
-                  display: "flex", alignItems: "center", justifyContent: "center", color: "#8B1A4A", flexShrink: 0,
+                  bgcolor: "rgba(210, 78, 51,0.08)",
+                  display: "flex", alignItems: "center", justifyContent: "center", color: "#d24e33", flexShrink: 0,
                 }}>
                   <FiTag size={18} />
                 </Box>
                 <Box>
-                  <Typography variant="h6" fontWeight={700} color="#1c1917" lineHeight={1.2}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: "#1c1917", lineHeight: 1.2 }}>
                     {editingCategory ? "Edit Category" : "Add New Category"}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" sx={{ color: "text.secondary" }}>
                     {editingCategory ? "Update category details below" : "Fill in the details to create a new category"}
                   </Typography>
                 </Box>
@@ -486,13 +486,13 @@ const CategoryManagement = () => {
             <Button type="submit" variant="contained" disabled={creating || updating || !categoryForm.name.trim()}
               sx={{
                 borderRadius: 2, textTransform: "none", fontWeight: 700,
-                background: "linear-gradient(135deg, #8B1A4A 0%, #7a1640 100%)",
-                boxShadow: "0 4px 12px rgba(139,26,74,0.28)",
+                background: "linear-gradient(135deg, #d24e33 0%, #7a1640 100%)",
+                boxShadow: "0 4px 12px rgba(210, 78, 51,0.28)",
                 "&:hover": { background: "linear-gradient(135deg, #7a1640 0%, #5e1232 100%)" },
                 minWidth: 140,
               }}>
               {creating || updating ? (
-                <Stack direction="row" alignItems="center" spacing={1}>
+                <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
                   <DotsLoader size="sm" />
                   <span>{editingCategory ? "Updating…" : "Creating…"}</span>
                 </Stack>
@@ -512,18 +512,18 @@ const CategoryManagement = () => {
       >
         <form onSubmit={handleSubcategorySubmit}>
           <Box sx={{ px: 3, pt: 3, pb: 2 }}>
-            <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
-              <Stack direction="row" alignItems="center" spacing={1.5}>
+            <Stack direction="row" sx={{ alignItems: "flex-start", justifyContent: "space-between" }}>
+              <Stack direction="row" sx={{ alignItems: "center" }} spacing={1.5}>
                 <Box sx={{
                   width: 40, height: 40, borderRadius: 2,
-                  bgcolor: "rgba(139,26,74,0.08)",
-                  display: "flex", alignItems: "center", justifyContent: "center", color: "#8B1A4A", flexShrink: 0,
+                  bgcolor: "rgba(210, 78, 51,0.08)",
+                  display: "flex", alignItems: "center", justifyContent: "center", color: "#d24e33", flexShrink: 0,
                 }}>
                   <FiLayers size={18} />
                 </Box>
                 <Box>
-                  <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
-                    <Typography variant="h6" fontWeight={700} color="#1c1917" lineHeight={1.2}>
+                  <Stack direction="row" sx={{ alignItems: "center", flexWrap: "wrap" }} spacing={1}>
+                    <Typography variant="h6" sx={{ fontWeight: 700, color: "#1c1917", lineHeight: 1.2 }}>
                       {editingSubcategory ? "Edit Subcategory" : "Add Subcategory"}
                     </Typography>
                     {selectedCategory && (
@@ -531,7 +531,7 @@ const CategoryManagement = () => {
                         sx={{ height: 20, fontSize: "0.7rem", fontWeight: 700 }} />
                     )}
                   </Stack>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" sx={{ color: "text.secondary" }}>
                     {editingSubcategory ? "Update subcategory details below" : `Adding to "${selectedCategory?.name}"`}
                   </Typography>
                 </Box>
@@ -584,13 +584,13 @@ const CategoryManagement = () => {
             <Button type="submit" variant="contained" disabled={creating || updating || !subcategoryForm.name.trim()}
               sx={{
                 borderRadius: 2, textTransform: "none", fontWeight: 700,
-                background: "linear-gradient(135deg, #8B1A4A 0%, #7a1640 100%)",
-                boxShadow: "0 4px 12px rgba(139,26,74,0.28)",
+                background: "linear-gradient(135deg, #d24e33 0%, #7a1640 100%)",
+                boxShadow: "0 4px 12px rgba(210, 78, 51,0.28)",
                 "&:hover": { background: "linear-gradient(135deg, #7a1640 0%, #5e1232 100%)" },
                 minWidth: 140,
               }}>
               {creating || updating ? (
-                <Stack direction="row" alignItems="center" spacing={1}>
+                <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
                   <DotsLoader size="sm" />
                   <span>{editingSubcategory ? "Updating…" : "Adding…"}</span>
                 </Stack>
@@ -609,8 +609,8 @@ const CategoryManagement = () => {
         PaperProps={{ sx: { borderRadius: 3 } }}
       >
         <Box sx={{ px: 3, pt: 3, pb: 2 }}>
-          <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
-            <Stack direction="row" alignItems="center" spacing={1.5}>
+          <Stack direction="row" sx={{ alignItems: "flex-start", justifyContent: "space-between" }}>
+            <Stack direction="row" sx={{ alignItems: "center" }} spacing={1.5}>
               <Box sx={{
                 width: 40, height: 40, borderRadius: 2,
                 bgcolor: "rgba(198,40,40,0.08)",
@@ -619,10 +619,10 @@ const CategoryManagement = () => {
                 <FiAlertTriangle size={18} />
               </Box>
               <Box>
-                <Typography variant="h6" fontWeight={700} color="#1c1917" lineHeight={1.2}>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: "#1c1917", lineHeight: 1.2 }}>
                   Confirm Delete
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>
                   This action cannot be undone
                 </Typography>
               </Box>
@@ -639,14 +639,14 @@ const CategoryManagement = () => {
         <Divider />
 
         <DialogContent sx={{ px: 3, py: 2.5 }}>
-          <Typography variant="body2" color="#374151" sx={{ mb: deleteItem.type === "category" ? 2 : 0 }}>
+          <Typography variant="body2" sx={{ color: "#374151", mb: deleteItem.type === "category" ? 2 : 0 }}>
             Are you sure you want to delete the {deleteItem.type}{" "}
             <Box component="span" fontWeight={700} color="#1c1917">"{deleteItem.name}"</Box>?
           </Typography>
           {deleteItem.type === "category" && (
             <Box sx={{ display: "flex", gap: 1.5, bgcolor: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 2, p: 1.5 }}>
               <FiAlertTriangle size={16} color="#c2410c" style={{ flexShrink: 0, marginTop: 2 }} />
-              <Typography variant="caption" color="#9a3412" lineHeight={1.5}>
+              <Typography variant="caption" sx={{ color: "#9a3412", lineHeight: 1.5 }}>
                 <strong>Warning:</strong> This will affect all products in this category. The category will be deactivated rather than permanently deleted.
               </Typography>
             </Box>
@@ -664,7 +664,7 @@ const CategoryManagement = () => {
             startIcon={!deleting && <FiTrash2 size={14} />}
             sx={{ borderRadius: 2, textTransform: "none", fontWeight: 700, minWidth: 120 }}>
             {deleting ? (
-              <Stack direction="row" alignItems="center" spacing={1}>
+              <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
                 <DotsLoader size="sm" />
                 <span>Deleting…</span>
               </Stack>
