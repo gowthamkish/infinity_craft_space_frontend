@@ -233,19 +233,18 @@ export default function Checkout() {
         return;
       }
       const orderResponse = await api.post("/api/payment", {
-        amount: Math.round(total * 100),
+        // Prices and shipping are recalculated on the server; only what to buy and where to ship is sent.
         currency: "INR",
         shippingAddress: shippingAddress,
-        items: cartItems,
-        shippingCost: shipping,
+        items: cartItems.map((i) => ({ productId: i.product._id, quantity: i.quantity })),
         shippingCourierId: shippingRate?.courierId || null,
       });
-      const { razorpayOrderId, currency } = orderResponse.data.order;
+      const { razorpayOrderId, currency, amountInPaise } = orderResponse.data.order;
       const orderId = orderResponse.data.order.id;
 
       const options = {
         key: orderResponse.data.razorpayKeyId,
-        amount: Math.round(total * 100),
+        amount: amountInPaise,
         currency: currency,
         name: "Infinity Craft Space",
         description: "Order Payment",
