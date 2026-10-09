@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { OrbitLoader, DotsLoader } from "../Loader";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import Box from "@mui/material/Box";
 import MuiCard from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -38,30 +37,37 @@ import {
 } from "react-icons/fi";
 import AdminLayout from "../admin/AdminLayout";
 import {
-  fetchCategories,
-  createCategory,
-  updateCategory,
-  deleteCategory,
-  addSubcategory,
-  updateSubcategory,
-  deleteSubcategory,
-  clearCategoriesError,
-  clearOperationError,
-} from "../../features/categoriesSlice";
+  useGetCategoriesQuery,
+  useCreateCategoryMutation,
+  useUpdateCategoryMutation,
+  useDeleteCategoryMutation,
+  useAddSubcategoryMutation,
+  useUpdateSubcategoryMutation,
+  useDeleteSubcategoryMutation,
+} from "../../services/categoriesApi";
+import { errMsg } from "../../app/baseApi";
 
 const CategoryManagement = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
+  // Cached category list; every mutation below invalidates the "Category" tag, so this list
+  // (and the storefront filters / product form dropdown) refetch on their own. Update, delete
+  // and toggle are optimistic and roll back if the server rejects the change.
   const {
-    categories,
-    categoriesLoading: loading,
-    categoriesError: error,
-    creating,
-    updating,
-    deleting,
-    operationError,
-  } = useSelector((state) => state.categories);
+    data: categories = [],
+    isLoading: loading,
+    error: listError,
+  } = useGetCategoriesQuery({ includeInactive: true });
+  const error = listError ? errMsg(listError, "Failed to fetch categories") : null;
+  const [createCategory, { isLoading: creating }] = useCreateCategoryMutation();
+  const [updateCategory, { isLoading: updatingCategory }] = useUpdateCategoryMutation();
+  const [deleteCategory, { isLoading: deletingCategory }] = useDeleteCategoryMutation();
+  const [addSubcategory, { isLoading: addingSub }] = useAddSubcategoryMutation();
+  const [updateSubcategory, { isLoading: updatingSub }] = useUpdateSubcategoryMutation();
+  const [deleteSubcategory, { isLoading: deletingSub }] = useDeleteSubcategoryMutation();
+  const updating = updatingCategory || addingSub || updatingSub;
+  const deleting = deletingCategory || deletingSub;
+  const [operationError, setOperationError] = useState(null);
 
   const [success, setSuccess] = useState(null);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -77,10 +83,6 @@ const CategoryManagement = () => {
   });
 
   useEffect(() => {
-    dispatch(fetchCategories({ includeInactive: true }));
-  }, [dispatch]);
-
-  useEffect(() => {
     if (success) {
       const t = setTimeout(() => setSuccess(null), 5000);
       return () => clearTimeout(t);
@@ -88,32 +90,26 @@ const CategoryManagement = () => {
   }, [success]);
 
   useEffect(() => {
-    if (error) {
-      const t = setTimeout(() => dispatch(clearCategoriesError()), 5000);
-      return () => clearTimeout(t);
-    }
-  }, [error, dispatch]);
-
-  useEffect(() => {
     if (operationError) {
-      const t = setTimeout(() => dispatch(clearOperationError()), 5000);
+      const t = setTimeout(() => setOperationError(null), 5000);
       return () => clearTimeout(t);
     }
-  }, [operationError, dispatch]);
+  }, [operationError]);
 
   const handleCategorySubmit = async (e) => {
     e.preventDefault();
     try {
       if (editingCategory) {
-        await dispatch(updateCategory({ id: editingCategory._id, ...categoryForm })).unwrap();
+        await updateCategory({ id: editingCategory._id, ...categoryForm }).unwrap();
         setSuccess("Category updated successfully!");
       } else {
-        await dispatch(createCategory(categoryForm)).unwrap();
+        await createCategory(categoryForm).unwrap();
         setSuccess("Category created successfully!");
       }
       handleCloseCategoryModal();
     } catch (err) {
       console.error("Error saving category:", err);
+      setOperationError(errMsg(err, "Failed to save category"));
     }
   };
 
@@ -121,50 +117,53 @@ const CategoryManagement = () => {
     e.preventDefault();
     try {
       if (editingSubcategory) {
-        await dispatch(updateSubcategory({
+        await updateSubcategory({
           categoryId: selectedCategory._id,
           subcategoryId: editingSubcategory._id,
           subcategoryData: subcategoryForm,
-        })).unwrap();
+        }).unwrap();
         setSuccess("Subcategory updated successfully!");
       } else {
-        await dispatch(addSubcategory({
+        await addSubcategory({
           categoryId: selectedCategory._id,
           subcategoryData: subcategoryForm,
-        })).unwrap();
+        }).unwrap();
         setSuccess("Subcategory added successfully!");
       }
       handleCloseSubcategoryModal();
     } catch (err) {
       console.error("Error saving subcategory:", err);
+      setOperationError(errMsg(err, "Failed to save subcategory"));
     }
   };
 
   const handleDelete = async () => {
     try {
       if (deleteItem.type === "category") {
-        await dispatch(deleteCategory(deleteItem.categoryId)).unwrap();
+        await deleteCategory(deleteItem.categoryId).unwrap();
         setSuccess("Category deleted successfully!");
       } else if (deleteItem.type === "subcategory") {
-        await dispatch(deleteSubcategory({
+        await deleteSubcategory({
           categoryId: deleteItem.categoryId,
           subcategoryId: deleteItem.subcategoryId,
-        })).unwrap();
+        }).unwrap();
         setSuccess("Subcategory deleted successfully!");
       }
       setShowDeleteModal(false);
       setDeleteItem({ type: null, categoryId: null, subcategoryId: null, name: "" });
     } catch (err) {
       console.error("Error deleting:", err);
+      setOperationError(errMsg(err, "Failed to delete"));
     }
   };
 
   const toggleCategoryStatus = async (categoryId, currentStatus) => {
     try {
-      await dispatch(updateCategory({ id: categoryId, isActive: !currentStatus })).unwrap();
+      await updateCategory({ id: categoryId, isActive: !currentStatus }).unwrap();
       setSuccess(`Category ${!currentStatus ? "activated" : "deactivated"} successfully!`);
     } catch (err) {
       console.error("Error toggling category status:", err);
+      setOperationError(errMsg(err, "Failed to update category status"));
     }
   };
 
@@ -265,7 +264,7 @@ const CategoryManagement = () => {
 
       {/* Alerts */}
       {(error || operationError) && (
-        <MuiAlert severity="error" onClose={() => { if (error) dispatch(clearCategoriesError()); if (operationError) dispatch(clearOperationError()); }} sx={{ mb: 2 }}>
+        <MuiAlert severity="error" onClose={() => setOperationError(null)} sx={{ mb: 2 }}>
           {error || operationError}
         </MuiAlert>
       )}

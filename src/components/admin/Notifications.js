@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import {
   FiBell, FiCheck, FiCheckCircle, FiPackage, FiRefreshCw,
   FiInbox, FiChevronRight, FiAlertCircle, FiTruck,
@@ -9,7 +9,11 @@ import {
   Paper, Divider, Skeleton, Tooltip, CircularProgress,
 } from "@mui/material";
 import AdminLayout from "./AdminLayout";
-import api from "../../api/axios";
+import {
+  useGetNotificationsQuery,
+  useMarkNotificationReadMutation,
+  useMarkAllNotificationsReadMutation,
+} from "../../services/adminApi";
 import { useNavigate } from "react-router-dom";
 import { BRAND } from "../../theme/muiTheme";
 
@@ -141,38 +145,25 @@ function NotificationRow({ n, onMarkRead, onViewOrder }) {
 }
 
 export default function Notifications() {
-  const [notifications, setNotifications] = useState([]);
-  const [loading,       setLoading]       = useState(true);
-  const [markingAll,    setMarkingAll]    = useState(false);
-  const [filter,        setFilter]        = useState("all");
+  const [filter, setFilter] = useState("all");
   const navigate = useNavigate();
 
-  const fetchNotifications = async () => {
-    setLoading(true);
-    try {
-      const res = await api.get("/api/admin/notifications");
-      setNotifications(res.data.notifications || []);
-    } catch { /* ignore */ }
-    finally { setLoading(false); }
-  };
+  // New notifications appear on their own: polled every 30s (paused while the tab is
+  // hidden) and refetched on window focus. Marking read is optimistic (also drops the header badge).
+  const { data: notifications = [], isLoading: loading, isFetching, refetch } = useGetNotificationsQuery(undefined, {
+    pollingInterval: 30000,
+    skipPollingIfUnfocused: true,
+    refetchOnFocus: true,
+  });
+  const [markNotificationRead] = useMarkNotificationReadMutation();
+  const [markAllNotificationsRead, { isLoading: markingAll }] = useMarkAllNotificationsReadMutation();
 
-  useEffect(() => { fetchNotifications(); }, []);
+  const markRead = (id) => markNotificationRead(id).unwrap().catch(() => { /* rolled back automatically */ });
 
-  const markRead = async (id) => {
-    try {
-      await api.put(`/api/admin/notifications/${id}/read`, {});
-      setNotifications((prev) => prev.map((n) => n._id === id ? { ...n, read: true } : n));
-    } catch { /* ignore */ }
-  };
-
-  const markAllRead = async () => {
-    setMarkingAll(true);
-    try {
-      const unread = notifications.filter((n) => !n.read);
-      await Promise.all(unread.map((n) => api.put(`/api/admin/notifications/${n._id}/read`, {})));
-      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    } catch { /* ignore */ }
-    finally { setMarkingAll(false); }
+  const markAllRead = () => {
+    const unreadIds = notifications.filter((n) => !n.read).map((n) => n._id);
+    if (!unreadIds.length) return;
+    markAllNotificationsRead(unreadIds).unwrap().catch(() => { /* rolled back automatically */ });
   };
 
   const handleViewOrder = (orderId) => {
@@ -234,9 +225,9 @@ export default function Notifications() {
         <Stack direction="row" gap={1}>
           <Button
             size="small"
-            startIcon={loading ? <CircularProgress size={13} color="inherit" /> : <FiRefreshCw size={14} />}
-            onClick={fetchNotifications}
-            disabled={loading}
+            startIcon={isFetching ? <CircularProgress size={13} color="inherit" /> : <FiRefreshCw size={14} />}
+            onClick={refetch}
+            disabled={isFetching}
             sx={{
               textTransform: "none", fontWeight: 600, fontSize: "0.8125rem",
               color: "#57534e", borderRadius: "10px", px: 1.75, py: 0.875,

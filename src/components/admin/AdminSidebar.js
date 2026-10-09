@@ -3,8 +3,6 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../features/authSlice";
 import { clearCart, syncCartToBackend } from "../../features/cartSlice";
-import { clearProducts } from "../../features/productsSlice";
-import { clearAdminData } from "../../features/adminSlice";
 import api from "../../api/axios";
 import Box from "@mui/material/Box";
 import List from "@mui/material/List";
@@ -72,10 +70,8 @@ export default function AdminSidebar() {
   const handleLogout = async () => {
     try { await dispatch(syncCartToBackend()); } catch { /* ignore */ }
     try { await api.post("/api/auth/logout"); } catch { /* proceed */ }
-    dispatch(logout());
+    dispatch(logout()); // also wipes the RTK Query cache (store listener)
     dispatch(clearCart());
-    dispatch(clearProducts());
-    dispatch(clearAdminData());
     localStorage.removeItem("redirectAfterLogin");
     navigate("/login");
   };

@@ -18,7 +18,7 @@ import { PageLoader } from "./components/Loader";
 import { HelmetProvider } from "react-helmet-async";
 import ErrorBoundary, { RouteErrorBoundary } from "./components/ErrorBoundary";
 import { ToastContext } from "./context/ToastContext";
-import api from "./api/axios";
+import { useStreamOrderEventsQuery, useGetMyOrdersQuery } from "./services/ordersApi";
 import { Analytics } from "@vercel/analytics/react";
 
 // Lazy-load everything that is NOT needed to render the first visible frame.
@@ -178,138 +178,86 @@ function App() {
     }
   };
 
-  // SSE connection for real-time order status updates
+  // ── Live order status (RTK Query) ──────────────────────────────────────────
+  // 1) STREAMING: an SSE connection (opened/closed/retried inside the endpoint) writes every
+  //    ORDER_UPDATE into the cached order list and exposes the latest event here.
+  const { data: orderStream } = useStreamOrderEventsQuery(undefined, { skip: !userId });
+  const lastOrderEvent = orderStream?.lastEvent;
+
   useEffect(() => {
-    if (!userId) return;
+    if (!lastOrderEvent) return;
+    const { order, previousStatus } = lastOrderEvent;
+    const key = String(order._id);
+    const notifKey = `${key}:${order.status}`;
 
-    const baseURL = import.meta.env.VITE_API_URL || "";
-    let es;
-    let retryTimeout;
-    let retryDelay = 2000;
-    let cancelled = false;
-
-    function connect() {
-      if (cancelled) return;
-      try {
-        es = new EventSource(`${baseURL}/api/sse/stream`, {
-          withCredentials: true,
-        });
-
-        es.addEventListener("ORDER_UPDATE", (e) => {
-          try {
-            const payload = JSON.parse(e.data);
-            const { order, previousStatus } = payload;
-            if (!order || !order.status) return;
-
-            const key = String(order._id);
-            const notifKey = `${key}:${order.status}`;
-
-            if (liveMapRef.current) {
-              liveMapRef.current[key] = order.status;
-            }
-
-            if (
-              order.status !== previousStatus &&
-              !shownRef.current.has(notifKey)
-            ) {
-              shownRef.current.add(notifKey);
-              setOrderStatusEventRef.current({
-                order,
-                previousStatus: previousStatus || null,
-              });
-            }
-          } catch {}
-        });
-
-        es.addEventListener("open", () => {
-          retryDelay = 2000; // reset backoff on successful connect
-        });
-
-        es.onerror = () => {
-          es.close();
-          if (!cancelled) {
-            retryTimeout = setTimeout(() => {
-              retryDelay = Math.min(retryDelay * 2, 30000); // cap at 30s
-              connect();
-            }, retryDelay);
-          }
-        };
-      } catch {}
+    if (liveMapRef.current) {
+      liveMapRef.current[key] = order.status;
     }
 
-    connect();
+    if (order.status !== previousStatus && !shownRef.current.has(notifKey)) {
+      shownRef.current.add(notifKey);
+      setOrderStatusEventRef.current({
+        order,
+        previousStatus: previousStatus || null,
+      });
+    }
+  }, [lastOrderEvent]);
 
-    return () => {
-      cancelled = true;
-      clearTimeout(retryTimeout);
-      if (es) es.close();
-    };
+  // 2) POLLING fallback (if the stream is down or events were missed while offline).
+  //    The Orders page reads the SAME cache entry, so this is one shared request. Polls every 30s,
+  //    pauses while the tab is hidden, and refetches when the window regains focus.
+  //    First poll waits 4s after a fresh login so iOS Safari ITP can settle cookies.
+  const [ordersWatchReady, setOrdersWatchReady] = useState(false);
+  useEffect(() => {
+    if (!userId) {
+      setOrdersWatchReady(false);
+      return;
+    }
+    const loginTime = Number(sessionStorage.getItem("authLoginTime") || 0);
+    const msSinceLogin = loginTime ? Date.now() - loginTime : Infinity;
+    const timer = setTimeout(() => setOrdersWatchReady(true), msSinceLogin < 10_000 ? 4_000 : 0);
+    return () => clearTimeout(timer);
   }, [userId]);
 
+  const { data: watchedOrders } = useGetMyOrdersQuery(undefined, {
+    skip: !userId || !ordersWatchReady,
+    pollingInterval: 30_000,
+    skipPollingIfUnfocused: true,
+    refetchOnFocus: true,
+  });
+
+  const isFirstOrdersRun = useRef(true);
   useEffect(() => {
     if (!userId) {
       liveMapRef.current = null;
       shownRef.current = new Set();
-      return;
+      isFirstOrdersRun.current = true;
     }
-
-    let cancelled = false;
-
-    const poll = async (isFirstRun) => {
-      try {
-        const res = await api.get("/api/orders");
-        if (cancelled) return;
-
-        const orders =
-          res.data.success && Array.isArray(res.data.orders)
-            ? res.data.orders
-            : [];
-
-        // Build current map
-        const currentMap = {};
-        orders.forEach((o) => {
-          currentMap[String(o._id)] = o.status;
-        });
-
-        if (isFirstRun) {
-          // On first run: compare against localStorage snapshot (catches offline + new-order cases).
-          // Use {} when no snapshot exists so new recent orders (< 10 min) are still detected
-          // without waiting for a hard reload to clear the snapshot.
-          const persisted = loadSnapshot(userId) || {};
-          fireToasts(persisted, orders);
-          // Seed in-memory map with current data
-          liveMapRef.current = currentMap;
-        } else {
-          // On subsequent polls: compare against in-memory map (catches live changes)
-          if (liveMapRef.current) {
-            fireToasts(liveMapRef.current, orders);
-          }
-          liveMapRef.current = currentMap;
-        }
-
-        // Always persist the latest snapshot to localStorage
-        saveSnapshot(userId, currentMap);
-      } catch (err) {
-        console.warn("[Order polling] fetch failed:", err.message);
-      }
-    };
-
-    // Delay first poll by 4 s after login to let iOS Safari ITP settle cookies.
-    // Subsequent polls run every 15 s as before.
-    const loginTime = Number(sessionStorage.getItem("authLoginTime") || 0);
-    const msSinceLogin = loginTime ? Date.now() - loginTime : Infinity;
-    const initialDelay = msSinceLogin < 10_000 ? 4_000 : 0;
-
-    const firstPoll = setTimeout(() => poll(true), initialDelay);
-    const id = setInterval(() => poll(false), 15_000);
-
-    return () => {
-      cancelled = true;
-      clearTimeout(firstPoll);
-      clearInterval(id);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
+
+  // Runs only when the order list actually changes (RTK Query keeps the same reference otherwise)
+  useEffect(() => {
+    if (!userId || !watchedOrders) return;
+
+    const currentMap = {};
+    watchedOrders.forEach((o) => {
+      currentMap[String(o._id)] = o.status;
+    });
+
+    if (isFirstOrdersRun.current) {
+      // First data after login: compare with the persisted snapshot (catches offline changes and
+      // freshly placed orders; {} when no snapshot exists so recent orders (<10 min) still notify).
+      isFirstOrdersRun.current = false;
+      fireToasts(loadSnapshot(userId) || {}, watchedOrders);
+    } else if (liveMapRef.current) {
+      // Later changes: compare with the in-memory map (SSE events keep it current, and
+      // shownRef de-duplicates anything both channels report).
+      fireToasts(liveMapRef.current, watchedOrders);
+    }
+    liveMapRef.current = currentMap;
+    saveSnapshot(userId, currentMap);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchedOrders, userId]);
 
   return (
     <ThemeProvider theme={muiTheme}>

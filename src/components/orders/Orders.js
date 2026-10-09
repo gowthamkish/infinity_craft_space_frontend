@@ -1,11 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import AdminLayout from "../admin/AdminLayout";
 import { OrbitLoader } from "../Loader";
 import { FiShoppingBag, FiX } from "react-icons/fi";
-import { useOrders } from "../../hooks/useSmartFetch";
-import { updateOrderStatus } from "../../features/adminSlice";
+import { useGetAdminOrdersQuery, useUpdateOrderStatusMutation } from "../../services/adminApi";
+import { errMsg } from "../../app/baseApi";
 import { getStatusBadge } from "../../utils/statusHelpers";
 import { formatDateShort, formatCurrency } from "../../utils/formatters";
 import FiltersBar from "./FiltersBar";
@@ -19,8 +18,19 @@ import "../admin/admin.css";
 const Orders = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useDispatch();
-  const { data: orders, loading, error } = useOrders();
+  // New orders show up without a manual refresh: polled every 60s (paused when the
+  // tab is hidden) and refetched on window focus. Status changes are optimistic.
+  const {
+    data: orders = { orders: [] },
+    isLoading: loading,
+    error: ordersError,
+  } = useGetAdminOrdersQuery(undefined, {
+    pollingInterval: 60000,
+    skipPollingIfUnfocused: true,
+    refetchOnFocus: true,
+  });
+  const error = ordersError ? errMsg(ordersError, "Failed to fetch orders") : null;
+  const [updateOrderStatus] = useUpdateOrderStatusMutation();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -129,12 +139,10 @@ const Orders = () => {
 
     setUpdating(true);
     try {
-      await dispatch(
-        updateOrderStatus({
-          orderId: selectedOrder._id,
-          status: newStatus,
-        }),
-      ).unwrap();
+      await updateOrderStatus({
+        orderId: selectedOrder._id,
+        status: newStatus,
+      }).unwrap();
       setShowStatusModal(false);
       setSelectedOrder(null);
       setNewStatus("");

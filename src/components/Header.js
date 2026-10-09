@@ -1,8 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../features/authSlice";
 import { clearCart, syncCartToBackend } from "../features/cartSlice";
-import { clearProducts } from "../features/productsSlice";
-import { clearAdminData } from "../features/adminSlice";
+import { useGetUnreadCountQuery } from "../services/adminApi";
 import { useNavigate, useLocation } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -43,17 +42,22 @@ function Header() {
   const isAuthenticated = useSelector((state) => !!state.auth.user);
   const cartItems = useSelector((state) => state.cart.items);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
+  // Admin notification badge: polled every 30s (paused while the tab is hidden),
+  // refreshed on window focus, and updated optimistically when a notification is read.
+  const { data: unreadCount = 0 } = useGetUnreadCountQuery(undefined, {
+    skip: !user?.isAdmin,
+    pollingInterval: 30000,
+    skipPollingIfUnfocused: true,
+    refetchOnFocus: true,
+  });
 
   const totalCartItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleLogout = async () => {
     try { await dispatch(syncCartToBackend()); } catch { /* ignore */ }
     try { await api.post("/api/auth/logout"); } catch { /* proceed */ }
-    dispatch(logout());
+    dispatch(logout()); // also wipes the RTK Query cache (store listener)
     dispatch(clearCart());
-    dispatch(clearProducts());
-    dispatch(clearAdminData());
     localStorage.removeItem("redirectAfterLogin");
     navigate("/login");
   };
@@ -68,20 +72,6 @@ function Header() {
   };
 
   const handleBrandClick = () => navigate(user?.isAdmin ? "/admin/dashboard" : "/");
-
-  useEffect(() => {
-    if (!user?.isAdmin) return;
-    let mounted = true;
-    const fetchUnread = async () => {
-      try {
-        const res = await api.get("/api/admin/notifications/unread-count");
-        if (mounted) setUnreadCount(res.data.unreadCount || 0);
-      } catch { /* ignore */ }
-    };
-    fetchUnread();
-    const t = setInterval(fetchUnread, 30000);
-    return () => { mounted = false; clearInterval(t); };
-  }, [user]);
 
   useEffect(() => {
     document.body.style.overflow = drawerOpen ? "hidden" : "";

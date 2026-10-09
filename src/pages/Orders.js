@@ -34,6 +34,7 @@ import {
   FiXCircle,
 } from "react-icons/fi";
 import api from "../api/axios";
+import { useGetMyOrdersQuery, useCancelOrderMutation } from "../services/ordersApi";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 import { ToastContext } from "../context/ToastContext";
 import { getStatusBadgeVariant } from "../utils/statusHelpers";
@@ -558,37 +559,27 @@ function ReturnModal({ order, onClose, onSuccess }) {
   );
 }
 
+const EMPTY_ORDERS = [];
+
 export default function Orders() {
   const navigate = useNavigate();
   const { addToast } = useContext(ToastContext);
 
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // Shared with the app-level order watcher (same cache entry → ONE request, not two).
+  // Refetched on window focus; live SSE updates are written straight into this cache.
+  const {
+    data: orders = EMPTY_ORDERS,
+    isLoading: loading,
+    error: ordersError,
+    refetch: fetchOrders,
+  } = useGetMyOrdersQuery(undefined, { refetchOnFocus: true, refetchOnMountOrArgChange: true });
+  const [cancelOrder] = useCancelOrderMutation();
+  const [errorState, setError] = useState(null);
+  const error = errorState || (ordersError ? "Failed to load orders. Please try again later." : null);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [returnOrder, setReturnOrder] = useState(null);
-
-  const fetchOrders = useCallback(async () => {
-    try {
-      const res = await api.get("/api/orders");
-      const fetched =
-        res.data.success && Array.isArray(res.data.orders)
-          ? res.data.orders
-          : [];
-      setOrders(fetched);
-    } catch {
-      setError("Failed to load orders. Please try again later.");
-      setOrders([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
 
   const filteredOrders = useMemo(() => {
     if (!search) return orders;
@@ -643,15 +634,14 @@ export default function Orders() {
         return;
       setCancellingId(order._id);
       try {
-        await api.post(`/api/shipping/cancel/${order._id}`);
+        await cancelOrder(order._id).unwrap();
         addToast("Order cancelled successfully.", {
           type: "success",
           title: "❌ Order Cancelled",
           duration: 5000,
         });
-        fetchOrders();
       } catch (err) {
-        addToast(err.response?.data?.error || "Failed to cancel order.", {
+        addToast(err?.data?.error || "Failed to cancel order.", {
           type: "error",
           title: "Error",
           duration: 5000,
@@ -660,7 +650,7 @@ export default function Orders() {
         setCancellingId(null);
       }
     },
-    [addToast, fetchOrders],
+    [addToast, cancelOrder],
   );
 
   const handleReturnSuccess = () => {

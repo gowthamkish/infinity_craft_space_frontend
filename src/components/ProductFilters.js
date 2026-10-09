@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchPublicCategories } from "../features/categoriesSlice";
+import { useGetPublicCategoriesQuery } from "../services/categoriesApi";
 import {
   Box, Typography, Stack, Chip, TextField, Button, Collapse,
   Checkbox, FormControlLabel, CircularProgress, Divider, InputAdornment,
@@ -35,15 +34,12 @@ function SectionHeading({ children }) {
 }
 
 export default function ProductFilters({ products, onFiltersChange, activeFilters, onClearFilters }) {
-  const dispatch = useDispatch();
   const [priceMin, setPriceMin]   = useState("");
   const [priceMax, setPriceMax]   = useState("");
   const [openCats, setOpenCats]   = useState(new Set());
 
-  const { publicCategories: categories, publicCategoriesLoading } =
-    useSelector((s) => s.categories);
+  const { data: categories = [], isLoading: publicCategoriesLoading } = useGetPublicCategoriesQuery();
 
-  useEffect(() => { dispatch(fetchPublicCategories()); }, [dispatch]);
 
   useEffect(() => {
     const pr = activeFilters.priceRange;

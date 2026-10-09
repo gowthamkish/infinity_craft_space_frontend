@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useState, useMemo } from "react";
+import { useSelector } from "react-redux";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -16,10 +16,7 @@ import MuiLink from "@mui/material/Link";
 import CloseIcon from "@mui/icons-material/Close";
 import { DotsLoader } from "../Loader";
 import { FiMessageSquare, FiAlertCircle } from "react-icons/fi";
-import {
-  fetchProductReviews,
-  checkCanReview,
-} from "../../features/reviewsSlice";
+import { useGetProductReviewsInfiniteQuery, useGetCanReviewQuery } from "../../services/reviewsApi";
 import { RatingSummary } from "./StarRating";
 import ReviewCard from "./ReviewCard";
 import AddReviewForm from "./AddReviewForm";
@@ -35,10 +32,6 @@ const SORT_OPTIONS = [
 ];
 
 const ReviewList = ({ productId, productName }) => {
-  const dispatch = useDispatch();
-  const { reviewsByProduct, canReviewStatus, loading } = useSelector(
-    (state) => state.reviews,
-  );
   const isAuthenticated = useSelector((state) => !!state.auth.user);
 
   const [sortBy, setSortBy] = useState("verified");
@@ -47,39 +40,23 @@ const ReviewList = ({ productId, productName }) => {
   const [selectedImages, setSelectedImages] = useState([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-  const productReviews = reviewsByProduct[productId];
-  const canReviewInfo = canReviewStatus[productId];
-
-  const loadReviews = useCallback(
-    (page = 1) => {
-      dispatch(fetchProductReviews({ productId, page, limit: 10, sortBy }));
-    },
-    [dispatch, productId, sortBy],
-  );
-
-  useEffect(() => {
-    loadReviews();
-  }, [loadReviews]);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      dispatch(checkCanReview(productId));
-    }
-  }, [dispatch, productId, isAuthenticated]);
+  // Cached per product + sort order. "Load more" APPENDS pages inside the cache (the old slice
+  // replaced the list with the next page). Submitting a review invalidates this product's
+  // "Review" tag, which refreshes the list, the rating summary and the can-review flag together.
+  const {
+    data: reviewPages,
+    isFetching: loading,
+    fetchNextPage,
+    hasNextPage,
+  } = useGetProductReviewsInfiniteQuery({ productId, limit: 10, sortBy });
+  const { data: canReviewInfo } = useGetCanReviewQuery(productId, { skip: !isAuthenticated });
 
   const handleLoadMore = () => {
-    if (productReviews?.pagination?.hasMore) {
-      const nextPage = productReviews.pagination.currentPage + 1;
-      dispatch(
-        fetchProductReviews({ productId, page: nextPage, limit: 10, sortBy }),
-      );
-    }
+    if (hasNextPage && !loading) fetchNextPage();
   };
 
   const handleReviewSubmitted = () => {
     setShowAddReview(false);
-    loadReviews();
-    dispatch(checkCanReview(productId));
   };
 
   const handleImageClick = (images, index) => {
@@ -88,7 +65,7 @@ const ReviewList = ({ productId, productName }) => {
     setImageModalOpen(true);
   };
 
-  const rawReviews = productReviews?.reviews || [];
+  const rawReviews = useMemo(() => reviewPages?.pages.flatMap((p) => p.reviews) ?? [], [reviewPages]);
   const reviews =
     sortBy === "verified"
       ? [...rawReviews].sort((a, b) => {
@@ -101,8 +78,8 @@ const ReviewList = ({ productId, productName }) => {
         })
       : rawReviews;
 
-  const ratingStats = productReviews?.ratingStats || {};
-  const pagination = productReviews?.pagination;
+  const ratingStats = reviewPages?.pages[0]?.ratingStats || {};
+  const pagination = reviewPages?.pages[reviewPages.pages.length - 1]?.pagination;
 
   return (
     <Box>

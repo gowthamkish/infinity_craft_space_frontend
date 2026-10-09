@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
@@ -18,7 +18,12 @@ import Divider from "@mui/material/Divider";
 import Skeleton from "@mui/material/Skeleton";
 import { OrbitLoader } from "../Loader";
 import AdminLayout from "./AdminLayout";
-import api from "../../api/axios";
+import {
+  useGetAnalyticsSummaryQuery,
+  useGetAnalyticsChartsQuery,
+  useGetPredictionsQuery,
+} from "../../services/adminApi";
+import { errMsg } from "../../app/baseApi";
 import SEOHead, { SEO_CONFIG } from "../SEOHead";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
@@ -36,48 +41,30 @@ const P_DARK = "#6b1238";
 const BORDER = "rgba(0,0,0,0.07)";
 const BG     = "#f8f9fc";
 
-/* ── Data hooks ────────────────────────────────────────────────── */
-const useAnalyticsSummary = (period = 30) => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const fetch = useCallback(async () => {
-    setLoading(true); setError(null);
-    try { const res = await api.get(`/api/admin/analytics/summary?period=${period}`); setData(res.data); }
-    catch (err) { setError(err.response?.data?.error || "Failed to fetch analytics summary"); }
-    finally { setLoading(false); }
-  }, [period]);
-  useEffect(() => { fetch(); }, [fetch]);
-  return { data, loading, error, refetch: fetch };
-};
+/* ── Data hooks (RTK Query: cached per period, de-duplicated, manual refetch) ───────── */
+// Same { data, loading, error, refetch } shape the components already use.
+// refetchOnMountOrArgChange: 60 → revisiting the page re-fetches if the cached copy is >60s old.
+const toHookShape = ({ data, isFetching, error, refetch }, fallback) => ({
+  data: data ?? null,
+  loading: isFetching,
+  error: error ? errMsg(error, fallback) : null,
+  refetch,
+});
 
-const useAnalyticsCharts = (period = 30) => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const fetch = useCallback(async () => {
-    setLoading(true); setError(null);
-    try { const res = await api.get(`/api/admin/analytics/charts?period=${period}`); setData(res.data); }
-    catch (err) { setError(err.response?.data?.error || "Failed to fetch analytics charts"); }
-    finally { setLoading(false); }
-  }, [period]);
-  useEffect(() => { fetch(); }, [fetch]);
-  return { data, loading, error, refetch: fetch };
-};
+const useAnalyticsSummary = (period = 30) =>
+  toHookShape(
+    useGetAnalyticsSummaryQuery(String(period), { refetchOnMountOrArgChange: 60 }),
+    "Failed to fetch analytics summary",
+  );
 
-const usePredictions = () => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const fetchPredictions = useCallback(async () => {
-    setLoading(true); setError(null);
-    try { const res = await api.get("/api/admin/predictions"); setData(res.data); }
-    catch (err) { setError(err.response?.data?.message || "Failed to fetch predictions"); }
-    finally { setLoading(false); }
-  }, []);
-  useEffect(() => { fetchPredictions(); }, [fetchPredictions]);
-  return { data, loading, error, refetch: fetchPredictions };
-};
+const useAnalyticsCharts = (period = 30) =>
+  toHookShape(
+    useGetAnalyticsChartsQuery(String(period), { refetchOnMountOrArgChange: 60 }),
+    "Failed to fetch analytics charts",
+  );
+
+const usePredictions = () =>
+  toHookShape(useGetPredictionsQuery(undefined, { refetchOnMountOrArgChange: 60 }), "Failed to fetch predictions");
 
 /* ── Helpers ───────────────────────────────────────────────────── */
 const fmtRupee = (d) => {

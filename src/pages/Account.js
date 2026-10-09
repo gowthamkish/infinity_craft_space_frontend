@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -37,7 +37,15 @@ import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 
-import api from "../api/axios";
+import {
+  useGetAddressesQuery,
+  useGetWishlistQuery,
+  useGetProfileQuery,
+  useDeleteAddressMutation,
+  useSetDefaultAddressMutation,
+  useUpdateAddressMutation,
+  useRemoveFromWishlistMutation,
+} from "../services/accountApi";
 import Header from "../components/Header";
 import { addToCart } from "../features/cartSlice";
 
@@ -50,55 +58,27 @@ const ADDRESS_FIELDS = [
   { key: "phone", label: "Phone" },
 ];
 
+const EMPTY_LIST = [];
+
 export default function Account() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const [addresses, setAddresses] = useState([]);
-  const [wishlist, setWishlist] = useState([]);
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // Three cached, de-duplicated queries (shared with Checkout / product pages). Address and wishlist
+  // changes below are optimistic; tag invalidation keeps every screen in sync with no manual refetch.
+  const { data: addresses = EMPTY_LIST, isLoading: addressesLoading } = useGetAddressesQuery();
+  const { data: wishlist = EMPTY_LIST, isLoading: wishlistLoading } = useGetWishlistQuery();
+  const { data: profile = null, isLoading: profileLoading } = useGetProfileQuery();
+  const loading = addressesLoading || wishlistLoading || profileLoading;
+  const [deleteAddress] = useDeleteAddressMutation();
+  const [setDefaultAddress] = useSetDefaultAddressMutation();
+  const [updateAddress] = useUpdateAddressMutation();
+  const [removeFromWishlist] = useRemoveFromWishlistMutation();
   const [copiedCode, setCopiedCode] = useState(false);
   const authUser = useSelector((s) => s.auth.user);
 
   const [editingAddress, setEditingAddress] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
-
-  const fetchAddresses = async () => {
-    try {
-      const res = await api.get("/api/auth/addresses");
-      setAddresses(res.data.addresses || []);
-    } catch {
-      /* ignore */
-    }
-  };
-
-  const fetchWishlist = async () => {
-    try {
-      const res = await api.get("/api/auth/wishlist");
-      setWishlist(res.data.wishlist || []);
-    } catch {
-      /* ignore */
-    }
-  };
-
-  const fetchProfile = async () => {
-    try {
-      const res = await api.get("/api/auth/profile");
-      setProfile(res.data.user || res.data);
-    } catch {
-      /* ignore */
-    }
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      await Promise.all([fetchAddresses(), fetchWishlist(), fetchProfile()]);
-      setLoading(false);
-    };
-    fetchData();
-  }, []);
 
   const handleCopyReferral = useCallback(() => {
     const code = profile?.referralCode || authUser?.referralCode;
@@ -111,8 +91,7 @@ export default function Account() {
 
   const handleDeleteAddress = async (id) => {
     try {
-      await api.delete(`/api/auth/addresses/${id}`);
-      fetchAddresses();
+      await deleteAddress(id).unwrap();
     } catch {
       /* ignore */
     }
@@ -120,8 +99,7 @@ export default function Account() {
 
   const handleSetDefault = async (id) => {
     try {
-      await api.post(`/api/auth/addresses/${id}/default`);
-      fetchAddresses();
+      await setDefaultAddress(id).unwrap();
     } catch {
       /* ignore */
     }
@@ -134,12 +112,9 @@ export default function Account() {
 
   const saveEdit = async () => {
     try {
-      await api.put(
-        `/api/auth/addresses/${editingAddress._id}`,
-        editingAddress,
-      );
+      const { _id, ...fields } = editingAddress;
+      await updateAddress({ id: _id, ...fields }).unwrap();
       setShowEditModal(false);
-      fetchAddresses();
     } catch {
       /* ignore */
     }
@@ -147,8 +122,7 @@ export default function Account() {
 
   const handleRemoveWishlist = async (productId) => {
     try {
-      await api.delete(`/api/auth/wishlist/${productId}`);
-      fetchWishlist();
+      await removeFromWishlist(productId).unwrap();
     } catch {
       /* ignore */
     }

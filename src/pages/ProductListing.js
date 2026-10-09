@@ -4,7 +4,14 @@ import React, {
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { addToCart, removeFromCart } from "../features/cartSlice";
-import { useProducts } from "../hooks/useSmartFetch";
+import { useProductFeedInfiniteQuery } from "../services/productsApi";
+import { useGetPublicCategoriesQuery } from "../services/categoriesApi";
+import {
+  useGetWishlistQuery,
+  useAddToWishlistMutation,
+  useRemoveFromWishlistMutation,
+} from "../services/accountApi";
+import { errMsg } from "../app/baseApi";
 import {
   Box, Typography, TextField, InputAdornment, IconButton, Button,
   Chip, Skeleton, CircularProgress, Alert, Stack, Popover, Tooltip,
@@ -15,8 +22,6 @@ import {
   FiSearch, FiPackage, FiCheck, FiAlertCircle, FiEye, FiStar,
   FiChevronDown, FiArrowUp, FiArrowDown, FiType, FiTag,
 } from "react-icons/fi";
-import { fetchPublicCategories } from "../features/categoriesSlice";
-import api from "../api/axios";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 import { trackAddToCart, trackRemoveFromCart } from "../utils/analytics";
 
@@ -69,12 +74,15 @@ const SkeletonCard = () => (
 /* ── Product Card ────────────────────────────────────────────────────── */
 const ProductCard = React.memo(({
   product, quantityInCart, onAddToCart, onRemoveFromCart,
-  onImageClick, onShowToast, isWishlisted, onWishlistToggle,
+  onImageClick, onShowToast, isWishlisted,
 }) => {
   const navigate = useNavigate();
   const isAuthenticated = useSelector((s) => !!s.auth.user);
   const [cartLoading, setCartLoading] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
+  // Optimistic: the heart flips instantly via the shared wishlist cache; rolled back on failure.
+  const [addToWishlist] = useAddToWishlistMutation();
+  const [removeFromWishlist] = useRemoveFromWishlistMutation();
 
   const isOutOfStock = product.trackInventory !== false && product.stock <= 0;
   const isLowStock   = product.trackInventory !== false && product.stock > 0 && product.stock <= (product.lowStockThreshold || 5);
@@ -95,13 +103,11 @@ const ProductCard = React.memo(({
     setWishlistLoading(true);
     try {
       if (isWishlisted) {
-        await api.delete(`/api/auth/wishlist/${product._id}`);
+        await removeFromWishlist(product._id).unwrap();
         onShowToast("Removed from wishlist", "success");
-        onWishlistToggle?.(product._id, false);
       } else {
-        await api.post("/api/auth/wishlist", { productId: product._id });
+        await addToWishlist({ product }).unwrap();
         onShowToast("Added to wishlist ♡", "success");
-        onWishlistToggle?.(product._id, true);
       }
     } catch { onShowToast("Wishlist action failed", "error"); }
     finally { setWishlistLoading(false); }
@@ -378,10 +384,19 @@ const ProductCard = React.memo(({
 const ProductListing = () => {
   const dispatch   = useDispatch();
   const navigate   = useNavigate();
-  const { data: products, loading, error, fetchPage, pagination } = useProducts();
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [loadingMore, setLoadingMore] = useState(false);
+  // Infinite scroll: all fetched pages live in the RTK Query cache (no hand-rolled append reducer);
+  // identical requests from other components are de-duplicated and re-visits are instant.
+  const {
+    data: productPages,
+    isLoading: loading,
+    error: productsError,
+    fetchNextPage,
+    hasNextPage: hasMore,
+    isFetchingNextPage: loadingMore,
+  } = useProductFeedInfiniteQuery({ limit: PAGE_SIZE });
+  const products = useMemo(() => productPages?.pages.flatMap((p) => p.products) ?? [], [productPages]);
+  const totalProducts = productPages?.pages[0]?.total;
+  const error = productsError ? errMsg(productsError, "Failed to fetch products") : null;
   const sentinelRef = useRef(null);
 
   const [filters, setFilters] = useState({ categories: [], priceRange: null, searchTerm: "", sortBy: "" });
@@ -397,26 +412,18 @@ const ProductListing = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMsg, setToastMsg]   = useState("");
   const [toastType, setToastType] = useState("success");
-  const [wishlistIds, setWishlistIds] = useState(new Set());
 
   const cartItems       = useSelector((s) => s.cart.items);
   const isAuthenticated = useSelector((s) => !!s.auth.user);
-  const publicCategories = useSelector((s) => s.categories.publicCategories || []);
-
-  useEffect(() => { dispatch(fetchPublicCategories()); }, [dispatch]);
+  const { data: publicCategories = [] } = useGetPublicCategoriesQuery();
 
   const totalCartItems = useMemo(() => cartItems.reduce((s, i) => s + i.quantity, 0), [cartItems]);
   const cartItemsMap   = useMemo(() => { const m = new Map(); cartItems.forEach((i) => m.set(i.product._id, i.quantity)); return m; }, [cartItems]);
   const getQty = useCallback((id) => cartItemsMap.get(id) || 0, [cartItemsMap]);
 
-  useEffect(() => {
-    if (!isAuthenticated) { setWishlistIds(new Set()); return; }
-    let mounted = true;
-    api.get("/api/auth/wishlist").then((res) => { if (mounted) setWishlistIds(new Set((res.data.wishlist || []).map((p) => p._id))); }).catch(() => {});
-    return () => { mounted = false; };
-  }, [isAuthenticated]);
-
-  useEffect(() => { setCurrentPage(1); }, [filters]);
+  // One shared wishlist query for every card (previously one fetch per page visit)
+  const { data: wishlist } = useGetWishlistQuery(undefined, { skip: !isAuthenticated });
+  const wishlistIds = useMemo(() => new Set((wishlist || []).map((p) => (typeof p === "object" ? p._id : p))), [wishlist]);
 
   useEffect(() => {
     const pr = filters.priceRange;
@@ -424,21 +431,15 @@ const ProductListing = () => {
     setPriceMax(pr && pr.max !== Infinity ? String(pr.max) : "");
   }, [filters.priceRange]);
 
-  const hasMore = pagination ? currentPage < pagination.totalPages : false;
-
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel || typeof IntersectionObserver === "undefined") return;
     const ob = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && !loadingMore && hasMore) {
-        const next = currentPage + 1;
-        setLoadingMore(true); setCurrentPage(next);
-        fetchPage({ page: next, limit: PAGE_SIZE }).finally(() => setLoadingMore(false));
-      }
+      if (entry.isIntersecting && !loadingMore && hasMore) fetchNextPage();
     }, { rootMargin: "300px" });
     ob.observe(sentinel);
     return () => ob.disconnect();
-  }, [loadingMore, hasMore, currentPage, fetchPage]);
+  }, [loadingMore, hasMore, fetchNextPage]);
 
   const filteredProducts = useMemo(() => {
     if (!Array.isArray(products) || !products.length) return [];
@@ -466,7 +467,6 @@ const ProductListing = () => {
   const handleCheckout = useCallback(() => { if (!isAuthenticated) { localStorage.setItem("redirectAfterLogin", "/checkout"); navigate("/login"); } else navigate("/checkout"); }, [isAuthenticated, navigate]);
   const handleImageClick = useCallback((p) => { setSelectedProduct(p); setShowImageModal(true); }, []);
   const handleShowToast  = useCallback((msg, type = "success") => { setToastMsg(msg); setToastType(type); setShowToast(true); setTimeout(() => setShowToast(false), 3000); }, []);
-  const handleWishlistToggle = useCallback((id, added) => { setWishlistIds((prev) => { const s = new Set(prev); added ? s.add(id) : s.delete(id); return s; }); }, []);
 
   // O(1) membership for the category pills (checked for every category + subcategory)
   const selectedCategorySet = useMemo(() => new Set(filters.categories), [filters.categories]);
@@ -983,7 +983,6 @@ const ProductListing = () => {
                       onImageClick={handleImageClick}
                       onShowToast={handleShowToast}
                       isWishlisted={wishlistIds.has(product._id)}
-                      onWishlistToggle={handleWishlistToggle}
                     />
                   ))}
                   {loadingMore && Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={`more-${i}`} />)}
@@ -993,7 +992,7 @@ const ProductListing = () => {
 
                 {!hasMore && filteredProducts.length > PAGE_SIZE && (
                   <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 4, pb: 2 }}>
-                    ✓ All {pagination?.total ?? filteredProducts.length} products shown
+                    ✓ All {totalProducts ?? filteredProducts.length} products shown
                   </Typography>
                 )}
               </>

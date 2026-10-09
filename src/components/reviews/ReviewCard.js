@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { FiThumbsUp, FiCheckCircle, FiMessageCircle } from "react-icons/fi";
-import { markReviewHelpful } from "../../features/reviewsSlice";
+import { useMarkReviewHelpfulMutation } from "../../services/reviewsApi";
 import { StarRating } from "./StarRating";
 import "./reviews.css";
 
 const ReviewCard = ({ review, onImageClick }) => {
-  const dispatch = useDispatch();
+  // Optimistic: the count and highlight flip instantly, then the server's numbers replace them.
+  const [markReviewHelpful] = useMarkReviewHelpfulMutation();
   const user = useSelector((state) => state.auth.user);
   const isAuthenticated = useSelector((state) => !!state.auth.user);
   const [helpfulLoading, setHelpfulLoading] = useState(false);
@@ -33,7 +34,7 @@ const ReviewCard = ({ review, onImageClick }) => {
 
     setHelpfulLoading(true);
     try {
-      await dispatch(markReviewHelpful(review._id)).unwrap();
+      await markReviewHelpful(review._id).unwrap();
     } catch (error) {
       console.error("Error marking review as helpful:", error);
     } finally {

@@ -1,22 +1,20 @@
 import { useState, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import TextField from "@mui/material/TextField";
 import MuiAlert from "@mui/material/Alert";
 import { DotsLoader } from "../Loader";
 import { FiCamera, FiX, FiCheck } from "react-icons/fi";
-import {
-  createReview,
-  clearReviewError,
-  clearSuccessMessage,
-} from "../../features/reviewsSlice";
+import { useCreateReviewMutation } from "../../services/reviewsApi";
+import { errMsg } from "../../app/baseApi";
 import { StarRatingInput } from "./StarRating";
 import "./reviews.css";
 
 const AddReviewForm = ({ productId, productName, onReviewSubmitted }) => {
-  const dispatch = useDispatch();
-  const { createLoading, error, successMessage } = useSelector(
-    (state) => state.reviews,
-  );
+  // Creating a review invalidates this product's "Review" tag → the list, the rating
+  // summary and the "can review" flag all refresh by themselves.
+  const [createReview, { isLoading: createLoading }] = useCreateReviewMutation();
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
   const isAuthenticated = useSelector((state) => !!state.auth.user);
 
   const [rating, setRating] = useState(0);
@@ -101,7 +99,7 @@ const AddReviewForm = ({ productId, productName, onReviewSubmitted }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setValidationError("");
-    dispatch(clearReviewError());
+    setError(null);
 
     // Validation
     if (rating === 0) {
@@ -136,15 +134,14 @@ const AddReviewForm = ({ productId, productName, onReviewSubmitted }) => {
     }));
 
     try {
-      await dispatch(
-        createReview({
-          productId,
-          rating,
-          title: title.trim(),
-          comment: comment.trim(),
-          images: imageData,
-        }),
-      ).unwrap();
+      await createReview({
+        productId,
+        rating,
+        title: title.trim(),
+        comment: comment.trim(),
+        images: imageData,
+      }).unwrap();
+      setSuccessMessage("Review submitted successfully!");
 
       // Reset form
       setRating(0);
@@ -158,11 +155,9 @@ const AddReviewForm = ({ productId, productName, onReviewSubmitted }) => {
       }
 
       // Clear success message after 3 seconds
-      setTimeout(() => {
-        dispatch(clearSuccessMessage());
-      }, 3000);
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
-      // Error is handled by Redux
+      setError(errMsg(err, "Failed to create review"));
     }
   };
 
@@ -200,7 +195,7 @@ const AddReviewForm = ({ productId, productName, onReviewSubmitted }) => {
         <MuiAlert severity="error"
           onClose={() => {
             setValidationError("");
-            dispatch(clearReviewError());
+            setError(null);
           }}
           dismissible
         >

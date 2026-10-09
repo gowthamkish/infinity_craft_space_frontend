@@ -3,10 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Header from "../components/Header";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
-import { useProducts } from "../hooks/useSmartFetch";
+import { useGetProductsQuery, useGetPopularProductsQuery } from "../services/productsApi";
+import {
+  useGetWishlistQuery,
+  useAddToWishlistMutation,
+  useRemoveFromWishlistMutation,
+} from "../services/accountApi";
 import { buildCloudinaryUrl } from "../components/OptimizedImage";
 import { optimisticAddToCart } from "../features/cartSlice";
-import api from "../api/axios";
 import {
   FiShoppingCart,
   FiHeart,
@@ -215,18 +219,23 @@ function StatCounter({ value, suffix, label, icon, animate }) {
 }
 
 function WishlistButton({ productId }) {
-  const [wishlisted, setWishlisted] = useState(false);
   const [loading, setLoading] = useState(false);
   const isAuthenticated = useSelector((s) => !!s.auth.user);
+  // Shared, de-duplicated wishlist query: every heart on the page reads the same cache entry,
+  // so hearts show the REAL saved state (they used to always start empty) and flip optimistically.
+  const { data: wishlist } = useGetWishlistQuery(undefined, { skip: !isAuthenticated });
+  const wishlisted = !!wishlist?.some((p) => (typeof p === "object" ? p._id : p) === productId);
+  const [addToWishlist] = useAddToWishlistMutation();
+  const [removeFromWishlist] = useRemoveFromWishlistMutation();
   const toggle = useCallback(async (e) => {
     e.stopPropagation();
     if (!isAuthenticated) { window.location.href = "/login"; return; }
     setLoading(true);
     try {
-      if (wishlisted) { await api.delete(`/api/auth/wishlist/${productId}`); setWishlisted(false); }
-      else            { await api.post("/api/auth/wishlist", { productId }); setWishlisted(true); }
-    } catch { /* silent */ } finally { setLoading(false); }
-  }, [wishlisted, productId, isAuthenticated]);
+      if (wishlisted) await removeFromWishlist(productId).unwrap();
+      else            await addToWishlist({ product: { _id: productId } }).unwrap();
+    } catch { /* silent — optimistic change is rolled back automatically */ } finally { setLoading(false); }
+  }, [wishlisted, productId, isAuthenticated, addToWishlist, removeFromWishlist]);
 
   return (
     <Tooltip title={wishlisted ? "Remove from wishlist" : "Add to wishlist"}>
@@ -397,12 +406,8 @@ function ProductSkeleton() {
 }
 
 function PopularSection({ navigate }) {
-  const [popularProducts, setPopularProducts] = useState([]);
-  useEffect(() => {
-    api.get("/api/products/popular/list")
-      .then((res) => { setPopularProducts((res.data.products || res.data || []).slice(0, 4)); })
-      .catch(() => {});
-  }, []);
+  const { data: popularData } = useGetPopularProductsQuery({ limit: 4 });
+  const popularProducts = (popularData ?? []).slice(0, 4);
   if (!popularProducts.length) return null;
 
   return (
@@ -441,10 +446,13 @@ function PopularSection({ navigate }) {
   );
 }
 
+const EMPTY_LIST = []; // stable reference so memoised sections don't re-run while loading
+
 /* ─── Main Component ───────────────────────────────────────────────────── */
 export default function Home() {
   const navigate = useNavigate();
-  const { data: products = [], loading } = useProducts();
+  const { data: productsPage, isLoading: loading } = useGetProductsQuery(undefined, { refetchOnFocus: true });
+  const products = productsPage?.products ?? EMPTY_LIST;
   const user = useSelector((state) => state.auth.user);
 
   const [statsRef, statsInView] = useInView(0.3);

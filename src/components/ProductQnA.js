@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useContext } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Select from "@mui/material/Select";
@@ -8,7 +8,13 @@ import InputLabel from "@mui/material/InputLabel";
 import MuiAlert from "@mui/material/Alert";
 import { DotsLoader } from "./Loader";
 import { FiThumbsUp, FiMessageSquare, FiCheckCircle } from "react-icons/fi";
-import { qnaAPI } from "../api/features";
+import {
+  useGetQnAQuery,
+  usePostQuestionMutation,
+  usePostAnswerMutation,
+  useMarkQnaHelpfulMutation,
+} from "../services/engagementApi";
+import { errMsg } from "../app/baseApi";
 import { ToastContext } from "../context/ToastContext";
 import { SkeletonListLoader } from "./SkeletonLoaders";
 import "../styles/designPatterns.css";
@@ -17,41 +23,28 @@ import "../styles/designPatterns.css";
  * ProductQnA Component
  * Displays Q&A section for a product with ability to ask questions
  */
+const EMPTY_LIST = [];
+
 const ProductQnA = ({ productId, isAuthenticated, userName }) => {
-  const [qnaList, setQnaList] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [asking, setAsking] = useState(false);
   const [question, setQuestion] = useState("");
   const [sortBy, setSortBy] = useState("latest");
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const { addSuccess, addError } = useContext(ToastContext);
 
   const ITEMS_PER_PAGE = 10;
 
-  useEffect(() => {
-    fetchQnA();
-  }, [productId, sortBy, page]);
-
-  const fetchQnA = async () => {
-    setLoading(true);
-    try {
-      const result = await qnaAPI.getByProduct(
-        productId,
-        page,
-        ITEMS_PER_PAGE,
-        sortBy,
-      );
-      if (result.success) {
-        setQnaList(result.data);
-        setTotalPages(result.pagination?.pages || 1);
-      }
-    } catch (err) {
-      console.error("Error fetching Q&A:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Cached per product + sort + page; posting a question invalidates the product's "Qna" tag,
+  // which refetches the list on its own. "Helpful" is optimistic.
+  const { data: qnaData, isFetching: loading } = useGetQnAQuery({
+    productId,
+    page,
+    limit: ITEMS_PER_PAGE,
+    sort: sortBy,
+  });
+  const qnaList = qnaData?.success ? qnaData.data : EMPTY_LIST;
+  const totalPages = qnaData?.pagination?.pages || 1;
+  const [postQuestion, { isLoading: asking }] = usePostQuestionMutation();
+  const [markQnaHelpful] = useMarkQnaHelpfulMutation();
 
   const handlePostQuestion = async (e) => {
     e.preventDefault();
@@ -66,38 +59,26 @@ const ProductQnA = ({ productId, isAuthenticated, userName }) => {
       return;
     }
 
-    setAsking(true);
     try {
-      const result = await qnaAPI.postQuestion(productId, question);
-      if (result.success) {
-        addSuccess("Question posted successfully!", "Question Added");
-        setQuestion("");
-        setPage(1);
-        await fetchQnA();
-      } else {
+      const result = await postQuestion({ productId, question }).unwrap();
+      if (result.success === false) {
         addError(result.error || "Failed to post question", "Error");
+        return;
       }
+      addSuccess("Question posted successfully!", "Question Added");
+      setQuestion("");
+      setPage(1);
     } catch (err) {
       console.error("Error posting question:", err);
-      addError("An error occurred", "Error");
-    } finally {
-      setAsking(false);
+      addError(errMsg(err, "An error occurred"), "Error");
     }
   };
 
   const handleMarkHelpful = async (qnaId) => {
     try {
-      const result = await qnaAPI.markHelpful(qnaId);
-      if (result.success) {
-        // Update the QnA item
-        setQnaList((prev) =>
-          prev.map((item) =>
-            item._id === qnaId ? { ...item, helpful: item.helpful + 1 } : item,
-          ),
-        );
-      }
+      await markQnaHelpful(qnaId).unwrap();
     } catch (err) {
-      console.error("Error marking helpful:", err);
+      console.error("Error marking helpful:", err); // optimistic increment is rolled back
     }
   };
 
@@ -261,7 +242,7 @@ const ProductQnA = ({ productId, isAuthenticated, userName }) => {
 const QnAItem = ({ qna, onMarkHelpful }) => {
   const [showAnswers, setShowAnswers] = useState(false);
   const [newAnswer, setNewAnswer] = useState("");
-  const [posting, setPosting] = useState(false);
+  const [postAnswer, { isLoading: posting }] = usePostAnswerMutation();
 
   const handlePostAnswer = async (e) => {
     e.preventDefault();
@@ -270,17 +251,11 @@ const QnAItem = ({ qna, onMarkHelpful }) => {
       return;
     }
 
-    setPosting(true);
     try {
-      const result = await qnaAPI.postAnswer(qna._id, newAnswer);
-      if (result.success) {
-        setNewAnswer("");
-        // Refresh Q&A list from parent
-      }
+      await postAnswer({ qnaId: qna._id, content: newAnswer }).unwrap();
+      setNewAnswer(""); // the Q&A list refreshes itself (tag invalidation)
     } catch (err) {
       console.error("Error posting answer:", err);
-    } finally {
-      setPosting(false);
     }
   };
 

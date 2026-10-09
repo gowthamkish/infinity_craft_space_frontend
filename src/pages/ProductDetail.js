@@ -22,7 +22,14 @@ import {
 } from "react-icons/fi";
 import { addToCart } from "../features/cartSlice";
 import { StarRating } from "../components/reviews/StarRating";
-import api from "../api/axios";
+import { useGetProductQuery, useNotifyBackInStockMutation } from "../services/productsApi";
+import { useGetRatingSummaryQuery } from "../services/reviewsApi";
+import {
+  useGetWishlistQuery,
+  useAddToWishlistMutation,
+  useRemoveFromWishlistMutation,
+} from "../services/accountApi";
+import { errMsg } from "../app/baseApi";
 import SEOHead, {
   generateProductStructuredData,
   generateBreadcrumbStructuredData,
@@ -230,15 +237,26 @@ const ProductDetail = () => {
   const cartItems = useSelector((state) => state.cart.items);
   const userName = useSelector((state) => state.auth.user?.name || state.auth.user?.email || "Customer");
 
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // Cached per product id and refreshed on window focus (live stock). `currentData` is the data
+  // for THIS id only, so navigating between products never flashes the previous product.
+  const {
+    currentData: product,
+    isFetching: productFetching,
+    error: productError,
+  } = useGetProductQuery(id, { skip: !id, refetchOnFocus: true });
+  const loading = productFetching && !product;
+  const error = productError ? errMsg(productError, "Failed to load product") : null;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showImageModal, setShowImageModal] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
-  const [ratingStats, setRatingStats] = useState(null);
+  const { data: ratingStatsData } = useGetRatingSummaryQuery(id, { skip: !id });
+  const ratingStats = ratingStatsData ?? null;
+  const { data: wishlist } = useGetWishlistQuery(undefined, { skip: !isAuthenticated });
+  const isWishlisted = !!product && !!wishlist?.some((p) => (typeof p === "object" ? p._id : p) === product._id);
+  const [addToWishlist] = useAddToWishlistMutation();
+  const [removeFromWishlist] = useRemoveFromWishlistMutation();
+  const [notifyBackInStock] = useNotifyBackInStockMutation();
   const [notifyEmail, setNotifyEmail] = useState("");
   const [notifyStatus, setNotifyStatus] = useState(null);
   const [customNote, setCustomNote] = useState("");
@@ -250,62 +268,25 @@ const ProductDetail = () => {
   const [selectedHoopSize, setSelectedHoopSize] = useState(null);
   const thumbsRef = useRef(null);
 
+  // Record the product in "recently viewed" once per product (not on every background refetch)
   useEffect(() => {
-    if (!id) return;
-    const fetchProduct = async () => {
-      try {
-        setLoading(true);
-        const response = await api.get(`/api/products/${id}`);
-        const productData = response.data.product || response.data;
-        setProduct(productData);
-        setError(null);
-        addProduct(productData);
-      } catch (err) {
-        setError(err.response?.data?.error || "Failed to load product");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProduct();
-  }, [id]);
-
-  useEffect(() => {
-    if (!id) return;
-    const fetchRatingSummary = async () => {
-      try {
-        const response = await api.get(`/api/reviews/product/${id}/summary`);
-        setRatingStats(response.data);
-      } catch {
-        setRatingStats({ averageRating: 0, reviewCount: 0, ratingBreakdown: {} });
-      }
-    };
-    fetchRatingSummary();
-  }, [id]);
-
-  useEffect(() => {
-    if (!isAuthenticated || !product) return;
-    const checkWishlist = async () => {
-      try {
-        const response = await api.get("/api/auth/wishlist");
-        const ids = (response.data.wishlist || []).map((item) =>
-          typeof item === "object" ? item._id : item
-        );
-        setIsWishlisted(ids.includes(product._id));
-      } catch { /* silent */ }
-    };
-    checkWishlist();
-  }, [isAuthenticated, product]);
+    if (product) addProduct(product);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?._id]);
 
   useEffect(() => {
     if (!product?.showColorPickerToUsers || !product?.colors?.length) return;
     const first = product.colors.find((c) => c.visibleToUsers);
     if (first) setSelectedColor(first);
-  }, [product]);
+    // Keyed on the id: a background refetch (e.g. stock changed) must not reset the shopper's choice
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?._id]);
 
   useEffect(() => {
     if (!product?.showHoopSizePicker || !product?.hoopSizes?.length) return;
     setSelectedHoopSize(product.hoopSizes[0]);
-  }, [product]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?._id]);
 
   useEffect(() => {
     if (!thumbsRef.current) return;
@@ -343,12 +324,10 @@ const ProductDetail = () => {
     setWishlistLoading(true);
     try {
       if (isWishlisted) {
-        await api.delete(`/api/auth/wishlist/${product._id}`);
-        setIsWishlisted(false);
+        await removeFromWishlist(product._id).unwrap();
         addSuccess("Removed from wishlist", "Wishlist");
       } else {
-        await api.post("/api/auth/wishlist", { productId: product._id });
-        setIsWishlisted(true);
+        await addToWishlist({ product }).unwrap();
         addSuccess("Saved to wishlist!", "Wishlist");
       }
     } catch {
@@ -363,7 +342,7 @@ const ProductDetail = () => {
     if (!notifyEmail) return;
     setNotifyStatus("loading");
     try {
-      await api.post(`/api/products/${id}/notify`, { email: notifyEmail });
+      await notifyBackInStock({ id, email: notifyEmail }).unwrap();
       setNotifyStatus("success");
     } catch {
       setNotifyStatus("error");

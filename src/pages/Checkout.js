@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -18,6 +18,12 @@ import {
 } from "../features/cartSlice";
 import Header from "../components/Header";
 import api from "../api/axios";
+import { baseApi, errMsg } from "../app/baseApi";
+import {
+  useGetAddressesQuery,
+  useAddAddressMutation,
+  useDeleteAddressMutation,
+} from "../services/accountApi";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 import {
   trackBeginCheckout,
@@ -40,6 +46,7 @@ const isCustomProduct = (item) => {
   return CUSTOM_KEYWORDS.some((kw) => text.includes(kw));
 };
 
+const EMPTY_ADDRESSES = [];
 const STEPS = ["Cart Review", "Shipping", "Payment", "Confirmation"];
 
 export default function Checkout() {
@@ -66,8 +73,14 @@ export default function Checkout() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [savedAddresses, setSavedAddresses] = useState([]);
-  const [loadingAddresses, setLoadingAddresses] = useState(false);
+  // Saved addresses: cached and shared with the Account page; add/delete keep both in sync.
+  const { data: savedAddresses = EMPTY_ADDRESSES, isLoading: loadingAddresses } = useGetAddressesQuery(
+    undefined,
+    { skip: !user, refetchOnMountOrArgChange: true },
+  );
+  const [addAddress] = useAddAddressMutation();
+  const [deleteAddress] = useDeleteAddressMutation();
+  const defaultAddressApplied = useRef(false);
   const [saveAddressToBook, setSaveAddressToBook] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
 
@@ -93,34 +106,14 @@ export default function Checkout() {
     setShippingAddress((prev) => ({ ...prev, [name]: value }));
   };
 
-  const fetchSavedAddresses = async () => {
-    setLoadingAddresses(true);
-    try {
-      if (!user) { setSavedAddresses([]); setLoadingAddresses(false); return; }
-      const res = await api.get("/api/auth/addresses");
-      const addrs = res.data.addresses || [];
-      setSavedAddresses(addrs);
-      const defaultAddr = addrs.find((a) => a.isDefault || a.isDefault === true);
-      if (defaultAddr) {
-        selectSavedAddress(defaultAddr);
-        setSelectedAddressId(defaultAddr._id);
-      }
-    } catch (err) {
-      console.error("Failed to load saved addresses", err.response?.data || err.message);
-    } finally {
-      setLoadingAddresses(false);
-    }
-  };
-
   const handleSaveAddress = async () => {
     try {
       if (!user) { setError("Please login to save addresses"); return; }
       const payload = { ...shippingAddress };
-      const res = await api.post("/api/auth/addresses", payload);
-      setSavedAddresses(res.data.addresses || []);
+      await addAddress(payload).unwrap();
       setSaveAddressToBook(false);
     } catch (err) {
-      console.error("Failed to save address", err.response?.data || err.message);
+      console.error("Failed to save address", errMsg(err));
       setError("Failed to save address");
     }
   };
@@ -128,10 +121,9 @@ export default function Checkout() {
   const handleDeleteAddress = async (addressId) => {
     try {
       if (!user) { setError("Please login to manage addresses"); return; }
-      const res = await api.delete(`/api/auth/addresses/${addressId}`);
-      setSavedAddresses(res.data.addresses || []);
+      await deleteAddress(addressId).unwrap();
     } catch (err) {
-      console.error("Failed to delete address", err.response?.data || err.message);
+      console.error("Failed to delete address", errMsg(err));
       setError("Failed to delete address");
     }
   };
@@ -151,10 +143,16 @@ export default function Checkout() {
     setError(null);
   };
 
+  // Pre-select the default saved address once, the first time addresses are available
   useEffect(() => {
-    fetchSavedAddresses();
+    if (defaultAddressApplied.current || !savedAddresses.length) return;
+    const defaultAddr = savedAddresses.find((a) => a.isDefault);
+    if (defaultAddr) {
+      defaultAddressApplied.current = true;
+      selectSavedAddress(defaultAddr);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [savedAddresses]);
 
   useEffect(() => {
     if (cartItems.length > 0 && currentStep === 1) {
@@ -298,6 +296,8 @@ export default function Checkout() {
   const completeOrder = async (paymentResponse, verifiedOrder = null) => {
     try {
       setLoading(true);
+      // The purchase changed orders and stock — drop cached copies so every screen refetches.
+      dispatch(baseApi.util.invalidateTags(["Order", "Product", "Recommendation"]));
       const items = cartItems.map((item) => ({
         product: item.product._id,
         productName: item.product.name,

@@ -19,7 +19,7 @@ import {
   FiTag,
 } from "react-icons/fi";
 import AdminLayout from "./AdminLayout";
-import { useDashboardCounts } from "../../hooks/useSmartFetch";
+import { useGetDashboardCountsQuery } from "../../services/adminApi";
 import SEOHead, { SEO_CONFIG } from "../SEOHead";
 import { BRAND } from "../../theme/muiTheme";
 
@@ -45,7 +45,14 @@ const QUICK_ACTIONS = [
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { data: counts, loading } = useDashboardCounts();
+  // Live KPIs: refreshed every 60s (paused when the tab is hidden), on window focus,
+  // and automatically whenever products/orders change (tag invalidation).
+  const { data: counts = { userCount: 0, productCount: 0, orderCount: 0 }, isLoading: loading } =
+    useGetDashboardCountsQuery(undefined, {
+      pollingInterval: 60000,
+      skipPollingIfUnfocused: true,
+      refetchOnFocus: true,
+    });
 
   return (
     <>

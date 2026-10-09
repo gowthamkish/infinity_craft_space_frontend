@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
@@ -8,11 +7,18 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import { FiChevronRight } from "react-icons/fi";
-import { recommendationsAPI } from "../api/features";
+import {
+  useGetRecommendationsQuery,
+  useGetBoughtTogetherQuery,
+  useGetTrendingProductsQuery,
+  useGetPopularProductsQuery,
+} from "../services/productsApi";
 import { SkeletonProductGrid } from "./SkeletonLoaders";
 import OptimizedImage from "./OptimizedImage";
 import { StarRating } from "./reviews/StarRating";
 import { BRAND } from "../theme/muiTheme";
+
+const EMPTY_LIST = [];
 
 /**
  * ProductRecommendations Component
@@ -24,55 +30,17 @@ const ProductRecommendations = ({
   limit = 6,
   type = "similar",
 }) => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // Each recommendation type is its own cached query (shared across pages, de-duplicated);
+  // only the one matching `type` actually runs.
+  const similar = useGetRecommendationsQuery({ productId, limit }, { skip: type !== "similar" || !productId });
+  const together = useGetBoughtTogetherQuery({ productId, limit }, { skip: type !== "boughtTogether" || !productId });
+  const trending = useGetTrendingProductsQuery({ limit }, { skip: type !== "trending" });
+  const popular = useGetPopularProductsQuery({ limit }, { skip: type !== "popular" });
+  const active = { boughtTogether: together, trending, popular }[type] ?? similar;
 
-  useEffect(() => {
-    const fetchRecommendations = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        let result;
-
-        switch (type) {
-          case "boughtTogether":
-            result = await recommendationsAPI.getBoughtTogether(
-              productId,
-              limit,
-            );
-            break;
-          case "trending":
-            result = await recommendationsAPI.getTrending(limit);
-            break;
-          case "popular":
-            result = await recommendationsAPI.getPopular(limit);
-            break;
-          case "similar":
-          default:
-            result = await recommendationsAPI.getByProduct(productId, limit);
-        }
-
-        if (result.success) {
-          setProducts(
-            result.data || result.products || result.recommendations || [],
-          );
-        } else {
-          setError("Failed to load recommendations");
-        }
-      } catch (err) {
-        console.error("Error fetching recommendations:", err);
-        setError("An error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (productId || type !== "similar") {
-      fetchRecommendations();
-    }
-  }, [productId, type]);
+  const loading = active.isLoading || (type === "similar" && !productId);
+  const error = active.isError ? "Failed to load recommendations" : null;
+  const products = active.data ?? EMPTY_LIST;
 
   if (loading) {
     return (

@@ -1,10 +1,8 @@
-import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "../features/authSlice";
-import productsReducer from "../features/productsSlice";
+import { configureStore, createListenerMiddleware, isAnyOf } from "@reduxjs/toolkit";
+import { setupListeners } from "@reduxjs/toolkit/query";
+import { baseApi } from "./baseApi";
+import authReducer, { logout, autoLogout } from "../features/authSlice";
 import cartReducer, { syncCartToBackend } from "../features/cartSlice";
-import adminReducer from "../features/adminSlice";
-import categoriesReducer from "../features/categoriesSlice";
-import reviewsReducer from "../features/reviewsSlice";
 
 // Cart actions that should trigger a debounced sync to backend
 // Note: clearCart is intentionally excluded — logout calls syncCartToBackend
@@ -82,27 +80,34 @@ const serializationMiddleware = {
     // Ignore these paths in the state
     ignoredPaths: [
       "auth.lastFetched",
-      "products.lastFetched",
-      "admin.dashboardLastFetched",
     ],
   },
 };
 
+// Wipe the entire RTK Query cache whenever the user logs out (manually or via idle
+// timeout) so one account's orders / wishlist / admin data can never show up for the next.
+const authCacheListener = createListenerMiddleware();
+authCacheListener.startListening({
+  matcher: isAnyOf(logout, autoLogout),
+  effect: (_action, listenerApi) => {
+    listenerApi.dispatch(baseApi.util.resetApiState());
+  },
+});
+
 export const store = configureStore({
   reducer: {
+    [baseApi.reducerPath]: baseApi.reducer,
     auth: authReducer,
-    products: productsReducer,
     cart: cartReducer,
-    admin: adminReducer,
-    categories: categoriesReducer,
-    reviews: reviewsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       ...serializationMiddleware,
       // Disable immutability and serialization checks in production for better performance
       immutableCheck: import.meta.env.DEV,
-    }).concat(
+    }).prepend(authCacheListener.middleware).concat(
+      // RTK Query: caching, de-duplication, invalidation, polling, streaming
+      baseApi.middleware,
       // Add cart sync middleware
       cartSyncMiddleware,
       // Add performance monitoring in development
@@ -112,3 +117,6 @@ export const store = configureStore({
   devTools: import.meta.env.DEV,
 });
 
+
+// Enables refetchOnFocus / refetchOnReconnect for queries that opt in.
+setupListeners(store.dispatch);

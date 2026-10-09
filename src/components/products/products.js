@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import {
   Box,
   Card,
@@ -43,8 +42,12 @@ import {
   FiRefreshCw,
   FiCheckCircle,
 } from "react-icons/fi";
-import { useProducts } from "../../hooks/useSmartFetch";
-import { deleteProduct, restockProduct } from "../../features/productsSlice";
+import {
+  useGetProductsQuery,
+  useDeleteProductMutation,
+  useRestockProductMutation,
+} from "../../services/productsApi";
+import { errMsg } from "../../app/baseApi";
 import "../admin/admin.css";
 
 const formatDateTime = (dateString) => {
@@ -103,8 +106,16 @@ function ProductThumb({ product }) {
 
 const ProductList = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { data: products = [], loading = false } = useProducts() || {};
+  // Admin catalogue: up to 100 per request (the API maximum). Stock is refetched on window focus;
+  // delete / restock update the table optimistically and roll back if the server rejects them.
+  const { data: productsPage, isLoading: loading } = useGetProductsQuery(
+    { limit: 100 },
+    { refetchOnFocus: true },
+  );
+  const products = productsPage?.products ?? [];
+  const totalProducts = productsPage?.total ?? products.length;
+  const [deleteProduct] = useDeleteProductMutation();
+  const [restockProduct] = useRestockProductMutation();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -135,10 +146,10 @@ const ProductList = () => {
     if (!qty || qty <= 0) { setRestockError("Please enter a valid quantity greater than 0."); return; }
     setRestockLoading(true); setRestockError(null);
     try {
-      const result = await dispatch(restockProduct({ id: restockTarget._id, quantity: qty, note: restockNote })).unwrap();
+      const { product: result } = await restockProduct({ id: restockTarget._id, quantity: qty, note: restockNote }).unwrap();
       setRestockDone({ prev: result.stock - qty, added: qty, newStock: result.stock });
     } catch (err) {
-      setRestockError(err || "Failed to restock. Please try again.");
+      setRestockError(errMsg(err, "Failed to restock. Please try again."));
     } finally {
       setRestockLoading(false);
     }
@@ -147,9 +158,9 @@ const ProductList = () => {
   const handleDeleteConfirm = async () => {
     setDeleteLoading(true);
     try {
-      await dispatch(deleteProduct(selectedProduct._id)).unwrap();
+      await deleteProduct(selectedProduct._id).unwrap();
       setShowDeleteModal(false); setSelectedProduct(null);
-    } catch { /* handled by redux */ } finally {
+    } catch { /* optimistic removal is rolled back automatically */ } finally {
       setDeleteLoading(false);
     }
   };
@@ -176,7 +187,7 @@ const ProductList = () => {
             <FiPackage size={22} style={{ color: "#8B1A4A" }} />
             Products
           </Typography>
-          <Typography variant="body2" color="text.secondary">{products.length} total products</Typography>
+          <Typography variant="body2" color="text.secondary">{totalProducts} total products</Typography>
         </Box>
         <button className="adm-btn adm-btn-primary adm-btn-lg" onClick={() => navigate("/admin/addProduct")}>
           <FiPlus size={16} />

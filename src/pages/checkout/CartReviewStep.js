@@ -28,7 +28,7 @@ import CouponInput from "../../components/CouponInput";
 import { isCustomItem } from "../../components/CheckoutDeliveryPanel";
 import { updateCartItemNote } from "../../features/cartSlice";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import api from "../../api/axios";
+import { useGetRecommendationsQuery } from "../../services/productsApi";
 
 const P = "#8b2252";
 const P_LIGHT = "rgba(139,34,82,0.07)";
@@ -257,15 +257,10 @@ function CartItemRow({ item, handleQuantityChange, handleRemoveItem, isLast }) {
 
 /* ── Cross-sell strip ──────────────────────────────────────────────── */
 function CrossSellSection({ cartItems, navigate }) {
-  const [recs, setRecs] = useState([]);
-
-  useEffect(() => {
-    const id = cartItems[0]?.product?._id;
-    if (!id) return;
-    api.get(`/api/products/${id}/recommendations`)
-      .then((res) => setRecs((res.data?.recommendations || res.data?.products || []).slice(0, 3)))
-      .catch(() => {});
-  }, [cartItems]);
+  // Cached per product id — editing quantities no longer re-requests the same recommendations.
+  const firstId = cartItems[0]?.product?._id;
+  const { data: recsData } = useGetRecommendationsQuery({ productId: firstId, limit: 6 }, { skip: !firstId });
+  const recs = (recsData ?? []).slice(0, 3);
 
   if (!recs.length) return null;
 

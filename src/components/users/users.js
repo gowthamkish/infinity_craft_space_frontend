@@ -1,6 +1,5 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import { ToastContext } from "../../context/ToastContext";
 import {
   Box,
@@ -33,16 +32,26 @@ import AdminLayout from "../admin/AdminLayout";
 import {
   FiUsers, FiMail, FiShield, FiUser, FiSearch, FiUserX, FiEdit2, FiEye, FiEyeOff, FiTrash2,
 } from "react-icons/fi";
-import { useUsers } from "../../hooks/useSmartFetch";
-import { updateUserRole } from "../../features/adminSlice";
-import api from "../../api/axios";
+import {
+  useGetUsersQuery,
+  useUpdateUserRoleMutation,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
+} from "../../services/adminApi";
+import { errMsg } from "../../app/baseApi";
 import "../admin/admin.css";
 
 const UsersList = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { addSuccess, addError } = useContext(ToastContext);
-  const { data: users, loading, error } = useUsers();
+  const { data: usersData, isLoading: loading, error: usersError } = useGetUsersQuery(undefined, {
+    refetchOnFocus: true,
+  });
+  const users = usersData?.users ?? [];
+  const error = usersError ? errMsg(usersError, "Failed to fetch users") : null;
+  const [updateUserRole] = useUpdateUserRoleMutation();
+  const [updateUser] = useUpdateUserMutation();
+  const [deleteUserMutation] = useDeleteUserMutation();
   const [searchTerm, setSearchTerm] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -76,7 +85,7 @@ const UsersList = () => {
     if (!selectedUser) return;
     setRoleActionLoading(true);
     try {
-      await dispatch(updateUserRole({ userId: selectedUser._id, isAdmin: !selectedUser.isAdmin })).unwrap();
+      await updateUserRole({ userId: selectedUser._id, isAdmin: !selectedUser.isAdmin }).unwrap();
       addSuccess(
         `${selectedUser.username} is now ${selectedUser.isAdmin ? "a regular user" : "an admin"}.`,
         "Role Updated"
@@ -100,13 +109,12 @@ const UsersList = () => {
     setDeleteLoading(true);
     setDeleteError("");
     try {
-      await api.delete(`/api/admin/users/${deleteUser._id}`);
+      await deleteUserMutation(deleteUser._id).unwrap();
       addSuccess(`${deleteUser.username} has been deleted.`, "User Deleted");
       setShowDeleteModal(false);
       setDeleteUser(null);
-      window.location.reload();
     } catch (err) {
-      const msg = err.response?.data?.error || "Failed to delete user.";
+      const msg = err?.data?.error || "Failed to delete user.";
       setDeleteError(msg);
       addError(msg, "Delete Failed");
     } finally {
@@ -132,11 +140,11 @@ const UsersList = () => {
     try {
       const payload = { email: editEmail.trim() };
       if (editPassword) payload.password = editPassword;
-      await api.patch(`/api/admin/users/${editUser._id}`, payload);
+      await updateUser({ userId: editUser._id, ...payload }).unwrap();
       addSuccess("User details updated successfully.", "User Updated");
       setShowEditModal(false);
     } catch (err) {
-      const msg = err.response?.data?.error || "Failed to update user.";
+      const msg = err?.data?.error || "Failed to update user.";
       setEditError(msg);
       addError(msg, "Update Failed");
     } finally {

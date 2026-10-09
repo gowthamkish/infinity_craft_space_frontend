@@ -10,21 +10,20 @@ import InputAdornment from "@mui/material/InputAdornment";
 import CircularProgress from "@mui/material/CircularProgress";
 import { BRAND } from "../theme/muiTheme";
 import { FiTag, FiCheck, FiX } from "react-icons/fi";
-import { couponAPI } from "../api/features";
+import { useValidateCouponMutation } from "../services/engagementApi";
 
 const CouponInput = ({ cartTotal, onCouponApplied, appliedCoupon = null, onRemoveCoupon }) => {
   const [code, setCode] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [validateCoupon, { isLoading: loading }] = useValidateCouponMutation();
   const [validatedCoupon, setValidatedCoupon] = useState(appliedCoupon);
   const [error, setError] = useState(null);
 
   const handleValidate = async (e) => {
     e.preventDefault();
     if (!code.trim()) { setError("Please enter a coupon code"); return; }
-    setLoading(true);
     setError(null);
     try {
-      const result = await couponAPI.validate(code.toUpperCase(), cartTotal);
+      const result = await validateCoupon({ code: code.toUpperCase(), cartTotal }).unwrap();
       if (result.success) {
         setValidatedCoupon(result.data);
         setCode("");
@@ -33,10 +32,10 @@ const CouponInput = ({ cartTotal, onCouponApplied, appliedCoupon = null, onRemov
         setError(result.error || "Invalid coupon code");
         setValidatedCoupon(null);
       }
-    } catch {
-      setError("An error occurred. Please try again.");
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      // 400 responses carry { success:false, error } (invalid / expired / minimum not met)
+      setError(err?.data?.error || "Invalid coupon code");
+      setValidatedCoupon(null);
     }
   };
 

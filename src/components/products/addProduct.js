@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -34,8 +33,8 @@ import {
 } from "react-icons/fi";
 import { MdPalette } from "react-icons/md";
 import AdminLayout from "../admin/AdminLayout";
-import { addProduct, updateProduct } from "../../features/productsSlice";
-import { fetchPublicCategories } from "../../features/categoriesSlice";
+import { useAddProductMutation, useUpdateProductMutation } from "../../services/productsApi";
+import { useGetPublicCategoriesQuery } from "../../services/categoriesApi";
 import api from "../../api/axios";
 
 /* ── Design tokens ─────────────────────────────────────────────── */
@@ -923,12 +922,13 @@ const AddProduct = () => {
   const params   = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useDispatch();
   const fileInputRef = useRef(null);
   const descRef      = useRef(null);
 
-  const { publicCategories: categories = [], publicCategoriesLoading: categoriesLoading } =
-    useSelector((s) => s.categories);
+  // Cached + shared with the storefront filters; a category change elsewhere invalidates it automatically.
+  const { data: categories = [], isLoading: categoriesLoading } = useGetPublicCategoriesQuery();
+  const [addProduct] = useAddProductMutation();
+  const [updateProduct] = useUpdateProductMutation();
 
   const [form, setForm] = useState({
     name: "", sku: "", price: "", compareAtPrice: "",
@@ -1058,10 +1058,10 @@ const AddProduct = () => {
         }
       }
       if (editingId) {
-        await dispatch(updateProduct({ id: editingId, productData })).unwrap();
+        await updateProduct({ id: editingId, productData }).unwrap();
         setAlert({ show: true, message: "Product updated successfully!", variant: "success" });
       } else {
-        await dispatch(addProduct(productData)).unwrap();
+        await addProduct(productData).unwrap();
         setAlert({ show: true, message: "Product added successfully!", variant: "success" });
       }
       if (!editingId) {
@@ -1080,7 +1080,6 @@ const AddProduct = () => {
   };
 
   /* ── Data loading ──────────────────────────────────────────────── */
-  useEffect(() => { dispatch(fetchPublicCategories()); }, [dispatch]);
   useEffect(() => {
     const product = location.state?.product;
     if (editingId && product) {
