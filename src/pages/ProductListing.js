@@ -13,6 +13,8 @@ import {
 } from "../services/accountApi";
 import { errMsg } from "../app/baseApi";
 import { onImgError, PLACEHOLDER_SRC } from "../utils/imageFallback";
+import { buildCloudinaryUrl } from "../components/OptimizedImage";
+import "./categoryCircles.css";
 import {
   Box, Typography, TextField, InputAdornment, IconButton, Button,
   Chip, Skeleton, CircularProgress, Alert, Stack, Popover, Tooltip,
@@ -42,6 +44,62 @@ const PAGE_SIZE = 16;
 // which is the hot path of an O(n log n) sort
 const nameCollator = new Intl.Collator();
 const ROSE = "#d24e33";
+
+function UtilCircle({ icon: Icon, label, active, onClick, ariaLabel, danger, expanded }) {
+  return (
+    <button type="button" className={`cc-item ${active ? "is-active" : ""} ${danger ? "is-danger" : ""}`} aria-label={ariaLabel || label} aria-pressed={active} aria-expanded={expanded} onClick={onClick}>
+      <span className="cc-circle cc-circle--util"><Icon size={20} aria-hidden="true" /><i className="cc-check" aria-hidden="true">✓</i></span>
+      <span className="cc-label">{label}</span>
+    </button>
+  );
+}
+
+/* ── Circular category filters ─────────────────────────────────────────────
+   Square 1:1 crop → round, label underneath, ring + check badge when active,
+   horizontal scroll-snap row (never wraps). Categories have no image of their own,
+   so each circle shows the first product image found in that category. */
+function CategoryCircles({ categories, products, selectedSet, expandedId, onSelect, onClear, lead, trail }) {
+  const imageByName = useMemo(() => {
+    const m = new Map();
+    for (const p of products) {
+      const url = p.images?.[0]?.url || p.image?.url || p.image;
+      if (!url) continue;
+      for (const k of [p.category, p.subCategory]) {
+        const key = k?.toLowerCase();
+        if (key && !m.has(key)) m.set(key, url);
+      }
+    }
+    return m;
+  }, [products]);
+
+  const anySelected = selectedSet.size > 0;
+  return (
+    <div className="cc-row" role="group" aria-label="Filters">
+      {lead}
+      <button type="button" className={`cc-item ${!anySelected ? "is-active" : ""}`} aria-pressed={!anySelected} onClick={onClear}>
+        <span className="cc-circle cc-circle--all"><span aria-hidden="true">✦</span><i className="cc-check" aria-hidden="true">✓</i></span>
+        <span className="cc-label">All</span>
+      </button>
+      {categories.map((cat) => {
+        const names = [cat.name, ...(cat.subcategories?.filter((s) => s.isActive !== false).map((s) => s.name) || [])];
+        const count = names.filter((n) => selectedSet.has(n)).length;
+        const raw = names.map((n) => imageByName.get(n.toLowerCase())).find(Boolean);
+        const src = raw ? buildCloudinaryUrl(raw, 160) || raw : PLACEHOLDER_SRC;
+        return (
+          <button key={cat._id} type="button" className={`cc-item ${count ? "is-active" : ""}`} aria-pressed={count > 0} aria-expanded={expandedId === cat._id} onClick={() => onSelect(cat)}>
+            <span className="cc-circle">
+              <img src={src} alt="" loading="lazy" decoding="async" width="80" height="80" onError={onImgError} />
+              <i className="cc-check" aria-hidden="true">✓</i>
+              {count > 1 && <b className="cc-count">{count}</b>}
+            </span>
+            <span className="cc-label">{cat.name}</span>
+          </button>
+        );
+      })}
+      {trail}
+    </div>
+  );
+}
 
 /* ── Lazy Image ─────────────────────────────────────────────────────── */
 function useLazyImage(src) {
@@ -421,9 +479,9 @@ const ProductListing = () => {
   }, [urlKey, filtersFromUrl]);
 
   // Popovers for horizontal filter strip
-  const [sortAnchor,    setSortAnchor]   = useState(null);
   const [priceAnchor,   setPriceAnchor]  = useState(null);
-  const [catPopover,    setCatPopover]   = useState({ anchor: null, cat: null }); // { anchor, cat: categoryObj }
+  const [sortOpen, setSortOpen] = useState(false); // sort chips row under the circles
+  const [expandedCatId, setExpandedCatId] = useState(null); // category whose subcategory pills are showing
   const [priceMin,      setPriceMin]     = useState("");
   const [priceMax,      setPriceMax]     = useState("");
   const [showImageModal, setShowImageModal] = useState(false);
@@ -490,6 +548,38 @@ const ProductListing = () => {
 
   // O(1) membership for the category pills (checked for every category + subcategory)
   const selectedCategorySet = useMemo(() => new Set(filters.categories), [filters.categories]);
+
+  const activeCategories = useMemo(() => publicCategories.filter((c) => c.isActive !== false), [publicCategories]);
+  const expandedCat = useMemo(() => activeCategories.find((c) => c._id === expandedCatId) || null, [activeCategories, expandedCatId]);
+  const expandedSubs = useMemo(() => expandedCat?.subcategories?.filter((s) => s.isActive !== false) || [], [expandedCat]);
+  const namesOf = (cat) => [cat.name, ...(cat.subcategories?.map((s) => s.name) || [])];
+
+  // Tap a circle: no subcategories → plain toggle. With subcategories → select the whole category and
+  // reveal its pills; tapping the open circle again collapses it and clears that category.
+  const handleCircleSelect = (cat) => {
+    const own = new Set(namesOf(cat));
+    const rest = filters.categories.filter((n) => !own.has(n));
+    const hasSubs = cat.subcategories?.some((s) => s.isActive !== false);
+    const selected = filters.categories.some((n) => own.has(n));
+    if (!hasSubs) { setExpandedCatId(null); handleFiltersChange({ ...filters, categories: selected ? rest : [...rest, cat.name] }); return; }
+    if (expandedCatId === cat._id) { setExpandedCatId(null); handleFiltersChange({ ...filters, categories: rest }); return; }
+    setSortOpen(false);
+    setExpandedCatId(cat._id);
+    if (!selected) handleFiltersChange({ ...filters, categories: [...rest, cat.name] });
+  };
+
+  // Pill tap: null = "All <category>"; otherwise toggle a subcategory (parent name dropped while subs are picked).
+  const setSubSelection = (cat, subName) => {
+    const own = new Set(namesOf(cat));
+    const rest = filters.categories.filter((n) => !own.has(n));
+    let mine = filters.categories.filter((n) => own.has(n) && n !== cat.name);
+    if (subName == null) mine = [cat.name];
+    else {
+      mine = mine.includes(subName) ? mine.filter((n) => n !== subName) : [...mine, subName];
+      if (!mine.length) mine = [cat.name];
+    }
+    handleFiltersChange({ ...filters, categories: [...rest, ...mine] });
+  };
 
   const activeFilterCount = [filters.categories.length > 0, !!filters.priceRange, !!filters.sortBy, !!filters.customizable].filter(Boolean).length;
 
@@ -597,266 +687,55 @@ const ProductListing = () => {
         borderBottom: "1px solid #e7e5e4",
         px: { xs: 2, sm: 3, md: 4, lg: 5 }, py: 1,
       }}>
-        <Box sx={{
-          overflowX: "auto",
-          "&::-webkit-scrollbar": { display: "none" },
-          msOverflowStyle: "none", scrollbarWidth: "none",
-        }}>
-          <Stack direction="row" spacing={1} sx={{ alignItems: "center", width: "max-content", minWidth: "100%", py: 0.5 }}>
-
-            {/* ── Sort pill ── */}
-            {(() => {
-              const active = SORT_OPTIONS.find((o) => o.value === filters.sortBy);
-              const isActive = !!filters.sortBy;
+        <CategoryCircles
+          categories={activeCategories}
+          products={products}
+          selectedSet={selectedCategorySet}
+          expandedId={expandedCatId}
+          onClear={() => { setExpandedCatId(null); handleFiltersChange({ ...filters, categories: [] }); }}
+          onSelect={handleCircleSelect}
+          lead={(() => {
+            const sortOpt = SORT_OPTIONS.find((o) => o.value === filters.sortBy);
+            const price = filters.priceRange;
+            const priceLabel = price ? `₹${price.min.toLocaleString()}–${price.max === Infinity ? "Max" : price.max.toLocaleString()}` : "Price";
+            return (
+              <>
+                <UtilCircle icon={FiArrowUp} label={sortOpt ? sortOpt.label.replace(/^(Price|Name): /, "") : "Sort"} active={!!filters.sortBy || sortOpen} ariaLabel="Sort options" expanded={sortOpen} onClick={() => { setSortOpen((v) => !v); setExpandedCatId(null); }} />
+                <UtilCircle icon={FiTag} label={priceLabel} active={!!price} ariaLabel="Price range" onClick={(e) => setPriceAnchor(e.currentTarget)} />
+                <span className="cc-sep" aria-hidden="true" />
+              </>
+            );
+          })()}
+          trail={activeFilterCount > 0 ? <UtilCircle icon={FiX} label="Clear" danger onClick={handleClearFilters} ariaLabel="Clear all filters" /> : null}
+        />
+        {sortOpen && (
+          <div className="cc-subs" role="radiogroup" aria-label="Sort by">
+            {SORT_OPTIONS.map((opt) => {
+              const on = filters.sortBy === opt.value;
               return (
-                <Box
-                  component="button"
-                  onClick={(e) => setSortAnchor(e.currentTarget)}
-                  aria-label="Sort options"
-                  sx={{
-                    display: "inline-flex", alignItems: "center", gap: 0.625,
-                    px: 1.5, py: 0.625, borderRadius: "20px",
-                    border: `1.5px solid ${isActive ? ROSE : "rgba(0,0,0,0.15)"}`,
-                    bgcolor: isActive ? ROSE : "#fff",
-                    color: isActive ? "#fff" : "#44403c",
-                    cursor: "pointer", whiteSpace: "nowrap",
-                    fontSize: "0.8125rem", fontWeight: isActive ? 700 : 500,
-                    fontFamily: "inherit",
-                    transition: "all 140ms",
-                    "&:hover": { borderColor: ROSE, bgcolor: isActive ? "#b8412a" : "rgba(210, 78, 51,0.06)", color: isActive ? "#fff" : ROSE },
-                  }}
-                >
-                  <FiArrowUp size={12} />
-                  {isActive ? active?.label : "Sort"}
-                  <FiChevronDown size={11} style={{ opacity: 0.7 }} />
-                </Box>
-              );
-            })()}
-
-            {/* ── Divider ── */}
-            <Box sx={{ width: "1px", height: 24, bgcolor: "rgba(0,0,0,0.12)", flexShrink: 0 }} />
-
-            {/* ── Category pills ── */}
-            {publicCategories.filter((c) => c.isActive !== false).map((cat) => {
-              const allNames = [cat.name, ...(cat.subcategories?.filter((s) => s.isActive !== false).map((s) => s.name) || [])];
-              const selectedInCat = allNames.filter((n) => selectedCategorySet.has(n));
-              const isActive = selectedInCat.length > 0;
-              const hasSubs = cat.subcategories?.some((s) => s.isActive !== false);
-
-              const handleCatClick = (e) => {
-                if (hasSubs) {
-                  setCatPopover({ anchor: e.currentTarget, cat });
-                } else {
-                  // No subs — direct toggle
-                  const next = filters.categories.includes(cat.name)
-                    ? filters.categories.filter((c) => c !== cat.name)
-                    : [...filters.categories, cat.name];
-                  handleFiltersChange({ ...filters, categories: next });
-                }
-              };
-
-              return (
-                <Box
-                  key={cat._id}
-                  component="button"
-                  onClick={handleCatClick}
-                  sx={{
-                    display: "inline-flex", alignItems: "center", gap: 0.625,
-                    px: 1.5, py: 0.625, borderRadius: "20px",
-                    border: `1.5px solid ${isActive ? ROSE : "rgba(0,0,0,0.15)"}`,
-                    bgcolor: isActive ? ROSE : "#fff",
-                    color: isActive ? "#fff" : "#44403c",
-                    cursor: "pointer", whiteSpace: "nowrap",
-                    fontSize: "0.8125rem", fontWeight: isActive ? 700 : 500,
-                    fontFamily: "inherit",
-                    transition: "all 140ms",
-                    "&:hover": { borderColor: ROSE, bgcolor: isActive ? "#b8412a" : "rgba(210, 78, 51,0.06)", color: isActive ? "#fff" : ROSE },
-                  }}
-                >
-                  {cat.name}
-                  {isActive && selectedInCat.length > 0 && (
-                    <Box sx={{
-                      display: "inline-flex", alignItems: "center", justifyContent: "center",
-                      width: 16, height: 16, borderRadius: "50%",
-                      bgcolor: "rgba(255,255,255,0.3)", fontSize: "0.6rem", fontWeight: 800,
-                    }}>
-                      {selectedInCat.length}
-                    </Box>
-                  )}
-                  {hasSubs && <FiChevronDown size={11} style={{ opacity: 0.7 }} />}
-                </Box>
+                <button key={opt.value || "relevance"} type="button" role="radio" aria-checked={on} className={`cc-pill ${on ? "is-active" : ""}`} onClick={() => handleFiltersChange({ ...filters, sortBy: opt.value })}>
+                  {on && <FiCheck size={12} aria-hidden="true" />}{opt.label}
+                </button>
               );
             })}
-
-            {/* ── Divider ── */}
-            <Box sx={{ width: "1px", height: 24, bgcolor: "rgba(0,0,0,0.12)", flexShrink: 0 }} />
-
-            {/* ── Price pill ── */}
-            {(() => {
-              const isActive = !!filters.priceRange;
-              const label = isActive
-                ? `₹${filters.priceRange.min.toLocaleString()} – ${filters.priceRange.max === Infinity ? "Max" : `₹${filters.priceRange.max.toLocaleString()}`}`
-                : "Price";
+          </div>
+        )}
+        {expandedCat && !sortOpen && (
+          <div className="cc-subs" role="group" aria-label={`${expandedCat.name} subcategories`}>
+            <button type="button" className={`cc-pill ${selectedCategorySet.has(expandedCat.name) ? "is-active" : ""}`} aria-pressed={selectedCategorySet.has(expandedCat.name)} onClick={() => setSubSelection(expandedCat, null)}>
+              All {expandedCat.name}
+            </button>
+            {expandedSubs.map((sub) => {
+              const on = selectedCategorySet.has(sub.name);
               return (
-                <Box
-                  component="button"
-                  onClick={(e) => setPriceAnchor(e.currentTarget)}
-                  sx={{
-                    display: "inline-flex", alignItems: "center", gap: 0.625,
-                    px: 1.5, py: 0.625, borderRadius: "20px",
-                    border: `1.5px solid ${isActive ? ROSE : "rgba(0,0,0,0.15)"}`,
-                    bgcolor: isActive ? ROSE : "#fff",
-                    color: isActive ? "#fff" : "#44403c",
-                    cursor: "pointer", whiteSpace: "nowrap",
-                    fontSize: "0.8125rem", fontWeight: isActive ? 700 : 500,
-                    fontFamily: "inherit",
-                    transition: "all 140ms",
-                    "&:hover": { borderColor: ROSE, bgcolor: isActive ? "#b8412a" : "rgba(210, 78, 51,0.06)", color: isActive ? "#fff" : ROSE },
-                  }}
-                >
-                  <FiTag size={12} />
-                  {label}
-                  <FiChevronDown size={11} style={{ opacity: 0.7 }} />
-                </Box>
+                <button key={sub._id || sub.name} type="button" className={`cc-pill ${on ? "is-active" : ""}`} aria-pressed={on} onClick={() => setSubSelection(expandedCat, sub.name)}>
+                  {on && <FiCheck size={12} aria-hidden="true" />}{sub.name}
+                </button>
               );
-            })()}
-
-            {/* ── Clear all ── */}
-            {activeFilterCount > 0 && (
-              <>
-                <Box sx={{ width: 1, height: 24, bgcolor: "rgba(0,0,0,0.1)", flexShrink: 0 }} />
-                <Box
-                  component="button"
-                  onClick={handleClearFilters}
-                  sx={{
-                    display: "inline-flex", alignItems: "center", gap: 0.5,
-                    px: 1.5, py: 0.625, borderRadius: "20px",
-                    border: "1.5px solid rgba(0,0,0,0.12)",
-                    bgcolor: "transparent", color: "#78716c",
-                    cursor: "pointer", whiteSpace: "nowrap",
-                    fontSize: "0.8125rem", fontWeight: 500, fontFamily: "inherit",
-                    transition: "all 140ms",
-                    "&:hover": { borderColor: "#ef4444", color: "#ef4444", bgcolor: "rgba(239,68,68,0.05)" },
-                  }}
-                >
-                  <FiX size={11} />
-                  Clear all
-                </Box>
-              </>
-            )}
-          </Stack>
-        </Box>
+            })}
+          </div>
+        )}
       </Box>
-
-      {/* ── Sort popover ──────────────────────────────────────────── */}
-      <Popover
-        open={Boolean(sortAnchor)}
-        anchorEl={sortAnchor}
-        onClose={() => setSortAnchor(null)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-        transformOrigin={{ vertical: "top", horizontal: "left" }}
-        PaperProps={{ sx: { mt: 0.75, borderRadius: 2.5, boxShadow: "0 8px 32px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.07)", p: 0.75, minWidth: 210 } }}
-      >
-        {SORT_OPTIONS.map((opt) => {
-          const active = filters.sortBy === opt.value;
-          const Icon = opt.icon;
-          return (
-            <Box
-              key={opt.value}
-              component="button"
-              onClick={() => { handleFiltersChange({ ...filters, sortBy: opt.value }); setSortAnchor(null); }}
-              sx={{
-                display: "flex", alignItems: "center", gap: 1.25,
-                width: "100%", px: 1.5, py: 1, borderRadius: "10px",
-                border: "none", cursor: "pointer", textAlign: "left",
-                bgcolor: active ? "rgba(210, 78, 51,0.08)" : "transparent",
-                color: active ? ROSE : "#44403c",
-                fontFamily: "inherit", fontSize: "0.875rem", fontWeight: active ? 700 : 400,
-                transition: "all 120ms",
-                "&:hover": { bgcolor: "rgba(210, 78, 51,0.06)", color: ROSE },
-              }}
-            >
-              {Icon && <Icon size={14} />}
-              {!Icon && <Box sx={{ width: 14 }} />}
-              {opt.label}
-              {active && <Box sx={{ ml: "auto", width: 7, height: 7, borderRadius: "50%", bgcolor: ROSE }} />}
-            </Box>
-          );
-        })}
-      </Popover>
-
-      {/* ── Category popover (subcategories) ─────────────────────── */}
-      <Popover
-        open={Boolean(catPopover.anchor)}
-        anchorEl={catPopover.anchor}
-        onClose={() => setCatPopover({ anchor: null, cat: null })}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-        transformOrigin={{ vertical: "top", horizontal: "left" }}
-        PaperProps={{ sx: { mt: 0.75, borderRadius: 2.5, boxShadow: "0 8px 32px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.07)", py: 1, px: 0.75, minWidth: 200, maxWidth: 280 } }}
-      >
-        {catPopover.cat && (() => {
-          const cat = catPopover.cat;
-          const activeSubs = cat.subcategories?.filter((s) => s.isActive !== false) || [];
-          const catSelected = filters.categories.includes(cat.name);
-
-          const toggleName = (name) => {
-            const next = filters.categories.includes(name)
-              ? filters.categories.filter((c) => c !== name)
-              : [...filters.categories, name];
-            handleFiltersChange({ ...filters, categories: next });
-          };
-
-          const rowSx = (active) => ({
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            width: "100%", px: 1.25, py: 0.75, borderRadius: "8px",
-            border: "none", cursor: "pointer", textAlign: "left", transition: "all 100ms",
-            fontFamily: "inherit",
-            bgcolor: active ? "rgba(210, 78, 51,0.08)" : "transparent",
-            color: active ? ROSE : "#44403c",
-            fontWeight: active ? 600 : 400,
-            "&:hover": { bgcolor: "rgba(210, 78, 51,0.06)", color: ROSE },
-          });
-
-          return (
-            <Box>
-              {/* Category label */}
-              <Typography sx={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "text.disabled", px: 1.25, mb: 0.5 }}>
-                {cat.name}
-              </Typography>
-
-              {/* Parent "All" row */}
-              <Box component="button" onClick={() => toggleName(cat.name)} sx={{ ...rowSx(catSelected), fontSize: "0.875rem" }}>
-                All {cat.name}
-                {catSelected && <FiCheck size={13} />}
-              </Box>
-
-              {/* Subcategories */}
-              {activeSubs.length > 0 && (
-                <>
-                  <Box sx={{ height: "1px", bgcolor: "rgba(0,0,0,0.07)", mx: 1.25, my: 0.625 }} />
-                  <Typography sx={{ fontSize: "0.6875rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "text.disabled", px: 1.25, mb: 0.375 }}>
-                    Subcategories
-                  </Typography>
-                  {activeSubs.map((sub) => {
-                    const subSelected = filters.categories.includes(sub.name);
-                    return (
-                      <Box
-                        key={sub._id}
-                        component="button"
-                        onClick={() => toggleName(sub.name)}
-                        sx={{ ...rowSx(subSelected), fontSize: "0.8125rem" }}
-                      >
-                        {sub.name}
-                        {subSelected && <FiCheck size={12} />}
-                      </Box>
-                    );
-                  })}
-                </>
-              )}
-            </Box>
-          );
-        })()}
-      </Popover>
 
       {/* ── Price popover ─────────────────────────────────────────── */}
       <Popover
@@ -865,37 +744,37 @@ const ProductListing = () => {
         onClose={() => setPriceAnchor(null)}
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         transformOrigin={{ vertical: "top", horizontal: "left" }}
-        PaperProps={{ sx: { mt: 0.75, borderRadius: 2.5, boxShadow: "0 8px 32px rgba(0,0,0,0.12)", border: "1px solid rgba(0,0,0,0.07)", p: 2, minWidth: 240 } }}
+        slotProps={{ paper: { sx: { mt: 1, borderRadius: 3, boxShadow: "0 8px 32px rgba(0,0,0,0.14)", border: "1px solid rgba(0,0,0,0.07)", p: 2.5, width: 320, maxWidth: "calc(100vw - 32px)", bgcolor: "#fff" } } }}
       >
-        <Typography sx={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "text.disabled", mb: 1.5 }}>
+        <Typography sx={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "text.disabled", mb: 2 }}>
           Price Range
         </Typography>
-        <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 1.5 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2.5 }}>
           <TextField
             size="small" type="number" placeholder="Min"
             value={priceMin}
             onChange={(e) => setPriceMin(e.target.value)}
             slotProps={{ input: { startAdornment: <InputAdornment position="start"><Typography sx={{ fontSize: "0.8rem", color: "text.disabled" }}>₹</Typography></InputAdornment> } }}
-            sx={{ flex: 1, "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+            sx={{ flex: 1, minWidth: 0, "& .MuiOutlinedInput-root": { borderRadius: "10px", pl: 1.5 }, "& input": { py: 1.25, pl: 0.5 } }}
           />
-          <Typography sx={{ color: "text.disabled" }}>–</Typography>
+          <Typography sx={{ color: "text.disabled", flexShrink: 0 }}>–</Typography>
           <TextField
             size="small" type="number" placeholder="Max"
             value={priceMax}
             onChange={(e) => setPriceMax(e.target.value)}
             slotProps={{ input: { startAdornment: <InputAdornment position="start"><Typography sx={{ fontSize: "0.8rem", color: "text.disabled" }}>₹</Typography></InputAdornment> } }}
-            sx={{ flex: 1, "& .MuiOutlinedInput-root": { borderRadius: "10px" } }}
+            sx={{ flex: 1, minWidth: 0, "& .MuiOutlinedInput-root": { borderRadius: "10px", pl: 1.5 }, "& input": { py: 1.25, pl: 0.5 } }}
           />
-        </Stack>
-        <Stack direction="row" spacing={1}>
+        </Box>
+        <Box sx={{ display: "flex", gap: 1.5 }}>
           {filters.priceRange && (
-            <Button size="small" variant="outlined" fullWidth onClick={() => { handleFiltersChange({ ...filters, priceRange: null }); setPriceAnchor(null); }}
+            <Button variant="outlined" fullWidth onClick={() => { handleFiltersChange({ ...filters, priceRange: null }); setPriceAnchor(null); }}
               sx={{ textTransform: "none", borderRadius: "10px", fontWeight: 600, borderColor: "rgba(0,0,0,0.15)", color: "#78716c", "&:hover": { borderColor: "#ef4444", color: "#ef4444" } }}>
               Clear
             </Button>
           )}
           <Button
-            size="small" variant="contained" fullWidth
+            variant="contained" fullWidth
             disabled={!priceMin && !priceMax}
             onClick={() => {
               const min = parseFloat(priceMin) || 0;
@@ -913,7 +792,7 @@ const ProductListing = () => {
           >
             Apply
           </Button>
-        </Stack>
+        </Box>
       </Popover>
 
       {/* ── Main Content ─────────────────────────────────────────── */}
