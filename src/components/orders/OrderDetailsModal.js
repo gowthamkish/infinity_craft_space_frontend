@@ -836,14 +836,6 @@ const OrderDetailsModal = ({
                         {formatCurrency(selectedOrder.shipping || selectedOrder.shippingCost || 0)}
                       </span>
                     </Box>
-                    {selectedOrder.tax > 0 && (
-                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
-                        <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Tax:</span>
-                        <span style={{ color: "#475569", fontWeight: 600, fontSize: "0.9rem" }}>
-                          {formatCurrency(selectedOrder.tax)}
-                        </span>
-                      </Box>
-                    )}
                   </Box>
                   <hr
                     style={{ margin: "1rem 0", border: "1px solid #e2e8f0" }}

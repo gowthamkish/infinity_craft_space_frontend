@@ -593,7 +593,7 @@ const ProductListing = () => {
   const seoDescription = filters.searchTerm
     ? `Shop ${filters.searchTerm} craft supplies at Infinity Craft Space. Handmade, artisan-crafted products delivered across India.`
     : activeCategory
-    ? `Explore our ${activeCategory} collection — handcrafted, artisan-made products at Infinity Craft Space. Free delivery options across India.`
+    ? `Explore our ${activeCategory} collection — handcrafted, artisan-made products at Infinity Craft Space. Delivered across India.`
     : "Browse 100+ handcrafted products at Infinity Craft Space — jewellery, resin art, custom gifts, pottery supplies and more. Delivered across India.";
 
   const ogImage = filteredProducts[0]?.images?.[0]?.url

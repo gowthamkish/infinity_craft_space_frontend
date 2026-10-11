@@ -32,7 +32,6 @@ export const PaymentStep = ({
   shippingAddress,
   subtotal,
   shipping,
-  tax,
   total,
   error,
   loading,
@@ -142,8 +141,7 @@ export const PaymentStep = ({
             <hr className="ck-hr" />
             <div className="ck-rows">
               <Row label="Subtotal" value={inr(subtotal)} />
-              <Row label="Shipping" value={shipping === 0 ? "FREE" : inr(shipping)} tone={shipping === 0 ? "ok" : undefined} />
-              {tax > 0 && <Row label="Tax (18% GST)" value={inr(tax)} />}
+              <Row label="Shipping" value={inr(shipping)} />
             </div>
             <hr className="ck-hr" />
             <Total label="Total to pay" value={inr(total)} />

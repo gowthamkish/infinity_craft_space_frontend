@@ -69,7 +69,7 @@ const OCCASIONS = [
 ];
 
 const TRUST_ITEMS = [
-  { Icon: FiTruck,     title: "Free Shipping",  desc: "On every order above ₹999, delivered across India." },
+  { Icon: FiTruck,     title: "Pan-India Delivery", desc: "Delivered across India — you only pay shipping based on distance." },
   { Icon: FiRefreshCw, title: "Easy Returns",   desc: "7-day hassle-free returns if something isn't right." },
   { Icon: FiLock,      title: "Secure Payment", desc: "100% encrypted checkout powered by Razorpay." },
   { Icon: FiAward,     title: "Handcrafted",    desc: "Every piece is made by hand, with love and care." },
@@ -96,7 +96,6 @@ const TESTIMONIALS = [
 ];
 
 const MARQUEE_ITEMS = [
-  "🚚 Free Shipping above ₹999",
   "✋ 100% Handcrafted",
   "🇮🇳 Pan-India Delivery",
   "⭐ 4.9/5 Average Rating",
@@ -451,7 +450,7 @@ export default function Home() {
                   })}
                 </div>
                 <div className="hm-chip hm-chip--a"><span className="mini">⭐</span>4.9/5 · 1,200+ reviews</div>
-                <div className="hm-chip hm-chip--teal hm-chip--b"><span className="mini">🚚</span>Free shipping ₹999+</div>
+                <div className="hm-chip hm-chip--teal hm-chip--b"><span className="mini">🚚</span>Delivered across India</div>
                 <div className="hm-chip hm-chip--c"><span className="mini">✋</span>100% handmade</div>
               </div>
             </div>

@@ -11,31 +11,12 @@ import { useGetRecommendationsQuery } from "../../services/productsApi";
 import { Thumb, Card, Alert, SummaryItems, Row, Total, MiniTrust, TRUST_MINI, HelpCard, inr, productImage } from "./ui";
 import { PLACEHOLDER_SRC, onImgError } from "../../utils/imageFallback";
 
-const FREE_THRESHOLD = 999;
-
 /** Discount to show for an applied coupon: trust the amount the API calculated, else derive it. */
 function couponDiscount(coupon, subtotal) {
   if (!coupon) return 0;
   if (typeof coupon.discount === "number") return coupon.discount;
   const isPercent = coupon.discountType === "percent" || coupon.discountType === "percentage";
   return isPercent ? (subtotal * coupon.discountValue) / 100 : coupon.discountValue || 0;
-}
-
-/* ── Free-shipping progress ─────────────────────────────────────────────── */
-function FreeShippingBar({ subtotal }) {
-  const remaining = Math.max(0, FREE_THRESHOLD - subtotal);
-  const achieved = remaining === 0;
-  const pct = Math.min(100, (subtotal / FREE_THRESHOLD) * 100);
-  return (
-    <div style={{ marginBottom: 24 }}>
-      <div className="ck-ship-msg" style={{ color: achieved ? "#15803d" : "var(--ics-text)" }}>
-        {achieved ? "🎉 You've unlocked free shipping!" : `Add ${inr(remaining).replace(".00", "")} more for free shipping`}
-      </div>
-      <div className={`ck-bar ${achieved ? "ck-bar--ok" : ""}`} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)}>
-        <i style={{ width: `${pct}%` }} />
-      </div>
-    </div>
-  );
 }
 
 /* ── One cart line ──────────────────────────────────────────────────────── */
@@ -163,7 +144,7 @@ function CrossSell({ cartItems, navigate }) {
 
 const PROMISES = [
   { Icon: FiLock, title: "Secure checkout", text: "Encrypted payments via Razorpay" },
-  { Icon: FiTruck, title: "Free shipping ₹999+", text: "Delivered across India" },
+  { Icon: FiTruck, title: "Pan-India delivery", text: "Shipping charged by distance" },
   { Icon: FiRefreshCw, title: "Easy returns", text: "7-day hassle-free returns" },
 ];
 
@@ -230,7 +211,6 @@ export const CartReviewStep = ({
       <aside className="ck-aside" aria-label="Order summary">
         <Card title="Order summary" subtitle={`${count} ${count === 1 ? "item" : "items"} in your cart`} noBody footer={<MiniTrust items={TRUST_MINI} />}>
           <div className="ck-card-body">
-            <FreeShippingBar subtotal={subtotal} />
             <SummaryItems cartItems={cartItems} />
             <hr className="ck-hr" />
             <div className="ck-rows">

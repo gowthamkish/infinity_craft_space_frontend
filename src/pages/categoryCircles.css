@@ -1,8 +1,8 @@
 .cc-row {
   display: flex;
-  gap: 14px;
+  gap: 12px;
   overflow-x: auto;
-  padding: 10px 2px 6px;
+  padding: 8px 2px 6px;
   margin-top: 4px;
   scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
@@ -15,11 +15,11 @@
 }
 .cc-item {
   flex: 0 0 auto;
-  width: 56px;
+  width: 50px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   background: none;
   border: 0;
   padding: 0;
@@ -30,8 +30,8 @@
 }
 .cc-circle {
   position: relative;
-  width: 46px;
-  height: 46px;
+  width: 40px;
+  height: 40px;
   aspect-ratio: 1/1;
   border-radius: 50%;
   padding: 2px;
@@ -55,7 +55,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   color: var(--ics-ember, #e8623d);
   background: linear-gradient(135deg, #fff3ee, #e3f5f2);
 }
@@ -110,8 +110,8 @@
   box-sizing: border-box;
 }
 .cc-label {
-  max-width: 56px;
-  font-size: 0.78rem;
+  max-width: 50px;
+  font-size: 0.7rem;
   line-height: 1.2;
   color: #5b5d58;
   font-weight: 500;
@@ -127,18 +127,18 @@
 }
 @media (min-width: 900px) {
   .cc-item {
-    width: 66px;
+    width: 58px;
   }
   .cc-circle {
-    width: 52px;
-    height: 52px;
+    width: 44px;
+    height: 44px;
   }
   .cc-label {
-    max-width: 66px;
-    font-size: 0.78rem;
+    max-width: 58px;
+    font-size: 0.7rem;
   }
   .cc-row {
-    gap: 20px;
+    gap: 16px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -149,9 +149,10 @@
 }
 .cc-subs {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   overflow-x: auto;
-  padding: 8px 2px 4px;
+  padding: 2px 2px 4px;
+  margin-top: 14px;
   scrollbar-width: none;
   animation: cc-in 0.22s ease both;
 }
@@ -162,15 +163,17 @@
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  min-height: 36px;
-  padding: 0 15px;
+  gap: 4px;
+  min-height: 28px;
+  padding: 0 12px;
   border-radius: 999px;
   border: 1px solid transparent;
   background: #efece5;
   color: #5b5d58;
-  font: 500 0.82rem/1 inherit;
   font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1;
   cursor: pointer;
   white-space: nowrap;
   transition:
@@ -231,15 +234,15 @@
   color: #ef4444;
 }
 .cc-check {
-  width: 18px;
-  height: 18px;
-  font-size: 0.62rem;
-  line-height: 18px;
+  width: 16px;
+  height: 16px;
+  font-size: 0.55rem;
+  line-height: 16px;
 }
 .cc-sep {
   flex: 0 0 1px;
   align-self: center;
-  height: 36px;
+  height: 30px;
   background: rgba(0, 0, 0, 0.12);
   margin: 0 2px 18px;
 }

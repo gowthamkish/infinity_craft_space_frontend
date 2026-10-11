@@ -84,8 +84,7 @@ export default function Checkout() {
 
   const subtotal = cartItems.reduce((total, item) => total + item.totalPrice, 0);
   const shipping = shippingRate?.rate || 0;
-  const tax = 0;
-  const total = subtotal + shipping + tax;
+  const total = subtotal + shipping; // no taxes are charged — only shipping, which depends on distance
 
   const steps = [
     { number: 1, title: "Cart", sub: "Review your items" },
@@ -197,7 +196,7 @@ export default function Checkout() {
       setError(`Please fill in all required fields: ${missingFields.join(", ")}`);
       return;
     }
-    trackAddShippingInfo(cartItems, total, shipping === 0 ? "free" : "standard");
+    trackAddShippingInfo(cartItems, total, "standard");
     setCurrentStep(3);
     setError(null);
   };
@@ -300,14 +299,12 @@ export default function Checkout() {
       }));
       const subtotalLocal = subtotal;
       const shippingLocal = shipping;
-      const taxLocal = tax;
       const totalLocal = total;
       const finalOrderData = {
         orderId: paymentResponse?.order_id || paymentResponse?.razorpay_order_id || `ORD-${Date.now()}`,
         items,
         subtotal: subtotalLocal,
         shipping: shippingLocal,
-        tax: taxLocal,
         total: totalLocal,
         paymentDetails: {
           razorpay_order_id: paymentResponse?.razorpay_order_id,
@@ -440,7 +437,6 @@ export default function Checkout() {
               shippingAddress={shippingAddress}
               subtotal={subtotal}
               shipping={shipping}
-              tax={tax}
               total={total}
               error={error}
               loading={loading}

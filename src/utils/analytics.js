@@ -203,7 +203,6 @@ export const trackPurchase = (orderData) => {
     items,
     total,
     subtotal,
-    tax = 0,
     shipping = 0,
     paymentDetails,
   } = orderData;
@@ -222,7 +221,6 @@ export const trackPurchase = (orderData) => {
     transaction_id: orderId || orderData._id || `ORD-${Date.now()}`,
     value: total,
     currency: "INR",
-    tax: tax,
     shipping: shipping,
     items: formattedItems,
     payment_type: paymentDetails?.method || "online",

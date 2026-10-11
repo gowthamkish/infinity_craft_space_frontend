@@ -134,7 +134,7 @@ function ShippingWidget({ zoneKey, weightKg, rate, dispatchBuffer = 0 }) {
           {zone.sublabel} · {weightKg < 1 ? `${Math.round(weightKg * 1000)} g` : `${weightKg.toFixed(2)} kg`}
         </div>
       </div>
-      <div className="ck-ship-price">{rate === 0 ? "FREE" : `₹${rate}`}</div>
+      <div className="ck-ship-price">₹{rate}</div>
     </div>
   );
 }
@@ -562,7 +562,7 @@ export const ShippingStep = ({
           <div className="ck-rows">
             <Row label="Subtotal" value={inr(subtotal)} />
             {shippingRate ? (
-              <Row label="Shipping" value={shippingRate.rate === 0 ? "FREE" : inr(shippingRate.rate)} tone={shippingRate.rate === 0 ? "ok" : undefined} />
+              <Row label="Shipping" value={inr(shippingRate.rate)} />
             ) : (
               <Row label="Shipping" hint="Enter your PIN code" />
             )}

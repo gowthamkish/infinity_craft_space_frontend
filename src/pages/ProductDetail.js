@@ -87,7 +87,7 @@ const T = {
 };
 
 const TRUST_ITEMS = [
-  { icon: <FiTruck  size={20} />, label: "Free Shipping",    sub: "Orders above ₹999"      },
+  { icon: <FiTruck  size={20} />, label: "Pan-India Delivery", sub: "Shipping by distance"  },
   { icon: <FiShield size={20} />, label: "Secure Payment",   sub: "100% Safe Checkout"     },
   { icon: <FiRefreshCw size={20} />, label: "Easy Returns",  sub: "7-Day Return Policy"    },
   { icon: <FiCheck  size={20} />, label: "Quality Assured",  sub: "Handcrafted with care"  },
@@ -678,7 +678,7 @@ const ProductDetail = () => {
                       )}
                     </Stack>
                     <Typography sx={{ ...T.supporting, color: "text.disabled" }}>
-                      Inclusive of all taxes
+                      No taxes added · shipping calculated at checkout
                     </Typography>
                   </Box>
 

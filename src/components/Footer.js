@@ -35,7 +35,7 @@ const QUICK_LINKS = [
 ];
 
 const TRUST_ITEMS = [
-  { icon: FiTruck,  label: "Free Shipping",   sub: "On orders above ₹999",  color: "#0f9488" },
+  { icon: FiTruck,  label: "Pan-India Delivery", sub: "Shipping by distance", color: "#0f9488" },
   { icon: FiShield, label: "Secure Payments", sub: "100% safe checkout",    color: "#e8623d" },
   { icon: FiAward,  label: "Quality Promise", sub: "Curated craft supplies", color: "#e8623d" },
 ];

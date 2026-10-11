@@ -193,10 +193,6 @@
 .ck-total { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
 .ck-total span { font-size: 1.1rem; font-weight: 600; }
 .ck-total b { font-family: var(--ics-font-mono); font-size: 1.7rem; font-weight: 700; color: var(--ics-ember-deep); }
-.ck-bar { height: 8px; border-radius: 99px; background: var(--ics-surface-2); overflow: hidden; margin-top: 10px; }
-.ck-bar > i { display: block; height: 100%; border-radius: 99px; background: var(--ics-grad); transition: width .5s ease; }
-.ck-bar--ok > i { background: var(--ics-grad-teal); }
-.ck-ship-msg { font-size: .95rem; font-weight: 600; }
 .ck-mini-trust { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 20px; padding: 16px 24px; background: var(--ics-bg); border-top: 1px solid var(--ics-border); font-size: .88rem; color: var(--ics-text-2); }
 .ck-mini-trust span { display: inline-flex; align-items: center; gap: 6px; }
 .ck-mini-trust svg { color: var(--ics-teal-text); }
