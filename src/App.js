@@ -18,7 +18,12 @@ import { PageLoader } from "./components/Loader";
 import { HelmetProvider } from "react-helmet-async";
 import ErrorBoundary, { RouteErrorBoundary } from "./components/ErrorBoundary";
 import { ToastContext } from "./context/ToastContext";
-import { useStreamOrderEventsQuery, useGetMyOrdersQuery } from "./services/ordersApi";
+import {
+  useStreamOrderEventsQuery,
+  useGetMyOrdersQuery,
+  useGetStatusUpdatesQuery,
+  useAckStatusUpdatesMutation,
+} from "./services/ordersApi";
 import { Analytics } from "@vercel/analytics/react";
 
 // Lazy-load everything that is NOT needed to render the first visible frame.
@@ -181,6 +186,7 @@ function App() {
   // ── Live order status (RTK Query) ──────────────────────────────────────────
   // 1) STREAMING: an SSE connection (opened/closed/retried inside the endpoint) writes every
   //    ORDER_UPDATE into the cached order list and exposes the latest event here.
+  const [ackStatusUpdates] = useAckStatusUpdatesMutation();
   const { data: orderStream } = useStreamOrderEventsQuery(undefined, { skip: !userId });
   const lastOrderEvent = orderStream?.lastEvent;
 
@@ -201,7 +207,38 @@ function App() {
         previousStatus: previousStatus || null,
       });
     }
+    // Seen live — clear the server-side "unseen change" so it isn't repeated at the next login
+    ackStatusUpdates([{ orderId: key, status: order.status }]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastOrderEvent]);
+
+  // 1b) CATCH-UP: status changes an admin made while this customer was offline / logged out. They are
+  //     stored on the server until acknowledged, so they appear right after login even in a fresh
+  //     browser session. Newest change → modal; any others → toasts.
+  const { data: unseenUpdates } = useGetStatusUpdatesQuery(undefined, {
+    skip: !userId,
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+  });
+  useEffect(() => {
+    if (!userId || !unseenUpdates?.length) return;
+    const fresh = unseenUpdates.filter(
+      (u) => STATUS_TOAST_CONFIG[u.order.status] && !shownRef.current.has(`${u.order._id}:${u.order.status}`),
+    );
+    fresh.forEach((u) => shownRef.current.add(`${u.order._id}:${u.order.status}`));
+    const [latest, ...rest] = [...fresh].sort((a, b) => new Date(b.at) - new Date(a.at));
+    if (latest) setOrderStatusEventRef.current({ order: latest.order, previousStatus: latest.previousStatus });
+    rest.forEach((u) => {
+      const cfg = STATUS_TOAST_CONFIG[u.order.status];
+      addToastRef.current(`Order #${String(u.order._id).slice(-6).toUpperCase()} — ${cfg.label}`, {
+        type: cfg.type,
+        title: `${cfg.emoji} Order update`,
+        duration: 8000,
+      });
+    });
+    ackStatusUpdates(unseenUpdates.map((u) => ({ orderId: String(u.order._id), status: u.order.status })));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [unseenUpdates, userId]);
 
   // 2) POLLING fallback (if the stream is down or events were missed while offline).
   //    The Orders page reads the SAME cache entry, so this is one shared request. Polls every 30s,

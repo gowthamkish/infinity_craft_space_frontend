@@ -195,7 +195,7 @@ export default function TrackOrder() {
 
         <Grid container spacing={2}>
           {/* ── Left: Tracking ── */}
-          <Grid item xs={12} lg={8}>
+          <Grid size={{ xs: 12, lg: 8 }}>
             {/* Order status card */}
             <div className="to-card mb-3">
               <div
@@ -225,7 +225,7 @@ export default function TrackOrder() {
           </Grid>
 
           {/* ── Right: Order Summary ── */}
-          <Grid item xs={12} lg={4}>
+          <Grid size={{ xs: 12, lg: 4 }}>
             {/* Shipping address */}
             <div className="to-card mb-3">
               <div

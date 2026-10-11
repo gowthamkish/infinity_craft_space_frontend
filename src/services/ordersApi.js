@@ -30,6 +30,17 @@ export const ordersApi = baseApi.injectEndpoints({
       invalidatesTags: (_r, _e, orderId) => [{ type: "Order", id: orderId }, "Dashboard", "Product"],
     }),
 
+    /** Admin status changes this customer hasn't seen yet (survives being offline / closing the browser). */
+    getStatusUpdates: build.query({
+      query: () => "/api/orders/status-updates",
+      transformResponse: (r) => (r?.success && Array.isArray(r.updates) ? r.updates : []),
+    }),
+
+    /** Mark status changes as seen. `items`: [{ orderId, status }] — no cache invalidation needed. */
+    ackStatusUpdates: build.mutation({
+      query: (items) => ({ url: "/api/orders/status-updates/ack", method: "post", data: { items } }),
+    }),
+
     /**
      * STREAMING: real-time order updates over Server-Sent Events.
      *
@@ -114,4 +125,10 @@ export const ordersApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetMyOrdersQuery, useCancelOrderMutation, useStreamOrderEventsQuery } = ordersApi;
+export const {
+  useGetMyOrdersQuery,
+  useCancelOrderMutation,
+  useStreamOrderEventsQuery,
+  useGetStatusUpdatesQuery,
+  useAckStatusUpdatesMutation,
+} = ordersApi;

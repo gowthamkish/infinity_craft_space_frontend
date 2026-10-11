@@ -21,7 +21,7 @@ const FiltersBar = ({ searchTerm, setSearchTerm, statusFilter, setStatusFilter }
     <Card sx={{ mb: 3, border: "1px solid #e2e8f0" }} elevation={0}>
       <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
         <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <TextField
               fullWidth
               size="small"
@@ -40,7 +40,7 @@ const FiltersBar = ({ searchTerm, setSearchTerm, statusFilter, setStatusFilter }
               sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <TextField
               select
               fullWidth

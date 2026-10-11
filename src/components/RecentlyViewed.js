@@ -61,7 +61,7 @@ const RecentlyViewed = ({ limit = 8 }) => {
         <Grid container spacing={2}>
 
           {displayedProducts.map((product) => (
-            <Grid item key={product._id} xs={6} md={4} lg={3}>
+            <Grid key={product._id} size={{ xs: 6, md: 4, lg: 3 }}>
               <RecentlyViewedCard product={product} onRemove={removeProduct} />
             </Grid>
           ))}

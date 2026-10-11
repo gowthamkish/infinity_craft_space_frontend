@@ -202,7 +202,7 @@ export default function Account() {
                 return (
                   <Grid container spacing={3} sx={{ mb: 4 }}>
                     {/* Loyalty points card */}
-                    <Grid item xs={12} md={code ? 6 : 12}>
+                    <Grid size={{ xs: 12, md: code ? 6 : 12 }}>
                       <Paper
                         elevation={0}
                         sx={{
@@ -257,7 +257,7 @@ export default function Account() {
 
                     {/* Referral card */}
                     {code && (
-                      <Grid item xs={12} md={6}>
+                      <Grid size={{ xs: 12, md: 6 }}>
                         <Paper
                           elevation={0}
                           sx={{
@@ -333,7 +333,7 @@ export default function Account() {
 
             <Grid container spacing={3}>
               {/* Address Book */}
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Card
                   elevation={0}
                   sx={{ border: "1px solid", borderColor: "divider", borderRadius: 2, height: "100%" }}
@@ -459,7 +459,7 @@ export default function Account() {
               </Grid>
 
               {/* Wishlist */}
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Card
                   elevation={0}
                   sx={{ border: "1px solid", borderColor: "divider", borderRadius: 2, height: "100%" }}

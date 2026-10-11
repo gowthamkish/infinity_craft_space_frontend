@@ -4,7 +4,6 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
@@ -47,10 +46,10 @@ const StatusUpdateModal = ({
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ p: 2, background: "#f8fafc" }}>
+      <DialogContent sx={{ p: 2.5, background: "#f8fafc" }}>
         {/* Order summary card */}
-        <Card sx={{ mb: 2, border: "1px solid #e2e8f0" }} elevation={0}>
-          <CardContent sx={{ p: 2, textAlign: "center" }}>
+        <Card sx={{ mb: 2.5, border: "1px solid #e2e8f0" }} elevation={0}>
+          <CardContent sx={{ p: 2.5, textAlign: "center", "&:last-child": { pb: 2.5 } }}>
             <Box sx={{ width: 45, height: 45, background: "rgba(210, 78, 51,0.1)", borderRadius: "50%",
                 border: "2px solid rgba(210, 78, 51,0.3)", display: "flex", alignItems: "center",
                 justifyContent: "center", mx: "auto", mb: 1 }}>
@@ -65,8 +64,8 @@ const StatusUpdateModal = ({
             </Box>
 
             {selectedOrder && (
-              <Grid container spacing={1} sx={{ mt: 1.5, background: "#f1f5f9",
-                  borderRadius: 1.5, p: 1, border: "1px solid #e2e8f0" }}>
+              <Box sx={{ mt: 2, display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 1.5, background: "#f1f5f9",
+                  borderRadius: 2, p: 2, border: "1px solid #e2e8f0" }}>
                 {[
                   { icon: <FiUser size={14} style={{ color: "#10b981" }} />, label: "Customer",
                     value: selectedOrder.userId?.username || selectedOrder.customerName || "Unknown" },
@@ -75,15 +74,15 @@ const StatusUpdateModal = ({
                   { icon: <FiDollarSign size={14} style={{ color: "#059669" }} />, label: "Amount",
                     value: formatCurrency(selectedOrder.totalAmount || selectedOrder.total), green: true },
                 ].map(({ icon, label, value, green }) => (
-                  <Grid item xs={4} key={label} sx={{ textAlign: "center" }}>
+                  <Box key={label} sx={{ textAlign: "center", minWidth: 0 }}>
                     <Box sx={{ display: "flex", justifyContent: "center", mb: 0.5 }}>{icon}</Box>
-                    <Typography variant="caption" sx={{ display: "block", color: "text.secondary" }}>{label}</Typography>
-                    <Typography variant="caption" sx={{ fontWeight: 700, color: green ? "#059669" : "text.primary" }}>
+                    <Typography variant="caption" sx={{ display: "block", color: "text.secondary", mb: 0.25 }}>{label}</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 700, color: green ? "#059669" : "text.primary", overflowWrap: "anywhere" }}>
                       {value}
                     </Typography>
-                  </Grid>
+                  </Box>
                 ))}
-              </Grid>
+              </Box>
             )}
           </CardContent>
         </Card>
@@ -91,12 +90,12 @@ const StatusUpdateModal = ({
         {/* Status selector card */}
         <Card sx={{ border: "1px solid #e2e8f0", overflow: "hidden" }} elevation={0}>
           <Box sx={{ background: "linear-gradient(135deg, #059669 0%, #047857 100%)",
-              color: "white", px: 2, py: 1 }}>
+              color: "white", px: 2.5, py: 1.25 }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 700, display: "flex", alignItems: "center", gap: 1 }}>
               <FiEdit size={14} /> Select New Status
             </Typography>
           </Box>
-          <CardContent sx={{ p: 2 }}>
+          <CardContent sx={{ p: 2.5, "&:last-child": { pb: 2.5 } }}>
             <Typography variant="body2" sx={{ color: "text.secondary", mb: 1.5 }}>
               Choose the new status for this order:
             </Typography>

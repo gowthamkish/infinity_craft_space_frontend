@@ -95,7 +95,7 @@ const ProductRecommendations = ({
 
       <Grid container spacing={{ xs: 2, sm: 3 }}>
         {products.map((product) => (
-          <Grid item key={product._id} xs={12} sm={6} md={4} lg={3}>
+          <Grid key={product._id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
             <ProductRecommendationCard product={product} />
           </Grid>
         ))}

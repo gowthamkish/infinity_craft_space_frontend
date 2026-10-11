@@ -47,7 +47,7 @@ const VirtualizedProductGrid = memo(({
     return (
       <Grid container spacing={2}>
         {products.map((product, index) => (
-          <Grid item key={product._id || index} xs={12} sm={6} lg={4} xl={3}>
+          <Grid key={product._id || index} size={{ xs: 12, sm: 6, lg: 4, xl: 3 }}>
             {renderProduct(product, index)}
           </Grid>
         ))}

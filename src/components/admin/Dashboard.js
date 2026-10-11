@@ -101,7 +101,7 @@ export default function Dashboard() {
               {STAT_CARDS.map(({ key, label, hint, icon: Icon, color, path }) => {
                 const c = STAT_COLORS[color];
                 return (
-                  <Grid item xs={12} sm={6} md={4} key={key} sx={{ display: "flex" }}>
+                  <Grid key={key} sx={{ display: "flex" }} size={{ xs: 12, sm: 6, md: 4 }}>
                     <Card
                       onClick={() => navigate(path)}
                       role="button"
@@ -171,7 +171,7 @@ export default function Dashboard() {
               <CardContent sx={{ p: 2.5, "&:last-child": { pb: 2.5 } }}>
                 <Grid container spacing={1.5}>
                   {QUICK_ACTIONS.map(({ label, icon: Icon, path }) => (
-                    <Grid item xs={12} sm={6} md={4} lg={3} key={label}>
+                    <Grid key={label} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
                       <Button
                         variant="outlined"
                         startIcon={<Icon size={15} />}

@@ -403,8 +403,8 @@ const OrderDetailsModal = ({
             </Box>
 
             <Box sx={{ padding: "1.25rem" }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} lg={6}>
+              <Grid container spacing={2.5}>
+                <Grid size={{ xs: 12, lg: 6 }}>
                   <Card
                     sx={{
                       height: "100%",
@@ -419,7 +419,7 @@ const OrderDetailsModal = ({
                         background:
                           "linear-gradient(135deg, #10b981 0%, #059669 100%)",
                         color: "white",
-                        padding: "0.875rem 1rem",
+                        padding: "0.875rem 1.25rem",
                       }}
                     >
                       <h6
@@ -435,7 +435,7 @@ const OrderDetailsModal = ({
                         Customer Information
                       </h6>
                     </Box>
-                    <CardContent sx={{ padding: "1rem" }}>
+                    <CardContent sx={{ padding: "1.25rem", "&:last-child": { paddingBottom: "1.25rem" } }}>
                       <Box sx={{ mb: 1.5 }}>
                         <label style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: 500 }}>Username</label>
                         <p style={{ margin: "0.15rem 0 0 0", fontSize: "0.9rem", fontWeight: 600, color: "#1e293b" }}>
@@ -461,7 +461,7 @@ const OrderDetailsModal = ({
                     </CardContent>
                   </Card>
                 </Grid>
-                <Grid item xs={12} lg={6}>
+                <Grid size={{ xs: 12, lg: 6 }}>
                   <Card
                     sx={{
                       height: "100%",
@@ -476,7 +476,7 @@ const OrderDetailsModal = ({
                         background:
                           "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
                         color: "white",
-                        padding: "0.875rem 1rem",
+                        padding: "0.875rem 1.25rem",
                       }}
                     >
                       <h6
@@ -492,7 +492,7 @@ const OrderDetailsModal = ({
                         Shipping Address
                       </h6>
                     </Box>
-                    <CardContent sx={{ padding: "1rem" }}>
+                    <CardContent sx={{ padding: "1.25rem", "&:last-child": { paddingBottom: "1.25rem" } }}>
                       {selectedOrder.shippingAddress ? (
                         <div
                           style={{
@@ -544,7 +544,7 @@ const OrderDetailsModal = ({
 
               <Card
                 sx={{
-                  mt: 2,
+                  mt: 2.5,
                   border: "none",
                   boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
                   borderRadius: "12px",
@@ -555,7 +555,7 @@ const OrderDetailsModal = ({
                   sx={{
                     background: "linear-gradient(135deg, #0f172a, #1e293b)",
                     color: "white",
-                    padding: "0.875rem 1rem",
+                    padding: "0.875rem 1.25rem",
                   }}
                 >
                   <h6
@@ -578,7 +578,7 @@ const OrderDetailsModal = ({
                         <div
                           key={idx}
                           style={{
-                            padding: "1rem",
+                            padding: "1.25rem",
                             borderBottom:
                               idx < selectedOrder.items.length - 1
                                 ? "1px solid #f1f5f9"
@@ -696,7 +696,7 @@ const OrderDetailsModal = ({
               {hasShipment && (
                 <Card
                   sx={{
-                    mt: 2,
+                    mt: 2.5,
                     border: "none",
                     boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
                     borderRadius: "12px",
@@ -707,7 +707,7 @@ const OrderDetailsModal = ({
                     sx={{
                       background: "linear-gradient(135deg, #0f9488, #d24e33)",
                       color: "white",
-                      padding: "0.875rem 1rem",
+                      padding: "0.875rem 1.25rem",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
@@ -725,22 +725,7 @@ const OrderDetailsModal = ({
                       <FiTruck size={16} style={{ marginRight: "0.5rem" }} />
                       Shipment & Tracking
                     </h6>
-                    {orderId && canDownloadInvoice(selectedOrder) && (
-            <Button
-              variant="contained"
-              onClick={handleInvoice}
-              disabled={invoiceBusy}
-              startIcon={<FiDownload size={16} />}
-              sx={{
-                flex: 1, borderRadius: 2, padding: "0.6rem 1.5rem", fontWeight: 600, fontSize: "0.9rem",
-                textTransform: "none", boxShadow: "none", background: "#d24e33", color: "white",
-                "&:hover": { background: "#b8412a", boxShadow: "none" },
-              }}
-            >
-              {invoiceBusy ? "Preparing…" : "Download invoice"}
-            </Button>
-          )}
-          {orderId && hasShipment && (
+                    {orderId && hasShipment && (
                       <button
                         onClick={() => { onHide(); navigate(`/track/${orderId}`); }}
                         style={{
@@ -758,7 +743,7 @@ const OrderDetailsModal = ({
                       </button>
                     )}
                   </Box>
-                  <div style={{ padding: "1rem", background: "white" }}>
+                  <div style={{ padding: "1.25rem", background: "white" }}>
                     {trackingLoading ? (
                       <div style={{ textAlign: "center", padding: "1rem", color: "#94a3b8" }}>
                         Loading tracking…
@@ -777,7 +762,7 @@ const OrderDetailsModal = ({
               {selectedOrder.hasReturnRequest && selectedOrder.returnRequestId && (
                 <Card
                   sx={{
-                    mt: 2,
+                    mt: 2.5,
                     border: "none",
                     boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
                     borderRadius: "12px",
@@ -788,7 +773,7 @@ const OrderDetailsModal = ({
                     sx={{
                       background: "linear-gradient(135deg, #f59e0b, #d97706)",
                       color: "white",
-                      padding: "0.875rem 1rem",
+                      padding: "0.875rem 1.25rem",
                     }}
                   >
                     <h6 style={{ margin: 0, fontWeight: 600, display: "flex", alignItems: "center", fontSize: "0.9rem" }}>
@@ -805,7 +790,7 @@ const OrderDetailsModal = ({
 
               <Card
                 sx={{
-                  mt: 2,
+                  mt: 2.5,
                   border: "1px solid #e2e8f0",
                   boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
                   borderRadius: "12px",
@@ -817,7 +802,7 @@ const OrderDetailsModal = ({
                     background:
                       "linear-gradient(135deg, #059669 0%, #047857 100%)",
                     color: "white",
-                    padding: "0.875rem 1rem",
+                    padding: "0.875rem 1.25rem",
                   }}
                 >
                   <h6
@@ -833,9 +818,9 @@ const OrderDetailsModal = ({
                     Payment Summary
                   </h6>
                 </Box>
-                <div style={{ padding: "1rem", background: "white" }}>
-                  <Box sx={{ mb: 1.5 }}>
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5 }}>
+                <div style={{ padding: "1.25rem", background: "white" }}>
+                  <Box sx={{ mb: 0 }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
                       <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Subtotal:</span>
                       <span style={{ color: "#475569", fontWeight: 600, fontSize: "0.9rem" }}>
                         {formatCurrency(
@@ -845,14 +830,14 @@ const OrderDetailsModal = ({
                         )}
                       </span>
                     </Box>
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5 }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
                       <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Shipping:</span>
                       <span style={{ color: "#475569", fontWeight: 600, fontSize: "0.9rem" }}>
                         {formatCurrency(selectedOrder.shipping || selectedOrder.shippingCost || 0)}
                       </span>
                     </Box>
-                    {selectedOrder.tax && (
-                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5 }}>
+                    {selectedOrder.tax > 0 && (
+                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
                         <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Tax:</span>
                         <span style={{ color: "#475569", fontWeight: 600, fontSize: "0.9rem" }}>
                           {formatCurrency(selectedOrder.tax)}
@@ -861,14 +846,14 @@ const OrderDetailsModal = ({
                     )}
                   </Box>
                   <hr
-                    style={{ margin: "0.75rem 0", border: "1px solid #e2e8f0" }}
+                    style={{ margin: "1rem 0", border: "1px solid #e2e8f0" }}
                   />
                   <Box
                     sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
                     style={{
                       background:
                         "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
-                      padding: "0.75rem",
+                      padding: "1rem",
                       borderRadius: 8,
                       border: "1px solid #bbf7d0",
                     }}
@@ -931,6 +916,21 @@ const OrderDetailsModal = ({
           >
             Close
           </Button>
+          {orderId && canDownloadInvoice(selectedOrder) && (
+            <Button
+              variant="contained"
+              onClick={handleInvoice}
+              disabled={invoiceBusy}
+              startIcon={<FiDownload size={16} />}
+              sx={{
+                flex: 1, borderRadius: 2, padding: "0.6rem 1.5rem", fontWeight: 600, fontSize: "0.9rem",
+                textTransform: "none", boxShadow: "none", background: "#d24e33", color: "white",
+                "&:hover": { background: "#b8412a", boxShadow: "none" },
+              }}
+            >
+              {invoiceBusy ? "Preparing…" : "Download invoice"}
+            </Button>
+          )}
           {orderId && hasShipment && (
             <Button
               variant="contained"
