@@ -26,8 +26,10 @@ import {
   FiImage,
   FiChevronLeft,
   FiChevronRight,
+  FiDownload,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { downloadInvoice, canDownloadInvoice } from "../../utils/downloadInvoice";
 import TrackingTimeline from "../TrackingTimeline";
 import api from "../../api/axios";
 
@@ -266,6 +268,16 @@ const OrderDetailsModal = ({
   const navigate = useNavigate();
   const [tracking, setTracking] = useState(null);
   const [trackingLoading, setTrackingLoading] = useState(false);
+  const [invoiceBusy, setInvoiceBusy] = useState(false);
+  const [invoiceError, setInvoiceError] = useState("");
+
+  const handleInvoice = async () => {
+    setInvoiceBusy(true);
+    setInvoiceError("");
+    try { await downloadInvoice(selectedOrder._id); }
+    catch (e) { setInvoiceError(e.message); }
+    finally { setInvoiceBusy(false); }
+  };
 
   // Shiprocket live tracking — re-enable when integrated
   // useEffect(() => {
@@ -713,7 +725,22 @@ const OrderDetailsModal = ({
                       <FiTruck size={16} style={{ marginRight: "0.5rem" }} />
                       Shipment & Tracking
                     </h6>
-                    {orderId && hasShipment && (
+                    {orderId && canDownloadInvoice(selectedOrder) && (
+            <Button
+              variant="contained"
+              onClick={handleInvoice}
+              disabled={invoiceBusy}
+              startIcon={<FiDownload size={16} />}
+              sx={{
+                flex: 1, borderRadius: 2, padding: "0.6rem 1.5rem", fontWeight: 600, fontSize: "0.9rem",
+                textTransform: "none", boxShadow: "none", background: "#d24e33", color: "white",
+                "&:hover": { background: "#b8412a", boxShadow: "none" },
+              }}
+            >
+              {invoiceBusy ? "Preparing…" : "Download invoice"}
+            </Button>
+          )}
+          {orderId && hasShipment && (
                       <button
                         onClick={() => { onHide(); navigate(`/track/${orderId}`); }}
                         style={{
@@ -881,8 +908,12 @@ const OrderDetailsModal = ({
           border: "none",
           borderRadius: "0 0 12px 12px",
           padding: "1rem 1.5rem",
+          flexWrap: "wrap",
         }}
       >
+        {invoiceError && (
+          <Typography role="alert" sx={{ width: "100%", color: "#b91c1c", fontSize: "0.85rem", mb: 1 }}>{invoiceError}</Typography>
+        )}
         <Box sx={{ display: "flex", width: "100%", gap: 1 }}>
           <Button
             variant="outlined"

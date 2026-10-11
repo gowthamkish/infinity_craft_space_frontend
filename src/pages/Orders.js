@@ -32,11 +32,13 @@ import {
   FiUploadCloud,
   FiImage,
   FiXCircle,
+  FiDownload,
 } from "react-icons/fi";
 import api from "../api/axios";
 import { useGetMyOrdersQuery, useCancelOrderMutation } from "../services/ordersApi";
 import SEOHead, { SEO_CONFIG } from "../components/SEOHead";
 import { ToastContext } from "../context/ToastContext";
+import { downloadInvoice, canDownloadInvoice } from "../utils/downloadInvoice";
 import { getStatusBadgeVariant } from "../utils/statusHelpers";
 import { formatDate, formatOrderId } from "../utils/formatters";
 
@@ -133,6 +135,27 @@ function TrackButton({ status, onClick }) {
       }}
     >
       {isDelivered ? "Delivered" : "Track Order"}
+    </Button>
+  );
+}
+
+function InvoiceButton({ order, onToastError }) {
+  const [busy, setBusy] = useState(false);
+  if (!canDownloadInvoice(order)) return null;
+  return (
+    <Button
+      variant="outlined"
+      size="small"
+      fullWidth
+      disabled={busy}
+      onClick={async () => {
+        setBusy(true);
+        try { await downloadInvoice(order._id); } catch (e) { onToastError(e.message); } finally { setBusy(false); }
+      }}
+      startIcon={<FiDownload size={13} />}
+      sx={{ textTransform: "none", fontSize: "0.8rem", mt: 0.75 }}
+    >
+      {busy ? "Preparing…" : "Invoice"}
     </Button>
   );
 }
@@ -902,6 +925,7 @@ export default function Orders() {
                             status={status}
                             onClick={() => navigate(`/track/${oid}`)}
                           />
+                          <InvoiceButton order={order} onToastError={(m) => addToast(m, { type: "error", title: "Invoice", duration: 5000 })} />
                           <ReturnButton
                             order={order}
                             onClick={() => setReturnOrder(order)}

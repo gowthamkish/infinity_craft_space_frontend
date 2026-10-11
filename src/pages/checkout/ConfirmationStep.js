@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  FiCheck, FiTruck, FiPackage, FiCreditCard, FiMapPin, FiShoppingBag, FiMail, FiClock, FiShare2, FiCopy, FiMessageCircle, FiArrowRight, FiBox,
+  FiCheck, FiTruck, FiPackage, FiCreditCard, FiMapPin, FiShoppingBag, FiMail, FiClock, FiShare2, FiCopy, FiMessageCircle, FiArrowRight, FiBox, FiDownload,
 } from "react-icons/fi";
 import { Card, inr } from "./ui";
+import { downloadInvoice } from "../../utils/downloadInvoice";
 
 /* ── Confetti ────────────────────────────────────────────────────────── */
 function Confetti({ container }) {
@@ -73,6 +74,7 @@ export const ConfirmationStep = ({
 }) => {
   const wrapRef = useRef(null);
   const [copied, setCopied] = useState(false);
+  const [invoiceState, setInvoiceState] = useState({ busy: false, error: "" });
   const orderId = backendOrder?._id || orderData?.orderId || orderData?.id || orderData?._id;
   const orderTotal = backendOrder?.totalAmount ?? orderData?.total ?? total ?? 0;
   const items = backendOrder?.items || orderData?.items || [];
@@ -85,6 +87,12 @@ export const ConfirmationStep = ({
     country: shippingAddress.country || orderData?.shippingAddress?.country || "India",
   };
   const trackUrl = `${window.location.origin}/track/${orderId ?? ""}`;
+
+  const handleInvoice = async () => {
+    setInvoiceState({ busy: true, error: "" });
+    try { await downloadInvoice(orderId); setInvoiceState({ busy: false, error: "" }); }
+    catch (e) { setInvoiceState({ busy: false, error: e.message }); }
+  };
 
   const copyLink = async () => {
     try {
@@ -125,6 +133,11 @@ export const ConfirmationStep = ({
               <FiTruck size={18} /> Track my order <FiArrowRight size={18} />
             </button>
           )}
+          {orderId && backendOrder && (
+            <button type="button" className="ck-btn ck-btn--ghost ck-btn--lg" onClick={handleInvoice} disabled={invoiceState.busy}>
+              <FiDownload size={18} /> {invoiceState.busy ? "Preparing…" : "Download invoice"}
+            </button>
+          )}
           <button type="button" className="ck-btn ck-btn--ghost ck-btn--lg" onClick={() => navigate("/orders")}>
             <FiPackage size={18} /> View orders
           </button>
@@ -132,6 +145,7 @@ export const ConfirmationStep = ({
             <FiShoppingBag size={18} /> Continue shopping
           </button>
         </div>
+        {invoiceState.error && <div role="alert" style={{ marginTop: 14, color: "#b91c1c", fontSize: "0.9rem" }}>{invoiceState.error}</div>}
       </section>
 
       {orderData && (
