@@ -6,11 +6,10 @@
  *  - Motion (confetti, ribbon shimmer, scissors) is switched off for prefers-reduced-motion in the CSS.
  */
 import { useEffect, useMemo, useState } from "react";
-import { FiBell } from "react-icons/fi";
+import { FiBell, FiCheckCircle, FiAlertCircle } from "react-icons/fi";
+import { LAUNCH_AT } from "../config/launch";
+import { useNewsletterSignup } from "../hooks/useNewsletterSignup";
 import "./LaunchBanner.css";
-
-// 20 Nov 2026, 00:00 India Standard Time (UTC+05:30)
-export const LAUNCH_AT = new Date("2026-11-20T00:00:00+05:30");
 
 const pad = (n) => String(n).padStart(2, "0");
 
@@ -42,30 +41,24 @@ const BOKEH = Array.from({ length: 9 }, (_, i) => ({
   delay: `${-i * 1.8}s`,
 }));
 
-function focusNewsletter() {
-  const input = document.querySelector('input[aria-label="Email for newsletter"]');
-  if (!input) return;
-  input.scrollIntoView({ behavior: "smooth", block: "center" });
-  setTimeout(() => input.focus({ preventScroll: true }), 500);
-}
-
 function Scissors() {
   return (
     <svg className="lb-scissors" viewBox="0 0 120 120" aria-hidden="true">
       <defs>
         <linearGradient id="lbGold" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#fff1b8" /><stop offset=".5" stopColor="#e2b04a" /><stop offset="1" stopColor="#a8741a" />
+          <stop offset="0" stopColor="#fff4e8" /><stop offset=".5" stopColor="#ffb18a" /><stop offset="1" stopColor="#e8623d" />
         </linearGradient>
       </defs>
       <g className="lb-blade lb-blade--a"><path d="M60 62 L104 8 L110 12 L68 70 Z" fill="url(#lbGold)" /><circle cx="42" cy="86" r="14" fill="none" stroke="url(#lbGold)" strokeWidth="7" /><path d="M52 76 L62 64" stroke="url(#lbGold)" strokeWidth="7" strokeLinecap="round" /></g>
       <g className="lb-blade lb-blade--b"><path d="M60 62 L16 8 L10 12 L52 70 Z" fill="url(#lbGold)" /><circle cx="78" cy="86" r="14" fill="none" stroke="url(#lbGold)" strokeWidth="7" /><path d="M68 76 L58 64" stroke="url(#lbGold)" strokeWidth="7" strokeLinecap="round" /></g>
-      <circle cx="60" cy="63" r="5" fill="#8a5a10" />
+      <circle cx="60" cy="63" r="5" fill="#8f3220" />
     </svg>
   );
 }
 
 export default function LaunchBanner() {
   const [now, setNow] = useState(() => Date.now());
+  const signup = useNewsletterSignup("launch");
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000); // always derived from the real clock → no drift
@@ -96,8 +89,8 @@ export default function LaunchBanner() {
           <svg className="lb-ribbon" viewBox="0 0 640 460" preserveAspectRatio="xMidYMid meet">
             <defs>
               <linearGradient id="lbRibbon" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0" stopColor="#a8741a" /><stop offset=".25" stopColor="#f7dc8a" /><stop offset=".5" stopColor="#c8932c" />
-                <stop offset=".75" stopColor="#f7dc8a" /><stop offset="1" stopColor="#a8741a" />
+                <stop offset="0" stopColor="#e8623d" /><stop offset=".25" stopColor="#ffd2b8" /><stop offset=".5" stopColor="#ff8a63" />
+                <stop offset=".75" stopColor="#ffd2b8" /><stop offset="1" stopColor="#e8623d" />
               </linearGradient>
             </defs>
             <path className="lb-ribbon-path" d="M-30 330 C 110 150, 240 330, 330 250 S 520 120, 680 200" fill="none" stroke="url(#lbRibbon)" strokeWidth="38" strokeLinecap="round" />
@@ -137,9 +130,28 @@ export default function LaunchBanner() {
             </div>
           )}
 
-          <button type="button" className="lb-cta" onClick={focusNewsletter}>
-            <FiBell size={18} aria-hidden="true" /> {t.done ? "Join our newsletter" : "Notify me on launch"}
-          </button>
+          <form className="lb-form" onSubmit={signup.submit} noValidate>
+            <label htmlFor="lb-email" className="sr-only">Email address for launch updates</label>
+            <input
+              id="lb-email"
+              type="email"
+              autoComplete="email"
+              inputMode="email"
+              placeholder="Enter your email for launch updates"
+              value={signup.email}
+              onChange={signup.onChange}
+              disabled={signup.loading}
+              aria-invalid={signup.status === "error"}
+              aria-describedby="lb-form-msg"
+            />
+            <button type="submit" className="lb-cta" disabled={signup.loading}>
+              <FiBell size={18} aria-hidden="true" /> {signup.loading ? "Saving…" : "Notify me"}
+            </button>
+          </form>
+          <p id="lb-form-msg" className={`lb-msg lb-msg--${signup.status}`} role="status" aria-live="polite">
+            {signup.status === "success" && <><FiCheckCircle aria-hidden="true" /> {signup.message}</>}
+            {signup.status === "error" && <><FiAlertCircle aria-hidden="true" /> {signup.message}</>}
+          </p>
         </div>
       </div>
     </section>

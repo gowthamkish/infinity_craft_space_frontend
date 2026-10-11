@@ -1,7 +1,7 @@
 import "./styles/designTokens.css";
 import "./App.css";
 import "./styles/buttons.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import muiTheme from "./theme/muiTheme";
 import {
@@ -18,6 +18,8 @@ import { PageLoader } from "./components/Loader";
 import { HelmetProvider } from "react-helmet-async";
 import ErrorBoundary, { RouteErrorBoundary } from "./components/ErrorBoundary";
 import { ToastContext } from "./context/ToastContext";
+import { useLaunchLock } from "./config/launch";
+const LaunchPage = lazy(() => import("./pages/LaunchPage"));
 import {
   useStreamOrderEventsQuery,
   useGetMyOrdersQuery,
@@ -99,6 +101,7 @@ const STATUS_TOAST_CONFIG = {
 
 function App() {
   const { toasts, removeToast, addToast } = useContext(ToastContext);
+  const launchLocked = useLaunchLock(); // pre-launch: only the launch page is reachable
   // Use _id as a stable scalar so the effect only re-runs on actual user change
   const userId = useSelector((state) => state.auth.user?._id ?? null);
 
@@ -321,7 +324,7 @@ function App() {
                   />
                 </Suspense>
 
-                {orderStatusEvent && (
+                {orderStatusEvent && !launchLocked && (
                   <Suspense fallback={null}>
                     <OrderStatusModal
                       event={orderStatusEvent}
@@ -331,13 +334,21 @@ function App() {
                 )}
 
                 {/* "Install app" banner (Android prompt / iOS Add to Home Screen guide) */}
-                <Suspense fallback={null}>
-                  <PWAInstallPrompt />
-                </Suspense>
+                {!launchLocked && (
+                  <Suspense fallback={null}>
+                    <PWAInstallPrompt />
+                  </Suspense>
+                )}
 
                 {/* Idle Timeout Manager - Active globally for all authenticated users */}
                 {/* <IdleTimeoutManager /> */}
 
+                {launchLocked ? (
+                  <Routes>
+                    <Route path="/" element={<RouteErrorBoundary><Suspense fallback={<LoadingFallback message="Loading…" />}><LaunchPage /></Suspense></RouteErrorBoundary>} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                ) : (
                 <Routes>
                   {/* Public Routes */}
                   <Route
@@ -774,14 +785,20 @@ function App() {
                     }
                   />
                 </Routes>
+                )}
 
-                <Suspense fallback={null}>
-                  <Footer />
-                </Suspense>
+                {/* Locked: footer links are blurred + inert, and the chat assistant / install prompt are hidden */}
+                <div className={launchLocked ? "launch-blurred" : undefined} {...(launchLocked ? { inert: "", "aria-hidden": "true" } : {})}>
+                  <Suspense fallback={null}>
+                    <Footer />
+                  </Suspense>
+                </div>
                 {/* AI chat assistant — loads after page is interactive */}
-                <Suspense fallback={null}>
-                  <ChatWidget />
-                </Suspense>
+                {!launchLocked && (
+                  <Suspense fallback={null}>
+                    <ChatWidget />
+                  </Suspense>
+                )}
               </Suspense>
             </Router>
           </HelmetProvider>
