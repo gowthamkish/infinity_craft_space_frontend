@@ -1,9 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
 import { useSelector } from "react-redux";
 import {
   FiRefreshCw,
@@ -97,17 +94,14 @@ export default function TrackOrder() {
           <h1>Track Your Order</h1>
           <p>Loading shipment details…</p>
         </div>
-        <Box sx={{ mt: 4 }}>
+        <div className="to-container">
           <div className="to-card">
             <div className="to-card-body">
-              <div
-                className="to-skeleton"
-                style={{ height: 100, marginBottom: 16 }}
-              />
+              <div className="to-skeleton" style={{ height: 100, marginBottom: 24 }} />
               <div className="to-skeleton" style={{ height: 200 }} />
             </div>
           </div>
-        </Box>
+        </div>
       </div>
     );
   }
@@ -116,36 +110,21 @@ export default function TrackOrder() {
     return (
       <div className="to-page">
         <Header />
-        <Box sx={{ mt: 5 }}>
-          <div
-            style={{
-              textAlign: "center",
-              padding: "3rem 1rem",
-              background: "white",
-              borderRadius: 16,
-              boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
-            }}
-          >
-            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>😕</div>
-            <h4 style={{ color: "#1e293b" }}>Could not load tracking</h4>
-            <p style={{ color: "#64748b", marginBottom: "1.5rem" }}>{error}</p>
-            <button
-              className="to-refresh-btn"
-              onClick={() => fetchTracking()}
-              style={{ margin: "0 auto" }}
-            >
-              <FiRefreshCw size={15} /> Try again
-            </button>
-            <br />
-            <button
-              className="to-refresh-btn"
-              onClick={() => navigate("/orders")}
-              style={{ margin: "1rem auto 0" }}
-            >
-              <FiArrowLeft size={15} /> Back to Orders
-            </button>
+        <div className="to-container to-container--narrow">
+          <div className="to-card to-error">
+            <div className="to-error-emoji">😕</div>
+            <h2>Could not load tracking</h2>
+            <p>{error}</p>
+            <div className="to-error-actions">
+              <button className="to-btn to-btn--primary" onClick={() => fetchTracking()}>
+                <FiRefreshCw size={15} /> Try again
+              </button>
+              <button className="to-btn" onClick={() => navigate("/orders")}>
+                <FiArrowLeft size={15} /> Back to Orders
+              </button>
+            </div>
           </div>
-        </Box>
+        </div>
       </div>
     );
   }
@@ -163,24 +142,22 @@ export default function TrackOrder() {
         <p>Order #{String(orderId).slice(-8).toUpperCase()}</p>
       </div>
 
-      <Box sx={{ mt: 4, mb: 5 }}>
+      <div className="to-container">
         {/* ── Action row ── */}
-        <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 1, mb: 2 }}>
+        <div className="to-actions">
           <button
-            className="to-refresh-btn"
+            className="to-btn"
             onClick={() => navigate("/orders")}
           >
             <FiArrowLeft size={15} /> My Orders
           </button>
 
-          <Stack direction="row" sx={{ alignItems: "center", gap: 1 }}>
+          <div className="to-actions-right">
             {lastUpdated && (
-              <Typography variant="caption" sx={{ color: "text.secondary" }}>
-                Updated {lastUpdated.toLocaleTimeString("en-IN")}
-              </Typography>
+              <span className="to-updated">Updated {lastUpdated.toLocaleTimeString("en-IN")}</span>
             )}
             <button
-              className="to-refresh-btn"
+              className="to-btn"
               onClick={() => fetchTracking(true)}
               disabled={refreshing}
             >
@@ -190,35 +167,30 @@ export default function TrackOrder() {
               />
               {refreshing ? "Refreshing…" : "Refresh"}
             </button>
-          </Stack>
-        </Stack>
+          </div>
+        </div>
 
-        <Grid container spacing={2}>
+        <Grid container spacing={3}>
           {/* ── Left: Tracking ── */}
           <Grid size={{ xs: 12, lg: 8 }}>
             {/* Order status card */}
-            <div className="to-card mb-3">
-              <div
-                className="to-card-header"
-                style={{
-                  background: "linear-gradient(135deg, #0f172a, #1e293b)",
-                }}
-              >
+            <div className="to-card">
+              <div className="to-card-header to-card-header--dark">
                 <FiPackage size={16} />
                 Shipment Status
               </div>
               <div className="to-card-body">
-                <Stack direction="row" sx={{ alignItems: "center", flexWrap: "wrap", gap: 1.5, mb: 2 }}>
+                <div className="to-status-row">
                   <div className={badgeClass}>
                     {STATUS_ICON[status] || "📦"}{" "}
                     {status.charAt(0).toUpperCase() + status.slice(1)}
                   </div>
                   {order?.estimatedDelivery && (
-                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                    <span className="to-eta">
                       Est. delivery: <strong>{fmtDate(order.estimatedDelivery)}</strong>
-                    </Typography>
+                    </span>
                   )}
-                </Stack>
+                </div>
                 <TrackingTimeline order={order} tracking={tracking} />
               </div>
             </div>
@@ -227,59 +199,30 @@ export default function TrackOrder() {
           {/* ── Right: Order Summary ── */}
           <Grid size={{ xs: 12, lg: 4 }}>
             {/* Shipping address */}
-            <div className="to-card mb-3">
-              <div
-                className="to-card-header"
-                style={{
-                  background: "linear-gradient(135deg, #f59e0b, #d97706)",
-                }}
-              >
+            <div className="to-card">
+              <div className="to-card-header to-card-header--ember">
                 <FiMapPin size={16} />
                 Delivery Address
               </div>
               <div className="to-card-body">
                 {order?.shippingAddress ? (
-                  <p
-                    style={{
-                      margin: 0,
-                      fontSize: "0.875rem",
-                      lineHeight: 1.7,
-                      color: "#475569",
-                    }}
-                  >
-                    {order.shippingAddress.street}
-                    <br />
-                    {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
-                    {order.shippingAddress.zipCode}
-                    <br />
-                    {order.shippingAddress.country}
-                    <br />
-                    <span style={{ color: "#94a3b8", fontSize: "0.8rem" }}>
-                      📞 {order.shippingAddress.phone || "Phone not provided"}
+                  <address className="to-address">
+                    <span>{order.shippingAddress.street}</span>
+                    <span>
+                      {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
                     </span>
-                  </p>
+                    <span>{order.shippingAddress.country}</span>
+                    <span className="to-address-phone">📞 {order.shippingAddress.phone || "Phone not provided"}</span>
+                  </address>
                 ) : (
-                  <p
-                    style={{
-                      margin: 0,
-                      color: "#94a3b8",
-                      fontSize: "0.875rem",
-                    }}
-                  >
-                    Address details not available.
-                  </p>
+                  <p className="to-muted">Address details not available.</p>
                 )}
               </div>
             </div>
 
             {/* Order items summary */}
             <div className="to-card">
-              <div
-                className="to-card-header"
-                style={{
-                  background: "linear-gradient(135deg, #0f9488, #d24e33)",
-                }}
-              >
+              <div className="to-card-header to-card-header--teal">
                 <FiShoppingBag size={16} />
                 Order Summary
               </div>
@@ -293,39 +236,21 @@ export default function TrackOrder() {
                   </div>
                   <div className="to-meta-item">
                     <span className="to-meta-label">Total amount</span>
-                    <span
-                      className="to-meta-value"
-                      style={{ color: "#059669" }}
-                    >
+                    <span className="to-meta-value to-meta-value--total">
                       {fmtCurrency(order?.totalAmount)}
                     </span>
                   </div>
                   {/* Shiprocket courier/AWB display — re-enable when integrated */}
                 </div>
 
-                <button
-                  onClick={() => navigate("/orders")}
-                  style={{
-                    display: "block",
-                    width: "100%",
-                    marginTop: "0.75rem",
-                    padding: "0.6rem 1rem",
-                    background: "transparent",
-                    border: "1.5px solid #e2e8f0",
-                    color: "#475569",
-                    borderRadius: 10,
-                    fontWeight: 500,
-                    fontSize: "0.875rem",
-                    cursor: "pointer",
-                  }}
-                >
-                  ← View All Orders
+                <button className="to-btn to-btn--block" onClick={() => navigate("/orders")}>
+                  <FiArrowLeft size={15} /> View all orders
                 </button>
               </div>
             </div>
           </Grid>
         </Grid>
-      </Box>
+      </div>
     </div>
   );
 }
