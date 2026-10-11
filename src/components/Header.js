@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../features/authSlice";
 import { clearCart, syncCartToBackend } from "../features/cartSlice";
 import { useGetUnreadCountQuery } from "../services/adminApi";
+import LaunchBanner from "./LaunchBanner";
 import { useNavigate, useLocation } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -262,6 +263,7 @@ function Header() {
           </Box>
         </Toolbar>
       </AppBar>
+      <LaunchBanner />
 
       {/* Mobile Drawer */}
       <Drawer
