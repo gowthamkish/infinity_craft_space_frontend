@@ -141,8 +141,8 @@
 @media (max-width: 900px) {
   .lb { padding: 36px 20px 44px; align-items: flex-start; }
   .lb-inner { grid-template-columns: minmax(0, 1fr); gap: 8px; }
-  .lb-copy { text-align: center; order: 1; }
-  .lb-visual { order: 2; min-height: 340px; }
+  .lb-visual { order: 1; min-height: 320px; margin-bottom: 4px; }  /* logo + scissors first, right under the header */
+  .lb-copy { text-align: center; order: 2; }
   .lb-title { align-items: center; }
   .lb-sub { margin-inline: auto; }
   .lb-timer { justify-content: center; }
@@ -156,7 +156,11 @@
   .lb-timer { width: 100%; }
   .lb-unit-wrap { flex: 1; }
   .lb-colon { font-size: 1.3rem; margin-top: 8px; }
-  .lb-visual { min-height: 300px; }
+  .lb-visual { min-height: 270px; }
+  .lb-scissors-wrap { width: 96px; }
+  .lb-podium { margin-top: 56px; }
+  .lb-medal { width: 150px; }
+  .lb-cylinder { width: 240px; height: 62px; }
   .lb-form { flex-direction: column; gap: 10px; }
   .lb-form input { flex: 0 0 auto; width: 100%; min-height: 48px; font-size: 16px; }
   .lb-cta { flex: 0 0 auto; width: 100%; min-height: 48px; }
