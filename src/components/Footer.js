@@ -21,10 +21,7 @@ import {
   FiTruck,
   FiShield,
   FiAward,
-  FiFacebook,
   FiInstagram,
-  FiTwitter,
-  FiLinkedin,
 } from "react-icons/fi";
 
 const QUICK_LINKS = [
@@ -41,10 +38,7 @@ const TRUST_ITEMS = [
 ];
 
 const SOCIAL_LINKS = [
-  { icon: FiFacebook,  label: "Facebook",  url: "#" },
-  { icon: FiInstagram, label: "Instagram", url: "#" },
-  { icon: FiTwitter,   label: "Twitter",   url: "#" },
-  { icon: FiLinkedin,  label: "LinkedIn",  url: "#" },
+  { icon: FiInstagram, label: "Instagram", url: "https://www.instagram.com/infinity_craft_space/" },
 ];
 
 const BUSINESS_HOURS = [
@@ -185,7 +179,9 @@ export default function Footer() {
                   key={label}
                   component="a"
                   href={url}
-                  aria-label={label}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${label} (opens in a new tab)`}
                   size="small"
                   sx={{
                     color: DARK_MUTED,
@@ -355,7 +351,7 @@ export default function Footer() {
               { label: "Terms",   to: "/terms-and-conditions", component: Link },
               { label: "Returns", to: "/return-policy",        component: Link },
               { label: "Support", to: "/contact-us",           component: Link },
-              { label: "Privacy", href: "#privacy" },
+              { label: "Privacy", to: "/privacy-policy", component: Link },
             ].map(({ label, to, href, component }) => (
               <MuiLink
                 key={label}

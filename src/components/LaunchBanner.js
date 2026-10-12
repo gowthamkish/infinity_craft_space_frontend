@@ -6,7 +6,9 @@
  *  - Motion (confetti, ribbon shimmer, scissors) is switched off for prefers-reduced-motion in the CSS.
  */
 import { useEffect, useMemo, useState } from "react";
-import { FiBell, FiCheckCircle, FiAlertCircle } from "react-icons/fi";
+import { Link } from "react-router-dom";
+import { FiBell, FiCheckCircle, FiAlertCircle, FiMail, FiPhone, FiInstagram } from "react-icons/fi";
+import { FaWhatsapp } from "react-icons/fa";
 import { LAUNCH_AT } from "../config/launch";
 import { useNewsletterSignup } from "../hooks/useNewsletterSignup";
 import "./LaunchBanner.css";
@@ -24,6 +26,14 @@ function remaining(now) {
     seconds: total % 60,
   };
 }
+
+const CONTACT = {
+  email: "infinitycraftspacejsag@gmail.com",
+  phoneDisplay: "+91 89250 83167",
+  phoneTel: "+918925083167",
+  whatsapp: "https://wa.me/918925083167?text=Hi%20InfinityCraftSpace%21",
+  instagram: "https://www.instagram.com/infinity_craft_space/",
+};
 
 // Deterministic (no Math.random) so the layout is stable between renders
 const CONFETTI = Array.from({ length: 34 }, (_, i) => ({
@@ -68,7 +78,7 @@ export default function LaunchBanner() {
   const t = useMemo(() => remaining(now), [now]);
   const units = [["Days", t.days], ["Hours", t.hours], ["Minutes", t.minutes], ["Seconds", t.seconds]];
   // Screen readers get a calm once-a-minute summary instead of a ticking clock
-  const spoken = `${t.days} days, ${t.hours} hours and ${t.minutes} minutes until the grand website launch on 20 November 2026`;
+  const spoken = `${t.days} days, ${t.hours} hours and ${t.minutes} minutes until the grand website launch on 20 November 2026 at 12:00 AM India Standard Time`;
 
   return (
     <section className="lb" aria-label="Grand website launch announcement">
@@ -127,6 +137,7 @@ export default function LaunchBanner() {
                 ))}
               </div>
               <span className="sr-only" role="status" aria-live="polite" key={`${t.days}-${t.hours}-${t.minutes}`}>{spoken}</span>
+              <p className="lb-when">Opens <strong>20 November 2026, 12:00 AM IST</strong> <span>(India Standard Time, UTC+5:30)</span></p>
             </div>
           )}
 
@@ -142,16 +153,26 @@ export default function LaunchBanner() {
               onChange={signup.onChange}
               disabled={signup.loading}
               aria-invalid={signup.status === "error"}
-              aria-describedby="lb-form-msg"
+              aria-describedby="lb-consent lb-form-msg"
             />
             <button type="submit" className="lb-cta" disabled={signup.loading}>
               <FiBell size={18} aria-hidden="true" /> {signup.loading ? "Saving…" : "Notify me"}
             </button>
           </form>
+          <p className="lb-consent" id="lb-consent">
+            We'll only email you about the launch. Unsubscribe anytime. See our <Link to="/privacy-policy">Privacy Policy</Link>.
+          </p>
           <p id="lb-form-msg" className={`lb-msg lb-msg--${signup.status}`} role="status" aria-live="polite">
             {signup.status === "success" && <><FiCheckCircle aria-hidden="true" />{signup.message}</>}
             {signup.status === "error" && <><FiAlertCircle aria-hidden="true" />{signup.message}</>}
           </p>
+
+          <nav className="lb-contact" aria-label="Contact us">
+            <a href={`mailto:${CONTACT.email}`}><FiMail aria-hidden="true" /> <span>Email</span></a>
+            <a href={`tel:${CONTACT.phoneTel}`}><FiPhone aria-hidden="true" /> <span>{CONTACT.phoneDisplay}</span></a>
+            <a href={CONTACT.whatsapp} target="_blank" rel="noopener noreferrer"><FaWhatsapp aria-hidden="true" /> <span>WhatsApp<span className="sr-only"> (opens in a new tab)</span></span></a>
+            <a href={CONTACT.instagram} target="_blank" rel="noopener noreferrer"><FiInstagram aria-hidden="true" /> <span>Instagram<span className="sr-only"> (opens in a new tab)</span></span></a>
+          </nav>
         </div>
       </div>
     </section>

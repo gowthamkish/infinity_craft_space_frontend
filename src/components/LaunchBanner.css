@@ -169,3 +169,30 @@
 
 /* Pre-launch lock: navigation stays visible but frosted and untouchable */
 .launch-blurred { filter: blur(7px) saturate(0.9); opacity: 0.75; pointer-events: none; user-select: none; }
+
+/* Time zone, consent note and contact links */
+.lb-when { margin: 12px 0 0; font-size: 0.95rem; color: #fff; }
+.lb-when strong { color: var(--lb-gold-1); font-weight: 700; }
+.lb-when span { color: rgba(255, 255, 255, 0.78); font-size: 0.85rem; }
+.lb-consent { margin: 12px 0 0; max-width: 560px; font-size: 0.82rem; line-height: 1.5; color: rgba(255, 255, 255, 0.82); }
+.lb-consent a { color: var(--lb-gold-1); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.lb-consent a:hover { color: #fff; }
+.lb-contact { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.lb-contact a {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px;
+  border-radius: 999px; border: 1px solid rgba(226, 176, 74, 0.55);
+  background: rgba(0, 0, 0, 0.3); color: var(--lb-gold-1);
+  font-size: 0.9rem; font-weight: 600; text-decoration: none; backdrop-filter: blur(6px);
+  transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+}
+.lb-contact a:hover { background: rgba(226, 176, 74, 0.2); border-color: var(--lb-gold-1); transform: translateY(-1px); }
+.lb-contact a:focus-visible, .lb-consent a:focus-visible { outline: 3px solid var(--lb-gold-1); outline-offset: 2px; }
+.lb-contact svg { flex: 0 0 auto; font-size: 1.05rem; }
+@media (max-width: 900px) {
+  .lb-consent { margin-inline: auto; }
+  .lb-contact { justify-content: center; }
+}
+@media (max-width: 480px) {
+  .lb-contact { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .lb-contact a { justify-content: center; padding: 0 10px; font-size: 0.85rem; }
+}

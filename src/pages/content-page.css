@@ -147,3 +147,8 @@
   background: var(--primary-subtle, rgba(210, 78, 51, 0.06)) !important;
   border-left-color: var(--primary, #d24e33) !important;
 }
+
+/* bullet lists inside policy pages (global reset removes markers) */
+.cp-body ul { list-style: disc; padding-left: 1.4rem; margin: 0 0 1rem; }
+.cp-body li { margin-bottom: 0.5rem; padding-left: 0.25rem; }
+.cp-body li::marker { color: #b8412a; }

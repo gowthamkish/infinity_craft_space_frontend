@@ -20,6 +20,7 @@ import ErrorBoundary, { RouteErrorBoundary } from "./components/ErrorBoundary";
 import { ToastContext } from "./context/ToastContext";
 import { useLaunchLock } from "./config/launch";
 const LaunchPage = lazy(() => import("./pages/LaunchPage"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 import {
   useStreamOrderEventsQuery,
   useGetMyOrdersQuery,
@@ -346,6 +347,7 @@ function App() {
                 {launchLocked ? (
                   <Routes>
                     <Route path="/" element={<RouteErrorBoundary><Suspense fallback={<LoadingFallback message="Loading…" />}><LaunchPage /></Suspense></RouteErrorBoundary>} />
+                    <Route path="/privacy-policy" element={<RouteErrorBoundary><Suspense fallback={<LoadingFallback message="Loading…" />}><PrivacyPolicy /></Suspense></RouteErrorBoundary>} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
                 ) : (
@@ -509,6 +511,17 @@ function App() {
                           }
                         >
                           <TermsAndConditions />
+                        </Suspense>
+                      </RouteErrorBoundary>
+                    }
+                  />
+
+                  <Route
+                    path="/privacy-policy"
+                    element={
+                      <RouteErrorBoundary>
+                        <Suspense fallback={<LoadingFallback message="Loading privacy policy..." />}>
+                          <PrivacyPolicy />
                         </Suspense>
                       </RouteErrorBoundary>
                     }
