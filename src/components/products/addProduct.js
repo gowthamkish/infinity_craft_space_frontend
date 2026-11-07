@@ -1038,6 +1038,7 @@ const AddProduct = () => {
     try {
       let productData = {
         ...form,
+        stock: String(form.stock).trim() === "" ? 0 : Number(form.stock),
         colors: colors.map(({ id, ...c }) => c),
         showColorPickerToUsers: showColorPicker,
         hoopSizes: isHoopCategory ? hoopSizes : [],
