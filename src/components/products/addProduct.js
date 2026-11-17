@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
+import { formatProductName } from "../../utils/formatProductName";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -1084,6 +1085,7 @@ const AddProduct = () => {
     try {
       let productData = {
         ...form,
+        name: formatProductName(form.name),
         stock: String(form.stock).trim() === "" ? 0 : Number(form.stock),
         colors: colors.map(({ id, ...c }) => c),
         showColorPickerToUsers: showColorPicker,
@@ -1266,7 +1268,8 @@ const AddProduct = () => {
                   <FL required>Product name</FL>
                   <TextField fullWidth size="small"
                     placeholder="e.g. Handmade Ceramic Mug"
-                    value={form.name} onChange={(e) => set("name", e.target.value)} required
+                    value={form.name} onChange={(e) => set("name", e.target.value)}
+                    onBlur={() => set("name", formatProductName(form.name))} required
                     sx={{ ...FIELD_SX, mb: 2.5 }} />
 
                   <Grid container spacing={2} sx={{ mb: 2.5 }}>
