@@ -60,10 +60,10 @@ export function SummaryItems({ cartItems }) {
   return (
     <div className="ck-sum-items">
       {cartItems.map((item) => (
-        <div key={item.product._id} className="ck-sum-item">
+        <div key={`${item.product._id}-${item.selectedStringSize ?? ""}`} className="ck-sum-item">
           <Thumb product={item.product} size="sm" />
           <div style={{ minWidth: 0 }}>
-            <div className="ck-sum-item-name">{item.product.name}</div>
+            <div className="ck-sum-item-name">{item.product.name}{item.selectedStringSize ? ` (${item.selectedStringSize}")` : ""}</div>
             <div className="ck-sum-item-meta">
               Qty {item.quantity} × {inr(item.product.price)}
             </div>

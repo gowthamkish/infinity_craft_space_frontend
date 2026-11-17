@@ -947,6 +947,20 @@ const AddProduct = () => {
   const [showHoopPicker,   setShowHoopPicker]   = useState(false);
 
   const HOOP_SIZE_OPTIONS = [6, 8, 10, 12];
+
+  // Artificial flower → Jasmine string / Mullai string: sold by length, each with its own price
+  const STRING_SIZE_OPTIONS = [4, 8, 12, 16, 24, 32];
+  const [stringSizes,      setStringSizes]      = useState([]); // [{ inches, price }] — price kept as a string while typing
+  const [showStringPicker, setShowStringPicker] = useState(true);
+  const isStringCategory =
+    /artificial\s*flower/i.test(form.category) && /(jasmine|mullai)/i.test(form.subCategory) && /string/i.test(form.subCategory);
+  const validStringSizes = stringSizes.filter((s) => s.price !== "" && Number(s.price) >= 0);
+  const toggleStringSize = (inches) =>
+    setStringSizes((prev) => prev.some((s) => s.inches === inches)
+      ? prev.filter((s) => s.inches !== inches)
+      : [...prev, { inches, price: "" }].sort((a, b) => a.inches - b.inches));
+  const setStringPrice = (inches, price) =>
+    setStringSizes((prev) => prev.map((s) => (s.inches === inches ? { ...s, price } : s)));
   const isHoopCategory = /hoop/i.test(form.category);
 
   const [weightUnit,     setWeightUnit]     = useState("g");
@@ -1008,8 +1022,12 @@ const AddProduct = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.price || !form.category) {
+    const usesStringSizes = isStringCategory && stringSizes.length > 0;
+    if (!form.name.trim() || (!form.price && !usesStringSizes) || !form.category) {
       setAlert({ show: true, message: "Please fill in all required fields", variant: "warning" }); return;
+    }
+    if (usesStringSizes && validStringSizes.length !== stringSizes.length) {
+      setAlert({ show: true, message: "Please enter a price for every selected string length.", variant: "warning" }); return;
     }
 
     /* ── Color validations ──────────────────────────────────────── */
@@ -1041,6 +1059,10 @@ const AddProduct = () => {
         stock: String(form.stock).trim() === "" ? 0 : Number(form.stock),
         colors: colors.map(({ id, ...c }) => c),
         showColorPickerToUsers: showColorPicker,
+        // Base price follows the cheapest string length (the server does the same)
+        ...(usesStringSizes ? { price: Math.min(...validStringSizes.map((s) => Number(s.price))) } : {}),
+        stringSizes: isStringCategory ? validStringSizes.map((s) => ({ inches: s.inches, price: Number(s.price) })) : [],
+        showStringSizePicker: isStringCategory ? showStringPicker : false,
         hoopSizes: isHoopCategory ? hoopSizes : [],
         showHoopSizePicker: isHoopCategory ? showHoopPicker : false,
       };
@@ -1069,6 +1091,7 @@ const AddProduct = () => {
         setForm({ name: "", sku: "", price: "", compareAtPrice: "", description: "", category: "", subCategory: "", stock: "", lowStockThreshold: "5", trackInventory: true, estimatedDelivery: "5", weightInGrams: "500", isCustomizable: false, processingDaysMin: "10", processingDaysMax: "12" });
         setColors([]); setShowColorPicker(false); setStockErrors({});
         setHoopSizes([]); setShowHoopPicker(false);
+        setStringSizes([]); setShowStringPicker(true);
         removeAllImages();
       }
       setTimeout(() => navigate("/admin/products"), 1500);
@@ -1100,6 +1123,10 @@ const AddProduct = () => {
       if (product.colors?.length > 0) {
         setColors(product.colors.map((c, i) => ({ ...c, id: c.id || genId(), sortOrder: c.sortOrder ?? i })));
         setShowColorPicker(product.showColorPickerToUsers ?? false);
+      }
+      if (product.stringSizes?.length > 0) {
+        setStringSizes(product.stringSizes.map((s) => ({ inches: s.inches, price: String(s.price) })));
+        setShowStringPicker(product.showStringSizePicker ?? true);
       }
       if (product.hoopSizes?.length > 0) {
         setHoopSizes(product.hoopSizes);
@@ -1282,6 +1309,87 @@ const AddProduct = () => {
                   stockErrors={stockErrors}
                   setStockErrors={setStockErrors}
                 />
+
+                {/* ── String Lengths & Prices (Artificial flower → Jasmine / Mullai string) ── */}
+                {isStringCategory && (
+                  <Card elevation={0} sx={{ border: `1px solid ${BORDER}`, borderRadius: "16px", bgcolor: "#fff", overflow: "visible" }}>
+                    <CardContent sx={{ p: 3, "&:last-child": { pb: 3 } }}>
+                      <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+                        <Box>
+                          <Typography sx={{ fontWeight: 700, fontSize: "0.9375rem", color: "#0f172a", lineHeight: 1.1 }}>
+                            String Lengths &amp; Prices
+                          </Typography>
+                          <Typography sx={{ fontSize: "0.72rem", color: "#94a3b8" }}>
+                            Choose the available lengths and set a price for each
+                          </Typography>
+                        </Box>
+                        <Stack direction="row" sx={{ alignItems: "center" }} spacing={0.75}>
+                          <Typography sx={{ fontSize: "0.8125rem", color: "#374151", fontWeight: 500 }}>
+                            Show length picker to customers
+                          </Typography>
+                          <Switch size="small" checked={showStringPicker} onChange={(e) => setShowStringPicker(e.target.checked)} sx={SWITCH_SX} />
+                        </Stack>
+                      </Stack>
+
+                      <Stack direction="row" sx={{ flexWrap: "wrap", gap: 1.5, mb: 2 }}>
+                        {STRING_SIZE_OPTIONS.map((inches) => {
+                          const selected = stringSizes.some((s) => s.inches === inches);
+                          return (
+                            <Box
+                              key={inches}
+                              component="button"
+                              type="button"
+                              onClick={() => toggleStringSize(inches)}
+                              aria-pressed={selected}
+                              sx={{
+                                width: 64, height: 64, borderRadius: "12px", cursor: "pointer", p: 0,
+                                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                                border: `2px solid ${selected ? P : BORDER}`,
+                                bgcolor: selected ? P_LIGHT : "#fafbfc",
+                                transition: "all 0.15s",
+                                "&:hover": { borderColor: P, bgcolor: P_LIGHT },
+                              }}
+                            >
+                              <Typography sx={{ fontWeight: 800, fontSize: "1.125rem", color: selected ? P : "#374151", lineHeight: 1 }}>
+                                {inches}"
+                              </Typography>
+                              <Typography sx={{ fontSize: "0.65rem", color: selected ? P : "#94a3b8", fontWeight: 500, mt: 0.25 }}>
+                                inch
+                              </Typography>
+                            </Box>
+                          );
+                        })}
+                      </Stack>
+
+                      {stringSizes.length > 0 && (
+                        <Grid container spacing={2}>
+                          {stringSizes.map((s) => (
+                            <Grid key={s.inches} size={{ xs: 6, sm: 4 }}>
+                              <FL required>{s.inches}" price (₹)</FL>
+                              <TextField fullWidth size="small" type="number" placeholder="0.00"
+                                value={s.price} onChange={(e) => setStringPrice(s.inches, e.target.value)}
+                                error={s.price === ""}
+                                slotProps={{
+                                  input: { startAdornment: <InputAdornment position="start"><Typography sx={{ color: "#6b7280", fontWeight: 700 }}>₹</Typography></InputAdornment> },
+                                  htmlInput: { min: 0, step: 0.01, "aria-label": `Price for ${s.inches} inch string` },
+                                }}
+                                sx={FIELD_SX} />
+                            </Grid>
+                          ))}
+                        </Grid>
+                      )}
+                      {stringSizes.length === 0 ? (
+                        <Typography sx={{ fontSize: "0.75rem", color: "#94a3b8" }}>
+                          No lengths selected — the product uses the single price below.
+                        </Typography>
+                      ) : (
+                        <Typography sx={{ mt: 1.5, fontSize: "0.75rem", color: "#94a3b8" }}>
+                          The product's listed price will be the lowest length price.
+                        </Typography>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
 
                 {/* ── Hoop Size Options (Embroidery Hoop category only) ── */}
                 {isHoopCategory && (
@@ -1489,7 +1597,7 @@ const AddProduct = () => {
                     <Grid size={{ xs: 12, sm: 6, lg: 12 }}>
                       <FL required>Price (₹)</FL>
                       <TextField fullWidth size="small" type="number" placeholder="0.00"
-                        value={form.price} onChange={(e) => set("price", e.target.value)} required
+                        value={form.price} onChange={(e) => set("price", e.target.value)} required={!(isStringCategory && stringSizes.length > 0)}
                         slotProps={{
                           input: { startAdornment: <InputAdornment position="start"><Typography sx={{ color: "#6b7280", fontWeight: 700 }}>₹</Typography></InputAdornment> },
                           htmlInput: { min: 0, step: 0.01 },

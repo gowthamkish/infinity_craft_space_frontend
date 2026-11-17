@@ -267,6 +267,7 @@ const ProductDetail = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedHoopSize, setSelectedHoopSize] = useState(null);
+  const [selectedStringSize, setSelectedStringSize] = useState(null);
   const thumbsRef = useRef(null);
 
   // Record the product in "recently viewed" once per product (not on every background refetch)
@@ -289,6 +290,18 @@ const ProductDetail = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product?._id]);
 
+  // Jasmine / Mullai string: pre-select the shortest length when the product loads
+  useEffect(() => {
+    if (!product?.showStringSizePicker || !product?.stringSizes?.length) return;
+    setSelectedStringSize(Math.min(...product.stringSizes.map((s) => s.inches)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?._id]);
+
+  // Price follows the chosen string length; ordinary products keep their base price
+  const hasStringSizes = !!product?.showStringSizePicker && product?.stringSizes?.length > 0;
+  const stringEntry = hasStringSizes ? product.stringSizes.find((s) => s.inches === selectedStringSize) : null;
+  const displayPrice = stringEntry ? stringEntry.price : product?.price;
+
   useEffect(() => {
     if (!thumbsRef.current) return;
     const active = thumbsRef.current.querySelector("[data-active='true']");
@@ -301,10 +314,16 @@ const ProductDetail = () => {
       addSuccess("Please select a hoop size before adding to cart.", "Select size");
       return;
     }
+    if (hasStringSizes && !stringEntry) {
+      addSuccess("Please select a string length before adding to cart.", "Select size");
+      return;
+    }
     setAddingToCart(true);
     try {
       dispatch(addToCart({
-        product,
+        // cart lines carry the price of the chosen length (server re-validates at checkout)
+        product: stringEntry ? { ...product, price: stringEntry.price } : product,
+        selectedStringSize: stringEntry ? stringEntry.inches : undefined,
         quantity,
         customNote: customNote.trim() || undefined,
         selectedHoopSize: product.showHoopSizePicker ? selectedHoopSize : undefined,
@@ -419,7 +438,7 @@ const ProductDetail = () => {
   }
 
   const images = getImages();
-  const quantityInCart = cartItems.find((item) => item.product._id === id)?.quantity || 0;
+  const quantityInCart = cartItems.filter((item) => item.product._id === id).reduce((n, item) => n + item.quantity, 0);
   const isOutOfStock = product.trackInventory !== false && product.stock <= 0;
   const isLowStock = product.trackInventory !== false && product.stock > 0 && product.stock <= (product.lowStockThreshold || 5);
   const DESC_LIMIT = 280;
@@ -431,7 +450,7 @@ const ProductDetail = () => {
         title={`${product.name} - Infinity Craft Space`}
         description={product.seoDescription || product.description}
         type="product"
-        price={product.price}
+        price={displayPrice}
         availability={isOutOfStock ? "https://schema.org/OutOfStock" : "https://schema.org/InStock"}
         rating={ratingStats?.averageRating}
         reviewCount={ratingStats?.reviewCount}
@@ -661,9 +680,9 @@ const ProductDetail = () => {
                     <Stack direction="row" sx={{ alignItems: "center", flexWrap: "wrap", gap: 1.25, mb: 0.5 }}>
                       <Typography sx={{ fontSize: "1.875rem", fontWeight: 700, color: PRIMARY,
                         lineHeight: 1, letterSpacing: "-0.02em" }}>
-                        ₹{product.price.toLocaleString("en-IN")}
+                        ₹{displayPrice.toLocaleString("en-IN")}
                       </Typography>
-                      {product.compareAtPrice > product.price && (
+                      {!hasStringSizes && product.compareAtPrice > product.price && (
                         <>
                           <Typography sx={{ fontSize: "1.0625rem", fontWeight: 400, color: "#94a3b8",
                             textDecoration: "line-through", lineHeight: 1 }}>
@@ -766,6 +785,53 @@ const ProductDetail = () => {
                       </Box>
                     );
                   })()}
+
+                  {/* String length selector (Jasmine / Mullai string) — price updates with the choice */}
+                  {hasStringSizes && (
+                    <Box sx={{ mb: 2.5 }}>
+                      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
+                        <Typography sx={{ fontSize: "0.8125rem", fontWeight: 600, color: "text.secondary" }}>
+                          String Length
+                        </Typography>
+                        {stringEntry && (
+                          <Typography sx={{ fontSize: "0.8125rem", fontWeight: 600, color: "text.primary" }}>
+                            {stringEntry.inches}" · ₹{stringEntry.price.toLocaleString("en-IN")}
+                          </Typography>
+                        )}
+                      </Box>
+                      <Stack direction="row" sx={{ flexWrap: "wrap" }} spacing={1.5} useFlexGap role="group" aria-label="String length">
+                        {[...product.stringSizes].sort((a, b) => a.inches - b.inches).map((s) => {
+                          const active = selectedStringSize === s.inches;
+                          return (
+                            <Box
+                              key={s.inches}
+                              component="button"
+                              type="button"
+                              onClick={() => setSelectedStringSize(s.inches)}
+                              aria-pressed={active}
+                              aria-label={`${s.inches} inch string, ₹${s.price}`}
+                              sx={{
+                                minWidth: 76, height: 64, px: 1, borderRadius: "12px", cursor: "pointer",
+                                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "2px",
+                                border: `2px solid ${active ? PRIMARY : "rgba(0,0,0,0.12)"}`,
+                                bgcolor: active ? PRIMARY_BG : "#fafafa",
+                                boxShadow: active ? "0 0 0 3px rgba(210, 78, 51,0.15)" : "0 1px 4px rgba(0,0,0,0.07)",
+                                transition: "all 150ms ease",
+                                "&:hover": { borderColor: PRIMARY, bgcolor: PRIMARY_BG },
+                              }}
+                            >
+                              <Typography sx={{ fontWeight: 800, fontSize: "1.0625rem", color: active ? PRIMARY : "text.primary", lineHeight: 1 }}>
+                                {s.inches}"
+                              </Typography>
+                              <Typography sx={{ fontSize: "0.7rem", color: active ? PRIMARY : "text.secondary", fontWeight: 600 }}>
+                                ₹{s.price.toLocaleString("en-IN")}
+                              </Typography>
+                            </Box>
+                          );
+                        })}
+                      </Stack>
+                    </Box>
+                  )}
 
                   {/* Hoop size selector */}
                   {product.showHoopSizePicker && product.hoopSizes?.length > 0 && (
@@ -1106,7 +1172,7 @@ const ProductDetail = () => {
                 {product.name}
               </Typography>
               <Typography sx={{ fontSize: "1rem", fontWeight: 700, color: PRIMARY, letterSpacing: "-0.02em" }}>
-                ₹{product.price.toLocaleString("en-IN")}
+                ₹{displayPrice.toLocaleString("en-IN")}
               </Typography>
             </Box>
           </Stack>

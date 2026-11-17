@@ -153,14 +153,14 @@ export default function Checkout() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleQuantityChange = (productId, newQuantity) => {
+  const handleQuantityChange = (productId, newQuantity, stringSize) => {
     if (newQuantity > 0) {
-      dispatch(updateCartItemQuantity({ productId, quantity: newQuantity }));
+      dispatch(updateCartItemQuantity({ productId, quantity: newQuantity, stringSize }));
     }
   };
 
-  const handleRemoveItem = (productId) => {
-    dispatch(removeItemCompletely(productId));
+  const handleRemoveItem = (productId, stringSize) => {
+    dispatch(removeItemCompletely(stringSize != null ? { productId, stringSize } : productId));
   };
 
   const handleCouponApplied = (coupon) => {
@@ -226,7 +226,7 @@ export default function Checkout() {
         // Prices and shipping are recalculated on the server; only what to buy and where to ship is sent.
         currency: "INR",
         shippingAddress: shippingAddress,
-        items: cartItems.map((i) => ({ productId: i.product._id, quantity: i.quantity })),
+        items: cartItems.map((i) => ({ productId: i.product._id, quantity: i.quantity, stringSize: i.selectedStringSize ?? null })),
         shippingCourierId: shippingRate?.courierId || null,
       });
       const { razorpayOrderId, currency, amountInPaise } = orderResponse.data.order;
@@ -294,6 +294,7 @@ export default function Checkout() {
         product: item.product._id,
         productName: item.product.name,
         quantity: item.quantity,
+        selectedStringSize: item.selectedStringSize ?? null,
         unitPrice: item.product.price,
         totalPrice: item.totalPrice,
       }));

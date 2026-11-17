@@ -63,10 +63,10 @@ export const PaymentStep = ({
 
           <div className="ck-review-items">
             {cartItems.map((item) => (
-              <div key={item.product._id} className="ck-review-item">
+              <div key={`${item.product._id}-${item.selectedStringSize ?? ""}`} className="ck-review-item">
                 <Thumb product={item.product} size="sm" />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="ck-item-name" style={{ fontSize: "1.02rem" }}>{item.product.name}</div>
+                  <div className="ck-item-name" style={{ fontSize: "1.02rem" }}>{item.product.name}{item.selectedStringSize ? ` (${item.selectedStringSize}")` : ""}</div>
                   <div className="ck-meta">Qty {item.quantity} × {inr(item.product.price)}</div>
                 </div>
                 <div className="ck-item-price">{inr(item.totalPrice)}</div>

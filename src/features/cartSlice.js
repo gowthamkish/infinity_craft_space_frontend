@@ -48,13 +48,13 @@ export const syncCartToBackend = createAsyncThunk(
 // Optimistic add to cart: updates UI immediately, syncs to backend, reverts on failure
 export const optimisticAddToCart = createAsyncThunk(
   "cart/optimisticAdd",
-  async ({ product, quantity = 1 }, { dispatch, rejectWithValue }) => {
-    dispatch(addToCart({ product, quantity }));
+  async ({ product, quantity = 1, selectedStringSize }, { dispatch, rejectWithValue }) => {
+    dispatch(addToCart({ product, quantity, selectedStringSize }));
     try {
-      await api.post("/api/cart/add", { productId: product._id, quantity });
+      await api.post("/api/cart/add", { productId: product._id, quantity, stringSize: selectedStringSize });
       return { success: true };
     } catch (error) {
-      dispatch(revertCartItem({ product, quantity }));
+      dispatch(revertCartItem({ product, quantity, selectedStringSize }));
       return rejectWithValue(error.response?.data?.error || "Failed to add to cart");
     }
   },
@@ -81,6 +81,10 @@ export const clearCartOnBackend = createAsyncThunk(
   },
 );
 
+// A cart line is identified by product + chosen string length (null for ordinary products)
+const sameLine = (item, productId, stringSize) =>
+  item.product._id === productId && (item.selectedStringSize ?? null) === (stringSize ?? null);
+
 const cartSlice = createSlice({
   name: "cart",
   initialState: {
@@ -92,10 +96,11 @@ const cartSlice = createSlice({
   },
   reducers: {
     addToCart: (state, action) => {
-      const { product, quantity, customNote, selectedHoopSize } = action.payload;
+      // For string products the caller passes `product` already priced for the chosen length
+      const { product, quantity, customNote, selectedHoopSize, selectedStringSize } = action.payload;
       const existing = state.items.find(
         (item) =>
-          item.product._id === product._id &&
+          sameLine(item, product._id, selectedStringSize) &&
           (item.selectedHoopSize ?? null) === (selectedHoopSize ?? null),
       );
       if (existing) {
@@ -109,45 +114,39 @@ const cartSlice = createSlice({
           totalPrice: product.price * quantity,
           ...(customNote ? { customNote } : {}),
           ...(selectedHoopSize != null ? { selectedHoopSize } : {}),
+          ...(selectedStringSize != null ? { selectedStringSize } : {}),
         });
       }
     },
 
     removeFromCart: (state, action) => {
       const productId = action.payload.product._id;
-      const existing = state.items.find(
-        (item) => item.product._id === productId,
-      );
+      const stringSize = action.payload.selectedStringSize;
+      const existing = state.items.find((item) => sameLine(item, productId, stringSize));
       if (existing) {
         if (existing.quantity > 1) {
           existing.quantity -= 1;
           existing.totalPrice = existing.quantity * existing.product.price;
         } else {
-          state.items = state.items.filter(
-            (item) => item.product._id !== productId,
-          );
+          state.items = state.items.filter((item) => !sameLine(item, productId, stringSize));
         }
       }
     },
 
     updateCartItemNote: (state, action) => {
-      const { productId, customNote } = action.payload;
-      const existing = state.items.find((item) => item.product._id === productId);
+      const { productId, customNote, stringSize } = action.payload;
+      const existing = state.items.find((item) => sameLine(item, productId, stringSize));
       if (existing) {
         existing.customNote = customNote || undefined;
       }
     },
 
     updateCartItemQuantity: (state, action) => {
-      const { productId, quantity } = action.payload;
-      const existing = state.items.find(
-        (item) => item.product._id === productId,
-      );
+      const { productId, quantity, stringSize } = action.payload;
+      const existing = state.items.find((item) => sameLine(item, productId, stringSize));
       if (existing) {
         if (quantity <= 0) {
-          state.items = state.items.filter(
-            (item) => item.product._id !== productId,
-          );
+          state.items = state.items.filter((item) => !sameLine(item, productId, stringSize));
         } else {
           existing.quantity = quantity;
           existing.totalPrice = existing.quantity * existing.product.price;
@@ -156,12 +155,12 @@ const cartSlice = createSlice({
     },
 
     revertCartItem: (state, action) => {
-      const { product, quantity } = action.payload;
-      const existing = state.items.find((item) => item.product._id === product._id);
+      const { product, quantity, selectedStringSize } = action.payload;
+      const existing = state.items.find((item) => sameLine(item, product._id, selectedStringSize));
       if (existing) {
         existing.quantity -= quantity;
         if (existing.quantity <= 0) {
-          state.items = state.items.filter((item) => item.product._id !== product._id);
+          state.items = state.items.filter((item) => !sameLine(item, product._id, selectedStringSize));
         } else {
           existing.totalPrice = existing.quantity * existing.product.price;
         }
@@ -169,10 +168,10 @@ const cartSlice = createSlice({
     },
 
     removeItemCompletely: (state, action) => {
-      const productId = action.payload;
-      state.items = state.items.filter(
-        (item) => item.product._id !== productId,
-      );
+      // payload: productId, or { productId, stringSize } for sized string products
+      const { productId, stringSize } =
+        typeof action.payload === "object" ? action.payload : { productId: action.payload };
+      state.items = state.items.filter((item) => !sameLine(item, productId, stringSize));
     },
 
     clearCart: (state) => {
@@ -182,16 +181,17 @@ const cartSlice = createSlice({
     mergeGuestCart: (state, action) => {
       const guestItems = action.payload;
       // Index cart items by product id once → O(n + m) merge instead of O(n·m)
-      const byId = new Map(state.items.map((item) => [item.product._id, item]));
+      const lineKey = (item) => `${item.product._id}|${item.selectedStringSize ?? ""}`;
+      const byId = new Map(state.items.map((item) => [lineKey(item), item]));
       guestItems.forEach((guestItem) => {
-        const existing = byId.get(guestItem.product._id);
+        const existing = byId.get(lineKey(guestItem));
         if (existing) {
           existing.quantity += guestItem.quantity;
           existing.totalPrice = existing.quantity * existing.product.price;
         } else {
           state.items.push(guestItem);
           // Register the draft so a repeated guest item merges into it
-          byId.set(guestItem.product._id, state.items[state.items.length - 1]);
+          byId.set(lineKey(guestItem), state.items[state.items.length - 1]);
         }
       });
     },

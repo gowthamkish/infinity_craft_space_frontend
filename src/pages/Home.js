@@ -226,6 +226,7 @@ function ProductCard({ product, delay = 0 }) {
   // Products that need a choice (size / colour / personalisation) go to the detail page
   const needsOptions =
     (product.showHoopSizePicker && product.hoopSizes?.length > 0) ||
+    (product.showStringSizePicker && product.stringSizes?.length > 0) ||
     (product.showColorPickerToUsers && (product.colors || []).some((c) => c.visibleToUsers)) ||
     product.isCustomizable;
   const detailPath = `/product/${product._id}`;

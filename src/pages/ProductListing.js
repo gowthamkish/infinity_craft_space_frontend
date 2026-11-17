@@ -151,6 +151,7 @@ const ProductCard = React.memo(({
   // Products that need the detail page to make a selection before buying
   const requiresOptionSelection =
     (product.showHoopSizePicker && product.hoopSizes?.length > 0) ||
+    (product.showStringSizePicker && product.stringSizes?.length > 0) ||
     (product.showColorPickerToUsers && (product.colors || []).some((c) => c.visibleToUsers)) ||
     product.isCustomizable;
   const rawImageUrl  = product.images?.[0]?.url || product.image?.url || product.image || null;

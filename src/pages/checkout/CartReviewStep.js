@@ -32,7 +32,7 @@ function CartItemRow({ item, handleQuantityChange, handleRemoveItem }) {
   const [noteValue, setNoteValue] = useState(item.customNote || "");
 
   const saveNote = () => {
-    dispatch(updateCartItemNote({ productId: product._id, customNote: noteValue.trim() }));
+    dispatch(updateCartItemNote({ productId: product._id, customNote: noteValue.trim(), stringSize: item.selectedStringSize }));
     setNoteOpen(false);
   };
 
@@ -43,7 +43,7 @@ function CartItemRow({ item, handleQuantityChange, handleRemoveItem }) {
       <div style={{ minWidth: 0 }}>
         <div className="ck-item-top">
           <div style={{ minWidth: 0 }}>
-            <h3 className="ck-item-name">{product.name}</h3>
+            <h3 className="ck-item-name">{product.name}{item.selectedStringSize ? ` (${item.selectedStringSize}" string)` : ""}</h3>
             <div className="ck-meta">{inr(product.price)} per unit</div>
           </div>
           <div className="ck-item-price">{inr(item.totalPrice)}</div>
@@ -98,15 +98,15 @@ function CartItemRow({ item, handleQuantityChange, handleRemoveItem }) {
 
         <div className="ck-item-foot">
           <div className="ck-qty" role="group" aria-label={`Quantity for ${product.name}`}>
-            <button type="button" aria-label="Decrease quantity" onClick={() => handleQuantityChange(product._id, item.quantity - 1)} disabled={item.quantity <= 1}>
+            <button type="button" aria-label="Decrease quantity" onClick={() => handleQuantityChange(product._id, item.quantity - 1, item.selectedStringSize)} disabled={item.quantity <= 1}>
               <FiMinus size={16} />
             </button>
             <span aria-live="polite">{item.quantity}</span>
-            <button type="button" aria-label="Increase quantity" onClick={() => handleQuantityChange(product._id, item.quantity + 1)} disabled={atMax}>
+            <button type="button" aria-label="Increase quantity" onClick={() => handleQuantityChange(product._id, item.quantity + 1, item.selectedStringSize)} disabled={atMax}>
               <FiPlus size={16} />
             </button>
           </div>
-          <button type="button" className="ck-link" onClick={() => handleRemoveItem(product._id)}>
+          <button type="button" className="ck-link" onClick={() => handleRemoveItem(product._id, item.selectedStringSize)}>
             <FiTrash2 size={16} /> Remove
           </button>
         </div>
@@ -188,7 +188,7 @@ export const CartReviewStep = ({
           )}
           <div className="ck-items">
             {cartItems.map((item) => (
-              <CartItemRow key={item.product._id} item={item} handleQuantityChange={handleQuantityChange} handleRemoveItem={handleRemoveItem} />
+              <CartItemRow key={`${item.product._id}-${item.selectedStringSize ?? ""}`} item={item} handleQuantityChange={handleQuantityChange} handleRemoveItem={handleRemoveItem} />
             ))}
           </div>
         </Card>

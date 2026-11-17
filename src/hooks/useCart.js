@@ -50,16 +50,16 @@ export const useCart = () => {
   );
 
   const updateQuantity = useCallback(
-    (productId, quantity) => {
-      dispatch(updateQuantityAction({ productId, quantity }));
+    (productId, quantity, stringSize) => {
+      dispatch(updateQuantityAction({ productId, quantity, stringSize }));
       debouncedSync();
     },
     [dispatch, debouncedSync],
   );
 
   const removeItem = useCallback(
-    (productId) => {
-      dispatch(removeItemAction(productId));
+    (productId, stringSize) => {
+      dispatch(removeItemAction(stringSize != null ? { productId, stringSize } : productId));
       debouncedSync();
     },
     [dispatch, debouncedSync],
