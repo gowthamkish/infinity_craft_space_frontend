@@ -1138,7 +1138,7 @@ const AddProduct = () => {
     const product = location.state?.product;
     if (editingId && product) {
       setForm({
-        name: product.name, sku: product.sku || "", price: product.price,
+        name: product.name, sku: (product.sku || "").toUpperCase(), price: product.price,
         compareAtPrice: product.compareAtPrice || "", description: product.description,
         category: product.category, subCategory: product.subCategory,
         stock: product.stock !== undefined ? product.stock : "",
@@ -1297,7 +1297,7 @@ const AddProduct = () => {
                     <Grid size={{ xs: 12, sm: 4 }}>
                       <FL hint="Stock Keeping Unit — your internal product code">SKU / Product code</FL>
                       <TextField fullWidth size="small" placeholder="e.g. MUG-001"
-                        value={form.sku} onChange={(e) => set("sku", e.target.value)} sx={FIELD_SX} />
+                        value={form.sku} onChange={(e) => set("sku", e.target.value.toUpperCase())} sx={FIELD_SX} />
                     </Grid>
                   </Grid>
 
