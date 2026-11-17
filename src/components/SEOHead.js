@@ -135,7 +135,7 @@ const SEOHead = ({
         publisher: baseOrganization,
         potentialAction: {
           "@type": "SearchAction",
-          target: `${baseUrl}/search?q={search_term_string}`,
+          target: `${baseUrl}/products?q={search_term_string}`,
           "query-input": "required name=search_term_string",
         },
       };
@@ -306,21 +306,40 @@ export const generateProductStructuredData = (product, reviews = []) => {
       name: "Infinity Craft Space",
     },
     category: product.category,
-    offers: {
-      "@type": "Offer",
-      price: product.price,
-      priceCurrency: "INR",
-      availability: "https://schema.org/InStock",
-      url: `${baseUrl}/product/${product.slug || product._id}`,
-      priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-      ...(product.compareAtPrice && product.compareAtPrice > product.price
-        ? { highPrice: product.compareAtPrice, "@type": "AggregateOffer" }
-        : {}),
-      seller: {
-        "@type": "Organization",
-        name: "Infinity Craft Space",
-      },
-    },
+    offers: (() => {
+      const url = `${baseUrl}/product/${product.slug || product._id}`;
+      const availability =
+        product.trackInventory === false || product.stock > 0
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock";
+      const seller = { "@type": "Organization", name: "Infinity Craft Space" };
+      const priceValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+      // Jasmine / Mullai string: one offer per length, so answer engines can quote each price
+      if (product.showStringSizePicker && product.stringSizes?.length > 0) {
+        const prices = product.stringSizes.map((s) => s.price);
+        return {
+          "@type": "AggregateOffer",
+          priceCurrency: "INR",
+          lowPrice: Math.min(...prices),
+          highPrice: Math.max(...prices),
+          offerCount: prices.length,
+          availability,
+          seller,
+          offers: [...product.stringSizes]
+            .sort((a, b) => a.inches - b.inches)
+            .map((s) => ({ "@type": "Offer", name: `${s.inches} inch`, price: s.price, priceCurrency: "INR", availability, url, priceValidUntil, seller })),
+        };
+      }
+      return {
+        "@type": "Offer",
+        price: product.price,
+        priceCurrency: "INR",
+        availability,
+        url,
+        priceValidUntil,
+        seller,
+      };
+    })(),
     aggregateRating: aggregateRating,
     review: reviewStructuredData.length > 0 ? reviewStructuredData : undefined,
   };

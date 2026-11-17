@@ -36,6 +36,7 @@ import SEOHead, {
   generateBreadcrumbStructuredData,
   getBaseUrl,
 } from "../components/SEOHead";
+import { buildProductFaq, faqJsonLd } from "../utils/productFaq";
 import { useRecentlyViewed } from "../hooks/useRecentlyViewed";
 import { useLazySection } from "../hooks/useLazySection";
 import DeliveryEstimator from "../components/DeliveryEstimator";
@@ -440,6 +441,7 @@ const ProductDetail = () => {
   const images = getImages();
   const quantityInCart = cartItems.filter((item) => item.product._id === id).reduce((n, item) => n + item.quantity, 0);
   const isOutOfStock = product.trackInventory !== false && product.stock <= 0;
+  const productFaq = buildProductFaq(product); // powers the visible "Quick answers" + FAQPage markup
   const isLowStock = product.trackInventory !== false && product.stock > 0 && product.stock <= (product.lowStockThreshold || 5);
   const DESC_LIMIT = 280;
   const isLongDesc = (product.description || "").length > DESC_LIMIT;
@@ -470,6 +472,7 @@ const ProductDetail = () => {
                 worstRating: 1,
               } : undefined,
             },
+            ...(faqJsonLd(productFaq) ? [faqJsonLd(productFaq)] : []),
             generateBreadcrumbStructuredData([
               { name: "Home", url: getBaseUrl() },
               { name: "Products", url: `${getBaseUrl()}/products` },
@@ -1088,6 +1091,22 @@ const ProductDetail = () => {
               </Box>
             </Grid>
           </Grid>
+
+          {/* ══ QUICK ANSWERS (AEO): visible text that matches the FAQPage markup ══ */}
+          {productFaq.length > 0 && (
+            <Paper elevation={0} component="section" aria-labelledby="pdp-quick-answers"
+              sx={{ mt: 6, p: { xs: 2.5, md: 3.5 }, borderRadius: "12px", border: `0.5px solid ${BORDER}`, bgcolor: "#fff" }}>
+              <Typography id="pdp-quick-answers" component="h2" sx={{ fontSize: "1.125rem", fontWeight: 700, mb: 1.5 }}>
+                Quick answers about {product.name}
+              </Typography>
+              {productFaq.map((f) => (
+                <Box key={f.q} sx={{ py: 1.25, borderTop: `1px solid ${BORDER}`, "&:first-of-type": { borderTop: "none" } }}>
+                  <Typography component="h3" sx={{ fontSize: "0.9375rem", fontWeight: 600 }}>{f.q}</Typography>
+                  <Typography sx={{ fontSize: "0.875rem", color: "text.secondary", mt: 0.25 }}>{f.a}</Typography>
+                </Box>
+              ))}
+            </Paper>
+          )}
 
           {/* ══ REVIEWS + Q&A ════════════════════════════════════════════════ */}
           <Paper elevation={0}
