@@ -38,6 +38,20 @@ import { useGetPublicCategoriesQuery } from "../../services/categoriesApi";
 import api from "../../api/axios";
 
 /* ── Design tokens ─────────────────────────────────────────────── */
+
+const ImgBtn = ({ label, onClick, disabled, children, danger }) => (
+  <Box component="button" type="button" onClick={onClick} disabled={disabled} aria-label={label} title={label}
+    sx={{
+      width: 26, height: 26, borderRadius: "50%", border: "none", p: 0,
+      cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.35 : 1,
+      background: danger ? "linear-gradient(135deg,#ef4444,#dc2626)" : "rgba(15,23,42,0.75)",
+      color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
+      boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+    }}>
+    {children}
+  </Box>
+);
+
 const P       = "#d24e33";
 const P_DARK  = "#b8412a";
 const P_LIGHT = "rgba(210, 78, 51,0.07)";
@@ -1001,6 +1015,20 @@ const AddProduct = () => {
     });
   };
   const removeImage     = (i) => { setImageFiles((p) => p.filter((_, idx) => idx !== i)); setImagePreviews((p) => p.filter((_, idx) => idx !== i)); };
+  // Edit mode: delete one saved image / reorder saved or newly-added images (first = primary)
+  const removeExistingImage = (i) => setExistingImages((p) => p.filter((_, idx) => idx !== i));
+  const swap = (arr, i, j) => { const a = [...arr]; [a[i], a[j]] = [a[j], a[i]]; return a; };
+  const moveExistingImage = (i, dir) => {
+    const j = i + dir;
+    if (j < 0 || j >= existingImages.length) return;
+    setExistingImages((p) => swap(p, i, j));
+  };
+  const moveNewImage = (i, dir) => {
+    const j = i + dir;
+    if (j < 0 || j >= imageFiles.length) return;
+    setImageFiles((p) => swap(p, i, j));
+    setImagePreviews((p) => swap(p, i, j));
+  };
   const removeAllImages = () => { setImageFiles([]); setImagePreviews([]); setExistingImages([]); if (fileInputRef.current) fileInputRef.current.value = ""; };
   const handleDragOver  = (e) => { e.preventDefault(); setDragOver(true); };
   const handleDragLeave = (e) => { e.preventDefault(); setDragOver(false); };
@@ -1066,6 +1094,8 @@ const AddProduct = () => {
         hoopSizes: isHoopCategory ? hoopSizes : [],
         showHoopSizePicker: isHoopCategory ? showHoopPicker : false,
       };
+      // Tell the server which saved images to keep, in order (anything missing is deleted)
+      if (editingId) productData.existingImages = existingImages.map(({ publicId, url }) => ({ publicId, url }));
       if (imageFiles.length > 0) {
         setImageUploading(true);
         try {
@@ -1533,12 +1563,19 @@ const AddProduct = () => {
                       </Stack>
                       <Grid container spacing={1.5}>
                         {existingImages.map((img, i) => (
-                          <Grid size={{ xs: 6, sm: 4, md: 3 }} key={`ex-${i}`}>
+                          <Grid size={{ xs: 6, sm: 4, md: 3 }} key={`ex-${img.publicId || img.url}`}>
                             <Box sx={{ position: "relative", borderRadius: "12px", overflow: "hidden",
                               border: `2px solid ${i === 0 ? P : BORDER}`, aspectRatio: "1/1" }}>
                               <Box component="img" src={img.url} alt={img.originalName || `Image ${i + 1}`}
                                 sx={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                              {img.isPrimary && (
+                              <Box sx={{ position: "absolute", top: 6, right: 6 }}>
+                                <ImgBtn danger label={`Delete image ${i + 1}`} onClick={() => removeExistingImage(i)}><FiX size={12} /></ImgBtn>
+                              </Box>
+                              <Stack direction="row" spacing={0.5} sx={{ position: "absolute", bottom: 6, right: 6 }}>
+                                <ImgBtn label="Move earlier" disabled={i === 0} onClick={() => moveExistingImage(i, -1)}>‹</ImgBtn>
+                                <ImgBtn label="Move later" disabled={i === existingImages.length - 1} onClick={() => moveExistingImage(i, 1)}>›</ImgBtn>
+                              </Stack>
+                              {i === 0 && (
                                 <Box sx={{
                                   position: "absolute", top: 6, left: 6,
                                   px: 1, py: 0.25, borderRadius: "6px",
@@ -1566,6 +1603,10 @@ const AddProduct = () => {
                                 }}>
                                 <FiX size={12} />
                               </Box>
+                              <Stack direction="row" spacing={0.5} sx={{ position: "absolute", bottom: 6, right: 6 }}>
+                                <ImgBtn label="Move earlier" disabled={i === 0} onClick={() => moveNewImage(i, -1)}>‹</ImgBtn>
+                                <ImgBtn label="Move later" disabled={i === imagePreviews.length - 1} onClick={() => moveNewImage(i, 1)}>›</ImgBtn>
+                              </Stack>
                               {i === 0 && existingImages.length === 0 && (
                                 <Box sx={{
                                   position: "absolute", top: 6, left: 6,
