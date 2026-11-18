@@ -112,7 +112,7 @@ export default function AdminSidebar() {
         {!collapsed && (
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, overflow: "hidden" }}>
             <img
-              src="/ICS_Logo.jpeg"
+              src="/ICS_Logo_160.jpeg" width="32" height="32"
               alt="ICS"
               style={{ height: 32, width: "auto", borderRadius: 6, flexShrink: 0 }}
             />
@@ -132,7 +132,7 @@ export default function AdminSidebar() {
         )}
         {collapsed && (
           <img
-            src="/ICS_Logo.jpeg"
+            src="/ICS_Logo_160.jpeg" width="32" height="32"
             alt="ICS"
             style={{ height: 32, width: "auto", borderRadius: 6 }}
           />

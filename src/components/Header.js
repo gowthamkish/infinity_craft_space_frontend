@@ -33,13 +33,13 @@ const NAV_LINKS = [
 
 // Ember & Teal theme (tokens live in styles/ember.css)
 const NAV_BG = "rgba(247, 244, 238, 0.82)";
-const ACCENT = "#d24e33";                       // active link text
+const ACCENT = "#a63a24";                       // active link text
 const ACCENT_BG = "rgba(232, 98, 61, 0.10)";
 const TEXT = "#232420";
 const TEXT_2 = "#5b5d58";
 const BORDER = "rgba(20, 24, 30, 0.10)";
 const BORDER_STRONG = "rgba(20, 24, 30, 0.18)";
-const EMBER_GRAD = "linear-gradient(135deg, #e8623d, #d24e33)";
+const EMBER_GRAD = "linear-gradient(135deg, #c4482a, #b8412a)";
 const HEAD_FONT = '"Space Grotesk", "Inter", system-ui, sans-serif';
 
 function Header() {
@@ -165,7 +165,7 @@ function Header() {
               flexShrink: 0, mr: { xs: "auto", lg: 3 },
             }}
           >
-            <img src="/ICS_Logo.jpeg" alt="Infinity Craft Space"
+            <img src="/ICS_Logo_160.jpeg" width="38" height="38" alt="Infinity Craft Space"
               style={{ height: 38, width: "auto", objectFit: "contain", borderRadius: 8 }} />
             <Box component="span"
               sx={{
@@ -280,7 +280,7 @@ function Header() {
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 2, py: 1.5, borderBottom: `1px solid ${BORDER}` }}>
           <Box component="button" onClick={() => { handleBrandClick(); setDrawerOpen(false); }}
             sx={{ display: "flex", alignItems: "center", gap: 1, background: "none", border: "none", cursor: "pointer", p: 0 }}>
-            <img src="/ICS_Logo.jpeg" alt="Infinity Craft Space"
+            <img src="/ICS_Logo_160.jpeg" width="36" height="36" alt="Infinity Craft Space"
               style={{ height: 36, width: "auto", objectFit: "contain", borderRadius: 8 }} />
             <Box component="span"
               sx={{ fontWeight: 700, fontSize: "1rem", fontFamily: HEAD_FONT, letterSpacing: "-0.02em", background: "linear-gradient(135deg, #ff7a50, #d24e33)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>

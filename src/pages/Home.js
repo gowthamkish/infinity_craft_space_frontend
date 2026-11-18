@@ -176,7 +176,7 @@ function SectionHead({ eyebrow, title, sub, teal = false, action }) {
 
 function Stars({ count, total }) {
   return (
-    <div className="hm-stars" aria-label={`${count} out of 5 stars`}>
+    <div className="hm-stars" role="img" aria-label={`${count} out of 5 stars`}>
       {Array.from({ length: 5 }).map((_, i) => (
         <FiStar key={i} className={i < count ? "on" : "off"} />
       ))}
@@ -257,7 +257,7 @@ function ProductCard({ product, delay = 0 }) {
   return (
     <Reveal as="article" delay={delay} className="hm-pcard" onClick={() => navigate(detailPath)}>
       <div className="hm-pmedia">
-        <img src={imgSrc} alt={product.name} loading="lazy" decoding="async" onError={onImgError} />
+        <img src={imgSrc} width="400" height="400" alt={product.name} loading="lazy" decoding="async" onError={onImgError} />
 
         <div className="hm-badges">
           {discountPct > 0 && <span className="hm-badge">{discountPct}% OFF</span>}
@@ -440,7 +440,7 @@ export default function Home() {
                       <div key={i} className={`hm-frame-tile ${src ? "" : "hm-frame-tile--empty"}`}>
                         {src ? (
                           <>
-                            <img src={src} alt={p.name} loading={i === 0 ? "eager" : "lazy"} decoding="async" onError={onImgError} />
+                            <img src={src} width="400" height="424" alt={p.name} loading={i === 0 ? "eager" : "lazy"} decoding="async" onError={onImgError} />
                             <span className="hm-frame-tag">{p.name}</span>
                           </>
                         ) : (
@@ -494,7 +494,7 @@ export default function Home() {
                         onClick={() => goShop(`?category=${encodeURIComponent(cat.name)}`)}
                         aria-label={`Shop ${cat.name}`}
                       >
-                        {src ? <img src={src} alt="" loading="lazy" decoding="async" onError={onImgError} /> : <span aria-hidden="true">🎨</span>}
+                        {src ? <img src={src} width="400" height="300" alt="" loading="lazy" decoding="async" onError={onImgError} /> : <span aria-hidden="true">🎨</span>}
                         <span className="hm-cat-body">
                           <span>
                             <span className="hm-cat-name" style={{ display: "block" }}>{cat.name}</span>

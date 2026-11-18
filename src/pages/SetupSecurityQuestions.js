@@ -98,7 +98,7 @@ export default function SetupSecurityQuestions() {
       <div className="auth-page">
         <div className="auth-brand-panel" aria-hidden="true">
           <div className="auth-brand-content">
-            <img src="/ICS_Logo.jpeg" alt="Infinity Craft Space" className="auth-brand-logo" />
+            <img src="/ICS_Logo_160.jpeg" width="80" height="80" alt="Infinity Craft Space" className="auth-brand-logo" />
             <h2 className="auth-brand-title">Infinity Craft Space</h2>
             <p className="auth-brand-subtitle">Premium craft supplies for creative minds</p>
             <ul className="auth-brand-perks">

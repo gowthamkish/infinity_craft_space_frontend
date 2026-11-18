@@ -117,7 +117,7 @@ export default function Footer() {
             <Stack direction="row" sx={{ alignItems: "center", gap: 1.5, mb: 2 }}>
               <Box sx={{ width: 40, height: 40, borderRadius: 2, overflow: "hidden", flexShrink: 0 }}>
                 <img
-                  src="/ICS_Logo.jpeg"
+                  src="/ICS_Logo_160.jpeg" width="40" height="40"
                   alt="Infinity Craft Space Logo"
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                   loading="lazy"
@@ -294,12 +294,12 @@ export default function Footer() {
                 aria-label="Subscribe"
                 disabled={newsletter.loading}
                 sx={{
-                  bgcolor: "#e8623d",
+                  bgcolor: "#b8412a",
                   color: "#fff",
                   borderRadius: 2,
                   fontWeight: 600,
                   textTransform: "none",
-                  "&:hover": { bgcolor: "#d24e33" },
+                  "&:hover": { bgcolor: "#9f3622" },
                   mb: 1,
                 }}
               >

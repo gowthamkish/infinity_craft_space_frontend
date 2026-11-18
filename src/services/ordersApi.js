@@ -114,11 +114,25 @@ export const ordersApi = baseApi.injectEndpoints({
           };
         };
 
+        // An open EventSource blocks the browser's back/forward cache. Close it when
+        // the page is hidden for navigation and reopen if the page is restored.
+        const onPageHide = () => {
+          clearTimeout(retryTimer);
+          if (es) { es.close(); es = null; }
+        };
+        const onPageShow = (e) => {
+          if (e.persisted && !closed && !es) connect();
+        };
+        window.addEventListener("pagehide", onPageHide);
+        window.addEventListener("pageshow", onPageShow);
+
         connect();
 
         await cacheEntryRemoved; // last subscriber gone → tear down
         closed = true;
         clearTimeout(retryTimer);
+        window.removeEventListener("pagehide", onPageHide);
+        window.removeEventListener("pageshow", onPageShow);
         if (es) es.close();
       },
     }),

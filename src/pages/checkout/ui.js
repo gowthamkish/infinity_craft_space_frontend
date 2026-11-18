@@ -15,7 +15,7 @@ export function Thumb({ product, size = "md" }) {
   const cls = size === "xs" ? "ck-thumb ck-thumb--xs" : size === "sm" ? "ck-thumb ck-thumb--sm" : "ck-thumb";
   return (
     <div className={cls}>
-      <img src={productImage(product) || PLACEHOLDER_SRC} alt={product?.name || ""} loading="lazy" decoding="async" onError={onImgError} />
+      <img src={productImage(product) || PLACEHOLDER_SRC} width="80" height="80" alt={product?.name || ""} loading="lazy" decoding="async" onError={onImgError} />
     </div>
   );
 }

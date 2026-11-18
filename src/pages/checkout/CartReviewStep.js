@@ -129,7 +129,7 @@ function CrossSell({ cartItems, navigate }) {
         {recs.map((p) => (
           <button key={p._id} type="button" className="ck-rec" onClick={() => navigate(`/product/${p.slug || p._id}`)}>
             <div className="ck-thumb ck-thumb--sm">
-              <img src={productImage(p) || PLACEHOLDER_SRC} alt="" loading="lazy" onError={onImgError} />
+              <img src={productImage(p) || PLACEHOLDER_SRC} width="80" height="80" alt="" loading="lazy" onError={onImgError} />
             </div>
             <div style={{ minWidth: 0 }}>
               <div className="ck-rec-name">{p.name}</div>
