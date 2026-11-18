@@ -1,11 +1,15 @@
 import { baseApi, patchAllCached, undoAll } from "../app/baseApi";
+import { formatProductName } from "../utils/formatProductName";
+
+// Product names are shown in Title Case everywhere, even for rows saved before that rule existed.
+const fmt = (p) => (p && typeof p === "object" && typeof p.name === "string" ? { ...p, name: formatProductName(p.name) } : p);
 
 // Backend returns { products, page, pages, total }; tolerate a bare array too.
 const normalise = (data) =>
   Array.isArray(data)
-    ? { products: data, page: 1, pages: 1, total: data.length }
+    ? { products: data.map(fmt), page: 1, pages: 1, total: data.length }
     : {
-        products: data?.products || [],
+        products: (data?.products || []).map(fmt),
         page: data?.page ?? 1,
         pages: data?.pages ?? 1,
         total: data?.total ?? data?.products?.length ?? 0,
@@ -29,11 +33,11 @@ const patchProductLists = (dispatch, getState, mutate) => [
   }),
 ];
 
-const extractProduct = (r) => r?.product || r;
+const extractProduct = (r) => fmt(r?.product || r);
 
 // The recommendation endpoints answer { success, count, data: [...] } (personalised: { products }).
 // Always hand components a plain array.
-const toList = (r) => r?.data || r?.products || r?.recommendations || (Array.isArray(r) ? r : []);
+const toList = (r) => (r?.data || r?.products || r?.recommendations || (Array.isArray(r) ? r : [])).map(fmt);
 
 export const productsApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
