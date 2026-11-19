@@ -150,10 +150,16 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        // Plain axios bypasses the `api` request interceptor, so attach the CSRF
+        // token by hand — the backend rejects POSTs without it (403).
+        const csrf = await ensureCsrfToken();
         const refreshRes = await axios.post(
           `${import.meta.env.VITE_API_URL}/api/auth/refresh-token`,
           {},
-          { withCredentials: true },
+          {
+            withCredentials: true,
+            headers: csrf ? { "X-CSRF-Token": csrf } : {},
+          },
         );
         // Update sessionStorage with the new access token for iOS Safari ITP fallback
         if (refreshRes.data?.accessToken) {
