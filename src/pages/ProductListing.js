@@ -101,21 +101,6 @@ function CategoryCircles({ categories, products, selectedSet, expandedId, onSele
   );
 }
 
-/* ── Lazy Image ─────────────────────────────────────────────────────── */
-function useLazyImage(src) {
-  const imgRef = useRef(null);
-  const [loaded, setLoaded] = useState(false);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const el = imgRef.current;
-    if (!el || typeof IntersectionObserver === "undefined") { setVisible(true); return; }
-    const ob = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVisible(true); ob.disconnect(); } }, { rootMargin: "200px" });
-    ob.observe(el);
-    return () => ob.disconnect();
-  }, []);
-  return { imgRef, src: visible ? src : undefined, loaded, setLoaded };
-}
-
 /* ── Skeleton Card ───────────────────────────────────────────────────── */
 const SkeletonCard = () => (
   <Box sx={{ borderRadius: 3, overflow: "hidden", border: "1px solid #e7e5e4", bgcolor: "#fff" }}>
@@ -133,7 +118,7 @@ const SkeletonCard = () => (
 /* ── Product Card ────────────────────────────────────────────────────── */
 const ProductCard = React.memo(({
   product, quantityInCart, onAddToCart, onRemoveFromCart,
-  onImageClick, onShowToast, isWishlisted,
+  onImageClick, onShowToast, isWishlisted, priority = false,
 }) => {
   const navigate = useNavigate();
   const isAuthenticated = useSelector((s) => !!s.auth.user);
@@ -156,7 +141,19 @@ const ProductCard = React.memo(({
     product.isCustomizable;
   const rawImageUrl  = product.images?.[0]?.url || product.image?.url || product.image || null;
   const imgCount     = product.images?.length || 0;
-  const { imgRef, src: imageUrl, loaded: imgLoaded, setLoaded: setImgLoaded } = useLazyImage(rawImageUrl);
+  // Native loading="lazy" handles deferral; gating `src` behind an IntersectionObserver
+  // hid the LCP image from the browser until after hydration. Serve a resized,
+  // auto-format Cloudinary rendition with a srcset instead of the full-size original.
+  const imgRef = useRef(null);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const imageUrl = buildCloudinaryUrl(rawImageUrl, 450);
+  const imageSrcSet = rawImageUrl && imageUrl !== rawImageUrl
+    ? [300, 450, 600].map((w) => `${buildCloudinaryUrl(rawImageUrl, w)} ${w}w`).join(", ")
+    : undefined;
+  useEffect(() => {
+    // Cached images can finish before React attaches onLoad
+    if (imgRef.current?.complete) setImgLoaded(true);
+  }, []);
 
   const handleToggleWishlist = async () => {
     if (!isAuthenticated) { navigate("/login"); return; }
@@ -209,14 +206,19 @@ const ProductCard = React.memo(({
             ref={imgRef}
             src={imageUrl}
             alt={product.name}
-            loading="lazy"
+            srcSet={imageSrcSet}
+            sizes="(max-width: 600px) 50vw, (max-width: 900px) 33vw, (max-width: 1200px) 25vw, 20vw"
+            width="450"
+            height="450"
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : "auto"}
             decoding="async"
             onLoad={() => setImgLoaded(true)}
             onError={(e) => { onImgError(e); setImgLoaded(true); }}
             className="card-img"
             sx={{
               width: "100%", aspectRatio: "1/1", objectFit: "cover", display: "block",
-              opacity: imgLoaded ? 1 : 0, transition: "opacity 0.3s, transform 0.4s ease",
+              opacity: imgLoaded || priority ? 1 : 0, transition: "opacity 0.3s, transform 0.4s ease",
             }}
           />
         ) : (
@@ -873,9 +875,10 @@ const ProductListing = () => {
             {filteredProducts.length > 0 && (
               <>
                 <Box sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2,1fr)", sm: "repeat(3,1fr)", md: "repeat(4,1fr)", lg: "repeat(5,1fr)" }, gap: { xs: 1.5, md: 2 } }}>
-                  {filteredProducts.map((product) => (
+                  {filteredProducts.map((product, idx) => (
                     <ProductCard
                       key={product._id}
+                      priority={idx < 4}
                       product={product}
                       quantityInCart={getQty(product._id)}
                       onAddToCart={handleAddToCart}

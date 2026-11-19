@@ -65,6 +65,7 @@ export const ordersApi = baseApi.injectEndpoints({
         let es = null;
         let retryTimer = null;
         let retryDelay = 2000;
+        let failuresBeforeOpen = 0;
         let closed = false;
 
         const setStatus = (status) => {
@@ -84,6 +85,7 @@ export const ordersApi = baseApi.injectEndpoints({
 
           es.addEventListener("open", () => {
             retryDelay = 2000; // reset backoff
+            failuresBeforeOpen = 0;
             setStatus("open");
           });
 
@@ -104,6 +106,12 @@ export const ordersApi = baseApi.injectEndpoints({
 
           es.onerror = () => {
             es.close();
+            // Never connected (e.g. 401 on an expired session): give up after a few
+            // tries instead of spamming the server and the console forever.
+            if (++failuresBeforeOpen >= 3 && retryDelay >= 8000) {
+              setStatus("closed");
+              return;
+            }
             setStatus("reconnecting");
             if (!closed) {
               retryTimer = setTimeout(() => {
