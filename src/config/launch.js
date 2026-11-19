@@ -8,8 +8,8 @@
  */
 import { useEffect, useState } from "react";
 
-// 20 Nov 2026, 00:00 India Standard Time (UTC+05:30)
-export const LAUNCH_AT = new Date("2026-11-20T00:00:00+05:30");
+// 20 Nov 2026, 07:30 India Standard Time (UTC+05:30)
+export const LAUNCH_AT = new Date("2026-11-20T07:30:00+05:30");
 
 const PREVIEW_KEY = import.meta.env.VITE_LAUNCH_PREVIEW_KEY || "ics-preview";
 const STORAGE_KEY = "ics_launch_preview";

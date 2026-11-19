@@ -78,7 +78,7 @@ export default function LaunchBanner() {
   const t = useMemo(() => remaining(now), [now]);
   const units = [["Days", t.days], ["Hours", t.hours], ["Minutes", t.minutes], ["Seconds", t.seconds]];
   // Screen readers get a calm once-a-minute summary instead of a ticking clock
-  const spoken = `${t.days} days, ${t.hours} hours and ${t.minutes} minutes until the grand website launch on 20 November 2026 at 12:00 AM India Standard Time`;
+  const spoken = `${t.days} days, ${t.hours} hours and ${t.minutes} minutes until the grand website launch on 20 November 2026 at 7:30 AM India Standard Time`;
 
   return (
     <section className="lb" aria-label="Grand website launch announcement">
@@ -137,7 +137,7 @@ export default function LaunchBanner() {
                 ))}
               </div>
               <span className="sr-only" role="status" aria-live="polite" key={`${t.days}-${t.hours}-${t.minutes}`}>{spoken}</span>
-              <p className="lb-when">Opens <strong>20 November 2026, 12:00 AM IST</strong> <span>(India Standard Time, UTC+5:30)</span></p>
+              <p className="lb-when">Opens <strong>20 November 2026, 7:30 AM IST</strong> <span>(India Standard Time, UTC+5:30)</span></p>
             </div>
           )}
 
