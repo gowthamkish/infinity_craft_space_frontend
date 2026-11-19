@@ -19,6 +19,39 @@
       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Cinzel:wght@600;700;800&display=swap" />
     </noscript>
 
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+
+    <!-- Hero collage: pick 3 random images from a curated set synchronously, and preload
+         the first one, so the LCP image starts downloading before any JS bundle or API call. -->
+    <script>
+      (function () {
+        if (location.pathname !== "/") return; // hero only exists on the home page
+        var base = "https://res.cloudinary.com/dr6wxx5gi/image/upload/f_auto,q_auto,w_520,c_limit/infinity_craft_products/";
+        var pool = [
+          ["Pearl Hairband", "product_1794923974688_0.jpg"],
+          ["Lotus Jadabilla", "product_1794923721130_0.png"],
+          ["Mullai Kemp Jadabilla", "product_1794923498120_0.jpg"],
+          ["Two Layer Kemp Jadabilla", "product_1794923050526_0.png"],
+          ["Heart Keychain", "product_1794922353387_0.png"],
+          ["Sunflower Keychain", "product_1794922203696_0.png"],
+          ["Wedding Reception Hoop", "product_1794032416337_0.png"],
+          ["Mom Embroidered Hoop", "product_1787067230489_0.png"],
+          ["Golden Potli Combo", "product_1794917142029_0.png"]
+        ];
+        // Fisher–Yates shuffle, keep 3
+        for (var i = pool.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = pool[i]; pool[i] = pool[j]; pool[j] = t;
+        }
+        var picks = pool.slice(0, 3).map(function (x) { return { name: x[0], src: base + x[1] }; });
+        window.__HERO__ = picks;
+        // Only the first tile is above the fold on mobile; preload just that one
+        var l = document.createElement("link");
+        l.rel = "preload"; l.as = "image"; l.href = picks[0].src; l.fetchPriority = "high";
+        document.head.appendChild(l);
+      })();
+    </script>
+
     <!-- Preconnect to external domains for faster loading -->
     <link
       rel="preconnect"

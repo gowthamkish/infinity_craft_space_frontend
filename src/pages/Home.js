@@ -353,10 +353,20 @@ export default function Home() {
     return (rated.length ? rated : products).slice(0, 8);
   }, [products]);
 
-  const collage = useMemo(
-    () => featured.filter((p) => p.images?.[0]?.url || p.image?.url || p.image).slice(0, 3),
-    [featured],
-  );
+  // Hero collage: a random trio picked by an inline script in index.html (window.__HERO__), so the
+  // first image is preloaded before this bundle or the products API respond. If that script
+  // didn't run, fall back to the top-rated products from the catalogue.
+  const [heroPicks] = useState(() => (typeof window !== "undefined" && window.__HERO__) || null);
+  const collage = useMemo(() => {
+    if (heroPicks?.length) return heroPicks;
+    return featured
+      .filter((p) => p.images?.[0]?.url || p.image?.url || p.image)
+      .slice(0, 3)
+      .map((p) => ({
+        name: p.name,
+        src: buildCloudinaryUrl(p.images?.[0]?.url || p.image?.url || p.image, 520),
+      }));
+  }, [heroPicks, featured]);
 
   const festival = getUpcomingFestival();
   const goShop = (query = "") => navigate(`/products${query}`);
@@ -435,12 +445,12 @@ export default function Home() {
                 <div className="hm-frame">
                   {[0, 1, 2].map((i) => {
                     const p = collage[i];
-                    const src = p && buildCloudinaryUrl(p.images?.[0]?.url || p.image?.url || p.image, 520);
+                    const src = p?.src;
                     return (
                       <div key={i} className={`hm-frame-tile ${src ? "" : "hm-frame-tile--empty"}`}>
                         {src ? (
                           <>
-                            <img src={src} width="400" height="424" alt={p.name} loading={i === 0 ? "eager" : "lazy"} decoding="async" onError={onImgError} />
+                            <img src={src} width="400" height="424" alt={p.name} loading={i === 0 ? "eager" : "lazy"} fetchPriority={i === 0 ? "high" : "auto"} decoding="async" onError={onImgError} />
                             <span className="hm-frame-tag">{p.name}</span>
                           </>
                         ) : (
