@@ -21,7 +21,7 @@
 
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
 
-    <!-- Hero collage: pick 3 random images from a curated set synchronously, and preload
+    <!-- Hero collage: pick 4 random images from a curated set synchronously, and preload
          the first one, so the LCP image starts downloading before any JS bundle or API call. -->
     <script>
       (function () {
@@ -38,12 +38,12 @@
           ["Mom Embroidered Hoop", "product_1787067230489_0.png"],
           ["Golden Potli Combo", "product_1794917142029_0.png"]
         ];
-        // Fisher–Yates shuffle, keep 3
+        // Fisher–Yates shuffle, keep 4
         for (var i = pool.length - 1; i > 0; i--) {
           var j = Math.floor(Math.random() * (i + 1));
           var t = pool[i]; pool[i] = pool[j]; pool[j] = t;
         }
-        var picks = pool.slice(0, 3).map(function (x) { return { name: x[0], src: base + x[1] }; });
+        var picks = pool.slice(0, 4).map(function (x) { return { name: x[0], src: base + x[1] }; });
         window.__HERO__ = picks;
         // Only the first tile is above the fold on mobile; preload just that one
         var l = document.createElement("link");

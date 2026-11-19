@@ -353,7 +353,7 @@ export default function Home() {
     return (rated.length ? rated : products).slice(0, 8);
   }, [products]);
 
-  // Hero collage: a random trio picked by an inline script in index.html (window.__HERO__), so the
+  // Hero collage: a random set of four picked by an inline script in index.html (window.__HERO__), so the
   // first image is preloaded before this bundle or the products API respond. If that script
   // didn't run, fall back to the top-rated products from the catalogue.
   const [heroPicks] = useState(() => (typeof window !== "undefined" && window.__HERO__) || null);
@@ -361,7 +361,7 @@ export default function Home() {
     if (heroPicks?.length) return heroPicks;
     return featured
       .filter((p) => p.images?.[0]?.url || p.image?.url || p.image)
-      .slice(0, 3)
+      .slice(0, 4)
       .map((p) => ({
         name: p.name,
         src: buildCloudinaryUrl(p.images?.[0]?.url || p.image?.url || p.image, 520),
@@ -443,7 +443,7 @@ export default function Home() {
 
               <div className="hm-collage" aria-hidden={collage.length === 0}>
                 <div className="hm-frame">
-                  {[0, 1, 2].map((i) => {
+                  {[0, 1, 2, 3].map((i) => {
                     const p = collage[i];
                     const src = p?.src;
                     return (
@@ -454,7 +454,7 @@ export default function Home() {
                             <span className="hm-frame-tag">{p.name}</span>
                           </>
                         ) : (
-                          <span aria-hidden="true">{["🎨", "💍", "🎁"][i]}</span>
+                          <span aria-hidden="true">{["🎨", "💍", "🎁", "✨"][i]}</span>
                         )}
                       </div>
                     );
