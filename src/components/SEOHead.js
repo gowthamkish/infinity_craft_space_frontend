@@ -41,6 +41,11 @@ const SEOHead = ({
   // Get dynamic base URL
   const baseUrl = getBaseUrl();
   const resolvedUrl = url || baseUrl;
+  const resolvedCanonical =
+    canonical ||
+    (typeof window !== "undefined"
+      ? `https://infinitycraftspace.com${window.location.pathname === "/" ? "/" : window.location.pathname.replace(/\/+$/, "")}`
+      : null);
   const resolvedImage = image || `${baseUrl}/ICS_Logo.jpeg`;
 
   // Generate structured data based on page type
@@ -176,7 +181,7 @@ const SEOHead = ({
       <meta name="author" content={author} />
 
       {/* Canonical URL */}
-      {canonical && <link rel="canonical" href={canonical} />}
+      {resolvedCanonical && <link rel="canonical" href={resolvedCanonical} />}
 
       {/* Robots Meta */}
       <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"} />

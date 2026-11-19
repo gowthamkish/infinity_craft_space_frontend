@@ -1,11 +1,13 @@
 # Robots.txt for Infinity Craft Space
-# https://www.infinitycraftspace.com/robots.txt
+# https://infinitycraftspace.com/robots.txt
 
 # ── Everyone (search engines + AI answer engines) ─────────────────────────
 User-agent: *
 Allow: /
 
 # Private / user-specific / non-content pages
+# (auth pages are left crawlable on purpose: they carry <meta name=robots noindex>,
+#  which crawlers can only honour if they are allowed to fetch the page)
 Disallow: /admin/
 Disallow: /checkout
 Disallow: /orders
@@ -15,12 +17,6 @@ Disallow: /cart
 Disallow: /my-account
 Disallow: /user/
 Disallow: /track/
-Disallow: /login
-Disallow: /register
-Disallow: /forgot-password
-Disallow: /reset-password
-Disallow: /verify-security
-Disallow: /setup-security-questions
 Disallow: /api/
 
 # ── AI search / answer engines — explicitly welcome (GEO) ────────────────
@@ -47,16 +43,10 @@ Disallow: /cart
 Disallow: /my-account
 Disallow: /user/
 Disallow: /track/
-Disallow: /login
-Disallow: /register
-Disallow: /forgot-password
-Disallow: /reset-password
-Disallow: /verify-security
-Disallow: /setup-security-questions
 Disallow: /api/
 
 # Bulk dataset scrapers stay blocked
 User-agent: CCBot
 Disallow: /
 
-Sitemap: https://www.infinitycraftspace.com/sitemap.xml
+Sitemap: https://infinitycraftspace.com/sitemap.xml
