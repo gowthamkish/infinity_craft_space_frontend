@@ -3,6 +3,7 @@ import {
   FiMapPin, FiBookmark, FiArrowRight, FiArrowLeft, FiTruck, FiTrash2, FiCheck,
 } from "react-icons/fi";
 import { Card, Alert, SummaryItems, Row, Total, HelpCard, Spinner, inr } from "./ui";
+import { isCustomItem } from "../../components/CheckoutDeliveryPanel";
 
 // ── Shipping zone data ────────────────────────────────────────────────
 const ROAD_ZONES = {
@@ -237,11 +238,7 @@ export const ShippingStep = ({
     }
   }, [setShippingAddress]);
 
-  const CUSTOM_KEYWORDS = ["embroidery", "kundan", "thread bangle", "thread bangles"];
-  const hasCustomItems = cartItems.some((item) => {
-    const text = `${item.product?.name ?? ""} ${item.product?.category ?? ""} ${item.product?.subCategory ?? ""}`.toLowerCase();
-    return CUSTOM_KEYWORDS.some((kw) => text.includes(kw));
-  });
+  const hasCustomItems = cartItems.some(isCustomItem);
   const dispatchBuffer = hasCustomItems ? 14 : 0;
 
   const cartWeight = cartItems.reduce(

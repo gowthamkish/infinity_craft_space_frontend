@@ -32,12 +32,10 @@ import { PaymentStep } from "./checkout/PaymentStep";
 import { ConfirmationStep } from "./checkout/ConfirmationStep";
 import { EmptyCart } from "./checkout/EmptyCart";
 import CustomOrderModal from "../components/CustomOrderModal";
+import { isCustomItem } from "../components/CheckoutDeliveryPanel";
 
-const CUSTOM_KEYWORDS = ["embroidery", "kundan", "thread bangle", "thread bangles"];
-const isCustomProduct = (item) => {
-  const text = `${item.product?.name ?? ""} ${item.product?.category ?? ""} ${item.product?.subCategory ?? ""}`.toLowerCase();
-  return CUSTOM_KEYWORDS.some((kw) => text.includes(kw));
-};
+// A cart line is handcrafted if the product is flagged customizable (or matches the legacy keywords)
+const isCustomProduct = isCustomItem;
 
 const EMPTY_ADDRESSES = [];
 const STEPS = ["Cart Review", "Shipping", "Payment", "Confirmation"];
