@@ -5,6 +5,7 @@ import {
   FiLock, FiTruck, FiRefreshCw,
 } from "react-icons/fi";
 import CouponInput from "../../components/CouponInput";
+import { isOfferActive, isFreeShipping, FREE_SHIPPING_ABOVE } from "../../config/offers";
 import { isCustomItem } from "../../components/CheckoutDeliveryPanel";
 import { updateCartItemNote } from "../../features/cartSlice";
 import { useGetRecommendationsQuery } from "../../services/productsApi";
@@ -216,10 +217,15 @@ export const CartReviewStep = ({
             <div className="ck-rows">
               <Row label="Subtotal" value={inr(subtotal)} />
               {discount > 0 && <Row label={`Coupon (${appliedCoupon.code})`} value={`−${inr(discount)}`} tone="ok" />}
-              <Row label="Shipping" hint="Calculated at the next step" />
+              <Row label="Shipping" hint={isFreeShipping(subtotal) ? "FREE — launch offer 🎉" : "Calculated at the next step"} />
             </div>
             <hr className="ck-hr" />
             <Total value={inr(discountedTotal)} />
+            {isOfferActive() && !isFreeShipping(subtotal) && (
+              <p className="ck-help" style={{ marginTop: 12 }}>
+                🎉 Launch offer: add {inr(FREE_SHIPPING_ABOVE + 1 - subtotal)} more for FREE shipping!
+              </p>
+            )}
 
             {error && <div style={{ marginTop: 20 }}><Alert kind="error">{error}</Alert></div>}
 

@@ -4,6 +4,7 @@ import {
 } from "react-icons/fi";
 import { Card, Alert, SummaryItems, Row, Total, HelpCard, Spinner, inr } from "./ui";
 import { isCustomItem } from "../../components/CheckoutDeliveryPanel";
+import { isFreeShipping } from "../../config/offers";
 
 // ── Shipping zone data ────────────────────────────────────────────────
 const ROAD_ZONES = {
@@ -115,7 +116,7 @@ function expectedDeliveryRange(deliveryDays, dispatchBuffer = 0) {
 }
 
 /* ── Shipping rate widget ───────────────────────────────────────────────── */
-function ShippingWidget({ zoneKey, weightKg, rate, dispatchBuffer = 0 }) {
+function ShippingWidget({ zoneKey, weightKg, rate, originalRate = null, dispatchBuffer = 0 }) {
   if (!zoneKey) return null;
   const zone = ROAD_ZONES[zoneKey];
   if (!zone) return null;
@@ -135,7 +136,9 @@ function ShippingWidget({ zoneKey, weightKg, rate, dispatchBuffer = 0 }) {
           {zone.sublabel} · {weightKg < 1 ? `${Math.round(weightKg * 1000)} g` : `${weightKg.toFixed(2)} kg`}
         </div>
       </div>
-      <div className="ck-ship-price">₹{rate}</div>
+      <div className="ck-ship-price">
+        {originalRate ? (<><s style={{ opacity: 0.55, marginRight: 6, fontWeight: 400 }}>₹{originalRate}</s>FREE</>) : `₹${rate}`}
+      </div>
     </div>
   );
 }
@@ -252,10 +255,14 @@ export const ShippingStep = ({
     return getZoneKey(state, city);
   }, [shippingAddress.state, shippingAddress.city]);
 
-  const shippingCharge = useMemo(() => {
+  const baseShippingCharge = useMemo(() => {
     if (!zoneKey) return null;
     return calcShippingRate(Math.max(cartWeight, 0.25), zoneKey);
   }, [zoneKey, cartWeight]);
+
+  // Launch-week offer: free shipping on orders above ₹999
+  const freeShipping = isFreeShipping(subtotal);
+  const shippingCharge = baseShippingCharge === null ? null : freeShipping ? 0 : baseShippingCharge;
 
   useEffect(() => {
     if (zoneKey && shippingCharge !== null) {
@@ -523,7 +530,7 @@ export const ShippingStep = ({
             </div>
 
             {zoneKey && shippingCharge !== null && (
-              <ShippingWidget zoneKey={zoneKey} weightKg={Math.max(cartWeight, 0.25)} rate={shippingCharge} dispatchBuffer={dispatchBuffer} />
+              <ShippingWidget zoneKey={zoneKey} weightKg={Math.max(cartWeight, 0.25)} rate={shippingCharge} originalRate={freeShipping ? baseShippingCharge : null} dispatchBuffer={dispatchBuffer} />
             )}
 
             <div className="ck-checks">
@@ -559,7 +566,7 @@ export const ShippingStep = ({
           <div className="ck-rows">
             <Row label="Subtotal" value={inr(subtotal)} />
             {shippingRate ? (
-              <Row label="Shipping" value={inr(shippingRate.rate)} />
+              <Row label="Shipping" value={shippingRate.rate === 0 && freeShipping ? "FREE" : inr(shippingRate.rate)} />
             ) : (
               <Row label="Shipping" hint="Enter your PIN code" />
             )}

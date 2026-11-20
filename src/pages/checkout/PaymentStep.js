@@ -3,6 +3,7 @@ import {
   FiLock, FiCreditCard, FiCheck, FiArrowLeft, FiMapPin, FiPackage, FiShield, FiCheckCircle, FiEdit2, FiSlash, FiKey, FiDatabase,
 } from "react-icons/fi";
 import CheckoutDeliveryPanel from "../../components/CheckoutDeliveryPanel";
+import { isFreeShipping } from "../../config/offers";
 import { Card, Alert, Thumb, SummaryItems, Row, Total, MiniTrust, HelpCard, Spinner, inr } from "./ui";
 
 const PAYMENT_METHODS = [
@@ -141,7 +142,7 @@ export const PaymentStep = ({
             <hr className="ck-hr" />
             <div className="ck-rows">
               <Row label="Subtotal" value={inr(subtotal)} />
-              <Row label="Shipping" value={inr(shipping)} />
+              <Row label="Shipping" value={shipping === 0 && isFreeShipping(subtotal) ? "FREE" : inr(shipping)} />
             </div>
             <hr className="ck-hr" />
             <Total label="Total to pay" value={inr(total)} />
