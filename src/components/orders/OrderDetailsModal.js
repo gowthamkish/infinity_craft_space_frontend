@@ -13,6 +13,8 @@ import {
   Button,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { productImage } from "../../pages/checkout/ui";
+import { PLACEHOLDER_SRC, onImgError } from "../../utils/imageFallback";
 import {
   FiShoppingBag,
   FiUser,
@@ -586,7 +588,16 @@ const OrderDetailsModal = ({
                             background: idx % 2 === 0 ? "white" : "#fafbfc",
                           }}
                         >
-                          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem" }}>
+                            <img
+                              src={item.imageUrl || productImage(item.product) || PLACEHOLDER_SRC}
+                              alt={item.product?.name || item.productName || "Product"}
+                              width="72"
+                              height="72"
+                              loading="lazy"
+                              onError={onImgError}
+                              style={{ width: 72, height: 72, objectFit: "cover", borderRadius: 8, border: "1px solid #e2e8f0", flexShrink: 0, background: "#f8fafc" }}
+                            />
                             <div style={{ flex: 1 }}>
                               <h6
                                 style={{
