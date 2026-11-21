@@ -5,12 +5,12 @@ import {
   FiLock, FiTruck, FiRefreshCw,
 } from "react-icons/fi";
 import CouponInput from "../../components/CouponInput";
-import { isOfferActive, isFreeShipping, FREE_SHIPPING_ABOVE } from "../../config/offers";
+import { isFreeShipping } from "../../config/offers";
 import { couponDiscount } from "../../utils/coupon";
 import { isCustomItem } from "../../components/CheckoutDeliveryPanel";
 import { updateCartItemNote } from "../../features/cartSlice";
 import { useGetRecommendationsQuery } from "../../services/productsApi";
-import { Thumb, Card, Alert, SummaryItems, Row, Total, MiniTrust, TRUST_MINI, HelpCard, inr, productImage } from "./ui";
+import { FreeShippingBar, Thumb, Card, Alert, SummaryItems, Row, Total, MiniTrust, TRUST_MINI, HelpCard, inr, productImage } from "./ui";
 import { PLACEHOLDER_SRC, onImgError } from "../../utils/imageFallback";
 
 /* ── One cart line ──────────────────────────────────────────────────────── */
@@ -215,11 +215,7 @@ export const CartReviewStep = ({
             </div>
             <hr className="ck-hr" />
             <Total value={inr(discountedTotal)} />
-            {isOfferActive() && !isFreeShipping(discountedSubtotal) && (
-              <p className="ck-help" style={{ marginTop: 12 }}>
-                🎉 Launch offer: add {inr(FREE_SHIPPING_ABOVE + 1 - discountedSubtotal)} more for FREE shipping!
-              </p>
-            )}
+            <div style={{ marginTop: 16 }}><FreeShippingBar subtotal={discountedSubtotal} /></div>
 
             {error && <div style={{ marginTop: 20 }}><Alert kind="error">{error}</Alert></div>}
 

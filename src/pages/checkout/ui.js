@@ -3,10 +3,36 @@
  */
 import { FiAlertTriangle, FiAlertCircle, FiInfo, FiCheckCircle, FiShield, FiTruck, FiRefreshCw, FiMail, FiPhone } from "react-icons/fi";
 import { PLACEHOLDER_SRC, onImgError } from "../../utils/imageFallback";
+import { isOfferActive, isFreeShipping, FREE_SHIPPING_ABOVE, OFFER_END } from "../../config/offers";
 
 /** ₹1,234.50 — Indian digit grouping, always 2 decimals */
 export const inr = (n) =>
   `₹${Number(n || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+/**
+ * Launch-offer progress bar: "Add ₹X more for FREE shipping" while below the threshold, a celebration once reached.
+ * `subtotal` must be the amount the offer is judged on (product total after any coupon). Renders nothing outside the offer window.
+ */
+export function FreeShippingBar({ subtotal }) {
+  if (!isOfferActive()) return null;
+  const done = isFreeShipping(subtotal);
+  const pct = done ? 100 : Math.max(0, Math.min(100, (subtotal / FREE_SHIPPING_ABOVE) * 100));
+  const remaining = Math.max(1, Math.ceil(FREE_SHIPPING_ABOVE - subtotal + 0.01)); // must end strictly above the threshold
+  const ends = OFFER_END.toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: "Asia/Kolkata" });
+  return (
+    <div className={`ck-ship-bar ${done ? "ck-ship-bar--done" : ""}`} role="status">
+      <p className="ck-ship-bar-text">
+        {done
+          ? "🎉 You've unlocked FREE shipping!"
+          : <>🚚 Add <b>{inr(remaining)}</b> more to get <b>FREE shipping</b></>}
+      </p>
+      <div className="ck-ship-bar-track" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)} aria-label="Progress to free shipping">
+        <div className="ck-ship-bar-fill" style={{ width: `${pct}%` }} />
+      </div>
+      <small className="ck-ship-bar-note">Launch offer · free shipping on orders above {inr(FREE_SHIPPING_ABOVE)} · ends {ends}</small>
+    </div>
+  );
+}
 
 export const productImage = (product) => product?.images?.[0]?.url || product?.image?.url || product?.image || null;
 

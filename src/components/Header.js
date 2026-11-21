@@ -20,6 +20,7 @@ import {
   FiMenu,
   FiX,
   FiBell,
+  FiBookOpen,
 } from "react-icons/fi";
 import { useEffect, useRef, useState } from "react";
 import api from "../api/axios";
@@ -27,6 +28,7 @@ import api from "../api/axios";
 const NAV_LINKS = [
   { path: "/", label: "Home", icon: FiHome, showWhen: "always" },
   { path: "/products", label: "Products", icon: FiShoppingCart, showWhen: "always" },
+  { path: "/blog", label: "Stories", icon: FiBookOpen, showWhen: "always" },
   { path: "/orders", label: "My Orders", icon: FiPackage, showWhen: "auth" },
   { path: "/account", label: "My Account", icon: FiUser, showWhen: "auth" },
 ];

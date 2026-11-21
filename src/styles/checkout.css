@@ -147,6 +147,14 @@
 .ck-input.is-filled { background: #f0fdf4; border-color: #86efac; }
 .ck-help { font-size: .85rem; color: var(--ics-text-2); }
 .ck-help--ok { color: #15803d; font-weight: 600; }
+/* Launch-offer free-shipping progress bar */
+.ck-ship-bar { padding: 13px 15px; border-radius: 12px; border: 1.5px solid #bbf7d0; background: linear-gradient(135deg, #f0fdf4, #ecfdf5); }
+.ck-ship-bar--done { border-color: #86efac; background: linear-gradient(135deg, #dcfce7, #d1fae5); }
+.ck-ship-bar-text { margin: 0 0 8px; font-size: .88rem; font-weight: 600; color: #166534; }
+.ck-ship-bar-track { height: 7px; border-radius: 99px; background: rgba(22,163,74,.18); overflow: hidden; }
+.ck-ship-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #4ade80, #16a34a); transition: width .6s cubic-bezier(.4,0,.2,1); }
+.ck-ship-bar-note { display: block; margin-top: 7px; font-size: .74rem; color: #4d7c5f; }
+@media (prefers-reduced-motion: reduce) { .ck-ship-bar-fill { transition: none; } }
 .ck-help--err { color: #c0392b; font-weight: 600; }
 .ck .iti { width: 100%; display: block; }
 .ck-chips { display: flex; flex-wrap: wrap; gap: 10px; }

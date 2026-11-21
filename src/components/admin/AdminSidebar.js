@@ -28,6 +28,7 @@ import {
   FiChevronRight,
   FiLogOut,
   FiUploadCloud,
+  FiBookOpen,
 } from "react-icons/fi";
 
 const PRIMARY = "#d24e33";
@@ -57,6 +58,7 @@ const NAV_ITEMS = [
       { label: "Users",         icon: FiUsers,       to: "/admin/users"        },
       { label: "Notifications", icon: FiBell,        to: "/admin/notifications"},
       { label: "Moderation",    icon: FiShield,      to: "/admin/moderation"   },
+      { label: "Blog",          icon: FiBookOpen,    to: "/admin/blog"         },
     ],
   },
 ];

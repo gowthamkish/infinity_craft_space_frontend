@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import {
   FiMapPin, FiBookmark, FiArrowRight, FiArrowLeft, FiTruck, FiTrash2, FiCheck,
 } from "react-icons/fi";
-import { Card, Alert, SummaryItems, Row, Total, HelpCard, Spinner, inr } from "./ui";
+import { FreeShippingBar, Card, Alert, SummaryItems, Row, Total, HelpCard, Spinner, inr } from "./ui";
 import { isCustomItem } from "../../components/CheckoutDeliveryPanel";
 import { isFreeShipping } from "../../config/offers";
 
@@ -576,6 +576,7 @@ export const ShippingStep = ({
           </div>
           <hr className="ck-hr" />
           <Total value={inr(displayTotal)} />
+          <div style={{ marginTop: 16 }}><FreeShippingBar subtotal={subtotal - discount} /></div>
           {!shippingRate && <p className="ck-help" style={{ marginTop: 12 }}>Your final total appears once we know your delivery PIN.</p>}
         </Card>
         <HelpCard />

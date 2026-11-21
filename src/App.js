@@ -79,6 +79,10 @@ const SetupSecurityQuestions = lazy(
 );
 const ReturnPolicy = lazy(() => import("./pages/ReturnPolicy"));
 const ContactUs = lazy(() => import("./pages/ContactUs"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const BlogManager = lazy(() => import("./components/admin/BlogManager"));
+const BlogEditor = lazy(() => import("./components/admin/BlogEditor"));
 const TermsAndConditions = lazy(() => import("./pages/TermsAndConditions"));
 const TrackOrder = lazy(() => import("./pages/TrackOrder"));
 
@@ -488,6 +492,26 @@ function App() {
                     }
                   />
                   <Route
+                    path="/blog"
+                    element={
+                      <RouteErrorBoundary>
+                        <Suspense fallback={<LoadingFallback message="Loading stories..." />}>
+                          <Blog />
+                        </Suspense>
+                      </RouteErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/blog/:slug"
+                    element={
+                      <RouteErrorBoundary>
+                        <Suspense fallback={<LoadingFallback message="Loading story..." />}>
+                          <BlogPost />
+                        </Suspense>
+                      </RouteErrorBoundary>
+                    }
+                  />
+                  <Route
                     path="/contact-us"
                     element={
                       <RouteErrorBoundary>
@@ -713,6 +737,30 @@ function App() {
                         >
                           <AdminRoute>
                             <AdminOrders />
+                          </AdminRoute>
+                        </Suspense>
+                      </RouteErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/admin/blog"
+                    element={
+                      <RouteErrorBoundary>
+                        <Suspense fallback={<LoadingFallback message="Loading blog..." />}>
+                          <AdminRoute>
+                            <BlogManager />
+                          </AdminRoute>
+                        </Suspense>
+                      </RouteErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/admin/blog/:id"
+                    element={
+                      <RouteErrorBoundary>
+                        <Suspense fallback={<LoadingFallback message="Loading editor..." />}>
+                          <AdminRoute>
+                            <BlogEditor />
                           </AdminRoute>
                         </Suspense>
                       </RouteErrorBoundary>

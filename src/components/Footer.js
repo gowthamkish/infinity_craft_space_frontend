@@ -22,10 +22,12 @@ import {
   FiShield,
   FiAward,
   FiInstagram,
+  FiBookOpen,
 } from "react-icons/fi";
 
 const QUICK_LINKS = [
   { label: "Shop All Products",  to: "/",                    icon: FiShoppingBag  },
+  { label: "Behind the Craft",   to: "/blog",                icon: FiBookOpen     },
   { label: "Return Policy",      to: "/return-policy",       icon: FiRefreshCcw   },
   { label: "Terms & Conditions", to: "/terms-and-conditions",icon: FiFileText     },
   { label: "Contact Us",         to: "/contact-us",          icon: FiMessageCircle},
