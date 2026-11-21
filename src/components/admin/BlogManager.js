@@ -55,7 +55,7 @@ export default function BlogManager() {
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3, flexWrap: "wrap", gap: 2 }}>
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700 }}>Blog — Behind the craft</Typography>
-          <Typography variant="body2" color="text.secondary">Write stories that show how your pieces are made. Published posts appear at /blog.</Typography>
+          <Typography variant="body2" color="text.secondary">Write stories about heritage, styling, care and gifting. Published posts appear at /blog.</Typography>
         </Box>
         <Button variant="contained" startIcon={<FiPlus />} onClick={() => navigate("/admin/blog/new")} sx={{ textTransform: "none" }}>New post</Button>
       </Box>
@@ -69,7 +69,7 @@ export default function BlogManager() {
       ) : posts.length === 0 ? (
         <Paper variant="outlined" sx={{ p: 5, textAlign: "center" }}>
           <Typography variant="h6" sx={{ mb: 1 }}>No posts yet</Typography>
-          <Typography color="text.secondary" sx={{ mb: 2 }}>Start with a story about how one of your best-selling pieces is made.</Typography>
+          <Typography color="text.secondary" sx={{ mb: 2 }}>Start with a story about the tradition behind your best-selling style, or a gifting guide.</Typography>
           <Button variant="contained" onClick={() => navigate("/admin/blog/new")} sx={{ textTransform: "none" }}>Write your first post</Button>
         </Paper>
       ) : (

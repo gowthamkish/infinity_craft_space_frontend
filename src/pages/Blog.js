@@ -51,8 +51,8 @@ export default function Blog() {
     <>
       <SEOHead
         title={tag ? `${tag} stories – Blog | ${SEO_CONFIG.SITE_NAME}` : `Behind the Craft – Stories & Guides | ${SEO_CONFIG.SITE_NAME}`}
-        description="Stories from our workshop: how our handmade jewellery and craft pieces are made, care guides, gifting ideas and the artisans behind Infinity Craft Space."
-        keywords="handmade jewellery blog, behind the craft, how handmade jewellery is made, jewellery care guide, gifting ideas India, Infinity Craft Space stories"
+        description="Stories, style guides, gifting ideas and care tips for handmade jewellery and craft pieces — the heritage and meaning behind the styles we love, from Infinity Craft Space."
+        keywords="handmade jewellery blog, jewellery style guide India, jewellery care guide, gifting ideas India, kundan jewellery history, wedding season jewellery, Infinity Craft Space stories"
         url={url}
         canonical={url}
         noindex={Boolean(tag) || page > 1}
@@ -62,8 +62,8 @@ export default function Blog() {
         <div className="blog-container">
           <header className="blog-hero">
             <div className="blog-eyebrow">Behind the Craft</div>
-            <h1>Stories from our workshop</h1>
-            <p>How our pieces are made, the hands behind them, and tips to care for and gift handmade.</p>
+            <h1>Stories, style &amp; heritage</h1>
+            <p>The meaning behind the styles we love, how to wear them, how to care for them and what to gift.</p>
           </header>
 
           {tags.length > 0 && (
