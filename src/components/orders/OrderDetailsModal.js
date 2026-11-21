@@ -601,6 +601,11 @@ const OrderDetailsModal = ({
                                   item.name ||
                                   "Unknown Product"}
                               </h6>
+                              {item.customNote && (
+                                <div style={{ fontSize: "0.8rem", color: "#b45309", margin: "0 0 0.35rem 0" }}>
+                                  <b>Customisation:</b> {item.customNote}
+                                </div>
+                              )}
                               <div
                                 style={{
                                   display: "flex",
@@ -830,6 +835,16 @@ const OrderDetailsModal = ({
                         )}
                       </span>
                     </Box>
+                    {selectedOrder.discount?.amount > 0 && (
+                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                        <span style={{ color: "#64748b", fontSize: "0.85rem" }}>
+                          Coupon{selectedOrder.discount.code ? ` (${selectedOrder.discount.code})` : ""}:
+                        </span>
+                        <span style={{ color: "#15803d", fontWeight: 600, fontSize: "0.9rem" }}>
+                          −{formatCurrency(selectedOrder.discount.amount)}
+                        </span>
+                      </Box>
+                    )}
                     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
                       <span style={{ color: "#64748b", fontSize: "0.85rem" }}>Shipping:</span>
                       <span style={{ color: "#475569", fontWeight: 600, fontSize: "0.9rem" }}>

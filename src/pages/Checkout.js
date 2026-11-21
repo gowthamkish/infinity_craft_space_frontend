@@ -11,6 +11,7 @@ import {
 } from "../features/cartSlice";
 import Header from "../components/Header";
 import api from "../api/axios";
+import { couponDiscount } from "../utils/coupon";
 import { baseApi, errMsg } from "../app/baseApi";
 import {
   useGetAddressesQuery,
@@ -81,8 +82,11 @@ export default function Checkout() {
   const [customItems, setCustomItems] = useState([]);
 
   const subtotal = cartItems.reduce((total, item) => total + item.totalPrice, 0);
+  const discount = couponDiscount(appliedCoupon, subtotal);
+  const discountedSubtotal = Math.round((subtotal - discount) * 100) / 100;
   const shipping = shippingRate?.rate || 0;
-  const total = subtotal + shipping; // no taxes are charged — only shipping, which depends on distance
+  // no taxes are charged — only shipping, which depends on distance. The server recomputes all of this.
+  const total = Math.round((discountedSubtotal + shipping) * 100) / 100;
 
   const steps = [
     { number: 1, title: "Cart", sub: "Review your items" },
@@ -224,8 +228,9 @@ export default function Checkout() {
         // Prices and shipping are recalculated on the server; only what to buy and where to ship is sent.
         currency: "INR",
         shippingAddress: shippingAddress,
-        items: cartItems.map((i) => ({ productId: i.product._id, quantity: i.quantity, stringSize: i.selectedStringSize ?? null })),
+        items: cartItems.map((i) => ({ productId: i.product._id, quantity: i.quantity, stringSize: i.selectedStringSize ?? null, customNote: i.customNote || "" })),
         shippingCourierId: shippingRate?.courierId || null,
+        couponCode: appliedCoupon?.code || null,
       });
       const { razorpayOrderId, currency, amountInPaise } = orderResponse.data.order;
       const orderId = orderResponse.data.order.id;
@@ -278,7 +283,13 @@ export default function Checkout() {
     } catch (error) {
       console.error("Payment initialization error:", error);
       console.error("Error details:", error.response?.data || error.message);
-      setError("Failed to initialize payment. Please try again.");
+      if (error.response?.data?.couponError) {
+        // Coupon no longer valid (expired, limit reached, already used…) — drop it so the total shown is what will be charged
+        setAppliedCoupon(null);
+        setError(`${error.response.data.message}. The coupon has been removed — please review your total and pay again.`);
+      } else {
+        setError(error.response?.data?.message || "Failed to initialize payment. Please try again.");
+      }
       setLoading(false);
     }
   };
@@ -303,6 +314,8 @@ export default function Checkout() {
         orderId: paymentResponse?.order_id || paymentResponse?.razorpay_order_id || `ORD-${Date.now()}`,
         items,
         subtotal: subtotalLocal,
+        discount,
+        couponCode: appliedCoupon?.code || null,
         shipping: shippingLocal,
         total: totalLocal,
         paymentDetails: {
@@ -428,6 +441,8 @@ export default function Checkout() {
               handleSaveAddress={handleSaveAddress}
               shippingRate={shippingRate}
               onShippingRateSelected={setShippingRate}
+              discount={discount}
+              couponCode={appliedCoupon?.code}
             />
           )}
           {currentStep === 3 && (
@@ -435,6 +450,8 @@ export default function Checkout() {
               cartItems={cartItems}
               shippingAddress={shippingAddress}
               subtotal={subtotal}
+              discount={discount}
+              couponCode={appliedCoupon?.code}
               shipping={shipping}
               total={total}
               error={error}

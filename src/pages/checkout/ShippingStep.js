@@ -208,6 +208,8 @@ export const ShippingStep = ({
   handleSaveAddress,
   shippingRate,
   onShippingRateSelected,
+  discount = 0,
+  couponCode = null,
 }) => {
   const phoneInputRef = useRef(null);
   const itiRef = useRef(null);
@@ -261,7 +263,7 @@ export const ShippingStep = ({
   }, [zoneKey, cartWeight]);
 
   // Launch-week offer: free shipping on orders above ₹999
-  const freeShipping = isFreeShipping(subtotal);
+  const freeShipping = isFreeShipping(subtotal - discount); // threshold applies after the coupon
   const shippingCharge = baseShippingCharge === null ? null : freeShipping ? 0 : baseShippingCharge;
 
   useEffect(() => {
@@ -377,7 +379,7 @@ export const ShippingStep = ({
     proceedToPayment();
   };
 
-  const displayTotal = subtotal + (shippingRate?.rate || 0);
+  const displayTotal = Math.round((subtotal - discount + (shippingRate?.rate || 0)) * 100) / 100;
   const count = cartItems.length;
 
   return (
@@ -565,6 +567,7 @@ export const ShippingStep = ({
           <hr className="ck-hr" />
           <div className="ck-rows">
             <Row label="Subtotal" value={inr(subtotal)} />
+            {discount > 0 && <Row label={`Coupon (${couponCode})`} value={`−${inr(discount)}`} tone="ok" />}
             {shippingRate ? (
               <Row label="Shipping" value={shippingRate.rate === 0 && freeShipping ? "FREE" : inr(shippingRate.rate)} />
             ) : (

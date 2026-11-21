@@ -651,20 +651,20 @@ export default function Orders() {
     async (order) => {
       if (
         !window.confirm(
-          `Cancel order ${formatOrderId(String(order._id))}? This cannot be undone.`,
+          `Cancel order ${formatOrderId(String(order._id))}? This cannot be undone.\n\nThe full amount will be refunded to your original payment method (usually 5–7 business days).`,
         )
       )
         return;
       setCancellingId(order._id);
       try {
-        await cancelOrder(order._id).unwrap();
-        addToast("Order cancelled successfully.", {
+        const res = await cancelOrder(order._id).unwrap();
+        addToast(res?.message || "Order cancelled successfully.", {
           type: "success",
-          title: "❌ Order Cancelled",
-          duration: 5000,
+          title: "Order Cancelled",
+          duration: 8000,
         });
       } catch (err) {
-        addToast(err?.data?.error || "Failed to cancel order.", {
+        addToast(err?.data?.message || err?.data?.error || "Failed to cancel order.", {
           type: "error",
           title: "Error",
           duration: 5000,

@@ -6,19 +6,12 @@ import {
 } from "react-icons/fi";
 import CouponInput from "../../components/CouponInput";
 import { isOfferActive, isFreeShipping, FREE_SHIPPING_ABOVE } from "../../config/offers";
+import { couponDiscount } from "../../utils/coupon";
 import { isCustomItem } from "../../components/CheckoutDeliveryPanel";
 import { updateCartItemNote } from "../../features/cartSlice";
 import { useGetRecommendationsQuery } from "../../services/productsApi";
 import { Thumb, Card, Alert, SummaryItems, Row, Total, MiniTrust, TRUST_MINI, HelpCard, inr, productImage } from "./ui";
 import { PLACEHOLDER_SRC, onImgError } from "../../utils/imageFallback";
-
-/** Discount to show for an applied coupon: trust the amount the API calculated, else derive it. */
-function couponDiscount(coupon, subtotal) {
-  if (!coupon) return 0;
-  if (typeof coupon.discount === "number") return coupon.discount;
-  const isPercent = coupon.discountType === "percent" || coupon.discountType === "percentage";
-  return isPercent ? (subtotal * coupon.discountValue) / 100 : coupon.discountValue || 0;
-}
 
 /* ── One cart line ──────────────────────────────────────────────────────── */
 function CartItemRow({ item, handleQuantityChange, handleRemoveItem }) {
@@ -159,7 +152,8 @@ export const CartReviewStep = ({
   onCouponApplied, onRemoveCoupon, appliedCoupon,
 }) => {
   const discount = couponDiscount(appliedCoupon, subtotal);
-  const discountedTotal = Math.max(0, total - discount);
+  const discountedTotal = total; // already includes the coupon discount (see Checkout.js)
+  const discountedSubtotal = subtotal - discount;
   const hasCustom = cartItems.some(isCustomItem);
   const missingNotes = cartItems.some((i) => isCustomItem(i) && !i.customNote);
   const count = cartItems.length;
@@ -217,13 +211,13 @@ export const CartReviewStep = ({
             <div className="ck-rows">
               <Row label="Subtotal" value={inr(subtotal)} />
               {discount > 0 && <Row label={`Coupon (${appliedCoupon.code})`} value={`−${inr(discount)}`} tone="ok" />}
-              <Row label="Shipping" hint={isFreeShipping(subtotal) ? "FREE — launch offer 🎉" : "Calculated at the next step"} />
+              <Row label="Shipping" hint={isFreeShipping(discountedSubtotal) ? "FREE — launch offer 🎉" : "Calculated at the next step"} />
             </div>
             <hr className="ck-hr" />
             <Total value={inr(discountedTotal)} />
-            {isOfferActive() && !isFreeShipping(subtotal) && (
+            {isOfferActive() && !isFreeShipping(discountedSubtotal) && (
               <p className="ck-help" style={{ marginTop: 12 }}>
-                🎉 Launch offer: add {inr(FREE_SHIPPING_ABOVE + 1 - subtotal)} more for FREE shipping!
+                🎉 Launch offer: add {inr(FREE_SHIPPING_ABOVE + 1 - discountedSubtotal)} more for FREE shipping!
               </p>
             )}
 

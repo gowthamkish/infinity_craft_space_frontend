@@ -49,6 +49,9 @@ import {
 import Header from "../components/Header";
 import { addToCart } from "../features/cartSlice";
 
+// Loyalty points / referrals are not live yet (nothing awards points or issues codes) — keep hidden until they are.
+const SHOW_LOYALTY = false;
+
 const ADDRESS_FIELDS = [
   { key: "label", label: "Label" },
   { key: "street", label: "Street" },
@@ -187,8 +190,8 @@ export default function Account() {
               </Typography>
             </Box>
 
-            {/* Loyalty + Referral strip */}
-            {(profile || authUser) &&
+            {/* Loyalty + Referral strip — hidden until the programme is built (SHOW_LOYALTY) */}
+            {SHOW_LOYALTY && (profile || authUser) &&
               (() => {
                 const pts =
                   profile?.loyaltyPoints ?? authUser?.loyaltyPoints ?? 0;

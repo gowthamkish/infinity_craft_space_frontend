@@ -32,6 +32,8 @@ export const PaymentStep = ({
   cartItems,
   shippingAddress,
   subtotal,
+  discount = 0,
+  couponCode = null,
   shipping,
   total,
   error,
@@ -142,7 +144,8 @@ export const PaymentStep = ({
             <hr className="ck-hr" />
             <div className="ck-rows">
               <Row label="Subtotal" value={inr(subtotal)} />
-              <Row label="Shipping" value={shipping === 0 && isFreeShipping(subtotal) ? "FREE" : inr(shipping)} />
+              {discount > 0 && <Row label={`Coupon (${couponCode})`} value={`−${inr(discount)}`} tone="ok" />}
+              <Row label="Shipping" value={shipping === 0 && isFreeShipping(subtotal - discount) ? "FREE" : inr(shipping)} />
             </div>
             <hr className="ck-hr" />
             <Total label="Total to pay" value={inr(total)} />

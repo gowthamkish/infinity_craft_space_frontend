@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FiTag, FiCheck, FiX } from "react-icons/fi";
 import { useValidateCouponMutation } from "../services/engagementApi";
 import { Spinner } from "../pages/checkout/ui";
+import { couponDiscount } from "../utils/coupon";
 
 /** Coupon box shown in the checkout summary (styles: styles/checkout.css .ck-coupon*) */
 const CouponInput = ({ cartTotal, onCouponApplied, appliedCoupon = null, onRemoveCoupon }) => {
@@ -47,7 +48,11 @@ const CouponInput = ({ cartTotal, onCouponApplied, appliedCoupon = null, onRemov
           <span className="ck-coupon-tick" aria-hidden="true"><FiCheck size={16} /></span>
           <div style={{ flex: 1, minWidth: 0 }}>
             <b>{validatedCoupon.code}</b>
-            <small>−₹{validatedCoupon.discount?.toFixed(2)} discount applied</small>
+            <small>
+              {validatedCoupon.minCartValue && cartTotal < validatedCoupon.minCartValue
+                ? `Add ₹${(validatedCoupon.minCartValue - cartTotal).toFixed(2)} more to use this coupon`
+                : `−₹${couponDiscount(validatedCoupon, cartTotal).toFixed(2)} discount applied`}
+            </small>
           </div>
           <button type="button" className="ck-link" onClick={handleRemove} aria-label="Remove coupon">
             <FiX size={16} /> Remove
