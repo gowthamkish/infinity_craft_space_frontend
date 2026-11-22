@@ -7,7 +7,8 @@
  */
 
 import { useState, useCallback, useRef } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import api from "../../api/axios";
 import { v4 as uuid } from "uuid";
 import { fetchUserCart } from "../cartSlice";
 
@@ -35,6 +36,31 @@ async function ensureCsrf() {
   }
 }
 
+// The login lives in an httpOnly cookie, but browsers that block cross-site cookies (iOS Safari, some
+// privacy settings) never send it — the rest of the site falls back to a Bearer header, so chat must too.
+function getBearerHeader() {
+  try {
+    const t = sessionStorage.getItem("_access_token");
+    return t ? { Authorization: `Bearer ${t}` } : {};
+  } catch {
+    return {};
+  }
+}
+
+// The access token lasts 2 hours. The shared API client renews it on a 401, but chat uses a plain fetch and would
+// silently be treated as a guest after expiry. So while the customer is logged in, make one cheap authenticated
+// call every so often — the API client refreshes the session if it has expired.
+let lastSessionCheck = 0;
+async function keepSessionFresh() {
+  if (Date.now() - lastSessionCheck < 10 * 60 * 1000) return;
+  try {
+    await api.get("/api/auth/profile");
+    lastSessionCheck = Date.now();
+  } catch {
+    /* not logged in or offline — chat still works as a guest */
+  }
+}
+
 // POST to the chat endpoint, retrying once on CSRF 403.
 async function chatFetch(history, signal) {
   const doFetch = () =>
@@ -44,6 +70,7 @@ async function chatFetch(history, signal) {
       headers: {
         "Content-Type": "application/json",
         "X-CSRF-Token": getCsrfToken(),
+        ...getBearerHeader(),
       },
       body: JSON.stringify({ messages: history, sessionId: SESSION_ID }),
       signal,
@@ -78,6 +105,7 @@ function getCsrfToken() {
 
 export function useChat() {
   const dispatch = useDispatch();
+  const isLoggedIn = useSelector((s) => !!s.auth?.user);
   const [messages, setMessages] = useState([
     {
       id: uuid(),
@@ -96,6 +124,7 @@ export function useChat() {
       if (isStreaming || !text.trim()) return;
 
       await ensureCsrf();
+      if (isLoggedIn) await keepSessionFresh();
 
       const userMsg = {
         id: uuid(),
@@ -222,7 +251,7 @@ export function useChat() {
         abortRef.current = null;
       }
     },
-    [isStreaming, messages],
+    [isStreaming, messages, isLoggedIn],
   );
 
   const clearHistory = useCallback(() => {
