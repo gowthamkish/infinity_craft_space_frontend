@@ -12,6 +12,7 @@ import {
 import { buildCloudinaryUrl } from "../components/OptimizedImage";
 import { PLACEHOLDER_SRC, onImgError } from "../utils/imageFallback";
 import { optimisticAddToCart } from "../features/cartSlice";
+import InstagramFeed from "../components/home/InstagramFeed";
 import { useNewsletterSignup } from "../hooks/useNewsletterSignup";
 import {
   FiShoppingCart,
@@ -682,6 +683,9 @@ export default function Home() {
               </Reveal>
             </div>
           </section>
+
+          {/* ══ INSTAGRAM — curated feed with "shop the look" tags (renders nothing until posts are added) */}
+          <InstagramFeed />
 
           {/* ══ CTA ════════════════════════════════════════════════════════ */}
           <section className="hm-section">

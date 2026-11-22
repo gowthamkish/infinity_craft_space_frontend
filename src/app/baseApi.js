@@ -53,6 +53,7 @@ export const baseApi = createApi({
     "Qna",
     "Recommendation",
     "Blog",
+    "Instagram",
   ],
   // Keep unused data 5 min so navigating back is instant.
   keepUnusedDataFor: 300,
