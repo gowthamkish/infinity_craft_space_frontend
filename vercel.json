@@ -1,0 +1,24 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "www.infinitycraftspace.com" }],
+      "destination": "https://infinitycraftspace.com/$1",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(GPTBot|ChatGPT-User|OAI-SearchBot|PerplexityBot|Perplexity-User|ClaudeBot|Claude-SearchBot|Claude-User|facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|Slackbot|TelegramBot|Discordbot|Pinterestbot|Applebot).*" }],
+      "destination": "https://infinity-craft-space-backend.onrender.com/prerender/home"
+    },
+    {
+      "source": "/product/:slug",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(GPTBot|ChatGPT-User|OAI-SearchBot|PerplexityBot|Perplexity-User|ClaudeBot|Claude-SearchBot|Claude-User|facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|Slackbot|TelegramBot|Discordbot|Pinterestbot|Applebot).*" }],
+      "destination": "https://infinity-craft-space-backend.onrender.com/prerender/product/:slug"
+    },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

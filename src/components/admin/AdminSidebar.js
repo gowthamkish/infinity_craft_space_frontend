@@ -30,6 +30,7 @@ import {
   FiUploadCloud,
   FiBookOpen,
   FiInstagram,
+  FiSearch,
 } from "react-icons/fi";
 
 const PRIMARY = "#d24e33";
@@ -61,6 +62,7 @@ const NAV_ITEMS = [
       { label: "Moderation",    icon: FiShield,      to: "/admin/moderation"   },
       { label: "Blog",          icon: FiBookOpen,    to: "/admin/blog"         },
       { label: "Instagram",     icon: FiInstagram,   to: "/admin/instagram"    },
+      { label: "SEO Health",    icon: FiSearch,      to: "/admin/seo"          },
     ],
   },
 ];

@@ -84,6 +84,7 @@ const BlogPost = lazy(() => import("./pages/BlogPost"));
 const BlogManager = lazy(() => import("./components/admin/BlogManager"));
 const BlogEditor = lazy(() => import("./components/admin/BlogEditor"));
 const InstagramManager = lazy(() => import("./components/admin/InstagramManager"));
+const SeoHealth = lazy(() => import("./components/admin/SeoHealth"));
 const TermsAndConditions = lazy(() => import("./pages/TermsAndConditions"));
 const TrackOrder = lazy(() => import("./pages/TrackOrder"));
 
@@ -762,6 +763,18 @@ function App() {
                         <Suspense fallback={<LoadingFallback message="Loading editor..." />}>
                           <AdminRoute>
                             <BlogEditor />
+                          </AdminRoute>
+                        </Suspense>
+                      </RouteErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/admin/seo"
+                    element={
+                      <RouteErrorBoundary>
+                        <Suspense fallback={<LoadingFallback message="Loading SEO health..." />}>
+                          <AdminRoute>
+                            <SeoHealth />
                           </AdminRoute>
                         </Suspense>
                       </RouteErrorBoundary>

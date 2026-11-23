@@ -449,8 +449,9 @@ const ProductDetail = () => {
   return (
     <>
       <SEOHead
-        title={`${product.name} - Infinity Craft Space`}
+        title={product.seoTitle?.trim() || `${product.name} - Infinity Craft Space`}
         description={product.seoDescription || product.description}
+        {...(product.seoKeywords?.length > 0 ? { keywords: product.seoKeywords.join(", ") } : {})}
         type="product"
         price={displayPrice}
         availability={isOutOfStock ? "https://schema.org/OutOfStock" : "https://schema.org/InStock"}
