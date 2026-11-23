@@ -3,12 +3,12 @@
 > Infinity Craft Space is an Indian online store for handcrafted gifts and craft products: custom resin art, personalised gifts, jewellery, artificial flower hair accessories (jadabilla, Jasmine and Mullai strings), embroidery hoops, crochet keychains and craft supplies. Products ship across India.
 
 ## Key pages
-- [Home](https://www.infinitycraftspace.com/): featured and popular products
-- [All products](https://www.infinitycraftspace.com/products): full catalogue; filter with ?category=NAME, search with ?q=TERM
-- [Contact us](https://www.infinitycraftspace.com/contact-us)
-- [Return policy](https://www.infinitycraftspace.com/return-policy)
-- [Terms and conditions](https://www.infinitycraftspace.com/terms-and-conditions)
-- [Privacy policy](https://www.infinitycraftspace.com/privacy-policy)
+- [Home](https://infinitycraftspace.com/): featured and popular products
+- [All products](https://infinitycraftspace.com/products): full catalogue; filter with ?category=NAME, search with ?q=TERM
+- [Contact us](https://infinitycraftspace.com/contact-us)
+- [Return policy](https://infinitycraftspace.com/return-policy)
+- [Terms and conditions](https://infinitycraftspace.com/terms-and-conditions)
+- [Privacy policy](https://infinitycraftspace.com/privacy-policy)
 
 ## Catalogue notes
 - Every product page lives at /product/{slug} and includes price in INR, availability, description and structured data (schema.org Product).
@@ -16,4 +16,4 @@
 - Some products are made to order and can be personalised; processing time is shown on the product page.
 
 ## Machine-readable
-- [Sitemap](https://www.infinitycraftspace.com/sitemap.xml): every active product URL with last-modified dates
+- [Sitemap](https://infinitycraftspace.com/sitemap.xml): every active product URL with last-modified dates

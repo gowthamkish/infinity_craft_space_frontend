@@ -25,6 +25,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import CircularProgress from "@mui/material/CircularProgress";
 import Chip from "@mui/material/Chip";
+import Popover from "@mui/material/Popover";
 import { DotsLoader } from "../Loader";
 import {
   FiArrowLeft, FiPackage, FiSave, FiCamera, FiX, FiHome,
@@ -159,6 +160,13 @@ function FmtBtn({ children, onClick, title }) {
 /* ══════════════════════════════════════════════════════════════════
    PRODUCT COLORS SECTION
    ══════════════════════════════════════════════════════════════════ */
+const COLOR_PRESETS = [
+  "#000000","#ffffff","#808080","#c0c0c0","#8b4513","#d2b48c","#f5f5dc","#ffd700",
+  "#b8860b","#cd7f32","#ff0000","#d24e33","#ff7f50","#ffa500","#ffff00","#9acd32",
+  "#008000","#006400","#40e0d0","#008080","#00bfff","#0000ff","#000080","#4b0082",
+  "#800080","#ff00ff","#ff69b4","#ffc0cb","#dc143c","#800000","#e6e6fa","#98ff98",
+];
+
 function ProductColorsSection({ colors, setColors, showColorPicker, setShowColorPicker, stockErrors, setStockErrors }) {
   const [collapsed,     setCollapsed]     = useState(false);
   const [draftHex,      setDraftHex]      = useState("#d24e33");
@@ -171,7 +179,7 @@ function ProductColorsSection({ colors, setColors, showColorPicker, setShowColor
   const [editVal,       setEditVal]       = useState("");
   const [confirmDel,    setConfirmDel]    = useState(null);
   const [previewSel,    setPreviewSel]    = useState(null);
-  const nativePickerRef = useRef(null);
+  const [paletteAnchor, setPaletteAnchor] = useState(null);
 
   const MAX_COLORS = 12;
   const atMax = colors.length >= MAX_COLORS;
@@ -342,7 +350,7 @@ function ProductColorsSection({ colors, setColors, showColorPicker, setShowColor
               <Box sx={{ flexShrink: 0 }}>
                 <Tooltip title="Click to pick color" arrow>
                   <Box
-                    onClick={() => nativePickerRef.current?.click()}
+                    onClick={(e) => setPaletteAnchor(e.currentTarget)}
                     sx={{
                       width: 40, height: 40, borderRadius: "8px",
                       bgcolor: draftHex, border: `2px solid ${BORDER}`,
@@ -353,13 +361,31 @@ function ProductColorsSection({ colors, setColors, showColorPicker, setShowColor
                     }}
                   />
                 </Tooltip>
-                <input
-                  ref={nativePickerRef}
-                  type="color"
-                  value={draftHex}
-                  onChange={handleNativePick}
-                  style={{ position: "absolute", opacity: 0, pointerEvents: "none", width: 0, height: 0 }}
-                />
+                <Popover
+                  open={Boolean(paletteAnchor)}
+                  anchorEl={paletteAnchor}
+                  onClose={() => setPaletteAnchor(null)}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                  slotProps={{ paper: { sx: { p: 1.5, borderRadius: "12px", mt: 0.5 } } }}
+                >
+                  <Box sx={{ display: "grid", gridTemplateColumns: "repeat(8, 28px)", gap: 0.75 }}>
+                    {COLOR_PRESETS.map((hex) => (
+                      <Box
+                        key={hex}
+                        title={hex}
+                        onClick={() => { handleNativePick({ target: { value: hex } }); setPaletteAnchor(null); }}
+                        sx={{
+                          width: 28, height: 28, borderRadius: "6px", bgcolor: hex, cursor: "pointer",
+                          border: hex.toLowerCase() === draftHex.toLowerCase() ? "2px solid #222" : "1px solid rgba(0,0,0,0.2)",
+                          "&:hover": { transform: "scale(1.12)" },
+                        }}
+                      />
+                    ))}
+                  </Box>
+                  <Typography sx={{ fontSize: "0.72rem", color: "text.secondary", mt: 1 }}>
+                    Need another shade? Type its hex code in the box next to the swatch.
+                  </Typography>
+                </Popover>
               </Box>
 
               {/* Hex text input */}
