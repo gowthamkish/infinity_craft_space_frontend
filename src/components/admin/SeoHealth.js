@@ -328,7 +328,7 @@ export default function SeoHealth() {
           <Paper variant="outlined" sx={{ p: 2.5, mb: 3 }}>
             <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Broken links &amp; photos</Typography>
             {report.linkIssues.length === 0 ? (
-              <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>{STATUS_ICON.pass}<Typography variant="body2">No broken product photos or links found ({report.imagesChecked} photos checked).</Typography></Box>
+              <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>{STATUS_ICON.pass}<Typography variant="body2">No broken product photos or links found ({report.imagesChecked} photos checked{report.imagesUnverified ? `, ${report.imagesUnverified} could not be reached this time` : ""}).</Typography></Box>
             ) : report.linkIssues.slice(0, 30).map((l, i) => (
               <Box key={i} sx={{ display: "flex", gap: 1.5, py: 1, borderTop: i ? "1px solid #f1f5f9" : "none" }}>
                 <Box sx={{ pt: 0.25 }}>{l.severity === "critical" ? STATUS_ICON.fail : STATUS_ICON.warn}</Box>
